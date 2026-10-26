@@ -1,0 +1,222 @@
+<!doctype html>
+<html lang="vi">
+  <head>
+    <meta charset="UTF-8" />
+    <title>EduClass v2 — Máy chủ Lớp học</title>
+    <style>
+      body {
+        margin: 0;
+        padding: 24px;
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        background-color: #fff9f0;
+        color: #1e293b;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        box-sizing: border-box;
+      }
+      .card {
+        background: #ffffff;
+        border-radius: 20px;
+        padding: 24px;
+        box-shadow: 0 8px 24px -4px rgba(79, 140, 255, 0.1);
+        width: 100%;
+        max-width: 440px;
+        text-align: center;
+        box-sizing: border-box;
+      }
+      h2 {
+        margin-top: 0;
+        color: #4f8cff;
+      }
+      .status-badge {
+        display: inline-block;
+        padding: 6px 14px;
+        background-color: #2ecc8f;
+        color: white;
+        border-radius: 9999px;
+        font-weight: 600;
+        font-size: 14px;
+        margin-bottom: 16px;
+      }
+      .qr-container {
+        background: #ffffff;
+        padding: 12px;
+        border-radius: 16px;
+        display: inline-block;
+        border: 2px solid #e2e8f0;
+        margin-bottom: 16px;
+      }
+      .qr-container img {
+        width: 200px;
+        height: 200px;
+        display: block;
+      }
+      .ip-box {
+        background: #f8fafc;
+        border: 1px dashed #cbd5e1;
+        padding: 12px;
+        border-radius: 12px;
+        font-size: 18px;
+        font-weight: 700;
+        color: #0f172a;
+        margin-bottom: 16px;
+        word-break: break-all;
+      }
+      .btn {
+        min-height: 48px;
+        padding: 12px 20px;
+        border-radius: 16px;
+        font-size: 15px;
+        font-weight: 600;
+        cursor: pointer;
+        border: none;
+        width: 100%;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        box-sizing: border-box;
+        transition: transform 0.1s ease;
+      }
+      .btn:active {
+        transform: scale(0.98);
+      }
+      .btn-primary {
+        background-color: #4f8cff;
+        color: white;
+      }
+      .btn-secondary {
+        background-color: #f1f5f9;
+        color: #475569;
+        margin-top: 10px;
+      }
+      .btn-secondary:hover {
+        background-color: #e2e8f0;
+      }
+      .tip {
+        font-size: 13px;
+        color: #64748b;
+        margin-top: 16px;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="card">
+      <div class="status-badge">● Máy chủ đang chạy</div>
+      <h2>EduClass v2 <span id="app-version" style="font-size: 13px; font-weight: 600; color: #475569; background: #f1f5f9; padding: 2px 8px; border-radius: 6px; border: 1px solid #e2e8f0; vertical-align: middle;">v2.0.85</span></h2>
+      <p style="margin-bottom: 16px; color: #475569">
+        Quét mã QR để điện thoại học sinh vào lớp cùng mạng WiFi:
+      </p>
+
+      <div class="qr-container">
+        <img id="qr-img" src="" alt="QR Code vào lớp" />
+      </div>
+
+      <div class="ip-box" id="ip-address">Đang tải địa chỉ IP...</div>
+
+      <button class="btn btn-primary" id="open-teacher-window-btn">
+        🖥 Mở Bàn Làm Việc Giáo Viên
+      </button>
+
+      <button class="btn btn-secondary" id="open-teacher-browser-btn">
+        🌐 Mở trong Trình duyệt web (Chrome/Edge)
+      </button>
+
+      <button class="btn btn-secondary" id="check-update-btn" style="font-size: 13px; min-height: 38px; margin-top: 8px;">
+        🔄 Kiểm tra cập nhật phần mềm
+      </button>
+      <div id="update-status" style="font-size: 12px; color: #64748b; margin-top: 6px; display: none;"></div>
+
+      <p class="tip">Phần mềm vẫn duy trì kết nối lớp học khi thu nhỏ xuống khay tác vụ (System Tray).</p>
+    </div>
+
+    <script>
+      let currentTeacherUrl = 'http://localhost:3000/teacher';
+
+      function applyServerInfo(info) {
+        if (!info) return;
+        if (info.version) {
+          const verEl = document.getElementById('app-version');
+          if (verEl) verEl.innerText = 'v' + info.version;
+        }
+        if (info.qrDataUrl) {
+          const qrImg = document.getElementById('qr-img');
+          if (qrImg) qrImg.src = info.qrDataUrl;
+        }
+        if (info.studentUrl) {
+          const ipBox = document.getElementById('ip-address');
+          if (ipBox) ipBox.innerText = info.studentUrl;
+        }
+        if (info.teacherUrl) {
+          currentTeacherUrl = info.teacherUrl;
+        }
+      }
+
+      // 1. Gán sự kiện ngay khi script nạp vào để người dùng bấm lúc nào cũng phản hồi
+      function setupListeners() {
+        const winBtn = document.getElementById('open-teacher-window-btn');
+        if (winBtn) {
+          winBtn.onclick = () => {
+            if (window.electronAPI) {
+              window.electronAPI.openTeacherWindow(currentTeacherUrl);
+            } else {
+              window.open(currentTeacherUrl, '_blank');
+            }
+          };
+        }
+
+        const browserBtn = document.getElementById('open-teacher-browser-btn');
+        if (browserBtn) {
+          browserBtn.onclick = () => {
+            if (window.electronAPI) {
+              window.electronAPI.openExternal(currentTeacherUrl);
+            } else {
+              window.open(currentTeacherUrl, '_blank');
+            }
+          };
+        }
+
+        const updateBtn = document.getElementById('check-update-btn');
+        const updateStatus = document.getElementById('update-status');
+        if (updateBtn && updateStatus) {
+          updateBtn.onclick = async () => {
+            if (!window.electronAPI || !window.electronAPI.checkForUpdate) return;
+            updateStatus.style.display = 'block';
+            updateStatus.innerText = 'Đang kiểm tra từ GitHub...';
+            try {
+              const res = await window.electronAPI.checkForUpdate();
+              if (res.hasUpdate) {
+                updateStatus.innerHTML = '<span style="color: #2563eb; font-weight: 700;">Đã có bản mới: v' + res.latestVersion + '</span>. Hãy mở Bàn làm việc để cập nhật.';
+              } else if (res.error) {
+                updateStatus.innerText = 'Không thể kiểm tra: ' + res.error;
+              } else {
+                updateStatus.innerText = 'Bạn đang dùng phiên bản mới nhất!';
+              }
+            } catch {
+              updateStatus.innerText = 'Lỗi kiểm tra cập nhật.';
+            }
+          };
+        }
+      }
+
+      window.addEventListener('DOMContentLoaded', async () => {
+        setupListeners();
+
+        if (window.electronAPI) {
+          // Lấy thông tin server chủ động qua IPC Invoke
+          try {
+            const info = await window.electronAPI.getServerInfo();
+            if (info) applyServerInfo(info);
+          } catch (err) {
+            console.error('Không thể lấy server info:', err);
+          }
+
+          // Lắng nghe sự kiện đẩy từ Main process nếu có
+          window.electronAPI.onServerInfo(info => {
+            applyServerInfo(info);
+          });
+        }
+      });
+    </script>
+  </body>
+</html>

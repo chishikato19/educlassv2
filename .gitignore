@@ -1,0 +1,15 @@
+node_modules
+dist
+out
+*.db
+*.db-journal
+.env
+.DS_Store
+coverage
+
+*.exe
+*.blockmap
+*.node
+data/temp/
+
+everything-everywhere-for-antigravity/

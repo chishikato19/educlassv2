@@ -1,0 +1,24 @@
+{
+  "name": "@educlass/question-kit",
+  "version": "0.1.0",
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "scripts": {
+    "test": "vitest run",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@educlass/core": "workspace:*",
+    "@educlass/protocol": "workspace:*",
+    "jszip": "^3.10.2",
+    "katex": "^0.19.0",
+    "mammoth": "^1.13.0",
+    "zod": "^3.24.2"
+  },
+  "devDependencies": {
+    "@types/jszip": "^3.4.1",
+    "@types/katex": "^0.16.8"
+  }
+}

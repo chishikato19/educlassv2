@@ -1,0 +1,28 @@
+{
+  "name": "@educlass/student-desktop",
+  "version": "2.2.17",
+  "description": "EduClass v2 - Ứng dụng Học Sinh Phòng Máy Tính (Wake-on-Session)",
+  "author": "EduClass Team",
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "main": "dist/main.cjs",
+  "scripts": {
+    "build": "node scripts/build.mjs",
+    "package:dir": "node scripts/build.mjs && electron-builder --dir",
+    "package:win": "node scripts/build.mjs && electron-builder --win",
+    "package:nsis": "node scripts/build.mjs && electron-builder --win nsis",
+    "package:portable": "node scripts/build.mjs && electron-builder --win portable",
+    "test": "vitest run",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@educlass/protocol": "workspace:*"
+  },
+  "devDependencies": {
+    "electron": "^34.2.0",
+    "electron-builder": "^26.15.3",
+    "esbuild": "^0.28.2"
+  }
+}

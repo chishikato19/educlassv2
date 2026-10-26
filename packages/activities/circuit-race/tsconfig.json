@@ -1,0 +1,16 @@
+{
+  "extends": "../../../tsconfig.base.json",
+  "compilerOptions": {
+    "composite": true,
+    "rootDir": "src",
+    "outDir": "dist",
+    "jsx": "react-jsx"
+  },
+  "references": [
+    { "path": "../../protocol" },
+    { "path": "../../core" },
+    { "path": "../../question-kit" },
+    { "path": "../../ui-kit" }
+  ],
+  "include": ["src/**/*"]
+}

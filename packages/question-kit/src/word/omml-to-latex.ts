@@ -1,0 +1,388 @@
+/**
+ * Bộ ánh xạ các ký tự toán học Unicode phổ biến sang lệnh LaTeX
+ */
+const SYMBOL_MAP: Record<string, string> = {
+  '±': '\\pm ',
+  '∓': '\\mp ',
+  '×': '\\times ',
+  '÷': '\\div ',
+  '≤': '\\le ',
+  '≥': '\\ge ',
+  '≠': '\\ne ',
+  '≈': '\\approx ',
+  '≡': '\\equiv ',
+  '∞': '\\infty ',
+  '∝': '\\propto ',
+  '√': '\\sqrt ',
+  '∫': '\\int ',
+  '∑': '\\sum ',
+  '∏': '\\prod ',
+  '∂': '\\partial ',
+  '∇': '\\nabla ',
+  '∈': '\\in ',
+  '∉': '\\notin ',
+  '⊂': '\\subset ',
+  '⊃': '\\supset ',
+  '⊆': '\\subseteq ',
+  '⊇': '\\supseteq ',
+  '∪': '\\cup ',
+  '∩': '\\cap ',
+  '∅': '\\emptyset ',
+  '∀': '\\forall ',
+  '∃': '\\exists ',
+  '¬': '\\neg ',
+  '→': '\\to ',
+  '⟶': '\\to ',
+  '←': '\\leftarrow ',
+  '↔': '\\leftrightarrow ',
+  '⇒': '\\Rightarrow ',
+  '⟹': '\\Rightarrow ',
+  '⇐': '\\Leftarrow ',
+  '⇔': '\\Leftrightarrow ',
+  '⟺': '\\Leftrightarrow ',
+  '·': '\\cdot ',
+  '•': '\\cdot ',
+  '°': '^\\circ ',
+  'α': '\\alpha ',
+  'β': '\\beta ',
+  'γ': '\\gamma ',
+  'δ': '\\delta ',
+  'ε': '\\epsilon ',
+  'ζ': '\\zeta ',
+  'η': '\\eta ',
+  'θ': '\\theta ',
+  'ι': '\\iota ',
+  'κ': '\\kappa ',
+  'λ': '\\lambda ',
+  'μ': '\\mu ',
+  'ν': '\\nu ',
+  'ξ': '\\xi ',
+  'π': '\\pi ',
+  'ρ': '\\rho ',
+  'σ': '\\sigma ',
+  'τ': '\\tau ',
+  'υ': '\\upsilon ',
+  'φ': '\\phi ',
+  'χ': '\\chi ',
+  'ψ': '\\psi ',
+  'ω': '\\omega ',
+  'Γ': '\\Gamma ',
+  'Δ': '\\Delta ',
+  'Θ': '\\Theta ',
+  'Λ': '\\Lambda ',
+  'Ξ': '\\Xi ',
+  'Π': '\\Pi ',
+  'Σ': '\\Sigma ',
+  'Υ': '\\Upsilon ',
+  'Φ': '\\Phi ',
+  'Ψ': '\\Psi ',
+  'Ω': '\\Omega ',
+};
+
+interface SimpleNode {
+  tag: string;
+  attrs: Record<string, string>;
+  children: SimpleNode[];
+  text?: string | undefined;
+}
+
+/**
+ * Phân tích cú pháp XML đơn giản, xử lý tốt cả trong Node.js và Browser
+ */
+function parseSimpleXml(xml: string): SimpleNode {
+  // Loại bỏ comments và doctype
+  const cleanXml = xml
+    .replace(/<!--[\s\S]*?-->/g, '')
+    .replace(/<\?[\s\S]*?\?>/g, '')
+    .trim();
+
+  let pos = 0;
+
+  function parseNode(): SimpleNode | null {
+    while (pos < cleanXml.length && /\s/.test(cleanXml[pos]!)) {
+      pos++;
+    }
+    if (pos >= cleanXml.length || cleanXml[pos] !== '<') {
+      return null;
+    }
+
+    if (cleanXml[pos + 1] === '/') {
+      return null; // Closing tag
+    }
+
+    // Đọc thẻ mở
+    const tagEnd = cleanXml.indexOf('>', pos);
+    if (tagEnd === -1) return null;
+
+    const tagContent = cleanXml.slice(pos + 1, tagEnd).trim();
+    const isSelfClosing = tagContent.endsWith('/');
+    const cleanTagContent = isSelfClosing ? tagContent.slice(0, -1).trim() : tagContent;
+
+    const parts = cleanTagContent.split(/\s+/);
+    const tagName = parts[0]!.toLowerCase();
+    const attrs: Record<string, string> = {};
+
+    for (let i = 1; i < parts.length; i++) {
+      const match = parts[i]!.match(/^([^=]+)="([^"]*)"$/);
+      if (match && match[1] && match[2] !== undefined) {
+        attrs[match[1].toLowerCase()] = match[2];
+      }
+    }
+
+    pos = tagEnd + 1;
+
+    const node: SimpleNode = {
+      tag: tagName,
+      attrs,
+      children: [],
+    };
+
+    if (isSelfClosing) {
+      return node;
+    }
+
+    // Đọc nội dung con hoặc text
+    while (pos < cleanXml.length) {
+      if (cleanXml.startsWith('</', pos)) {
+        const closeEnd = cleanXml.indexOf('>', pos);
+        pos = closeEnd === -1 ? cleanXml.length : closeEnd + 1;
+        break;
+      }
+
+      if (cleanXml[pos] === '<') {
+        const child = parseNode();
+        if (child) {
+          node.children.push(child);
+        } else {
+          pos++;
+        }
+      } else {
+        const nextTag = cleanXml.indexOf('<', pos);
+        const textChunk = nextTag === -1 ? cleanXml.slice(pos) : cleanXml.slice(pos, nextTag);
+        pos = nextTag === -1 ? cleanXml.length : nextTag;
+        if (textChunk) {
+          node.text = (node.text ?? '') + textChunk;
+        }
+      }
+    }
+
+    return node;
+  }
+
+  const root = parseNode();
+  return root ?? { tag: 'root', attrs: {}, children: [] };
+}
+
+function findChildrenByTag(node: SimpleNode, tag: string): SimpleNode[] {
+  const normTag = tag.toLowerCase();
+  return node.children.filter((c) => c.tag === normTag || c.tag.endsWith(':' + normTag));
+}
+
+function findFirstChildByTag(node: SimpleNode, tag: string): SimpleNode | undefined {
+  const list = findChildrenByTag(node, tag);
+  return list[0];
+}
+
+/**
+ * Chuyển đổi một node OMML sang chuỗi LaTeX
+ */
+function nodeToLatex(node: SimpleNode): string {
+  const tag = node.tag.includes(':') ? node.tag.split(':')[1]! : node.tag;
+
+  switch (tag) {
+    case 'omath':
+    case 'omathpara':
+    case 'e':
+    case 'num':
+    case 'den':
+    case 'sub':
+    case 'sup': {
+      return node.children.map(nodeToLatex).join('');
+    }
+
+    case 'r': {
+      // Run: có thể chứa m:t hoặc m:rPr
+      let text = '';
+      for (const child of node.children) {
+        const cTag = child.tag.includes(':') ? child.tag.split(':')[1]! : child.tag;
+        if (cTag === 't') {
+          text += child.text ?? '';
+        } else {
+          text += nodeToLatex(child);
+        }
+      }
+      if (node.text) text += node.text;
+
+      // Ánh xạ ký tự toán học
+      let mapped = '';
+      for (const ch of text) {
+        if (SYMBOL_MAP[ch]) {
+          mapped += SYMBOL_MAP[ch];
+        } else {
+          mapped += ch;
+        }
+      }
+      return mapped;
+    }
+
+    case 't': {
+      const text = node.text ?? '';
+      let mapped = '';
+      for (const ch of text) {
+        mapped += SYMBOL_MAP[ch] ?? ch;
+      }
+      return mapped;
+    }
+
+    case 'f': {
+      // Phân số: \frac{num}{den}
+      const numNode = findFirstChildByTag(node, 'num');
+      const denNode = findFirstChildByTag(node, 'den');
+      const numStr = numNode ? nodeToLatex(numNode) : '';
+      const denStr = denNode ? nodeToLatex(denNode) : '';
+      return `\\frac{${numStr}}{${denStr}}`;
+    }
+
+    case 'ssup': {
+      // Lũy thừa: {e}^{sup}
+      const eNode = findFirstChildByTag(node, 'e');
+      const supNode = findFirstChildByTag(node, 'sup');
+      const eStr = eNode ? nodeToLatex(eNode) : '';
+      const supStr = supNode ? nodeToLatex(supNode) : '';
+      return `{${eStr}}^{${supStr}}`;
+    }
+
+    case 'ssub': {
+      // Chỉ số dưới: {e}_{sub}
+      const eNode = findFirstChildByTag(node, 'e');
+      const subNode = findFirstChildByTag(node, 'sub');
+      const eStr = eNode ? nodeToLatex(eNode) : '';
+      const subStr = subNode ? nodeToLatex(subNode) : '';
+      return `{${eStr}}_{${subStr}}`;
+    }
+
+    case 'ssubsup': {
+      // Cả trên và dưới: {e}_{sub}^{sup}
+      const eNode = findFirstChildByTag(node, 'e');
+      const subNode = findFirstChildByTag(node, 'sub');
+      const supNode = findFirstChildByTag(node, 'sup');
+      const eStr = eNode ? nodeToLatex(eNode) : '';
+      const subStr = subNode ? nodeToLatex(subNode) : '';
+      const supStr = supNode ? nodeToLatex(supNode) : '';
+      return `{${eStr}}_{${subStr}}^{${supStr}}`;
+    }
+
+    case 'rad': {
+      // Căn thức: \sqrt{e} hoặc \sqrt[deg]{e}
+      const radPr = findFirstChildByTag(node, 'radpr');
+      const degHide = radPr && findFirstChildByTag(radPr, 'deghide');
+      const degNode = findFirstChildByTag(node, 'deg');
+      const eNode = findFirstChildByTag(node, 'e');
+      const eStr = eNode ? nodeToLatex(eNode) : '';
+
+      const degStr = degNode ? nodeToLatex(degNode).trim() : '';
+      if (!degHide && degStr.length > 0) {
+        return `\\sqrt[${degStr}]{${eStr}}`;
+      }
+      return `\\sqrt{${eStr}}`;
+    }
+
+    case 'nary': {
+      // Toán tử n-ary: tích phân, tổng, tích
+      const naryPr = findFirstChildByTag(node, 'narypr');
+      const chrNode = naryPr && findFirstChildByTag(naryPr, 'chr');
+      const chrVal = chrNode?.attrs['m:val'] ?? chrNode?.attrs['val'] ?? '∫';
+
+      let op = '\\int';
+      if (chrVal === '∑') op = '\\sum';
+      else if (chrVal === '∏') op = '\\prod';
+
+      const subNode = findFirstChildByTag(node, 'sub');
+      const supNode = findFirstChildByTag(node, 'sup');
+      const eNode = findFirstChildByTag(node, 'e');
+
+      const subStr = subNode ? nodeToLatex(subNode) : '';
+      const supStr = supNode ? nodeToLatex(supNode) : '';
+      const eStr = eNode ? nodeToLatex(eNode) : '';
+
+      let result = op;
+      if (subStr) result += `_{${subStr}}`;
+      if (supStr) result += `^{${supStr}}`;
+      result += `{${eStr}}`;
+      return result;
+    }
+
+    case 'd': {
+      // Delimiters (dấu ngoặc)
+      const dPr = findFirstChildByTag(node, 'dpr');
+      const begChr = dPr && findFirstChildByTag(dPr, 'begchr');
+      const endChr = dPr && findFirstChildByTag(dPr, 'endchr');
+
+      const beg = begChr?.attrs['m:val'] ?? begChr?.attrs['val'] ?? '(';
+      const end = endChr?.attrs['m:val'] ?? endChr?.attrs['val'] ?? ')';
+
+      const eNode = findFirstChildByTag(node, 'e');
+      const eStr = eNode ? nodeToLatex(eNode) : node.children.map(nodeToLatex).join('');
+
+      let left = `\\left${beg}`;
+      let right = `\\right${end}`;
+
+      if (beg === '{') left = '\\left\\{';
+      if (end === '}') right = '\\right\\}';
+      if (beg === '') left = '\\left.';
+      if (end === '') right = '\\right.';
+
+      return `${left}${eStr}${right}`;
+    }
+
+    case 'bar': {
+      // Gạch đầu: \overline{e}
+      const eNode = findFirstChildByTag(node, 'e');
+      const eStr = eNode ? nodeToLatex(eNode) : '';
+      return `\\overline{${eStr}}`;
+    }
+
+    case 'limlow': {
+      // Giới hạn dưới: \lim_{sub}{e}
+      const eNode = findFirstChildByTag(node, 'e');
+      const subNode = findFirstChildByTag(node, 'lim');
+      const eStr = eNode ? nodeToLatex(eNode) : '';
+      const subStr = subNode ? nodeToLatex(subNode) : '';
+      return `\\lim_{${subStr}}{${eStr}}`;
+    }
+
+    default: {
+      return node.children.map(nodeToLatex).join('');
+    }
+  }
+}
+
+/**
+ * Chuyển đổi một đoạn XML OMML (thẻ <m:oMath> hoặc <m:oMathPara>) sang chuỗi LaTeX
+ */
+export function convertOmmlToLatex(ommlXml: string): string {
+  if (!ommlXml || !ommlXml.trim()) return '';
+  const root = parseSimpleXml(ommlXml);
+  return nodeToLatex(root);
+}
+
+/**
+ * Thay thế tất cả các phần tử <m:oMathPara> và <m:oMath> trong file document.xml bằng text node $latex$
+ */
+export function replaceOmmlInXml(documentXml: string): string {
+  // 1. Xử lý các khối hiển thị riêng m:oMathPara -> $$latex$$
+  let result = documentXml.replace(/<m:oMathPara[\s\S]*?<\/m:oMathPara>/gi, (match) => {
+    const latex = convertOmmlToLatex(match).trim();
+    if (!latex) return '';
+    return `<w:r><w:t>$$${latex}$$</w:t></w:r>`;
+  });
+
+  // 2. Xử lý các khối inline m:oMath -> $latex$
+  result = result.replace(/<m:oMath[\s\S]*?<\/m:oMath>/gi, (match) => {
+    const latex = convertOmmlToLatex(match).trim();
+    if (!latex) return '';
+    return `<w:r><w:t>$${latex}$</w:t></w:r>`;
+  });
+
+  return result;
+}

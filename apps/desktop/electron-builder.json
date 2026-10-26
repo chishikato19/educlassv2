@@ -1,0 +1,53 @@
+{
+  "$schema": "https://json.schemastore.org/electron-builder",
+  "appId": "com.educlass.desktop",
+  "productName": "EduClass v2",
+  "publish": {
+    "provider": "github",
+    "owner": "chishikato19",
+    "repo": "educlassv2",
+    "releaseType": "release"
+  },
+  "directories": {
+    "output": "dist/installer"
+  },
+  "compression": "maximum",
+  "electronLanguages": ["vi", "en-US"],
+  "afterPack": "scripts/after-pack.cjs",
+  "files": [
+    "dist/**/*",
+    "src/window.html",
+    "!dist/installer",
+    "!dist/**/*.map",
+    "!**/*.map",
+    "!**/node_modules/@educlass/server/public/**"
+  ],
+  "asarUnpack": [
+    "**/*.node",
+    "**/better-sqlite3/**"
+  ],
+  "extraResources": [
+    {
+      "from": "../../packages/server/public",
+      "to": "public"
+    }
+  ],
+  "forceCodeSigning": false,
+  "win": {
+    "target": [
+      "nsis",
+      "portable"
+    ],
+    "signAndEditExecutable": false
+  },
+  "portable": {
+    "artifactName": "EduClass v2 Portable ${version}.${ext}"
+  },
+  "nsis": {
+    "artifactName": "EduClass v2 Setup ${version}.${ext}",
+    "oneClick": false,
+    "perMachine": true,
+    "allowToChangeInstallationDirectory": true,
+    "include": "build/installer.nsh"
+  }
+}

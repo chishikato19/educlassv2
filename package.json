@@ -1,0 +1,33 @@
+{
+  "name": "educlassv2-monorepo",
+  "version": "2.2.17",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "lint": "eslint .",
+    "typecheck": "tsc -b",
+    "test": "pnpm -r --workspace-concurrency=1 test",
+    "deps:check": "node ./node_modules/dependency-cruiser/bin/dependency-cruise.mjs --config .dependency-cruiser.cjs apps/*/src packages/*/src packages/activities/*/src",
+    "format:check": "prettier --check .",
+    "format": "prettier --write .",
+    "desktop:build": "pnpm --filter @educlass/desktop build",
+    "desktop:package": "pnpm --filter @educlass/desktop package:win",
+    "desktop:portable": "pnpm --filter @educlass/desktop package:portable",
+    "student:build": "pnpm --filter @educlass/student-desktop build",
+    "student:package": "pnpm --filter @educlass/student-desktop package:win",
+    "student:nsis": "pnpm --filter @educlass/student-desktop package:nsis",
+    "student:portable": "pnpm --filter @educlass/student-desktop package:portable"
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.20.0",
+    "dependency-cruiser": "^16.10.0",
+    "eslint": "^9.20.0",
+    "eslint-config-prettier": "^10.0.1",
+    "pdfjs-dist": "4.10.38",
+    "prettier": "^3.5.0",
+    "typescript": "^5.7.3",
+    "typescript-eslint": "^8.24.0",
+    "vitest": "^3.0.5"
+  },
+  "packageManager": "pnpm@12.9.1"
+}

@@ -1,0 +1,156 @@
+<!doctype html>
+<html lang="vi">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>EduClass v2 - UI Kit Demo</title>
+    <style>
+      :root {
+        --color-primary: #4f8cff;
+        --color-bg: #fff9f0;
+        --color-surface: #ffffff;
+        --color-secondary: #ffb020;
+        --color-success: #2ecc8f;
+        --color-error: #ff6b6b;
+        --font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      }
+      body {
+        background-color: var(--color-bg);
+        font-family: var(--font-family);
+        margin: 0;
+        padding: 24px;
+        color: #1e293b;
+      }
+      .container {
+        max-width: 800px;
+        margin: 0 auto;
+      }
+      .banner {
+        background-color: var(--color-secondary);
+        color: white;
+        padding: 12px 16px;
+        border-radius: 12px;
+        font-weight: 600;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 24px;
+      }
+      .card {
+        background: white;
+        border-radius: 20px;
+        padding: 24px;
+        box-shadow: 0 8px 24px -4px rgba(79, 140, 255, 0.08);
+        margin-bottom: 24px;
+      }
+      .btn {
+        min-height: 48px;
+        min-width: 48px;
+        padding: 12px 24px;
+        border-radius: 16px;
+        font-size: 18px;
+        font-weight: 600;
+        border: none;
+        cursor: pointer;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 10px;
+        color: white;
+        text-decoration: none;
+      }
+      .btn-primary {
+        background-color: var(--color-primary);
+      }
+      .btn-secondary {
+        background-color: var(--color-secondary);
+      }
+      .btn-success {
+        background-color: var(--color-success);
+      }
+      .btn-danger {
+        background-color: var(--color-error);
+      }
+      .kahoot-grid {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 12px;
+        margin-top: 16px;
+      }
+      .btn-kahoot-red {
+        background-color: #ff6b6b;
+      }
+      .btn-kahoot-blue {
+        background-color: #4f8cff;
+      }
+      .btn-kahoot-yellow {
+        background-color: #ffb020;
+      }
+      .btn-kahoot-green {
+        background-color: #2ecc8f;
+      }
+      .input-group {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+        margin-bottom: 16px;
+      }
+      .input-field {
+        min-height: 48px;
+        font-size: 18px;
+        padding: 10px 16px;
+        border-radius: 16px;
+        border: 2px solid #e2e8f0;
+        outline: none;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <div class="banner">
+        <span>⚡ Đang kết nối lại… Dữ liệu làm bài vẫn được lưu trên máy chủ.</span>
+        <button
+          class="btn btn-secondary"
+          style="min-height: 36px; padding: 6px 14px; font-size: 14px"
+          onclick="alert('Đang thử kết nối lại!')"
+        >
+          Thử lại
+        </button>
+      </div>
+
+      <h1>EduClass v2 — UI Kit Demo</h1>
+      <p style="font-size: 18px; color: #64748b">
+        Thiết kế tươi sáng, bo góc thân thiện, vùng chạm ≥ 48px và hỗ trợ người mù màu.
+      </p>
+
+      <div class="card">
+        <h2>1. Nút bấm & 4 Màu Kahoot (▲◆●■)</h2>
+        <div style="display: flex; gap: 12px; flex-wrap: wrap">
+          <button class="btn btn-primary">Nút Chính</button>
+          <button class="btn btn-secondary">Nút Phụ</button>
+          <button class="btn btn-success">Đúng (+10 EXP)</button>
+          <button class="btn btn-danger">Báo sai</button>
+        </div>
+
+        <div class="kahoot-grid">
+          <button class="btn btn-kahoot-red"><span>▲</span> Đáp án A</button>
+          <button class="btn btn-kahoot-blue"><span>◆</span> Đáp án B</button>
+          <button class="btn btn-kahoot-yellow"><span>●</span> Đáp án C</button>
+          <button class="btn btn-kahoot-green"><span>■</span> Đáp án D</button>
+        </div>
+      </div>
+
+      <div class="card">
+        <h2>2. Ô nhập liệu (Input)</h2>
+        <div class="input-group">
+          <label style="font-weight: 600">Mã vào lớp (6 ký tự)</label>
+          <input class="input-field" placeholder="Ví dụ: K6X9Z2" maxlength="6" />
+          <span style="color: #64748b; font-size: 14px"
+            >Nhập mã hiển thị trên màn chiếu của giáo viên</span
+          >
+        </div>
+        <button class="btn btn-primary" onclick="alert('Vào lớp thành công!')">Vào lớp học</button>
+      </div>
+    </div>
+  </body>
+</html>

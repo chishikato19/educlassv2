@@ -1,0 +1,34 @@
+{
+  "$schema": "https://json.schemastore.org/electron-builder",
+  "appId": "com.educlass.student",
+  "productName": "EduClass Học Sinh",
+  "directories": {
+    "output": "dist/installer"
+  },
+  "compression": "normal",
+  "electronLanguages": ["vi", "en-US"],
+  "files": [
+    "dist/**/*",
+    "src/window.html",
+    "!dist/installer"
+  ],
+  "forceCodeSigning": false,
+  "win": {
+    "target": [
+      "nsis",
+      "portable"
+    ],
+    "signAndEditExecutable": false
+  },
+  "portable": {
+    "artifactName": "EduClass Học Sinh Portable ${version}.${ext}"
+  },
+  "nsis": {
+    "artifactName": "EduClass Học Sinh Setup ${version}.${ext}",
+    "oneClick": false,
+    "perMachine": true,
+    "allowToChangeInstallationDirectory": true,
+    "shortcutName": "EduClass Học Sinh",
+    "include": "build/installer.nsh"
+  }
+}

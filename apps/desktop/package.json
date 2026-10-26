@@ -1,0 +1,34 @@
+{
+  "name": "@educlass/desktop",
+  "version": "2.2.17",
+  "description": "EduClass v2 - Phần mềm Máy chủ Lớp học Thông minh",
+  "author": "EduClass Team",
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "main": "dist/main.cjs",
+  "scripts": {
+    "build": "pnpm --filter @educlass/teacher-ui build && node scripts/build.mjs",
+    "package:dir": "pnpm --filter @educlass/teacher-ui build && node scripts/build.mjs && electron-builder --dir",
+    "package:win": "pnpm --filter @educlass/teacher-ui build && node scripts/build.mjs && electron-builder --win",
+    "package:nsis": "pnpm --filter @educlass/teacher-ui build && node scripts/build.mjs && electron-builder --win nsis",
+    "package:portable": "pnpm --filter @educlass/teacher-ui build && node scripts/build.mjs && electron-builder --win portable",
+    "test": "vitest run",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@educlass/protocol": "workspace:*",
+    "@educlass/server": "workspace:*",
+    "better-sqlite3": "^11.8.1",
+    "electron-updater": "^6.8.11",
+    "fastify": "^5.2.1",
+    "qrcode": "^1.5.4"
+  },
+  "devDependencies": {
+    "@types/qrcode": "^1.5.5",
+    "electron": "^34.2.0",
+    "electron-builder": "^26.15.3",
+    "esbuild": "^0.28.2"
+  }
+}

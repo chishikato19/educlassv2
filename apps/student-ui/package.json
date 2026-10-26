@@ -1,0 +1,36 @@
+{
+  "name": "@educlass/student-ui",
+  "version": "2.2.17",
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "scripts": {
+    "test": "vitest run",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@educlass/core": "workspace:*",
+    "@educlass/protocol": "workspace:*",
+    "@educlass/ui-kit": "workspace:*",
+    "@educlass/activity-quick-poll": "workspace:*",
+    "@educlass/activity-quiz-live": "workspace:*",
+    "@educlass/activity-exam": "workspace:*",
+    "@educlass/activity-swiss-duel": "workspace:*",
+    "@educlass/activity-pdf-presenter": "workspace:*",
+    "@educlass/activity-object-camera": "workspace:*",
+    "@educlass/activity-territory-war": "workspace:*",
+    "@educlass/activity-project-grading": "workspace:*",
+    "@educlass/activity-arcade-duel": "workspace:*",
+    "@educlass/activity-interactive-board": "workspace:*",
+    "@educlass/activity-circuit-race": "workspace:*",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1"
+  },
+  "devDependencies": {
+    "@testing-library/react": "^16.2.0",
+    "@types/react": "^18.3.18",
+    "@types/react-dom": "^18.3.5",
+    "jsdom": "^26.0.0"
+  }
+}

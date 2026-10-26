@@ -1,0 +1,26 @@
+{
+  "extends": "../../tsconfig.base.json",
+  "compilerOptions": {
+    "composite": true,
+    "rootDir": "src",
+    "outDir": "dist"
+  },
+  "references": [
+    { "path": "../../packages/protocol" },
+    { "path": "../../packages/core" },
+    { "path": "../../packages/question-kit" },
+    { "path": "../../packages/ui-kit" },
+    { "path": "../../packages/activities/quick-poll" },
+    { "path": "../../packages/activities/quiz-live" },
+    { "path": "../../packages/activities/exam" },
+    { "path": "../../packages/activities/swiss-duel" },
+    { "path": "../../packages/activities/assignment-hub" },
+    { "path": "../../packages/activities/pdf-presenter" },
+    { "path": "../../packages/activities/object-camera" },
+    { "path": "../../packages/activities/territory-war" },
+    { "path": "../../packages/activities/project-grading" },
+    { "path": "../../packages/activities/arcade-duel" },
+    { "path": "../../packages/activities/interactive-board" }
+  ],
+  "include": ["src/**/*"]
+}

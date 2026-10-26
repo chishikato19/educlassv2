@@ -1,0 +1,1920 @@
+<!doctype html>
+<html lang="vi">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    <title>EduClass v2 — Cổng Học Sinh</title>
+    <!-- KaTeX Offline cho công thức Toán học -->
+    <link rel="stylesheet" href="./vendor/katex/katex.min.css">
+    <script src="./vendor/katex/katex.min.js"></script>
+    <style>
+      :root {
+        --color-primary: #4f8cff;
+        --color-primary-dark: #3a75e6;
+        --color-bg: #fff9f0;
+        --color-surface: #ffffff;
+        --color-secondary: #ffb020;
+        --color-success: #2ecc8f;
+        --color-error: #ff6b6b;
+        --color-purple: #7c3aed;
+        --color-text: #1e293b;
+        --color-muted: #64748b;
+        --color-border: #e2e8f0;
+
+        /* 4 Màu phong cách Kahoot */
+        --kahoot-red: #e21b3c;
+        --kahoot-blue: #1368ce;
+        --kahoot-yellow: #d89e00;
+        --kahoot-green: #26890c;
+      }
+      * {
+        box-sizing: border-box;
+      }
+      body {
+        margin: 0;
+        padding: 16px;
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        background-color: var(--color-bg);
+        color: var(--color-text);
+        min-height: 100vh;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+      }
+      .card {
+        background: var(--color-surface);
+        border-radius: 24px;
+        padding: 24px;
+        border: 1px solid var(--color-border);
+        box-shadow: 0 10px 25px -5px rgba(79, 140, 255, 0.1);
+        width: 100%;
+        max-width: 420px;
+        text-align: center;
+      }
+      .logo-icon {
+        width: 64px;
+        height: 64px;
+        background: #eff6ff;
+        border-radius: 50%;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 32px;
+        margin-bottom: 12px;
+        border: 2px solid #bfdbfe;
+      }
+      h2 {
+        margin: 0 0 6px 0;
+        color: var(--color-primary);
+        font-size: 24px;
+        font-weight: 800;
+      }
+      .sub-title {
+        color: var(--color-muted);
+        font-size: 14px;
+        margin-bottom: 20px;
+      }
+      .form-group {
+        margin-bottom: 16px;
+        text-align: left;
+      }
+      .form-group label {
+        display: block;
+        font-size: 13px;
+        font-weight: 700;
+        margin-bottom: 6px;
+        color: var(--color-text);
+      }
+      .input-code {
+        width: 100%;
+        min-height: 54px;
+        border-radius: 16px;
+        border: 2px solid #cbd5e1;
+        font-size: 26px;
+        font-weight: 800;
+        text-align: center;
+        letter-spacing: 6px;
+        text-transform: uppercase;
+        color: var(--color-primary);
+        box-sizing: border-box;
+      }
+      .input-code:focus {
+        border-color: var(--color-primary);
+        outline: none;
+      }
+      .input-name {
+        width: 100%;
+        min-height: 48px;
+        border-radius: 14px;
+        border: 1px solid #cbd5e1;
+        font-size: 16px;
+        font-weight: 600;
+        padding: 0 14px;
+        box-sizing: border-box;
+      }
+      .btn {
+        width: 100%;
+        min-height: 52px;
+        border-radius: 16px;
+        font-size: 18px;
+        font-weight: 800;
+        border: none;
+        cursor: pointer;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        background-color: var(--color-primary);
+        color: white;
+        transition: transform 0.1s ease;
+      }
+      .btn:active {
+        transform: scale(0.98);
+      }
+
+      /* 4 nút đáp án Kahoot */
+      .kahoot-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 14px;
+        margin-top: 16px;
+        width: 100%;
+      }
+      .btn-kahoot {
+        min-height: 86px;
+        border-radius: 18px;
+        border: none;
+        color: white;
+        font-size: 16px;
+        font-weight: 800;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 6px;
+        cursor: pointer;
+        padding: 12px;
+        transition: transform 0.1s, opacity 0.2s, box-shadow 0.15s;
+        box-shadow: 0 4px 14px rgba(0,0,0,0.15);
+      }
+      .btn-kahoot:active {
+        transform: scale(0.96);
+      }
+      .btn-kahoot-red { background-color: var(--kahoot-red); }
+      .btn-kahoot-blue { background-color: var(--kahoot-blue); }
+      .btn-kahoot-yellow { background-color: var(--kahoot-yellow); }
+      .btn-kahoot-green { background-color: var(--kahoot-green); }
+      .btn-kahoot.selected {
+        outline: 4px solid #ffffff;
+        box-shadow: 0 0 0 6px var(--color-text);
+      }
+      .btn-kahoot.disabled {
+        opacity: 0.4;
+        cursor: not-allowed;
+      }
+
+      /* Giao diện Quiz Mở Rộng / Immersive Full-Screen cho học sinh */
+      #quiz-view.card {
+        position: relative;
+        overflow: hidden;
+        max-width: 1280px !important;
+        width: 96vw;
+        min-height: calc(100vh - 36px);
+        margin: 0 auto;
+        padding: clamp(16px, 2.5vw, 32px);
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        border-radius: 28px;
+        box-shadow: 0 16px 40px -10px rgba(79, 140, 255, 0.18);
+        border: 2px solid var(--color-border);
+        transition: all 0.2s ease-in-out;
+      }
+      @keyframes powerupGlow {
+        0%, 100% { box-shadow: 0 0 8px rgba(245, 158, 11, 0.4); transform: scale(1.02); }
+        50% { box-shadow: 0 0 16px rgba(245, 158, 11, 0.85); transform: scale(1.07); }
+      }
+      .powerup-slot-next {
+        animation: powerupGlow 1.8s infinite ease-in-out;
+      }
+      @media (max-width: 768px) {
+        #quiz-view.card {
+          width: 100%;
+          min-height: calc(100vh - 20px);
+          padding: 14px 12px;
+          border-radius: 20px;
+        }
+      }
+      .quiz-header-bar {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 16px;
+        padding-bottom: 14px;
+        border-bottom: 2px solid #f1f5f9;
+        margin-bottom: 16px;
+        flex-wrap: wrap;
+        width: 100%;
+      }
+      .quiz-progress-track {
+        flex: 1;
+        min-width: 120px;
+        height: 12px;
+        background: #e2e8f0;
+        border-radius: 999px;
+        overflow: hidden;
+        position: relative;
+      }
+      .quiz-progress-fill {
+        height: 100%;
+        background: linear-gradient(90deg, #4f8cff, #2ecc8f);
+        border-radius: 999px;
+        transition: width 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        width: 0%;
+      }
+      .quiz-stem-box {
+        background: linear-gradient(180deg, #ffffff, #f8fafc);
+        border: 2px solid #e2e8f0;
+        border-radius: 24px;
+        padding: clamp(18px, 3vw, 36px);
+        margin-bottom: 16px;
+        box-shadow: 0 4px 16px rgba(0, 0, 0, 0.04);
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        min-height: clamp(96px, 16vh, 190px);
+        width: 100%;
+      }
+      .quiz-stem-text {
+        font-size: clamp(20px, 3vw, 36px);
+        font-weight: 800;
+        line-height: 1.45;
+        color: #1e293b;
+        text-align: center;
+        width: 100%;
+        word-break: break-word;
+      }
+      .quiz-stem-image-wrap {
+        margin-top: 14px;
+        max-height: clamp(160px, 28vh, 320px);
+        display: flex;
+        justify-content: center;
+        width: 100%;
+      }
+      .quiz-stem-image-wrap img {
+        max-height: clamp(160px, 28vh, 320px);
+        max-width: 100%;
+        object-fit: contain;
+        border-radius: 16px;
+        border: 2px solid #cbd5e1;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+      }
+      /* Lưới đáp án mở rộng */
+      .quiz-options-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: clamp(12px, 2vw, 22px);
+        width: 100%;
+        margin-top: 8px;
+        margin-bottom: 12px;
+      }
+      @media (max-width: 640px) {
+        .quiz-options-grid {
+          grid-template-columns: 1fr 1fr;
+          gap: 10px;
+        }
+      }
+      .btn-kahoot-large {
+        min-height: clamp(96px, 15vh, 170px);
+        border-radius: 20px;
+        border: none;
+        color: white;
+        display: flex;
+        align-items: center;
+        justify-content: flex-start;
+        gap: clamp(10px, 1.8vw, 20px);
+        padding: clamp(14px, 2vw, 24px);
+        cursor: pointer;
+        transition: transform 0.12s ease, box-shadow 0.12s ease, opacity 0.2s ease;
+        box-shadow: 0 6px 18px rgba(0, 0, 0, 0.14);
+        position: relative;
+        text-align: left;
+        user-select: none;
+      }
+      .btn-kahoot-large:hover:not(.disabled) {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+      }
+      .btn-kahoot-large:active:not(.disabled) {
+        transform: translateY(2px) scale(0.98);
+      }
+      .btn-kahoot-shape {
+        font-size: clamp(26px, 3.2vw, 42px);
+        line-height: 1;
+        flex-shrink: 0;
+        opacity: 0.95;
+      }
+      .btn-kahoot-text {
+        font-size: clamp(17px, 2.2vw, 26px);
+        font-weight: 800;
+        line-height: 1.35;
+        flex: 1;
+        word-break: break-word;
+      }
+      .btn-kahoot-opt-image {
+        max-height: clamp(50px, 8vh, 90px);
+        max-width: clamp(60px, 10vw, 120px);
+        object-fit: contain;
+        border-radius: 10px;
+        background: #ffffff;
+        padding: 4px;
+        box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+      }
+      /* Màn hình Review đáp án Quizizz */
+      .quiz-review-container {
+        display: flex;
+        flex-direction: column;
+        gap: 16px;
+        width: 100%;
+        text-align: left;
+        animation: fadeInQuiz 0.2s ease-in;
+      }
+      @keyframes fadeInQuiz {
+        from { opacity: 0; transform: translateY(6px); }
+        to { opacity: 1; transform: translateY(0); }
+      }
+      .quiz-review-banner {
+        border-radius: 20px;
+        padding: clamp(14px, 2vw, 22px);
+        text-align: center;
+        border: 2px solid transparent;
+        box-shadow: 0 4px 16px rgba(0,0,0,0.06);
+      }
+      .quiz-review-banner.correct {
+        background: linear-gradient(135deg, #ecfdf5, #d1fae5);
+        border-color: #34d399;
+        color: #065f46;
+      }
+      .quiz-review-banner.incorrect {
+        background: linear-gradient(135deg, #fef2f2, #fee2e2);
+        border-color: #f87171;
+        color: #991b1b;
+      }
+      .quiz-review-card {
+        background: #ffffff;
+        border-radius: 18px;
+        border: 2px solid #e2e8f0;
+        padding: 16px 20px;
+        display: flex;
+        align-items: center;
+        gap: 14px;
+        transition: all 0.2s;
+      }
+      .quiz-review-card.is-correct {
+        border-color: #16a34a;
+        background: #f0fdf4;
+        box-shadow: 0 0 0 2px #22c55e, 0 4px 14px rgba(34, 197, 94, 0.25);
+      }
+      .quiz-review-card.is-selected-wrong {
+        border-color: #dc2626;
+        background: #fef2f2;
+        box-shadow: 0 0 0 2px #ef4444, 0 4px 14px rgba(239, 68, 68, 0.25);
+      }
+      .quiz-review-card.is-dimmed {
+        opacity: 0.45;
+        background: #f8fafc;
+      }
+      .btn-quiz-next-action {
+        width: 100%;
+        min-height: clamp(54px, 8vh, 68px);
+        font-size: clamp(18px, 2.2vw, 24px);
+        font-weight: 900;
+        border-radius: 18px;
+        background: linear-gradient(135deg, #2563eb, #1d4ed8);
+        color: #ffffff;
+        border: none;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 10px;
+        box-shadow: 0 8px 24px rgba(37, 99, 235, 0.35);
+        transition: transform 0.12s, box-shadow 0.12s;
+        margin-top: 10px;
+      }
+      .btn-quiz-next-action:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 10px 28px rgba(37, 99, 235, 0.45);
+      }
+      .btn-quiz-next-action:active {
+        transform: translateY(2px) scale(0.99);
+      }
+
+      .status-box {
+        margin-top: 16px;
+        padding: 12px;
+        border-radius: 14px;
+        background-color: #f8fafc;
+        border: 1px solid var(--color-border);
+        font-size: 13px;
+        color: var(--color-muted);
+      }
+      .exam-q-card {
+        background: #f8fafc;
+        border: 1px solid var(--color-border);
+        border-radius: 16px;
+        padding: 16px;
+        box-shadow: 0 1px 4px rgba(0,0,0,0.03);
+      }
+      .exam-q-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 10px;
+        font-size: 13px;
+        font-weight: 700;
+        color: var(--color-primary);
+      }
+      .exam-q-stem {
+        font-size: 15px;
+        font-weight: 600;
+        line-height: 1.5;
+        color: var(--color-text);
+        margin-bottom: 14px;
+      }
+      .exam-q-opt {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding: 10px 12px;
+        border: 1px solid var(--color-border);
+        border-radius: 12px;
+        background: #ffffff;
+        margin-bottom: 8px;
+        cursor: pointer;
+        transition: all 0.15s;
+        font-size: 14px;
+      }
+      .exam-q-opt:hover {
+        background: #f1f5f9;
+      }
+      .exam-q-opt.selected {
+        border-color: var(--color-primary);
+        background: #eff6ff;
+        font-weight: 700;
+        color: #1d4ed8;
+      }
+
+      /* Thẻ học sinh chọn theo danh sách lớp */
+      .roster-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(115px, 1fr));
+        gap: 8px;
+        max-height: 220px;
+        overflow-y: auto;
+        padding: 4px;
+        margin: 8px 0;
+        border: 1px solid var(--color-border);
+        border-radius: 14px;
+        background: #f8fafc;
+      }
+      .roster-card {
+        padding: 8px 6px;
+        border-radius: 12px;
+        border: 2px solid var(--color-border);
+        background: #ffffff;
+        font-size: 13px;
+        font-weight: 700;
+        text-align: center;
+        cursor: pointer;
+        transition: all 0.15s ease;
+        user-select: none;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        min-height: 52px;
+      }
+      .roster-card:hover {
+        border-color: #93c5fd;
+        background: #eff6ff;
+      }
+      .roster-card.selected {
+        border-color: var(--color-primary);
+        background: #eff6ff;
+        color: var(--color-primary);
+        box-shadow: 0 0 0 2px rgba(79, 140, 255, 0.35);
+      }
+      .roster-card.taken {
+        opacity: 0.45;
+        background: #f1f5f9;
+        cursor: not-allowed;
+        border-style: dashed;
+      }
+
+      /* Bảng số câu hỏi Kỳ thi (Exam Question Palette) */
+      .exam-nav-btn {
+        min-width: 38px;
+        height: 36px;
+        padding: 0 6px;
+        border-radius: 8px;
+        border: 1px solid #cbd5e1;
+        background: #f8fafc;
+        color: #334155;
+        font-size: 12px;
+        font-weight: 800;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        transition: all 0.15s ease;
+      }
+      .exam-nav-btn:hover {
+        transform: translateY(-1px);
+        border-color: #94a3b8;
+      }
+      .exam-nav-btn.answered {
+        background: #16a34a;
+        border-color: #15803d;
+        color: #ffffff;
+      }
+
+      @media (max-width: 768px) {
+        #exam-paper-layout {
+          flex-direction: column-reverse !important;
+        }
+        #exam-nav-palette {
+          width: 100% !important;
+          position: sticky !important;
+          top: 8px !important;
+          z-index: 40 !important;
+          margin-bottom: 16px;
+          background: rgba(255, 255, 255, 0.96) !important;
+          backdrop-filter: blur(8px);
+          box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1) !important;
+          padding: 10px 12px !important;
+        }
+        #exam-nav-grid {
+          grid-template-columns: repeat(auto-fill, minmax(38px, 1fr)) !important;
+          max-height: 96px !important;
+        }
+      }
+
+      /* Phong cách Cờ Vua Cổ Điển Hoàng Gia - Swiss Duel */
+      .chess-card {
+        background: #201610;
+        border: 2px solid #b8860b;
+        border-radius: 24px;
+        color: #fbf8ee;
+        box-shadow: 0 12px 36px rgba(0,0,0,0.45);
+      }
+      .chess-parchment {
+        background: #fbf8ee;
+        color: #201610;
+        border-radius: 18px;
+        border: 1px solid #d4af37;
+        padding: 16px;
+      }
+      .chess-opt-btn {
+        width: 100%;
+        min-height: 50px;
+        border-radius: 12px;
+        border: 2px solid #cbd5e1;
+        background: #ffffff;
+        color: #201610;
+        font-weight: 700;
+        font-size: 15px;
+        padding: 10px 14px;
+        text-align: left;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        transition: all 0.15s ease;
+        margin-bottom: 8px;
+      }
+      .chess-opt-btn:hover {
+        background: #fdf6e2;
+        border-color: #d4af37;
+      }
+      .chess-opt-btn.selected {
+        background: #2b1f16;
+        color: #d4af37;
+        border-color: #ffd700;
+        box-shadow: 0 0 0 2px #d4af37;
+      }
+      .chess-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        padding: 4px 12px;
+        border-radius: 999px;
+        font-size: 12px;
+        font-weight: 800;
+        border: 1px solid #d4af37;
+        background: rgba(212, 175, 55, 0.15);
+        color: #ffd700;
+      }
+
+      /* Mascot Avatar Button & Modal Styles */
+      .btn-avatar-tag {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        background: #ffffff;
+        border: 1.5px solid #bfdbfe;
+        color: #2563eb;
+        font-size: 13px;
+        font-weight: 800;
+        padding: 6px 16px;
+        border-radius: 99px;
+        cursor: pointer;
+        box-shadow: 0 2px 8px rgba(37, 99, 235, 0.12);
+        transition: all 0.15s ease;
+      }
+      .btn-avatar-tag:hover {
+        background: #eff6ff;
+        transform: translateY(-1px);
+        box-shadow: 0 4px 12px rgba(37, 99, 235, 0.2);
+      }
+      .btn-avatar-tag:active {
+        transform: scale(0.96);
+      }
+
+      .mascot-modal-dialog {
+        background: #fff9f0;
+        border-radius: 28px;
+        width: 100%;
+        max-width: 420px;
+        height: 720px;
+        max-height: 94vh;
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
+        box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.35);
+        border: 4px solid #ffffff;
+      }
+      @media (min-width: 768px) {
+        .mascot-modal-dialog {
+          max-width: 860px;
+          height: 540px;
+        }
+        .mascot-modal-body {
+          flex-direction: row !important;
+        }
+        .mascot-modal-stage {
+          flex: 0 0 32% !important;
+          border-right: 2px solid #f1e7d8;
+        }
+        .mascot-modal-items {
+          flex: 1 !important;
+        }
+        .mascot-grid {
+          grid-template-columns: repeat(4, 1fr) !important;
+        }
+      }
+      .mascot-modal-header {
+        padding: 12px 18px;
+        background: rgba(255, 255, 255, 0.95);
+        border-bottom: 2px solid #f1e7d8;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-shrink: 0;
+      }
+      .btn-modal-action {
+        background: #ffffff;
+        border: 1.5px solid #cbd5e1;
+        border-radius: 12px;
+        padding: 6px 14px;
+        font-size: 13px;
+        font-weight: 700;
+        cursor: pointer;
+        color: #1e293b;
+      }
+      .btn-modal-action.save {
+        background: #2ecc8f;
+        color: white;
+        border-color: #27ae60;
+        box-shadow: 0 3px 10px rgba(46, 204, 143, 0.3);
+      }
+      .mascot-modal-body {
+        display: flex;
+        flex-direction: column;
+        flex: 1;
+        overflow: hidden;
+      }
+      .mascot-modal-stage {
+        padding: 16px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        background: #fff9f0;
+        flex-shrink: 0;
+      }
+      .btn-randomize-mascot {
+        background: #ffffff;
+        border: 1.5px solid #fed7aa;
+        border-radius: 20px;
+        padding: 6px 14px;
+        font-size: 12px;
+        font-weight: 800;
+        color: #ea580c;
+        box-shadow: 0 3px 10px rgba(234, 88, 12, 0.12);
+        cursor: pointer;
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+      }
+      .mascot-modal-items {
+        flex: 1;
+        background: #ffffff;
+        display: flex;
+        flex-direction: column;
+        padding: 14px;
+        overflow: hidden;
+      }
+      .mascot-tabs-container {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        margin-bottom: 8px;
+        width: 100%;
+        position: relative;
+      }
+      .btn-tab-scroll {
+        width: 30px;
+        height: 30px;
+        min-width: 30px;
+        border-radius: 50%;
+        background: #ffffff;
+        border: 1.5px solid #cbd5e1;
+        color: #475569;
+        font-size: 12px;
+        font-weight: 800;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.08);
+        transition: all 0.15s ease;
+        padding: 0;
+        user-select: none;
+        flex-shrink: 0;
+      }
+      .btn-tab-scroll:hover {
+        background: #eff6ff;
+        border-color: #3b82f6;
+        color: #2563eb;
+        transform: scale(1.08);
+      }
+      .btn-tab-scroll:active {
+        transform: scale(0.92);
+      }
+      .mascot-tabs-bar {
+        display: flex;
+        gap: 6px;
+        overflow-x: auto;
+        padding: 2px 2px 6px 2px;
+        scrollbar-width: thin;
+        scrollbar-color: #cbd5e1 transparent;
+        flex: 1;
+        scroll-behavior: smooth;
+        -webkit-overflow-scrolling: touch;
+      }
+      .mascot-tabs-bar::-webkit-scrollbar {
+        height: 4px;
+      }
+      .mascot-tabs-bar::-webkit-scrollbar-track {
+        background: transparent;
+      }
+      .mascot-tabs-bar::-webkit-scrollbar-thumb {
+        background: #cbd5e1;
+        border-radius: 4px;
+      }
+      .btn-avatar-tab {
+        padding: 6px 12px;
+        background: #f1f5f9;
+        border: 1.5px solid transparent;
+        border-radius: 16px;
+        font-size: 12px;
+        font-weight: 700;
+        color: #64748b;
+        cursor: pointer;
+        white-space: nowrap;
+        flex-shrink: 0;
+        transition: all 0.15s ease;
+        user-select: none;
+      }
+      .btn-avatar-tab:hover {
+        background: #e2e8f0;
+        color: #334155;
+      }
+      .btn-avatar-tab.active {
+        background: #eff6ff;
+        color: #2563eb;
+        border-color: #2563eb;
+        box-shadow: 0 2px 6px rgba(37, 99, 235, 0.15);
+      }
+      .mascot-grid {
+        flex: 1;
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 8px;
+        overflow-y: auto;
+        padding: 4px;
+      }
+      .avatar-item-card {
+        background: #fafafa;
+        border: 2px solid #e2e8f0;
+        border-radius: 16px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        padding: 10px 4px;
+        cursor: pointer;
+        min-height: 72px;
+        transition: all 0.15s ease;
+      }
+      .avatar-item-card:hover {
+        background: #f8fafc;
+        border-color: #cbd5e1;
+      }
+      .avatar-item-card.active {
+        background: #f0fdf4;
+        border-color: #2ecc8f;
+        box-shadow: 0 3px 10px rgba(46, 204, 143, 0.2);
+      }
+      .item-icon { font-size: 24px; margin-bottom: 2px; }
+      .item-title { font-size: 11px; font-weight: 700; color: #334155; text-align: center; }
+
+      .hidden { display: none !important; }
+    </style>
+  </head>
+  <body>
+    <!-- 1. Màn hình Vào Lớp -->
+    <div id="join-view" class="card">
+      <!-- Mascot Avatar Thân Thiện & Nút Đổi Diện Mạo -->
+      <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; margin-bottom: 16px;">
+        <div id="join-mascot-container" style="cursor: pointer; transition: transform 0.2s;" onclick="openAvatarModal()" title="Bấm vào để đổi nhân vật & trang phục Mascot">
+          <!-- Mascot SVG nạp tự động qua initAvatar() -->
+        </div>
+        <button type="button" class="btn-avatar-tag" onclick="openAvatarModal()" style="margin-top: 10px;">
+          👗 Đổi diện mạo Mascot
+        </button>
+      </div>
+
+      <h2>EduClass v2</h2>
+      <div class="sub-title">Nhập mã vào lớp để tham gia cùng thầy cô</div>
+
+      <form id="join-form" action="javascript:void(0)" onsubmit="event.preventDefault(); if (window.handleJoin) { window.handleJoin(event); }">
+        <div class="form-group">
+          <label for="session-code">Mã vào lớp (6 ký tự)</label>
+          <input
+            type="text"
+            id="session-code"
+            class="input-code"
+            placeholder="ABCXYZ"
+            maxlength="6"
+            required
+            autocomplete="off"
+            autofocus
+            oninput="onSessionCodeInput(this.value)"
+          />
+        </div>
+
+        <!-- Khu vực chọn tên theo danh sách lớp (khi phiên có lớp) -->
+        <div id="roster-selection-group" class="hidden" style="margin-bottom: 16px; text-align: left;">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+            <label style="margin: 0; font-size: 13px; font-weight: 700; color: var(--color-text);">Chọn tên của bạn trong lớp:</label>
+            <span id="roster-class-badge" style="font-size: 11px; font-weight: 800; background: #e0f2fe; color: #0284c7; padding: 2px 8px; border-radius: 6px;">Lớp</span>
+          </div>
+          <input
+            type="text"
+            id="roster-search-input"
+            class="input-name"
+            placeholder="🔍 Gõ tìm tên nhanh..."
+            style="min-height: 40px; font-size: 14px; margin-bottom: 8px;"
+            oninput="filterRosterStudents(this.value)"
+          />
+          <div id="roster-student-list" class="roster-grid">
+            <!-- Danh sách các thẻ tên học sinh -->
+          </div>
+
+          <div id="roster-pin-group" class="hidden" style="margin-top: 10px; background: #fffbeb; border: 1px solid #fde68a; padding: 10px; border-radius: 12px;">
+            <label for="roster-pin-input" style="display: block; font-size: 12px; font-weight: 700; color: #92400e; margin-bottom: 4px;">Tài khoản này có mã PIN bảo vệ:</label>
+            <input
+              type="password"
+              id="roster-pin-input"
+              class="input-name"
+              placeholder="Nhập mã PIN"
+              maxlength="10"
+              style="text-align: center; letter-spacing: 4px; font-weight: 800;"
+            />
+          </div>
+
+          <div id="roster-guest-toggle" class="hidden" style="margin-top: 8px; text-align: right;">
+            <a href="javascript:void(0)" onclick="toggleGuestMode(true)" style="font-size: 12px; color: var(--color-primary); font-weight: 600; text-decoration: none;">
+              🏷️ Hoặc tham gia với tên tự do (khách)
+            </a>
+          </div>
+        </div>
+
+        <!-- Khu vực nhập tên tự do (khách / không có danh sách lớp) -->
+        <div id="guest-name-group" class="form-group">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+            <label for="student-name" style="margin: 0; font-size: 13px; font-weight: 700; color: var(--color-text);">Tên hoặc Biệt danh của bạn</label>
+            <a id="guest-roster-toggle" href="javascript:void(0)" onclick="toggleGuestMode(false)" class="hidden" style="font-size: 12px; color: var(--color-primary); font-weight: 600; text-decoration: none;">
+              📋 Chọn từ danh sách lớp
+            </a>
+          </div>
+          <input
+            type="text"
+            id="student-name"
+            class="input-name"
+            placeholder="Ví dụ: Nguyễn Minh An"
+          />
+        </div>
+
+        <div id="join-error" style="color: var(--color-error); font-size: 14px; margin-bottom: 12px; font-weight: 600;" class="hidden"></div>
+
+        <button type="submit" class="btn">🚀 Vào lớp ngay</button>
+      </form>
+    </div>
+
+    <!-- 2. Màn hình Phòng Chờ (Lobby) -->
+    <div id="lobby-view" class="card hidden">
+      <!-- Mascot Avatar Thân Thiện & Nút Đổi Diện Mạo -->
+      <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; margin-bottom: 14px;">
+        <div id="lobby-mascot-container" style="cursor: pointer; transition: transform 0.2s;" onclick="openAvatarModal()" title="Bấm vào để đổi nhân vật & trang phục Mascot">
+          <!-- Mascot SVG nạp tự động qua initAvatar() -->
+        </div>
+        <button type="button" class="btn-avatar-tag" onclick="openAvatarModal()" style="margin-top: 10px;">
+          👗 Đổi diện mạo Mascot
+        </button>
+      </div>
+
+      <h2 style="color: var(--color-success);">Đã vào lớp!</h2>
+      <div class="sub-title" id="lobby-welcome">Xin chào bạn!</div>
+
+      <div style="background: #eff6ff; padding: 18px; border-radius: 18px; margin: 16px 0; border: 1px solid #bfdbfe;">
+        <div style="font-size: 13px; color: var(--color-primary); font-weight: 800;">PHÒNG CHỜ TIẾT HỌC</div>
+        <div style="font-size: 15px; font-weight: 600; margin-top: 8px;">Thầy cô sắp bắt đầu trò chơi...</div>
+        <div style="font-size: 13px; color: var(--color-muted); margin-top: 4px;">Hãy quan sát màn hình máy chiếu!</div>
+      </div>
+
+      <!-- Khối Lựa Chọn Hoạt Động (Khi có từ 2 hoạt động chạy song song) -->
+      <div id="activity-chooser-box" class="hidden" style="margin: 16px 0; text-align: left;">
+        <div style="background: #ffffff; border: 2px solid #3b82f6; border-radius: 20px; padding: 18px; box-shadow: 0 10px 25px -5px rgba(59, 130, 246, 0.15);">
+          <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 6px;">
+            <span style="font-size: 22px;">🎯</span>
+            <div style="font-size: 16px; font-weight: 800; color: #1e3a8a;">CHỌN HOẠT ĐỘNG THAM GIA</div>
+          </div>
+          <p style="font-size: 13px; color: #475569; margin: 0 0 14px 0; line-height: 1.4;">
+            Thầy/Cô đang mở đồng thời các hoạt động dưới đây. Bạn muốn tham gia hoạt động nào trước?
+          </p>
+
+          <div style="display: flex; flex-direction: column; gap: 12px;">
+            <!-- Thẻ Lựa chọn 1: Kì thi trắc nghiệm -->
+            <div id="chooser-card-exam" class="hidden" style="background: linear-gradient(135deg, #eff6ff, #dbeafe); border: 2px solid #60a5fa; border-radius: 16px; padding: 14px 16px;">
+              <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+                <div style="font-size: 14px; font-weight: 800; color: #1e40af; display: flex; align-items: center; gap: 6px;">
+                  <span>📝</span> <span id="chooser-exam-title">Kỳ Thi Trắc Nghiệm</span>
+                </div>
+                <span id="chooser-exam-badge" style="font-size: 11px; background: #bfdbfe; color: #1e3a8a; font-weight: 700; padding: 2px 8px; border-radius: 99px;">Đang diễn ra</span>
+              </div>
+              <div id="chooser-exam-desc" style="font-size: 12px; color: #3b82f6; margin-bottom: 10px;">Làm bài thi trắc nghiệm trực tuyến</div>
+              <button type="button" class="btn" style="background: #2563eb; color: #ffffff; font-size: 14px; font-weight: 800; min-height: 46px; width: 100%; border-radius: 12px; cursor: pointer; border: none; box-shadow: 0 4px 12px rgba(37, 99, 235, 0.25);" onclick="chooseActivity('exam')">
+                ✍️ Vào Làm Bài Thi Trắc Nghiệm ➔
+              </button>
+            </div>
+
+            <!-- Thẻ Lựa chọn 2: Thu - phát bài tập thực hành -->
+            <div id="chooser-card-assignment" class="hidden" style="background: linear-gradient(135deg, #ecfdf5, #d1fae5); border: 2px solid #34d399; border-radius: 16px; padding: 14px 16px;">
+              <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+                <div style="font-size: 14px; font-weight: 800; color: #065f46; display: flex; align-items: center; gap: 6px;">
+                  <span>📁</span> <span id="chooser-assignment-title">Thu - Phát Bài Tập</span>
+                </div>
+                <span id="chooser-assignment-badge" style="font-size: 11px; background: #a7f3d0; color: #064e3b; font-weight: 700; padding: 2px 8px; border-radius: 99px;">Đang nhận bài</span>
+              </div>
+              <div id="chooser-assignment-desc" style="font-size: 12px; color: #059669; margin-bottom: 10px;">Tải tài liệu và nộp tệp bài làm thực hành (Word, Excel...)</div>
+              <button type="button" class="btn" style="background: #059669; color: #ffffff; font-size: 14px; font-weight: 800; min-height: 46px; width: 100%; border-radius: 12px; cursor: pointer; border: none; box-shadow: 0 4px 12px rgba(5, 150, 105, 0.25);" onclick="chooseActivity('assignment')">
+                📂 Vào Nộp Bài Thực Hành ➔
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Khối thông báo Thu - phát bài tập (Song song, khi ở lobby thường) -->
+      <div id="lobby-assignment-banner" class="hidden" style="background: linear-gradient(135deg, #ecfdf5, #d1fae5); border: 2px solid #34d399; border-radius: 18px; padding: 16px; margin: 16px 0; text-align: left; box-shadow: 0 4px 14px rgba(16, 185, 129, 0.15);">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+          <div style="font-size: 12px; font-weight: 800; color: #047857; text-transform: uppercase;">📁 CỔNG THU - PHÁT BÀI TẬP ĐANG MỞ</div>
+          <span style="font-size: 11px; background: #a7f3d0; color: #065f46; font-weight: 700; padding: 2px 8px; border-radius: 99px;">Đang nhận bài</span>
+        </div>
+        <div id="lobby-assignment-title" style="font-size: 16px; font-weight: 800; color: #064e3b; margin-bottom: 6px;">Thu - phát bài tập</div>
+        <div style="font-size: 13px; color: #065f46; margin-bottom: 14px;">Thầy/cô đang mở cổng nhận bài thực hành. Bạn có thể vào nộp bài bất kỳ lúc nào.</div>
+        <button type="button" class="btn" style="background: #059669; color: #ffffff; font-size: 14px; font-weight: 800; min-height: 46px; width: 100%; border-radius: 12px; display: flex; align-items: center; justify-content: center; gap: 8px; box-shadow: 0 4px 10px rgba(5, 150, 105, 0.3);" onclick="switchToAssignmentView()">
+          <span>📁</span>
+          <span>Vào Nộp Bài Thực Hành Ngay ➔</span>
+        </button>
+      </div>
+
+      <div class="status-box">
+        Trạng thái kết nối: <strong style="color: var(--color-success);">● Trực tuyến</strong>
+      </div>
+
+      <button type="button" class="btn" style="background: #f1f5f9; color: #475569; font-size: 14px; min-height: 42px; margin-top: 14px;" onclick="handleLeaveSession()">
+        🚪 Rời khỏi lớp
+      </button>
+    </div>
+
+    <!-- 3. Màn hình Chơi Trò Chơi Quiz Live (Phong cách Kahoot / Quizizz - Full màn hình) -->
+    <div id="quiz-view" class="card hidden">
+      <!-- Lớp phủ Đóng Băng khi bị đối thủ tấn công -->
+      <div id="quiz-freeze-overlay" class="hidden" style="position: absolute; inset: 0; background: rgba(14, 165, 233, 0.72); backdrop-filter: blur(5px); z-index: 60; border-radius: 28px; display: flex; flex-direction: column; align-items: center; justify-content: center; color: white; text-align: center; padding: 20px;">
+        <div style="font-size: 56px; margin-bottom: 8px;">❄️</div>
+        <div style="font-size: clamp(22px, 3.2vw, 34px); font-weight: 900; text-shadow: 0 2px 8px rgba(0,0,0,0.35);">BẠN ĐANG BỊ ĐÓNG BĂNG!</div>
+        <div id="quiz-freeze-timer" style="font-size: 16px; font-weight: 800; background: rgba(0,0,0,0.35); padding: 6px 18px; border-radius: 99px; margin-top: 10px; border: 1.5px solid rgba(255,255,255,0.4);">
+          Đang giải băng sau 5s...
+        </div>
+      </div>
+
+      <!-- Lớp phủ Bom Khói khi bị đối thủ tấn công -->
+      <div id="quiz-smoke-overlay" class="hidden" style="position: absolute; inset: 0; background: rgba(30, 41, 59, 0.88); backdrop-filter: blur(8px); z-index: 55; border-radius: 28px; display: flex; flex-direction: column; align-items: center; justify-content: center; color: white; text-align: center; padding: 20px;">
+        <div style="font-size: 56px; margin-bottom: 8px;">💨</div>
+        <div style="font-size: clamp(22px, 3.2vw, 34px); font-weight: 900; text-shadow: 0 2px 8px rgba(0,0,0,0.4);">BẠN TRÚNG PHẢI BOM KHÓI!</div>
+        <div id="quiz-smoke-timer" style="font-size: 16px; font-weight: 800; background: rgba(255,255,255,0.2); padding: 6px 18px; border-radius: 99px; margin-top: 10px; border: 1.5px solid rgba(255,255,255,0.3);">
+          Khói mù tan dần sau 7s...
+        </div>
+      </div>
+
+      <!-- Header thông tin câu, tiến trình và chuỗi streak -->
+      <div class="quiz-header-bar">
+        <div style="display: flex; align-items: center; gap: 8px;">
+          <span id="quiz-question-index" style="font-size: clamp(16px, 2vw, 22px); font-weight: 800; color: var(--color-primary); background: #eff6ff; border: 1.5px solid #bfdbfe; padding: 4px 14px; border-radius: 99px;">
+            Câu 1 / 10
+          </span>
+        </div>
+
+        <div class="quiz-progress-track" title="Tiến độ bài làm">
+          <div id="quiz-progress-fill" class="quiz-progress-fill"></div>
+        </div>
+
+        <div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
+          <div id="quiz-active-buffs" class="hidden" style="display: flex; align-items: center; gap: 6px;"></div>
+          <span id="quiz-streak-badge" style="font-size: clamp(15px, 1.8vw, 20px); font-weight: 800; color: #d97706; background: #fffbeb; border: 1.5px solid #fde68a; padding: 4px 14px; border-radius: 99px;">
+            🔥 Chuỗi: 0 | ⭐️ 0 đ
+          </span>
+        </div>
+      </div>
+
+      <!-- Thông báo chiến sự cá nhân (Nhận vật phẩm / Khiên chặn đòn / Phản đòn) -->
+      <div id="quiz-combat-notification" class="hidden" style="padding: 10px 16px; border-radius: 14px; font-size: 14px; font-weight: 800; text-align: center; margin-bottom: 12px; border: 1.5px solid transparent; box-shadow: 0 4px 12px rgba(0,0,0,0.12); transition: all 0.2s ease;"></div>
+
+      <!-- Khu vực Đề bài câu hỏi & Hình ảnh (phóng to, căn giữa rõ nét) -->
+      <div id="quiz-stem-container" class="quiz-stem-box">
+        <div id="quiz-stem" class="quiz-stem-text">
+          Đang tải câu hỏi...
+        </div>
+        <div id="quiz-stem-image-wrap" class="quiz-stem-image-wrap hidden">
+          <img id="quiz-stem-image" src="" alt="Hình ảnh câu hỏi" />
+        </div>
+      </div>
+
+      <!-- Trạng thái sau khi bấm trả lời (Toast / Banner) -->
+      <div id="quiz-feedback" class="hidden" style="padding: 14px 20px; border-radius: 16px; font-weight: 800; font-size: 16px; margin-bottom: 12px; text-align: center;"></div>
+
+      <!-- Khu vực Xem lại Đáp án Đúng (Dừng lại để xem sau mỗi câu ở chế độ Quizizz) -->
+      <div id="quiz-review-box" class="hidden quiz-review-container">
+        <!-- Render nội dung kết quả, đáp án đúng & nút Câu tiếp theo -->
+      </div>
+
+      <!-- 4 Nút màu phong cách Kahoot / Quizizz (Phóng to vừa màn hình) -->
+      <div id="quiz-options-container" class="quiz-options-grid">
+        <button class="btn-kahoot btn-kahoot-large btn-kahoot-red" onclick="handleSelectAnswer(0)">
+          <span class="btn-kahoot-shape">▲</span>
+          <span id="opt-text-0" class="btn-kahoot-text">A</span>
+        </button>
+        <button class="btn-kahoot btn-kahoot-large btn-kahoot-blue" onclick="handleSelectAnswer(1)">
+          <span class="btn-kahoot-shape">◆</span>
+          <span id="opt-text-1" class="btn-kahoot-text">B</span>
+        </button>
+        <button class="btn-kahoot btn-kahoot-large btn-kahoot-yellow" onclick="handleSelectAnswer(2)">
+          <span class="btn-kahoot-shape">●</span>
+          <span id="opt-text-2" class="btn-kahoot-text">C</span>
+        </button>
+        <button class="btn-kahoot btn-kahoot-large btn-kahoot-green" onclick="handleSelectAnswer(3)">
+          <span class="btn-kahoot-shape">■</span>
+          <span id="opt-text-3" class="btn-kahoot-text">D</span>
+        </button>
+      </div>
+
+      <!-- Khung Túi Đồ Vật Phẩm (Chế độ Quizizz) -->
+      <div id="quiz-inventory-bar" class="hidden" style="background: #0f172a; border: 2px solid #334155; border-radius: 20px; padding: 12px 16px; margin-top: 14px; display: flex; align-items: center; justify-content: space-between; gap: 12px; box-shadow: 0 8px 24px rgba(15, 23, 42, 0.25);">
+        <div style="display: flex; align-items: center; gap: 10px;">
+          <span style="font-size: 13px; font-weight: 900; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.5px; display: flex; align-items: center; gap: 6px;">
+            <span>🎒</span> Túi:
+          </span>
+          <div id="quiz-inventory-slots" style="display: flex; align-items: center; gap: 8px;">
+            <!-- Render động các slot túi đồ -->
+          </div>
+        </div>
+        <button id="btn-quiz-use-powerup" type="button" onclick="handleUsePowerUp()"
+          style="min-height: 48px; padding: 10px 20px; border-radius: 14px; font-size: 14px; font-weight: 900; background: linear-gradient(135deg, #f59e0b, #ea580c); color: #ffffff; border: none; cursor: pointer; box-shadow: 0 4px 14px rgba(245, 158, 11, 0.4); display: flex; align-items: center; gap: 6px; transition: all 0.15s ease;"
+          disabled>
+          <span>⚡</span>
+          <span>DÙNG</span>
+        </button>
+      </div>
+
+      <div class="status-box" id="quiz-footer-status" style="margin-top: 10px; font-weight: 600; font-size: 14px;">
+        Nhấn nút màu tương ứng với đáp án đúng!
+      </div>
+    </div>
+
+    <!-- 4. Màn hình Tổng Kết Hoàn Thành Quiz -->
+    <div id="quiz-finished-view" class="card hidden">
+      <div class="logo-icon" style="background: #fef3c7; border-color: #fde68a;">🏆</div>
+      <h2 style="color: var(--color-purple);">Hoàn thành Quiz!</h2>
+      <div class="sub-title">Bạn đã hoàn thành phần thi xuất sắc!</div>
+
+      <div style="background: #f8fafc; border: 1px solid var(--color-border); border-radius: 16px; padding: 18px; margin: 16px 0;">
+        <div style="font-size: 14px; color: var(--color-muted);">Điểm số của bạn:</div>
+        <div style="font-size: 32px; font-weight: 900; color: var(--color-primary); margin: 6px 0;" id="finish-score">1000</div>
+        <div style="font-size: 14px; font-weight: 700; color: var(--color-success);" id="finish-exp">+50 EXP đã được ghi nhận!</div>
+        <div id="finish-replay-stats" class="hidden" style="font-size: 13px; font-weight: 700; color: #2563eb; margin-top: 8px;"></div>
+      </div>
+
+      <div style="display: flex; flex-direction: column; gap: 10px;">
+        <button id="btn-quiz-replay" type="button" class="btn hidden" style="background: linear-gradient(135deg, #10b981, #059669); font-weight: 800; font-size: 16px; box-shadow: 0 4px 14px rgba(16, 185, 129, 0.3);" onclick="handleQuizReplay()">
+          🔄 Chơi lại lần nữa
+        </button>
+        <button type="button" class="btn btn-primary" onclick="backToLobby()">Quay lại phòng chờ</button>
+      </div>
+    </div>
+
+    <!-- 5. Màn hình Bình Chọn Nhanh (Quick Poll) -->
+    <div id="poll-view" class="card hidden" style="max-width: 480px;">
+      <div class="logo-icon" style="background: #eef2ff; border-color: #c7d2fe;">📊</div>
+      <h2 style="color: var(--color-primary);">Bình Chọn Nhanh</h2>
+      <div class="sub-title" id="poll-instruction">Chọn phương án biểu quyết của bạn</div>
+
+      <!-- Câu hỏi bình chọn -->
+      <div id="poll-question" style="font-size: 18px; font-weight: 800; min-height: 44px; margin: 12px 0 16px 0; color: var(--color-text);">
+        Đang tải câu hỏi...
+      </div>
+
+      <!-- Danh sách phương án -->
+      <div id="poll-options-container" style="display: flex; flex-direction: column; gap: 10px; margin-bottom: 16px;">
+      </div>
+
+      <!-- Nút xác nhận bình chọn khi chọn nhiều -->
+      <button id="poll-submit-btn" class="btn hidden" onclick="handleSubmitPollMultiple()">
+        Gửi bình chọn
+      </button>
+
+      <!-- Trạng thái sau khi bình chọn -->
+      <div id="poll-feedback" class="hidden" style="margin-top: 12px; padding: 12px; border-radius: 12px; font-weight: 700; background: #dcfce7; color: #15803d;">
+        ✓ Đã ghi nhận bình chọn của bạn!
+      </div>
+
+      <div class="status-box" id="poll-footer-status">
+        Quan sát kết quả biểu quyết trên màn chiếu lớp học!
+      </div>
+    </div>
+
+    <!-- 6. Màn hình Kỳ Thi (Exam) -->
+    <div id="exam-view" class="card hidden" style="max-width: 960px; width: 100%; text-align: left; padding: 20px;">
+      <!-- Header kỳ thi -->
+      <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--color-border); padding-bottom: 12px; margin-bottom: 16px; flex-wrap: wrap; gap: 8px;">
+        <div style="min-width: 0;">
+          <div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
+            <h2 id="exam-title" style="font-size: 20px; font-weight: 800; margin: 0; color: var(--color-text);">Kỳ Thi</h2>
+            <div id="exam-student-badge" style="display: inline-flex; align-items: center; gap: 5px; font-size: 13px; font-weight: 700; color: #1d4ed8; background: #eff6ff; border: 1px solid #bfdbfe; padding: 2px 10px; border-radius: 99px;">
+              <span>👤</span>
+              <span id="exam-student-name">Thí sinh</span>
+            </div>
+          </div>
+          <div id="exam-subtitle" style="font-size: 13px; color: var(--color-muted); margin-top: 3px;">Thời lượng: 45 phút</div>
+        </div>
+        <div style="display: flex; align-items: center; gap: 8px;">
+          <button id="exam-btn-change-activity" type="button" class="btn hidden" style="padding: 6px 12px; font-size: 12px; min-height: 36px; background: #f8fafc; color: #475569; border: 1px solid #cbd5e1; border-radius: 8px; font-weight: 700; cursor: pointer;" onclick="openActivityChooser()" title="Quay lại bảng chọn hoạt động">
+            🔄 Đổi hoạt động
+          </button>
+          <div id="exam-countdown" style="font-size: 16px; font-weight: 900; color: #dc2626; background: #fee2e2; padding: 6px 14px; border-radius: 10px;">
+            ⏳ --:--
+          </div>
+        </div>
+      </div>
+
+      <!-- Banner chuyển sang Thu - phát bài khi đang thi song song -->
+      <div id="exam-parallel-assignment-bar" class="hidden" style="background: #ecfdf5; border: 1.5px solid #34d399; border-radius: 14px; padding: 10px 14px; margin-bottom: 14px; display: flex; justify-content: space-between; align-items: center; text-align: left; box-shadow: 0 2px 8px rgba(16, 185, 129, 0.1);">
+        <div style="min-width: 0; padding-right: 8px;">
+          <div style="font-size: 12px; font-weight: 800; color: #065f46; display: flex; align-items: center; gap: 4px;">
+            <span>📁</span> Đang mở: <span id="exam-parallel-assignment-title" style="overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">Thu - phát bài tập</span>
+          </div>
+          <div style="font-size: 11px; color: #047857;">Thầy cô đang mở cổng nộp bài thực hành. Bạn có thể bấm để sang nộp bài (bài thi được lưu tự động).</div>
+        </div>
+        <div style="display: flex; gap: 6px; shrink: 0;">
+          <button type="button" class="btn" style="min-height: 36px; padding: 6px 12px; font-size: 12px; font-weight: 800; background: #059669; color: #ffffff; border-radius: 10px; border: none; cursor: pointer; white-space: nowrap;" onclick="switchToAssignmentView()">
+            📂 Sang nộp bài ➔
+          </button>
+        </div>
+      </div>
+
+      <!-- Màn hình nhập mật khẩu kỳ thi (nếu có) -->
+      <div id="exam-password-box" class="hidden" style="text-align: center; padding: 24px 0;">
+        <div style="font-size: 40px; margin-bottom: 8px;">🔒</div>
+        <h3 style="font-size: 16px; font-weight: 700; margin-bottom: 8px;">Kỳ thi có mật khẩu bảo vệ</h3>
+        <p style="font-size: 13px; color: var(--color-muted); margin-bottom: 16px;">Vui lòng nhập mật khẩu do thầy cô cung cấp để mở đề thi:</p>
+        <div style="max-width: 260px; margin: 0 auto;">
+          <input type="password" id="exam-input-password" class="input-name" placeholder="Mật khẩu đề thi" style="text-align: center; margin-bottom: 12px;" />
+          <div id="exam-password-error" class="hidden" style="color: var(--color-error); font-size: 13px; margin-bottom: 8px; font-weight: 600;"></div>
+          <button type="button" class="btn" onclick="handleUnlockExam()">🔓 Mở đề thi</button>
+        </div>
+      </div>
+
+      <!-- Màn hình chờ bắt đầu (khi status === 'ready') -->
+      <div id="exam-waiting-box" class="hidden" style="text-align: center; padding: 30px 10px;">
+        <div style="font-size: 44px; margin-bottom: 12px;">⏳</div>
+        <h3 style="font-size: 18px; font-weight: 700; color: var(--color-primary); margin-bottom: 6px;">Đề thi đã sẵn sàng!</h3>
+        <div style="margin-bottom: 10px; display: inline-flex; align-items: center; gap: 6px; font-size: 14px; font-weight: 700; color: #1e40af; background: #eff6ff; border: 1px solid #bfdbfe; padding: 3px 12px; border-radius: 99px;">
+          <span>👤 Thí sinh:</span> <span id="exam-waiting-student-name">--</span>
+        </div>
+        <p style="font-size: 14px; color: var(--color-muted);">Vui lòng chờ thầy cô bấm Mở đề & Tính giờ trên máy chủ...</p>
+      </div>
+
+      <!-- Danh sách câu hỏi đề thi: Bố cục 2 cột (Câu hỏi bên trái, Bảng câu hỏi bên phải) -->
+      <div id="exam-paper-box" class="hidden">
+        <div id="exam-paper-layout" style="display: flex; gap: 20px; align-items: flex-start;">
+          <!-- Cột trái: Đề bài & Các câu hỏi -->
+          <div style="flex: 1; min-width: 0;">
+            <div id="exam-questions-list" style="display: flex; flex-direction: column; gap: 16px; margin-bottom: 24px;"></div>
+
+            <div style="border-top: 1px solid var(--color-border); padding-top: 16px; text-align: center;">
+              <button type="button" id="btn-submit-exam" class="btn" style="background: #16a34a; font-size: 16px; font-weight: 800; padding: 14px 28px; width: 100%; max-width: 320px;" onclick="handleSubmitExam()">
+                📝 Nộp bài thi
+              </button>
+            </div>
+          </div>
+
+          <!-- Cột phải: Bảng câu hỏi chuyển sang bên phải -->
+          <div id="exam-nav-palette" style="width: 210px; flex-shrink: 0; position: sticky; top: 12px; background: #ffffff; border: 2px solid #e2e8f0; border-radius: 16px; padding: 14px; box-shadow: 0 4px 16px rgba(0,0,0,0.06);">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+              <span style="font-size: 13px; font-weight: 800; color: #1e293b;">📋 Bảng câu hỏi:</span>
+              <span id="exam-nav-summary" style="font-size: 11px; font-weight: 700; color: #16a34a; background: #dcfce7; padding: 2px 6px; border-radius: 6px;">
+                0/0 câu
+              </span>
+            </div>
+            <div id="exam-nav-grid" style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; max-height: calc(80vh - 120px); overflow-y: auto; padding: 2px;">
+              <!-- Các nút số câu [1✓] [2] ... -->
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Màn hình sau khi nộp bài -->
+      <div id="exam-submitted-box" class="hidden" style="text-align: center; padding: 24px 10px;">
+        <div style="font-size: 48px; margin-bottom: 8px;">🎉</div>
+        <h3 style="font-size: 20px; font-weight: 800; color: #16a34a; margin-bottom: 6px;">Đã nộp bài thi thành công!</h3>
+        <div id="exam-submitted-student-badge" style="display: inline-flex; align-items: center; gap: 6px; font-size: 14px; font-weight: 700; color: #1e293b; background: #f8fafc; border: 1px solid #cbd5e1; padding: 4px 14px; border-radius: 99px; margin-bottom: 12px;">
+          <span>👤 Thí sinh:</span>
+          <span id="exam-submitted-student-name" style="color: #2563eb; font-weight: 800;">--</span>
+        </div>
+        <p style="font-size: 14px; color: var(--color-muted); margin-bottom: 16px;" id="exam-submitted-msg">Bài thi của bạn đã được ghi nhận an toàn trên máy chủ.</p>
+
+        <!-- Khối hiển thị Điểm thi (nếu cho phép xem điểm) -->
+        <div id="exam-score-card" class="hidden" style="background: #f8fafc; border: 2px solid #e2e8f0; border-radius: 16px; padding: 18px 16px; margin: 0 auto 16px auto; max-width: 360px;">
+          <div style="font-size: 12px; color: var(--color-muted); font-weight: 700; letter-spacing: 0.5px; text-transform: uppercase;">KẾT QUẢ BÀI THI</div>
+          <div id="exam-score-student-name" style="font-size: 15px; font-weight: 800; color: #1e40af; margin-top: 6px; margin-bottom: 4px;">Thí sinh: --</div>
+          <div id="exam-score-val" style="font-size: 34px; font-weight: 900; color: #2563eb; margin: 4px 0;">--/--</div>
+          <div id="exam-score-detail" style="font-size: 13px; font-weight: 700; color: #16a34a;">Đúng --/-- câu (---%)</div>
+        </div>
+
+        <!-- Nút Xem lại bài làm & đáp án (nếu cho phép xem đáp án) -->
+        <div id="exam-review-btn-box" class="hidden" style="margin-bottom: 16px;">
+          <button type="button" class="btn" style="background: #2563eb; color: #ffffff; font-size: 14px; font-weight: 700; max-width: 320px; margin: 0 auto; display: flex; align-items: center; justify-content: center; gap: 6px;" onclick="toggleExamReview()">
+            <span>🔍</span>
+            <span id="exam-review-btn-text">Xem lại bài làm & Đáp án đúng</span>
+          </button>
+        </div>
+
+        <!-- Khối Danh sách Xem lại bài làm -->
+        <div id="exam-review-container" class="hidden" style="text-align: left; max-height: 440px; overflow-y: auto; background: #ffffff; border: 1px solid var(--color-border); border-radius: 16px; padding: 14px; margin-bottom: 20px;">
+        </div>
+
+        <!-- Nút chuyển sang nộp bài thực hành nếu có Assignment Hub đang mở song song -->
+        <div id="exam-to-assignment-box" class="hidden" style="margin-bottom: 18px;">
+          <button type="button" class="btn" style="background: linear-gradient(135deg, #059669, #10b981); color: #ffffff; font-size: 15px; font-weight: 800; min-height: 52px; max-width: 320px; margin: 0 auto; display: flex; align-items: center; justify-content: center; gap: 8px; box-shadow: 0 4px 14px rgba(16, 185, 129, 0.35); border-radius: 14px;" onclick="switchToAssignmentView()">
+            <span>📁</span>
+            <span>Tiếp tục nộp bài thực hành ➔</span>
+          </button>
+        </div>
+
+        <div style="display: flex; flex-direction: column; gap: 10px; max-width: 320px; margin: 0 auto;">
+          <button type="button" class="btn" style="background: #dc2626; color: #ffffff; font-size: 15px; min-height: 48px;" onclick="handleLeaveSession()">
+            🚪 Thoát để học sinh khác đăng nhập
+          </button>
+          <button type="button" class="btn" style="background: #f1f5f9; color: #475569; font-size: 14px; min-height: 42px;" onclick="handleDismissSubmittedExam()">
+            🏠 Về phòng chờ của lớp
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- 7. Màn hình Đấu Cờ Thụy Sỹ (Swiss Duel Quiz) -->
+    <div id="swiss-duel-view" class="card chess-card hidden" style="max-width: 680px; width: 100%; text-align: left; padding: 20px;">
+      <!-- Header Cờ Thụy Sỹ -->
+      <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #b8860b; padding-bottom: 12px; margin-bottom: 16px;">
+        <div>
+          <div style="display: flex; align-items: center; gap: 8px;">
+            <span style="font-size: 26px;">♟️</span>
+            <div>
+              <h2 id="swiss-title" style="font-size: 18px; font-weight: 800; margin: 0; color: #ffd700;">Đấu Cờ Thụy Sỹ</h2>
+              <div id="swiss-round-label" style="font-size: 13px; color: #d4af37; font-weight: 600;">Vòng 1/5</div>
+            </div>
+          </div>
+        </div>
+        <div style="display: flex; gap: 6px; align-items: center;">
+          <div id="swiss-round-timer-badge" class="chess-badge hidden" style="border-color: #ffd700; color: #ffd700; font-weight: 800;">
+            ⏱️ <span id="swiss-round-time-val">--:--</span>
+          </div>
+          <div class="chess-badge" id="swiss-my-stat-badge">
+            👑 <span id="swiss-my-pts">0</span> đ • 🔥 <span id="swiss-my-streak">0</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Khối nhận Suất BYE miễn đấu -->
+      <div id="swiss-bye-box" class="hidden" style="text-align: center; padding: 28px 14px; background: rgba(212, 175, 55, 0.1); border: 2px dashed #d4af37; border-radius: 18px; margin-bottom: 16px;">
+        <div style="font-size: 48px; margin-bottom: 8px;">👑</div>
+        <h3 style="font-size: 20px; font-weight: 800; color: #ffd700; margin: 0 0 8px 0;">BẠN NHẬN SUẤT BYE (MIỄN ĐẤU)!</h3>
+        <p style="font-size: 14px; color: #fbf8ee; margin: 0 0 10px 0;">Do số lượng kỳ thủ bị lẻ, bạn được đặc cách miễn thi đấu vòng này và <b>nhận trọn vẹn +2 điểm</b> vào bảng xếp hạng.</p>
+        <div style="font-size: 13px; color: #d4af37; font-style: italic;">Vui lòng nghỉ ngơi thư giãn chờ các bàn khác kết thúc nhé!</div>
+      </div>
+
+      <!-- Khối Bàn Đấu 1v1 -->
+      <div id="swiss-match-box">
+        <!-- Bảng thông tin Bàn đấu & Đối thủ -->
+        <div style="background: rgba(0,0,0,0.3); border: 1px solid #8b6508; border-radius: 14px; padding: 12px 16px; margin-bottom: 16px; display: flex; justify-content: space-between; align-items: center;">
+          <div>
+            <div style="font-size: 11px; font-weight: 800; color: #d4af37; letter-spacing: 1px; text-transform: uppercase;">
+              BÀN ĐẤU SỐ <span id="swiss-table-num">1</span>
+            </div>
+            <div style="font-size: 15px; font-weight: 700; color: #ffffff; margin-top: 2px;">
+              ⚔️ Đối đầu: <span id="swiss-opponent-name" style="color: #ffd700;">Đang tìm đối thủ...</span>
+            </div>
+          </div>
+          <div style="text-align: right;">
+            <div style="font-size: 11px; color: #d4af37; font-weight: 700;">TỈ SỐ HIỆP</div>
+            <div id="swiss-match-score" style="font-size: 20px; font-weight: 900; color: #ffffff;">0 - 0</div>
+          </div>
+        </div>
+
+        <!-- 2 Câu hỏi của Vòng -->
+        <div id="swiss-questions-container" style="display: flex; flex-direction: column; gap: 16px;">
+          <!-- Render động 2 câu hỏi tại đây -->
+        </div>
+
+        <!-- Nút Nộp Bài Thi Của Vòng - Luôn cố định nổi bật ở đáy màn hình -->
+        <div id="swiss-submit-container" style="position: sticky; bottom: 12px; z-index: 50; background: rgba(23, 14, 6, 0.96); backdrop-filter: blur(8px); padding: 12px 0 6px 0; border-top: 2px solid rgba(212, 175, 55, 0.4); border-radius: 16px; margin-top: 16px;">
+          <button type="button" id="swiss-btn-submit" class="btn" style="background: linear-gradient(135deg, #ffd700, #d4af37); color: #000000; font-weight: 900; width: 100%; font-size: 16px; min-height: 52px; padding: 14px; border-radius: 14px; cursor: pointer; box-shadow: 0 8px 24px rgba(212, 175, 55, 0.4); border: 2px solid #ffd700; display: flex; align-items: center; justify-content: center; gap: 8px;" onclick="handleSubmitSwissRound()">
+            ✓ XÁC NHẬN NỘP BÀI
+          </button>
+        </div>
+
+        <!-- Khối Xem Chi Tiết Đáp Án Đúng / Sai -->
+        <div id="swiss-answers-review-container" class="hidden" style="margin-top: 16px; display: flex; flex-direction: column; gap: 10px;">
+        </div>
+      </div>
+
+      <!-- Khối Đếm ngược 10 Giây và Bảng Xếp Hạng Vòng (round_review) -->
+      <div id="swiss-countdown-box" class="hidden" style="text-align: center; margin-top: 18px; padding-top: 16px; border-top: 1px solid #b8860b;">
+        <div id="swiss-round-result-banner" style="font-size: 17px; font-weight: 800; padding: 10px 14px; border-radius: 12px; margin-bottom: 14px;">
+          <!-- Kết quả trận: Thắng / Hòa / Thua -->
+        </div>
+
+        <div style="background: rgba(212, 175, 55, 0.15); border: 1px solid #d4af37; border-radius: 14px; padding: 12px; margin-bottom: 16px;">
+          <div style="font-size: 13px; color: #ffd700; font-weight: 700;">⏳ Bốc thăm & Bắt đầu Vòng tiếp theo sau:</div>
+          <div id="swiss-countdown-val" style="font-size: 32px; font-weight: 900; color: #ffffff; margin: 4px 0;">10s</div>
+          <div style="font-size: 12px; color: #e2e8f0;">Thầy cô có thể bấm qua nhanh hoặc tạm dừng trên máy chủ.</div>
+        </div>
+
+        <!-- Bảng xếp hạng Thụy Sỹ Thu Nhỏ -->
+        <div style="text-align: left; background: #261c14; border: 1px solid #8b6508; border-radius: 14px; padding: 12px; max-height: 220px; overflow-y: auto;">
+          <div style="font-size: 12px; font-weight: 800; color: #ffd700; margin-bottom: 8px;">🏆 BẢNG XẾP HẠNG THỤY SỸ:</div>
+          <div id="swiss-mini-leaderboard" style="display: flex; flex-direction: column; gap: 6px;"></div>
+        </div>
+      </div>
+
+      <!-- Khối Kết Thúc Giải Đấu (finished) -->
+      <div id="swiss-finished-box" class="hidden" style="text-align: center; padding: 20px 0;">
+        <div style="font-size: 52px; margin-bottom: 8px;">🏆</div>
+        <h3 style="font-size: 22px; font-weight: 900; color: #ffd700; margin: 0 0 8px 0;">GIẢI ĐẤU ĐÃ KẾT THÚC!</h3>
+        <p style="font-size: 14px; color: #fbf8ee; margin-bottom: 16px;">Chúc mừng các kỳ thủ đã cống hiến những ván cờ trí tuệ mãn nhãn!</p>
+
+        <div id="swiss-my-final-result" style="background: rgba(212, 175, 55, 0.15); border: 1px solid #d4af37; border-radius: 16px; padding: 16px; margin: 0 auto 16px auto; max-width: 380px;">
+          <div style="font-size: 12px; color: #d4af37; font-weight: 700;">THÀNH TÍCH CỦA BẠN</div>
+          <div id="swiss-final-rank" style="font-size: 28px; font-weight: 900; color: #ffffff; margin: 4px 0;">Hạng #--</div>
+          <div id="swiss-final-detail" style="font-size: 13px; color: #ffd700; font-weight: 600;">-- điểm • Thắng -- • Hòa -- • Thua --</div>
+        </div>
+
+        <button type="button" class="btn" style="background: #b8860b; color: #ffffff; font-weight: 800; max-width: 280px; margin: 0 auto;" onclick="backToLobby()">
+          🏠 Về phòng chờ của lớp
+        </button>
+      </div>
+    </div>
+
+    <!-- 8. Màn hình Thu - Phát Bài Tập (Assignment Hub) -->
+    <div id="assignment-view" class="card hidden" style="max-width: 680px; width: 100%; text-align: left; padding: 20px;">
+      <!-- Header Thu - Phát bài -->
+      <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--color-border); padding-bottom: 12px; margin-bottom: 16px;">
+        <div style="display: flex; align-items: center; gap: 10px;">
+          <span style="font-size: 28px;">📁</span>
+          <div>
+            <h2 id="assignment-title" style="font-size: 19px; font-weight: 800; margin: 0; color: var(--color-text);">Thu - Phát bài tập</h2>
+            <div style="display: flex; align-items: center; gap: 8px; margin-top: 3px; flex-wrap: wrap;">
+              <div id="assignment-badge-status" style="display: inline-block; font-size: 11px; font-weight: 700; color: #166534; background: #dcfce7; padding: 2px 8px; border-radius: 99px;">
+                🟢 Đang mở cổng nộp bài
+              </div>
+              <span id="assignment-student-name" style="font-size: 12px; font-weight: 700; color: #475569;"></span>
+            </div>
+          </div>
+        </div>
+        <div style="display: flex; gap: 6px; align-items: center; flex-wrap: wrap;">
+          <button id="assignment-back-to-exam-btn" type="button" class="btn hidden" style="padding: 6px 12px; font-size: 12px; min-height: 36px; background: #eff6ff; color: #1d4ed8; border: 1px solid #bfdbfe; border-radius: 8px; font-weight: 700; cursor: pointer;" onclick="switchBackToExamView()" title="Chuyển sang bài thi trắc nghiệm">
+            📝 <span id="assignment-back-to-exam-text">Sang làm bài thi</span>
+          </button>
+          <button id="assignment-btn-change-activity" type="button" class="btn hidden" style="padding: 6px 12px; font-size: 12px; min-height: 36px; background: #f8fafc; color: #475569; border: 1px solid #cbd5e1; border-radius: 8px; font-weight: 700; cursor: pointer;" onclick="openActivityChooser()" title="Quay lại bảng chọn hoạt động">
+            🔄 Đổi hoạt động
+          </button>
+          <button type="button" class="btn" style="padding: 6px 12px; font-size: 12px; min-height: 36px; background: #f1f5f9; color: #475569; border: 1px solid #cbd5e1; border-radius: 8px; font-weight: 700; cursor: pointer;" onclick="handleLeaveSession()" title="Đổi học sinh khác">
+            🚪 Đổi học sinh
+          </button>
+        </div>
+      </div>
+
+      <!-- Hướng dẫn giáo viên -->
+      <div id="assignment-instructions-box" class="hidden" style="background: #f0fdf4; border: 1px solid #bbf7d0; border-radius: 12px; padding: 12px 14px; margin-bottom: 16px; font-size: 13px; color: #166534; line-height: 1.5;">
+        <strong style="display: block; margin-bottom: 4px;">📝 Hướng dẫn của Thầy/Cô:</strong>
+        <span id="assignment-instructions-text"></span>
+      </div>
+
+      <!-- Khối Tài Liệu Phát Xuống (Phương án A) -->
+      <div id="assignment-materials-box" class="hidden" style="background: #eff6ff; border: 1px solid #bfdbfe; border-radius: 14px; padding: 14px; margin-bottom: 16px;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+          <div style="font-size: 14px; font-weight: 800; color: #1e40af; display: flex; align-items: center; gap: 6px;">
+            <span>📢</span> Tài liệu Thầy/Cô gửi cho lớp:
+          </div>
+          <span id="assignment-materials-count" style="font-size: 11px; background: #dbeafe; color: #1d4ed8; padding: 2px 8px; border-radius: 99px; font-weight: 700;">0 tệp</span>
+        </div>
+        <div id="assignment-materials-list" style="display: flex; flex-direction: column; gap: 8px;"></div>
+      </div>
+
+      <!-- Khối Trạng thái Đã Nộp Bài -->
+      <div id="assignment-submitted-box" class="hidden" style="background: #f0fdf4; border: 1px solid #86efac; border-radius: 14px; padding: 16px; margin-bottom: 16px; text-align: center;">
+        <div style="font-size: 40px; margin-bottom: 6px;">🎉</div>
+        <h3 style="font-size: 16px; font-weight: 800; color: #15803d; margin: 0 0 4px 0;">ĐÃ NỘP BÀI THÀNH CÔNG!</h3>
+        <p style="font-size: 13px; color: #166534; margin: 0 0 12px 0;">Thầy/Cô đã nhận được tệp bài làm của bạn.</p>
+        <div style="background: #ffffff; border: 1px solid #bbf7d0; border-radius: 10px; padding: 10px 14px; display: flex; justify-content: space-between; align-items: center; text-align: left; margin-bottom: 12px;">
+          <div style="min-width: 0; padding-right: 8px;">
+            <div id="assignment-my-filename" style="font-size: 13px; font-weight: 700; color: #1e293b; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">baithuchanh.docx</div>
+            <div id="assignment-my-subtime" style="font-size: 11px; color: #64748b;">Nộp lúc: 09:15</div>
+          </div>
+          <a id="assignment-my-downloadlink" href="#" download class="btn" style="padding: 6px 12px; font-size: 12px; min-height: 36px; background: #e0f2fe; color: #0369a1; text-decoration: none; border-radius: 8px; font-weight: 700;">Tải lại tệp</a>
+        </div>
+        <div id="assignment-resubmit-section" class="hidden">
+          <button type="button" class="btn" style="background: #f8fafc; color: #475569; border: 1px solid #cbd5e1; font-size: 13px; min-height: 42px;" onclick="handleShowResubmitForm()">
+            🔄 Chọn tệp khác để nộp lại
+          </button>
+        </div>
+        <div style="margin-top: 12px; display: flex; justify-content: center;">
+          <button type="button" class="btn" style="background: #ffffff; color: #475569; border: 1px solid #cbd5e1; font-size: 12px; min-height: 36px; padding: 6px 14px; font-weight: 700;" onclick="handleLeaveSession()">
+            🚪 Đổi học sinh khác nộp bài
+          </button>
+        </div>
+      </div>
+
+      <!-- Khối Form Nộp Bài -->
+      <div id="assignment-upload-box" style="background: #ffffff; border: 1px solid var(--color-border); border-radius: 14px; padding: 16px; margin-bottom: 16px;">
+        <h4 style="font-size: 14px; font-weight: 800; color: var(--color-text); margin: 0 0 10px 0;">📤 Chọn tệp bài làm để nộp:</h4>
+        
+        <div id="assignment-dropzone" style="border: 2px dashed #94a3b8; border-radius: 14px; padding: 24px 16px; text-align: center; background: #f8fafc; cursor: pointer; transition: all 0.2s;" onclick="document.getElementById('assignment-file-input').click()">
+          <div style="font-size: 32px; margin-bottom: 6px;">📎</div>
+          <div style="font-size: 14px; font-weight: 700; color: #334155;">Nhấn để chọn tệp hoặc kéo thả tệp vào đây</div>
+          <div id="assignment-drop-hint" style="font-size: 11px; color: #64748b; margin-top: 4px;">Dung lượng tối đa: 50MB</div>
+        </div>
+        <input type="file" id="assignment-file-input" style="display: none;" onchange="handleStudentFileSelected(this.files)" />
+
+        <div id="assignment-selected-info" class="hidden" style="margin-top: 12px; padding: 10px 14px; background: #f1f5f9; border-radius: 10px; display: flex; justify-content: space-between; align-items: center;">
+          <div style="min-width: 0;">
+            <div id="assignment-selected-name" style="font-size: 13px; font-weight: 700; color: #0f172a; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">file.docx</div>
+            <div id="assignment-selected-size" style="font-size: 11px; color: #64748b;">1.2 MB</div>
+          </div>
+          <button type="button" style="border: none; background: none; color: #ef4444; font-size: 16px; cursor: pointer; padding: 4px 8px;" onclick="handleClearSelectedStudentFile()">✕</button>
+        </div>
+
+        <div id="assignment-upload-error" class="hidden" style="margin-top: 10px; padding: 8px 12px; background: #fee2e2; border-radius: 8px; font-size: 12px; color: #b91c1c; font-weight: 600;"></div>
+
+        <button id="assignment-submit-btn" type="button" class="btn btn-primary hidden" style="margin-top: 14px; width: 100%; min-height: 48px; font-size: 15px; font-weight: 800;" onclick="handleUploadAndSubmitAssignment()">
+          🚀 Xác nhận nộp bài
+        </button>
+      </div>
+
+      <div class="status-box" id="assignment-footer-status">
+        Tệp bài làm sẽ được lưu trực tiếp vào máy tính của Thầy/Cô.
+      </div>
+    </div>
+
+    <!-- 8. Màn hình Đại Chiến Lãnh Thổ (Territory War View) -->
+    <div id="territory-war-view" class="card hidden" style="max-width: 460px; width: 100%; padding: 16px; background: #0f172a; color: #f8fafc; border: 2px solid #1e293b; border-radius: 24px; box-shadow: 0 14px 35px rgba(0,0,0,0.45); text-align: center;">
+      <!-- Thanh Tiêu đề & Thông tin Phe -->
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; gap: 8px;">
+        <span id="tw-my-team-badge" style="font-size: 13px; font-weight: 900; padding: 6px 14px; border-radius: 12px; background: #1d4ed8; color: #ffffff; letter-spacing: 0.5px; box-shadow: 0 2px 6px rgba(0,0,0,0.3);">
+          🔵 PHE XANH
+        </span>
+        <div style="display: flex; align-items: center; gap: 8px;">
+          <span id="tw-timer-text" style="font-size: 13px; font-weight: 800; background: #1e293b; color: #facc15; padding: 6px 12px; border-radius: 10px; border: 1px solid #334155;">
+            ⏱️ 00:00
+          </span>
+          <button type="button" onclick="backToLobby()" style="padding: 6px 10px; font-size: 12px; font-weight: 700; background: #1e293b; color: #94a3b8; border: 1px solid #334155; border-radius: 10px; cursor: pointer;">
+            Thoát
+          </button>
+        </div>
+      </div>
+
+      <!-- Bảng Tỉ số & Thanh Kéo Co Lãnh Thổ -->
+      <div style="background: #1e293b; border-radius: 16px; padding: 12px; margin-bottom: 12px; border: 1px solid #334155;">
+        <div style="display: flex; justify-content: space-between; align-items: center; font-size: 15px; font-weight: 900; margin-bottom: 8px;">
+          <div style="color: #60a5fa; display: flex; align-items: center; gap: 6px;">
+            <span>🔵 XANH:</span>
+            <span id="tw-blue-score" style="font-size: 18px;">0</span>
+          </div>
+          <div style="font-size: 11px; font-weight: 700; color: #94a3b8; text-transform: uppercase;">
+            Tỉ Lệ Đất
+          </div>
+          <div style="color: #f87171; display: flex; align-items: center; gap: 6px;">
+            <span id="tw-red-score" style="font-size: 18px;">0</span>
+            <span>:ĐỎ 🔴</span>
+          </div>
+        </div>
+
+        <!-- Thanh Kéo co chiếm đất -->
+        <div style="width: 100%; height: 12px; background: #0b1329; border-radius: 8px; overflow: hidden; display: flex; border: 1px solid #475569;">
+          <div id="tw-bar-blue" style="width: 50%; background: #2563eb; transition: width 0.3s ease;"></div>
+          <div id="tw-bar-neutral" style="width: 0%; background: #475569; transition: width 0.3s ease;"></div>
+          <div id="tw-bar-red" style="width: 50%; background: #dc2626; transition: width 0.3s ease;"></div>
+        </div>
+      </div>
+
+      <!-- Hộp cảnh báo hồi phục thể lực khi trả lời sai -->
+      <div id="tw-cooldown-box" class="hidden" style="background: #450a0a; border: 1px solid #b91c1c; border-radius: 12px; padding: 8px 12px; margin-bottom: 12px; font-size: 13px; font-weight: 700; color: #fca5a5;">
+        <span id="tw-cooldown-text">⏳ Đang hồi phục thể lực...</span>
+      </div>
+
+      <!-- Khung Trận Chiến (Chứa Lưới SVG) -->
+      <div id="tw-battle-container" style="display: flex; flex-direction: column; align-items: center; justify-content: center;">
+        <div id="tw-grid-svg-container" style="width: 100%; display: flex; justify-content: center;">
+          <!-- SVG bản đồ chiến sự tạo động từ territory.js -->
+        </div>
+        <div style="margin-top: 10px; font-size: 11px; color: #94a3b8; line-height: 1.4;">
+          💡 Chạm vào các ô có viền vàng liền kề đất phe mình để công thành hoặc gia cố!
+        </div>
+      </div>
+
+      <!-- Màn hình Kết Thúc Trận Đấu -->
+      <div id="tw-finished-container" class="hidden" style="padding: 16px 8px;">
+        <div style="font-size: 40px; margin-bottom: 8px;">🏆</div>
+        <h3 id="tw-finished-title" style="margin: 0 0 8px 0; font-size: 18px; font-weight: 900; color: #38bdf8;">
+          TRẬN ĐẤU KẾT THÚC
+        </h3>
+        <p id="tw-finished-reason" style="margin: 0 0 16px 0; font-size: 13px; color: #cbd5e1; font-weight: 600;">
+          Đã phân định thắng bại!
+        </p>
+        <div id="tw-finished-my-stats" style="background: #1e293b; border-radius: 14px; padding: 12px; margin-bottom: 12px; border: 1px solid #334155;">
+          <!-- Thống kê đóng góp của học sinh -->
+        </div>
+        <div id="tw-finished-leaderboard" style="background: #1e293b; border-radius: 14px; padding: 12px; margin-bottom: 16px; border: 1px solid #334155; text-align: left;">
+          <!-- Bảng xếp hạng điểm số từng người chơi -->
+        </div>
+        <button type="button" class="btn btn-primary" onclick="backToLobby()" style="width: 100%; min-height: 48px; font-weight: 800; font-size: 15px;">
+          Quay lại phòng chờ
+        </button>
+      </div>
+    </div>
+
+    <!-- Modal Câu Hỏi Công Thành Đại Chiến Lãnh Thổ -->
+    <div id="tw-question-modal" class="hidden" style="position: fixed; inset: 0; background: rgba(0, 0, 0, 0.85); backdrop-filter: blur(4px); z-index: 2000; display: flex; align-items: center; justify-content: center; padding: 16px;">
+      <div style="background: #0f172a; border: 2px solid #334155; border-radius: 20px; width: 100%; max-width: 440px; padding: 20px; box-shadow: 0 20px 40px rgba(0,0,0,0.6); color: #f8fafc; text-align: left;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; border-bottom: 1px solid #1e293b; padding-bottom: 10px;">
+          <div style="display: flex; align-items: center; gap: 8px;">
+            <span style="font-size: 20px;">⚔️</span>
+            <span style="font-size: 15px; font-weight: 800; color: #38bdf8;">Câu Hỏi Công Thành</span>
+          </div>
+          <button type="button" onclick="handleCancelTerritoryCell()" style="background: transparent; border: none; color: #94a3b8; font-size: 20px; cursor: pointer; padding: 4px;">
+            ✕
+          </button>
+        </div>
+
+        <div id="tw-modal-stem" style="font-size: 16px; font-weight: 700; color: #f8fafc; margin-bottom: 16px; line-height: 1.5; min-height: 48px;">
+          Đang tải câu hỏi...
+        </div>
+
+        <div id="tw-modal-options" style="display: flex; flex-direction: column; gap: 10px; margin-bottom: 16px;">
+          <!-- Các phương án đáp án -->
+        </div>
+
+        <button type="button" onclick="handleCancelTerritoryCell()" style="width: 100%; min-height: 44px; background: #1e293b; color: #94a3b8; border: 1px solid #334155; border-radius: 12px; font-size: 13px; font-weight: 700; cursor: pointer;">
+          Rút lui (Nhường ô cho đồng đội)
+        </button>
+      </div>
+    </div>
+
+    <!-- 8b. Màn hình Đường Đua Tri Thức (Circuit Race View) -->
+    <div id="circuit-race-view" class="card hidden" style="max-width: 500px; width: 100%; padding: 14px; background: #fff9f0; color: #1e293b; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); text-align: left;">
+      <div style="background: #ffffff; border-radius: 14px; padding: 10px 14px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 2px 6px rgba(0,0,0,0.05); margin-bottom: 10px;">
+        <div style="display: flex; align-items: center; gap: 8px;">
+          <span style="font-size: 22px;">🏎️</span>
+          <div>
+            <div id="circuit-round-label" style="font-size: 13px; font-weight: 800; color: #1e293b;">Vòng 1/?</div>
+            <div id="circuit-my-pos" style="font-size: 11px; color: #64748b; font-weight: 700;">Ô 0/50</div>
+          </div>
+        </div>
+        <div style="display: flex; gap: 6px;">
+          <span id="circuit-streak-badge" class="hidden" style="background: #fef3c7; color: #d97706; padding: 3px 8px; border-radius: 8px; font-size: 11px; font-weight: 800;">🔥 Chuỗi 0</span>
+          <span id="circuit-shield-badge" class="hidden" style="background: #dcfce7; color: #15803d; padding: 3px 8px; border-radius: 8px; font-size: 11px; font-weight: 800;">🛡️ Có Khiên</span>
+          <span id="circuit-mud-badge" class="hidden" style="background: #fee2e2; color: #b91c1c; padding: 3px 8px; border-radius: 8px; font-size: 11px; font-weight: 800;">🕳️ Sa Lầy</span>
+        </div>
+      </div>
+
+      <div id="circuit-notif-box" class="hidden" style="background: #e0f2fe; border: 1px solid #38bdf8; border-radius: 12px; padding: 8px 12px; font-size: 12px; font-weight: 700; color: #0369a1; margin-bottom: 10px;"></div>
+
+      <div id="circuit-mini-track" style="display: flex; gap: 8px; overflow-x: auto; padding: 10px; background: #f0f7ff; border-radius: 14px; margin-bottom: 12px; border: 1px solid #d0e2ff;"></div>
+
+      <div id="circuit-podium-box" class="hidden" style="background: #ffffff; border-radius: 16px; padding: 20px; text-align: center; box-shadow: 0 4px 14px rgba(0,0,0,0.06); margin-bottom: 12px;">
+        <div style="font-size: 44px; margin-bottom: 6px;">🏆</div>
+        <h3 style="font-size: 18px; font-weight: 900; margin: 0 0 10px 0; color: #1e293b;">Cuộc Đua Đã Kết Thúc!</h3>
+        <div style="background: #fef3c7; border: 2px solid #f59e0b; border-radius: 12px; padding: 10px; font-weight: 800; color: #92400e;">
+          🥇 Quán Quân: <span id="circuit-podium-r1">---</span>
+        </div>
+      </div>
+
+      <div id="circuit-question-box" style="background: #ffffff; border-radius: 16px; padding: 14px; box-shadow: 0 4px 14px rgba(0,0,0,0.06); margin-bottom: 12px;">
+        <div id="circuit-q-stem" style="font-size: 15px; font-weight: 700; color: #1e293b; line-height: 1.4; margin-bottom: 12px;"></div>
+        <div id="circuit-q-options"></div>
+        <div id="circuit-dice-res" class="hidden" style="margin-top: 10px; padding: 10px; border-radius: 12px;"></div>
+      </div>
+
+      <div style="background: #ffffff; border-radius: 16px; padding: 12px; box-shadow: 0 4px 14px rgba(0,0,0,0.06); margin-bottom: 10px;">
+        <div style="font-size: 13px; font-weight: 800; color: #475569; margin-bottom: 8px;">🎒 Túi đồ chiến thuật (Tối đa 2 thẻ)</div>
+        <div id="circuit-inventory-list" style="display: flex; gap: 8px;"></div>
+      </div>
+
+      <button id="circuit-skip-card-btn" type="button" class="hidden" onclick="handleSkipCircuitCard()" style="width: 100%; min-height: 44px; background: #f1f5f9; border: 1px solid #cbd5e1; border-radius: 12px; font-weight: 700; color: #475569; font-size: 13px; cursor: pointer;">
+        Không dùng thẻ ➔ Giữ nguyên bước đi
+      </button>
+    </div>
+
+    <!-- 9. Màn hình Chiếu Camera Vật Thể (Object Camera View) -->
+    <div id="object-camera-view" class="hidden" style="position: fixed; inset: 0; background: #090d16; color: #f8fafc; z-index: 1000; display: flex; flex-direction: column; overflow: hidden; width: 100vw; height: 100vh;">
+      <!-- Header điều hướng trên thiết bị học sinh -->
+      <div style="height: 48px; background: #0f172a; border-bottom: 1px solid #1e293b; display: flex; align-items: center; justify-content: space-between; padding: 0 16px; flex-shrink: 0; box-shadow: 0 2px 8px rgba(0,0,0,0.3);">
+        <div style="display: flex; align-items: center; gap: 8px;">
+          <span style="font-size: 20px;">📷</span>
+          <div>
+            <div style="font-size: 13px; font-weight: 800; color: #38bdf8; line-height: 1.2;">Camera vật thể</div>
+            <div id="object-camera-header-subtitle" style="font-size: 11px; color: #94a3b8; line-height: 1.1; max-width: 220px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">Soi bài & Chữa bài trực tiếp</div>
+          </div>
+        </div>
+        <div style="display: flex; align-items: center; gap: 8px;">
+          <span style="font-size: 11px; font-weight: 700; background: #065f46; color: #34d399; padding: 3px 8px; border-radius: 9999px; display: flex; align-items: center; gap: 4px;">
+            <span style="display: inline-block; width: 6px; height: 6px; border-radius: 50%; background: #34d399;"></span>
+            Trực tiếp
+          </span>
+          <button type="button" onclick="backToLobby()" style="padding: 4px 10px; font-size: 11px; font-weight: 700; background: #1e293b; color: #cbd5e1; border: 1px solid #334155; border-radius: 8px; cursor: pointer;">
+            Phòng chờ
+          </button>
+        </div>
+      </div>
+
+      <!-- Màn hình chờ khi giáo viên tạm dừng phát sóng -->
+      <div id="object-camera-paused" class="hidden" style="flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; padding: 24px;">
+        <div style="width: 80px; height: 80px; border-radius: 50%; background: #1e293b; border: 2px solid #334155; display: flex; align-items: center; justify-content: center; font-size: 38px; margin-bottom: 16px;">
+          ⏸️
+        </div>
+        <h3 style="font-size: 17px; font-weight: 800; color: #e2e8f0; margin: 0 0 8px 0;">Thầy/Cô đang tạm dừng chiếu</h3>
+        <p style="font-size: 13px; color: #94a3b8; max-width: 280px; margin: 0; line-height: 1.5;">
+          Vui lòng đợi giây lát, thầy/cô đang chuẩn bị bài làm tiếp theo.
+        </p>
+      </div>
+
+      <!-- Vùng chiếu Canvas chính của học sinh -->
+      <div id="object-camera-stage" style="flex: 1; min-height: 0; width: 100%; position: relative; display: flex; overflow: hidden; background: #020617;">
+        <!-- Chế độ 1 ảnh đơn -->
+        <div id="object-camera-single-container" style="flex: 1; width: 100%; height: 100%; position: relative; display: flex; align-items: center; justify-content: center; overflow: hidden;">
+          <canvas id="object-camera-canvas-single" style="width: 100%; height: 100%; display: block;"></canvas>
+        </div>
+
+        <!-- Chế độ so sánh 2 ảnh (chia dọc hoặc chia ngang) -->
+        <div id="object-camera-split-container" class="hidden" style="flex: 1; width: 100%; height: 100%; display: flex; overflow: hidden;">
+          <div style="flex: 1; position: relative; display: flex; align-items: center; justify-content: center; overflow: hidden; border-right: 1px solid #1e293b; border-bottom: 1px solid #1e293b;">
+            <div id="object-camera-label-1" style="position: absolute; top: 8px; left: 8px; z-index: 10; background: rgba(15, 23, 42, 0.85); color: #60a5fa; font-size: 10px; font-weight: 800; padding: 2px 8px; border-radius: 6px; border: 1px solid #1e3a8a;">
+              Ảnh 1
+            </div>
+            <canvas id="object-camera-canvas-1" style="width: 100%; height: 100%; display: block;"></canvas>
+          </div>
+          <div style="flex: 1; position: relative; display: flex; align-items: center; justify-content: center; overflow: hidden;">
+            <div id="object-camera-label-2" style="position: absolute; top: 8px; left: 8px; z-index: 10; background: rgba(15, 23, 42, 0.85); color: #34d399; font-size: 10px; font-weight: 800; padding: 2px 8px; border-radius: 6px; border: 1px solid #065f46;">
+              Ảnh 2
+            </div>
+            <canvas id="object-camera-canvas-2" style="width: 100%; height: 100%; display: block;"></canvas>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Màn hình Chiếu & Chữa bài PDF/Word (Mô hình A) -->
+    <div id="pdf-presenter-view" class="hidden" style="position: fixed; inset: 0; background: #0b1120; color: #f8fafc; z-index: 1000; display: flex; flex-direction: column; overflow: hidden; width: 100vw; height: 100vh;">
+      <!-- Header điều hướng trên thiết bị học sinh -->
+      <div style="height: 48px; background: #0f172a; border-bottom: 1px solid #1e293b; display: flex; align-items: center; justify-content: space-between; padding: 0 16px; flex-shrink: 0; box-shadow: 0 2px 8px rgba(0,0,0,0.3);">
+        <div style="display: flex; align-items: center; gap: 8px;">
+          <span style="font-size: 20px;">📄</span>
+          <div>
+            <div id="pdf-presenter-header-title" style="font-size: 13px; font-weight: 800; color: #38bdf8; line-height: 1.2; max-width: 200px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">Chiếu & Chữa bài PDF/Word</div>
+            <div id="pdf-presenter-header-subtitle" style="font-size: 11px; color: #94a3b8; line-height: 1.1;">Đang đồng bộ trực tiếp</div>
+          </div>
+        </div>
+        <div style="display: flex; align-items: center; gap: 8px;">
+          <span style="font-size: 11px; font-weight: 700; background: #065f46; color: #34d399; padding: 3px 8px; border-radius: 9999px; display: flex; align-items: center; gap: 4px;">
+            <span style="display: inline-block; width: 6px; height: 6px; border-radius: 50%; background: #34d399;"></span>
+            Trực tiếp
+          </span>
+          <button type="button" onclick="backToLobby()" style="padding: 4px 10px; font-size: 11px; font-weight: 700; background: #1e293b; color: #cbd5e1; border: 1px solid #334155; border-radius: 8px; cursor: pointer;">
+            Phòng chờ
+          </button>
+        </div>
+      </div>
+
+      <!-- Màn hình chờ khi giáo viên tạm dừng chiếu -->
+      <div id="pdf-presenter-paused" class="hidden" style="flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; padding: 24px;">
+        <div style="width: 80px; height: 80px; border-radius: 50%; background: #1e293b; border: 2px solid #334155; display: flex; align-items: center; justify-content: center; font-size: 38px; margin-bottom: 16px;">
+          ⏸️
+        </div>
+        <h3 style="font-size: 17px; font-weight: 800; color: #e2e8f0; margin: 0 0 8px 0;">Thầy/Cô đang tạm dừng chiếu tài liệu</h3>
+        <p style="font-size: 13px; color: #94a3b8; max-width: 280px; margin: 0; line-height: 1.5;">
+          Vui lòng đợi giây lát, nội dung bài giảng sẽ xuất hiện khi thầy/cô tiếp tục.
+        </p>
+      </div>
+
+      <!-- Vùng hiển thị cuộn liên tục tất cả các trang PDF/Word -->
+      <div id="pdf-presenter-stage" style="flex: 1; min-height: 0; width: 100%; position: relative; display: flex; flex-direction: column; overflow-y: auto; overflow-x: hidden; background: #0f172a; padding: 16px 12px; align-items: center;">
+        <div id="pdf-presenter-pages-container" style="width: 100%; max-width: 800px; display: flex; flex-direction: column; align-items: center;">
+          <!-- Các trang tài liệu được sinh tự động bởi pdf-presenter.js -->
+        </div>
+      </div>
+    </div>
+
+    <!-- 10. Màn hình Chấm điểm Dự án Đa chiều (Project Grading) -->
+    <div id="project-grading-view" class="card hidden" style="max-width: 640px; width: 100%; text-align: left; padding: 20px;">
+      <div id="project-grading-container">
+        <!-- Render động từ project-grading.js -->
+      </div>
+    </div>
+
+    <!-- 11. Màn hình Bảng Tương Tác Lớp Học (Interactive Board) -->
+    <div id="interactive-board-view" class="card hidden" style="max-width: 680px; width: 100%; text-align: left; padding: 20px;">
+      <div id="interactive-board-container">
+        <!-- Render động từ interactive-board.js -->
+      </div>
+    </div>
+
+
+    <!-- Nút Nổi Trò Chuyện & Trợ Giúp (Floating Action Button) (Task 5.2) -->
+    <div id="student-chat-fab" class="hidden" style="position: fixed; bottom: 20px; right: 20px; z-index: 9999; display: flex; flex-direction: column; align-items: flex-end; gap: 8px;">
+      <!-- Toast thông báo tin nhắn mới từ Giáo viên -->
+      <div id="student-chat-toast" class="hidden" style="background: #1e293b; color: #ffffff; padding: 12px 16px; border-radius: 14px; box-shadow: 0 10px 25px rgba(0,0,0,0.25); max-width: 320px; font-size: 13px; line-height: 1.4; display: flex; align-items: flex-start; gap: 10px; cursor: pointer; border: 1px solid #38bdf8;" onclick="openStudentChatModal()">
+        <span style="font-size: 20px; flex-shrink: 0;">👨‍🏫</span>
+        <div>
+          <div style="font-weight: 800; color: #38bdf8; margin-bottom: 2px;">Thầy/Cô vừa nhắn:</div>
+          <div id="student-chat-toast-text" style="color: #f1f5f9; word-break: break-word;">...</div>
+        </div>
+      </div>
+
+      <button type="button" onclick="toggleStudentChatModal()" style="width: 56px; height: 56px; border-radius: 50%; background: linear-gradient(135deg, #2563eb, #7c3aed); color: #ffffff; border: none; box-shadow: 0 8px 20px rgba(37,99,235,0.4); display: flex; align-items: center; justify-content: center; font-size: 26px; cursor: pointer; position: relative;" title="Trò chuyện & Trợ giúp">
+        💬
+        <!-- Huy hiệu tin nhắn mới -->
+        <span id="student-chat-badge" class="hidden" style="position: absolute; top: -2px; right: -2px; background: #ef4444; color: #ffffff; font-size: 11px; font-weight: 800; width: 22px; height: 22px; border-radius: 50%; display: flex; align-items: center; justify-content: center; border: 2px solid #ffffff;">
+          1
+        </span>
+      </button>
+    </div>
+
+    <!-- Modal Trò Chuyện & Xin Giúp Đỡ của Học Sinh (Task 5.2) -->
+    <div id="student-chat-modal" class="hidden" style="position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0,0,0,0.5); z-index: 10000; display: flex; justify-content: center; align-items: center; padding: 16px;">
+      <div style="background: #ffffff; border-radius: 20px; width: 100%; max-width: 420px; height: 560px; max-height: 90vh; display: flex; flex-direction: column; overflow: hidden; box-shadow: 0 20px 40px rgba(0,0,0,0.25);">
+        <!-- Modal Header -->
+        <div style="background: #2563eb; color: #ffffff; padding: 14px 18px; display: flex; justify-content: space-between; align-items: center;">
+          <div style="display: flex; align-items: center; gap: 8px;">
+            <span style="font-size: 20px;">💬</span>
+            <div>
+              <div style="font-weight: 800; font-size: 15px;">Trò chuyện & Trợ giúp</div>
+              <div id="student-chat-lock-status" style="font-size: 11px; color: #bfdbfe;">Đang kết nối với Thầy/Cô</div>
+            </div>
+          </div>
+          <button type="button" onclick="closeStudentChatModal()" style="background: transparent; border: none; color: #ffffff; font-size: 20px; cursor: pointer; padding: 4px;">✕</button>
+        </div>
+
+        <!-- Thanh Giơ Tay Nhanh -->
+        <div style="background: #eff6ff; border-bottom: 1px solid #dbeafe; padding: 10px 14px; display: flex; justify-content: space-between; align-items: center;">
+          <div style="font-size: 12px; font-weight: 700; color: #1e40af;">Gặp khó khăn trong bài học?</div>
+          <button type="button" id="btn-student-hand-raise" onclick="handleStudentHandRaise()" style="background: #f59e0b; color: #ffffff; border: none; border-radius: 10px; padding: 6px 12px; font-size: 12px; font-weight: 800; cursor: pointer; display: flex; align-items: center; gap: 4px; box-shadow: 0 2px 4px rgba(245,158,11,0.3);">
+            ✋ Xin Thầy/Cô giúp
+          </button>
+        </div>
+
+        <!-- Danh Sách Tin Nhắn -->
+        <div id="student-chat-messages-container" style="flex: 1; overflow-y: auto; padding: 14px; display: flex; flex-direction: column; gap: 10px; background: #f8fafc;">
+          <div style="text-align: center; color: #94a3b8; font-size: 12px; padding: 10px 0;">
+            Tin nhắn gửi đến Thầy/Cô sẽ được phản hồi tại đây.
+          </div>
+        </div>
+
+        <!-- Khung Nhập Tin Nhắn & Tùy Chọn Riêng Tư -->
+        <div style="border-top: 1px solid #e2e8f0; padding: 10px 14px; background: #ffffff;">
+          <div id="student-chat-privacy-toggle" style="margin-bottom: 8px; display: flex; align-items: center; justify-content: space-between; font-size: 12px;">
+            <label style="display: flex; align-items: center; gap: 6px; cursor: pointer; color: #1e40af; font-weight: 700;">
+              <input type="checkbox" id="student-chat-private-cb" checked style="accent-color: #2563eb; width: 16px; height: 16px; cursor: pointer;" />
+              <span>🔒 Chỉ gửi Thầy/Cô (Học sinh khác không thấy)</span>
+            </label>
+            <span id="student-chat-mode-badge" style="font-size: 10px; padding: 2px 6px; border-radius: 6px; background: #fee2e2; color: #dc2626; font-weight: 700;">Đã khóa</span>
+          </div>
+          <div id="student-chat-input-row" style="display: flex; gap: 8px; align-items: center;">
+            <input type="text" id="student-chat-input" disabled placeholder="Nhập tin nhắn..." style="flex: 1; height: 42px; border-radius: 12px; border: 1px solid #cbd5e1; padding: 0 12px; font-size: 14px; outline: none;" onkeydown="if(event.key === 'Enter') handleStudentSendChatMessage()" />
+            <button type="button" onclick="handleStudentSendChatMessage()" style="height: 42px; padding: 0 16px; border-radius: 12px; background: #2563eb; color: #ffffff; border: none; font-weight: 700; font-size: 14px; cursor: pointer;">
+              Gửi
+            </button>
+          </div>
+          <div id="student-chat-locked-warning" style="color: #ef4444; font-size: 12px; font-weight: 600; text-align: center; padding: 6px 0;">
+            🔒 Thầy/Cô đang tạm khóa trò chuyện. Bạn vẫn có thể bấm "Xin Thầy/Cô giúp".
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Modal Phòng Thay Đồ Mascot (Responsive Mobile & Desktop) -->
+    <div id="mascot-customizer-modal" class="hidden" style="position: fixed; inset: 0; background: rgba(15, 23, 42, 0.65); backdrop-filter: blur(6px); z-index: 10001; display: flex; justify-content: center; align-items: center; padding: 12px; box-sizing: border-box;">
+      <div class="mascot-modal-dialog">
+        <!-- Header -->
+        <div class="mascot-modal-header">
+          <button type="button" class="btn-modal-action" onclick="closeAvatarModal()">❮ Quay lại</button>
+          <div style="font-weight: 800; font-size: 16px; color: #1e293b;">👗 Phòng Thay Đồ Mascot</div>
+          <button type="button" class="btn-modal-action save" onclick="confirmAvatarSave()">Lưu Diện Mạo ✓</button>
+        </div>
+
+        <!-- Body: 2 cột trên Desktop, 1 cột trên Mobile -->
+        <div class="mascot-modal-body">
+          <!-- Cột 1: Sân khấu (Stage) -->
+          <div class="mascot-modal-stage">
+            <div style="background: rgba(255,255,255,0.9); padding: 4px 10px; border-radius: 99px; font-size: 11px; font-weight: 800; color: #059669; border: 1px solid #a7f3d0; margin-bottom: 12px; display: inline-flex; align-items: center; gap: 4px;">
+              <span>🔓 Mở khóa 100% trang phục</span>
+            </div>
+            <div id="modal-avatar-preview" style="display: flex; justify-content: center; margin-bottom: 14px;">
+              <!-- Live Preview SVG -->
+            </div>
+            <button type="button" class="btn-randomize-mascot" onclick="randomizeAvatar()">
+              🎲 Đổi ngẫu nhiên
+            </button>
+          </div>
+
+          <!-- Cột 2: Danh mục & Lưới đồ (Tabs & Grid) -->
+          <div class="mascot-modal-items">
+            <div class="mascot-tabs-container">
+              <button type="button" class="btn-tab-scroll prev" onclick="scrollMascotTabs(-140)" title="Xem danh mục trước" aria-label="Cuộn trái">❮</button>
+              <div class="mascot-tabs-bar" id="modal-avatar-tabs">
+                <!-- Rendered via JS -->
+              </div>
+              <button type="button" class="btn-tab-scroll next" onclick="scrollMascotTabs(140)" title="Xem danh mục tiếp theo" aria-label="Cuộn phải">❯</button>
+            </div>
+            <div class="mascot-grid" id="modal-avatar-grid">
+              <!-- Rendered via JS -->
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Toast thông báo lưu Avatar thành công -->
+    <div id="avatar-toast" class="hidden" style="position: fixed; top: 24px; left: 50%; transform: translateX(-50%); background: #0f172a; color: white; padding: 10px 20px; border-radius: 99px; font-size: 13px; font-weight: 700; z-index: 10002; box-shadow: 0 10px 25px rgba(0,0,0,0.3); display: flex; align-items: center; gap: 8px;">
+      <span>✨</span>
+      <span>Đã lưu diện mạo Mascot mới thành công!</span>
+    </div>
+
+    <!-- Module hóa JS cổng Học Sinh (Clean Architecture) -->
+    <script type="module" src="./js/app.js"></script>
+  </body>
+</html>

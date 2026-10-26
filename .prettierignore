@@ -1,0 +1,11 @@
+node_modules
+dist
+out
+coverage
+*.db
+*.db-journal
+everything-everywhere-for-antigravity
+.agents
+docs
+pnpm-lock.yaml
+AGENTS.md

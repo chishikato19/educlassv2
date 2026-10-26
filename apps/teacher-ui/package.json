@@ -1,0 +1,46 @@
+{
+  "name": "@educlass/teacher-ui",
+  "version": "2.2.17",
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "scripts": {
+    "build": "vite build",
+    "test": "vitest run",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@educlass/activity-assignment-hub": "workspace:*",
+    "@educlass/activity-pdf-presenter": "workspace:*",
+    "@educlass/activity-object-camera": "workspace:*",
+    "@educlass/activity-exam": "workspace:*",
+    "@educlass/activity-quick-poll": "workspace:*",
+    "@educlass/activity-quiz-live": "workspace:*",
+    "@educlass/activity-swiss-duel": "workspace:*",
+    "@educlass/activity-territory-war": "workspace:*",
+    "@educlass/activity-project-grading": "workspace:*",
+    "@educlass/activity-arcade-duel": "workspace:*",
+    "@educlass/activity-interactive-board": "workspace:*",
+    "@educlass/activity-circuit-race": "workspace:*",
+    "@educlass/core": "workspace:*",
+    "@educlass/protocol": "workspace:*",
+    "@educlass/question-kit": "workspace:*",
+    "@educlass/ui-kit": "workspace:*",
+    "gsap": "^3.15.0",
+    "katex": "^0.19.0",
+    "pixi.js": "^8.22.0",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1"
+  },
+  "devDependencies": {
+    "@tailwindcss/vite": "^4.3.3",
+    "@testing-library/react": "^16.2.0",
+    "@types/react": "^18.3.18",
+    "@types/react-dom": "^18.3.5",
+    "@vitejs/plugin-react": "^6.1.2",
+    "jsdom": "^26.0.0",
+    "tailwindcss": "^4.3.3",
+    "vite": "^8.3.3"
+  }
+}

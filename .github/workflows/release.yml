@@ -1,0 +1,38 @@
+name: Tự động Đóng gói & Phát hành EduClass v2
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+jobs:
+  build-and-release:
+    runs-on: windows-latest
+    permissions:
+      contents: write
+
+    steps:
+      - name: Checkout mã nguồn
+        uses: actions/checkout@v4
+
+      - name: Cài đặt pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 12.9.1
+
+      - name: Cài đặt Node.js 22.x
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: 'pnpm'
+
+      - name: Cài đặt dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Build toàn bộ dự án
+        run: pnpm run build
+
+      - name: Đóng gói và Đẩy lên GitHub Releases
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: pnpm --filter @educlass/desktop exec electron-builder --win nsis -p always
