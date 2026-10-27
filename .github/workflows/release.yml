@@ -1,6 +1,7 @@
 name: Tự động Đóng gói & Phát hành EduClass v2
 
 on:
+  workflow_dispatch:
   push:
     tags:
       - 'v*'
