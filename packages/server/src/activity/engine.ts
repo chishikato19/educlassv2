@@ -1,5 +1,7 @@
 import {
   rewards,
+  calculateIndividualGameElo,
+  calculateTeamMatchElo,
   type ActivityContext,
   type ActivityDefinition,
 } from '@educlass/core';
@@ -998,6 +1000,13 @@ export class ActivityEngine {
       }
     }
 
+    // 4.2. Cập nhật điểm Elo ẩn cho học sinh dựa trên kết quả thi đấu/hoạt động
+    try {
+      await this.updateStudentEloOnEnd(active, results);
+    } catch (eloErr) {
+      console.warn(`[ActivityEngine] Lỗi cập nhật Elo ẩn cho session ${sessionId}:`, eloErr);
+    }
+
     // 5. Xóa khỏi bộ nhớ theo runId
     this.activeRuns.delete(targetRunId);
 
@@ -1089,5 +1098,120 @@ export class ActivityEngine {
         state: active.state,
       };
     });
+  }
+
+  /**
+   * Cập nhật điểm Elo ẩn cho học sinh khi kết thúc hoạt động
+   */
+  private async updateStudentEloOnEnd(
+    active: ActiveSessionRun,
+    results: unknown[]
+  ): Promise<void> {
+    if (!this.options.studentRepo || !this.options.participantRepo) return;
+    if (results.length === 0) return;
+
+    const activityId = active.run.activityId;
+    const sessionId = active.run.sessionId;
+
+    const participants = await this.options.participantRepo.listBySessionId(sessionId);
+    const participantMap = new Map(participants.map((p) => [p.id, p]));
+
+    // 1. Đối với trò chơi đồng đội 2 phe: Đại Chiến Lãnh Thổ (territory-war)
+    if (activityId === 'territory-war') {
+      const stateObj = active.state as {
+        winnerTeam?: 'blue' | 'red' | 'draw' | null;
+      };
+      const winner = stateObj.winnerTeam ?? 'draw';
+
+      const teamBlueInputs: Array<{ id: string; studentId: string; elo: number; contribution: number }> = [];
+      const teamRedInputs: Array<{ id: string; studentId: string; elo: number; contribution: number }> = [];
+
+      for (const raw of results) {
+        const item = raw as Record<string, unknown>;
+        const participantId = String(item['participantId'] ?? '');
+        const team = item['team'] === 'blue' ? 'blue' : item['team'] === 'red' ? 'red' : null;
+        if (!team) continue;
+
+        const part = participantMap.get(participantId);
+        if (!part) continue;
+
+        // Lấy danh sách studentIds (cả đơn và ghép nhiều bạn 1 máy)
+        const sIds = ParticipantRepository.getStudentIds(part);
+        if (sIds.length === 0 && part.studentId) sIds.push(part.studentId);
+        if (sIds.length === 0) continue;
+
+        const contrib = Number(item['pointsContributed'] ?? item['score'] ?? 0);
+
+        for (const sId of sIds) {
+          const student = await this.options.studentRepo.findById(sId);
+          if (student) {
+            const elo = (student as { elo?: number }).elo ?? 1000;
+            const entry = { id: participantId, studentId: sId, elo, contribution: contrib };
+            if (team === 'blue') teamBlueInputs.push(entry);
+            else teamRedInputs.push(entry);
+          }
+        }
+      }
+
+      if (teamBlueInputs.length > 0 || teamRedInputs.length > 0) {
+        const matchResults = calculateTeamMatchElo(
+          teamBlueInputs.map((b) => ({ id: b.studentId, elo: b.elo, contribution: b.contribution })),
+          teamRedInputs.map((r) => ({ id: r.studentId, elo: r.elo, contribution: r.contribution })),
+          winner
+        );
+
+        for (const [studentId, change] of Object.entries(matchResults)) {
+          await this.options.studentRepo.update(studentId, { elo: change.newElo });
+        }
+      }
+      return;
+    }
+
+    // 2. Đối với trò chơi cá nhân: Quiz Live / Quizizz / Kahoot / Đường Đua Tri Thức
+    if (activityId === 'quiz-live' || activityId === 'circuit-race') {
+      const validParticipants: Array<{
+        studentId: string;
+        accuracyRatio: number;
+        currentElo: number;
+      }> = [];
+
+      let totalAccuracy = 0;
+
+      for (const raw of results) {
+        const item = raw as Record<string, unknown>;
+        const participantId = String(item['participantId'] ?? '');
+        const part = participantMap.get(participantId);
+        if (!part) continue;
+
+        const sIds = ParticipantRepository.getStudentIds(part);
+        if (sIds.length === 0 && part.studentId) sIds.push(part.studentId);
+        if (sIds.length === 0) continue;
+
+        let accuracyRatio = 0.5;
+        if (typeof item['accuracy'] === 'number') {
+          accuracyRatio = Math.max(0, Math.min(1, item['accuracy'] / 100));
+        } else if (typeof item['correctCount'] === 'number' && typeof item['totalQuestions'] === 'number' && item['totalQuestions'] > 0) {
+          accuracyRatio = Math.max(0, Math.min(1, item['correctCount'] / item['totalQuestions']));
+        }
+
+        totalAccuracy += accuracyRatio;
+
+        for (const sId of sIds) {
+          const student = await this.options.studentRepo.findById(sId);
+          if (student) {
+            const currentElo = (student as { elo?: number }).elo ?? 1000;
+            validParticipants.push({ studentId: sId, accuracyRatio, currentElo });
+          }
+        }
+      }
+
+      if (validParticipants.length > 0) {
+        const avgAccuracy = totalAccuracy / Math.max(1, results.length);
+        for (const vp of validParticipants) {
+          const { newElo } = calculateIndividualGameElo(vp.currentElo, vp.accuracyRatio, avgAccuracy);
+          await this.options.studentRepo.update(vp.studentId, { elo: newElo });
+        }
+      }
+    }
   }
 }

@@ -1,6 +1,6 @@
 {
   "name": "@educlass/student-desktop",
-  "version": "2.2.18",
+  "version": "2.2.19",
   "description": "EduClass v2 - Ứng dụng Học Sinh Phòng Máy Tính (Wake-on-Session)",
   "author": "EduClass Team",
   "type": "module",

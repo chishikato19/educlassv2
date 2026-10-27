@@ -210,12 +210,13 @@ export const ActivityHostWindow: React.FC = () => {
     (activeRun?.state as { mode?: string } | undefined)?.mode === 'quizizz';
 
   const isSwissDuelActivity = activeRun?.activityId === 'swiss-duel';
+  const isFactionDuelActivity = activeRun?.activityId === 'faction-duel';
 
   const isFullScreenActivity =
-    activeRun?.activityId === 'object-camera' || isQuizizzActivity || isSwissDuelActivity;
+    activeRun?.activityId === 'object-camera' || isQuizizzActivity || isSwissDuelActivity || isFactionDuelActivity;
 
   const isDarkActivity =
-    activeRun?.activityId === 'object-camera' || isQuizizzActivity || isSwissDuelActivity;
+    activeRun?.activityId === 'object-camera' || isQuizizzActivity || isSwissDuelActivity || isFactionDuelActivity;
 
   return (
     <div

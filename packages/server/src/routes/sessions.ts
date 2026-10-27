@@ -100,9 +100,10 @@ export interface SessionsRoutesOptions {
 
 export function toParticipantDto(
   p: ParticipantSelect,
-  teamName?: string | null
+  teamName?: string | null,
+  elo?: number
 ): ParticipantDto {
-  return {
+  const dto: ParticipantDto = {
     id: p.id,
     sessionId: p.sessionId,
     studentId: p.studentId ?? null,
@@ -114,6 +115,10 @@ export function toParticipantDto(
     status: p.status as 'online' | 'offline',
     joinedAt: p.joinedAt,
   };
+  if (typeof elo === 'number') {
+    dto.elo = elo;
+  }
+  return dto;
 }
 
 /**
@@ -1614,6 +1619,29 @@ export const sessionsRoutes: FastifyPluginAsync<SessionsRoutesOptions> = async (
         loadedStudents.push(student);
       }
 
+      // Kiểm tra khóa tên trùng đồng thời theo D7 trước khi nhập/xác thực PIN
+      const onlineParticipants = await participantRepo.findOnlineBySessionId(session.id);
+      const takenStudentIdSet = new Set<string>();
+      for (const p of onlineParticipants) {
+        const pIds = ParticipantRepository.getStudentIds(p);
+        for (const id of pIds) {
+          takenStudentIdSet.add(id);
+        }
+      }
+
+      for (const student of loadedStudents) {
+        if (takenStudentIdSet.has(student.id)) {
+          return reply
+            .status(409)
+            .send(
+              formatProtocolError(
+                'NAME_TAKEN',
+                'Tên này đang có bạn dùng. Chọn tên khác hoặc bấm Báo thầy/cô.'
+              )
+            );
+        }
+      }
+
       if (examRepo && examRecordRepo) {
         const exam = await examRepo.findBySessionId(session.id);
         if (exam) {
@@ -1689,30 +1717,9 @@ export const sessionsRoutes: FastifyPluginAsync<SessionsRoutesOptions> = async (
         );
     }
 
-    // Kiểm tra khóa tên trùng đồng thời theo D7
-    const onlineParticipants = await participantRepo.findOnlineBySessionId(session.id);
-    const takenStudentIdSet = new Set<string>();
-    for (const p of onlineParticipants) {
-      const pIds = ParticipantRepository.getStudentIds(p);
-      for (const id of pIds) {
-        takenStudentIdSet.add(id);
-      }
-    }
-
-    for (const sId of finalStudentIds) {
-      if (takenStudentIdSet.has(sId)) {
-        return reply
-          .status(409)
-          .send(
-            formatProtocolError(
-              'NAME_TAKEN',
-              'Tên này đang có bạn dùng. Chọn tên khác hoặc bấm Báo thầy/cô.'
-            )
-          );
-      }
-    }
-
+    // Kiểm tra khóa tên trùng đồng thời theo D7 cho khách tự do
     if (finalStudentIds.length === 0) {
+      const onlineParticipants = await participantRepo.findOnlineBySessionId(session.id);
       const taken = isNameTaken(finalDisplayName, onlineParticipants);
       if (taken) {
         return reply
@@ -1971,9 +1978,23 @@ export const sessionsRoutes: FastifyPluginAsync<SessionsRoutesOptions> = async (
       const offlineCount = participantsList.filter((p) => p.status === 'offline').length;
       const totalCount = participantsList.length;
 
-      const participantDtos = participantsList.map((p) =>
-        toParticipantDto(p, p.teamId ? teamMap.get(p.teamId) ?? null : null)
-      );
+      let eloMap = new Map<string, number>();
+      if (session.classId && studentRepo) {
+        try {
+          const classStudents = await studentRepo.listByClassId(session.classId);
+          eloMap = new Map(classStudents.map((s) => [s.id, (s as { elo?: number }).elo ?? 1000]));
+        } catch {
+          // ignore
+        }
+      }
+
+      const participantDtos = participantsList.map((p) => {
+        let elo: number | undefined;
+        if (p.studentId && eloMap.has(p.studentId)) {
+          elo = eloMap.get(p.studentId);
+        }
+        return toParticipantDto(p, p.teamId ? teamMap.get(p.teamId) ?? null : null, elo);
+      });
 
       return reply.send(
         SessionParticipantsResponseSchema.parse({

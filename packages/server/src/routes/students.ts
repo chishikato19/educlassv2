@@ -35,6 +35,7 @@ export function toStudentDto(s: StudentSelect): StudentDto {
     hasPin: Boolean(s.passwordHash),
     exp: s.exp,
     level: s.level,
+    elo: (s as { elo?: number }).elo ?? 1000,
     academicPerformance: s.academicPerformance ?? 'dat',
     createdAt: s.createdAt,
   };

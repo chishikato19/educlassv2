@@ -10,6 +10,8 @@ import { ProjectGradingStudentView } from '@educlass/activity-project-grading';
 import { ArcadeDuelStudentView } from '@educlass/activity-arcade-duel';
 import { InteractiveBoardStudentView } from '@educlass/activity-interactive-board';
 import { CircuitStudentView } from '@educlass/activity-circuit-race';
+import { VolleyballStudentView } from '@educlass/activity-volleyball-tournament';
+import { FactionDuelStudentView } from '@educlass/activity-faction-duel';
 
 export interface ActiveActivityData<St = unknown> {
   runId: string;
@@ -51,6 +53,8 @@ const studentViewRegistry: Record<
   'arcade-duel': ArcadeDuelStudentView as unknown as React.ComponentType<StudentViewComponentProps<never>>,
   'interactive-board': InteractiveBoardStudentView as unknown as React.ComponentType<StudentViewComponentProps<never>>,
   'circuit-race': CircuitStudentView as unknown as React.ComponentType<StudentViewComponentProps<never>>,
+  'volleyball-tournament': VolleyballStudentView as unknown as React.ComponentType<StudentViewComponentProps<never>>,
+  'faction-duel': FactionDuelStudentView as unknown as React.ComponentType<StudentViewComponentProps<never>>,
 };
 
 /**

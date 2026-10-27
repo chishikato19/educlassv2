@@ -255,6 +255,9 @@ importers:
       '@educlass/activity-exam':
         specifier: workspace:*
         version: link:../../packages/activities/exam
+      '@educlass/activity-faction-duel':
+        specifier: workspace:*
+        version: link:../../packages/activities/faction-duel
       '@educlass/activity-interactive-board':
         specifier: workspace:*
         version: link:../../packages/activities/interactive-board
@@ -279,6 +282,9 @@ importers:
       '@educlass/activity-territory-war':
         specifier: workspace:*
         version: link:../../packages/activities/territory-war
+      '@educlass/activity-volleyball-tournament':
+        specifier: workspace:*
+        version: link:../../packages/activities/volleyball-tournament
       '@educlass/core':
         specifier: workspace:*
         version: link:../../packages/core
@@ -322,6 +328,9 @@ importers:
       '@educlass/activity-exam':
         specifier: workspace:*
         version: link:../../packages/activities/exam
+      '@educlass/activity-faction-duel':
+        specifier: workspace:*
+        version: link:../../packages/activities/faction-duel
       '@educlass/activity-interactive-board':
         specifier: workspace:*
         version: link:../../packages/activities/interactive-board
@@ -346,6 +355,9 @@ importers:
       '@educlass/activity-territory-war':
         specifier: workspace:*
         version: link:../../packages/activities/territory-war
+      '@educlass/activity-volleyball-tournament':
+        specifier: workspace:*
+        version: link:../../packages/activities/volleyball-tournament
       '@educlass/core':
         specifier: workspace:*
         version: link:../../packages/core
@@ -515,6 +527,40 @@ importers:
       xlsx:
         specifier: ^0.18.5
         version: 0.18.5
+      zod:
+        specifier: ^3.24.2
+        version: 3.25.76
+    devDependencies:
+      '@testing-library/react':
+        specifier: ^16.2.0
+        version: 16.3.3(@testing-library/dom@10.4.2)(@types/react-dom@18.3.7(@types/react@18.3.31))(@types/react@18.3.31)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+      '@types/react':
+        specifier: ^18.3.18
+        version: 18.3.31
+      '@types/react-dom':
+        specifier: ^18.3.5
+        version: 18.3.7(@types/react@18.3.31)
+      jsdom:
+        specifier: ^26.0.0
+        version: 26.1.0(supports-color@7.2.0)
+      react:
+        specifier: ^18.3.1
+        version: 18.3.1
+      react-dom:
+        specifier: ^18.3.1
+        version: 18.3.1(react@18.3.1)
+
+  packages/activities/faction-duel:
+    dependencies:
+      '@educlass/core':
+        specifier: workspace:*
+        version: link:../../core
+      '@educlass/protocol':
+        specifier: workspace:*
+        version: link:../../protocol
+      '@educlass/question-kit':
+        specifier: workspace:*
+        version: link:../../question-kit
       zod:
         specifier: ^3.24.2
         version: 3.25.76
@@ -810,6 +856,40 @@ importers:
         specifier: ^18.3.1
         version: 18.3.1(react@18.3.1)
 
+  packages/activities/volleyball-tournament:
+    dependencies:
+      '@educlass/core':
+        specifier: workspace:*
+        version: link:../../core
+      '@educlass/protocol':
+        specifier: workspace:*
+        version: link:../../protocol
+      '@educlass/question-kit':
+        specifier: workspace:*
+        version: link:../../question-kit
+      zod:
+        specifier: ^3.24.2
+        version: 3.25.76
+    devDependencies:
+      '@testing-library/react':
+        specifier: ^16.2.0
+        version: 16.3.3(@testing-library/dom@10.4.2)(@types/react-dom@18.3.7(@types/react@18.3.31))(@types/react@18.3.31)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+      '@types/react':
+        specifier: ^18.3.18
+        version: 18.3.31
+      '@types/react-dom':
+        specifier: ^18.3.5
+        version: 18.3.7(@types/react@18.3.31)
+      jsdom:
+        specifier: ^26.0.0
+        version: 26.1.0(supports-color@7.2.0)
+      react:
+        specifier: ^18.3.1
+        version: 18.3.1
+      react-dom:
+        specifier: ^18.3.1
+        version: 18.3.1(react@18.3.1)
+
   packages/core:
     dependencies:
       '@educlass/protocol':
@@ -892,6 +972,9 @@ importers:
       '@educlass/activity-exam':
         specifier: workspace:*
         version: link:../activities/exam
+      '@educlass/activity-faction-duel':
+        specifier: workspace:*
+        version: link:../activities/faction-duel
       '@educlass/activity-interactive-board':
         specifier: workspace:*
         version: link:../activities/interactive-board
@@ -916,6 +999,9 @@ importers:
       '@educlass/activity-territory-war':
         specifier: workspace:*
         version: link:../activities/territory-war
+      '@educlass/activity-volleyball-tournament':
+        specifier: workspace:*
+        version: link:../activities/volleyball-tournament
       '@educlass/core':
         specifier: workspace:*
         version: link:../core

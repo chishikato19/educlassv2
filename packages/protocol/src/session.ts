@@ -164,6 +164,7 @@ export const ParticipantDtoSchema = z.object({
   identityLevel: IdentityLevelSchema,
   teamId: z.string().nullable().optional(),
   teamName: z.string().nullable().optional(),
+  elo: z.number().int().optional(),
   status: ParticipantStatusSchema,
   joinedAt: z.number().int().positive(),
 });

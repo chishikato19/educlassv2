@@ -57,6 +57,7 @@ export const TerritoryParticipantSchema = z.object({
   displayName: z.string(),
   team: TeamIdSchema.default('blue'),
   groupName: z.string().nullable().optional(),
+  elo: z.number().default(1000),
   capturedCount: z.number().default(0),
   fortifiedCount: z.number().default(0),
   correctCount: z.number().default(0),
@@ -72,6 +73,7 @@ export const TerritoryParticipantInitSchema = z.object({
   displayName: z.string(),
   team: TeamIdSchema,
   groupName: z.string().nullable().optional(),
+  elo: z.number().optional(),
 });
 export type TerritoryParticipantInit = z.infer<typeof TerritoryParticipantInitSchema>;
 

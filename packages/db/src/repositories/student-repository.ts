@@ -12,6 +12,7 @@ export interface UpdateStudentData {
   passwordHash?: string | null | undefined;
   academicPerformance?: 'tot' | 'kha' | 'dat' | 'chua_dat' | undefined;
   groupId?: string | null | undefined;
+  elo?: number | undefined;
 }
 
 export class StudentRepository {
@@ -140,11 +141,31 @@ export class StudentRepository {
     if (data.groupId !== undefined) {
       valuesToUpdate.groupId = data.groupId;
     }
+    if (data.elo !== undefined) {
+      (valuesToUpdate as Record<string, unknown>).elo = data.elo;
+    }
 
     if (Object.keys(valuesToUpdate).length > 0) {
       await this.db.update(students).set(valuesToUpdate).where(eq(students.id, id));
     }
     return this.findById(id);
+  }
+
+  /**
+   * Cập nhật điểm Elo ẩn cho học sinh
+   */
+  async updateElo(id: string, elo: number): Promise<StudentSelect | null> {
+    await this.db.update(students).set({ elo }).where(eq(students.id, id));
+    return this.findById(id);
+  }
+
+  /**
+   * Cập nhật hàng loạt điểm Elo cho nhiều học sinh
+   */
+  async updateEloBatch(updates: Array<{ id: string; elo: number }>): Promise<void> {
+    for (const u of updates) {
+      await this.db.update(students).set({ elo: u.elo }).where(eq(students.id, u.id));
+    }
   }
 
   /**

@@ -1,6 +1,6 @@
 {
   "name": "@educlass/student-ui",
-  "version": "2.2.18",
+  "version": "2.2.19",
   "type": "module",
   "exports": {
     ".": "./src/index.ts"
@@ -24,6 +24,8 @@
     "@educlass/activity-arcade-duel": "workspace:*",
     "@educlass/activity-interactive-board": "workspace:*",
     "@educlass/activity-circuit-race": "workspace:*",
+    "@educlass/activity-volleyball-tournament": "workspace:*",
+    "@educlass/activity-faction-duel": "workspace:*",
     "react": "^18.3.1",
     "react-dom": "^18.3.1"
   },

@@ -26,6 +26,7 @@ export const StudentDtoSchema = z.object({
   hasPin: z.boolean(),
   exp: z.number().int(),
   level: z.number().int(),
+  elo: z.number().int().optional(),
   academicPerformance: AcademicPerformanceSchema.default('dat'),
   avatarJson: z.string().nullable().optional(),
   avatar: AvatarConfigSchema.optional(),

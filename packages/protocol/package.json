@@ -1,6 +1,6 @@
 {
   "name": "@educlass/protocol",
-  "version": "2.2.18",
+  "version": "2.2.19",
   "type": "module",
   "exports": {
     ".": "./src/index.ts"

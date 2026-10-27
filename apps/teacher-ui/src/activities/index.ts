@@ -11,6 +11,8 @@ import { projectGradingPlugin } from './plugins/project-grading.plugin.js';
 import { arcadeDuelPlugin } from './plugins/arcade-duel.plugin.js';
 import { interactiveBoardPlugin } from './plugins/interactive-board.plugin.js';
 import { circuitRacePlugin } from './plugins/circuit-race.plugin.js';
+import { volleyballTournamentPlugin } from './plugins/volleyball-tournament.plugin.js';
+import { factionDuelPlugin } from './plugins/faction-duel.plugin.js';
 
 export * from './types.js';
 export * from './plugins/quiz-live.plugin.js';
@@ -25,6 +27,8 @@ export * from './plugins/project-grading.plugin.js';
 export * from './plugins/arcade-duel.plugin.js';
 export * from './plugins/interactive-board.plugin.js';
 export * from './plugins/circuit-race.plugin.js';
+export * from './plugins/volleyball-tournament.plugin.js';
+export * from './plugins/faction-duel.plugin.js';
 
 /**
  * Danh bạ toàn bộ các Plugins Tiện ích/Ứng dụng trong hệ thống EduClass v2.
@@ -43,6 +47,8 @@ export const activityPluginsRegistry: Record<string, ActivityHostPlugin<unknown>
   [arcadeDuelPlugin.id]: arcadeDuelPlugin,
   [interactiveBoardPlugin.id]: interactiveBoardPlugin,
   [circuitRacePlugin.id]: circuitRacePlugin,
+  [volleyballTournamentPlugin.id]: volleyballTournamentPlugin,
+  [factionDuelPlugin.id]: factionDuelPlugin,
 };
 
 /**

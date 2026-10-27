@@ -1,6 +1,56 @@
 # CHANGELOG
 
+## [2.2.19] - 2026-10-27
+
+### Chế Độ Chơi: Đại Chiến Xanh Đỏ (thử nghiệm)
+- **Module Activity Mới (`packages/activities/faction-duel`)**:
+  - Hoạt động thi đấu chia 2 phe Xanh - Đỏ cân bằng lực lượng dựa trên điểm trình độ ẩn Elo (`balanceTwoTeamsByElo` Snake Draft ABBA).
+  - Lượt 1: Bốc thăm ngẫu nhiên 1-1 giữa 2 phe.
+  - Lượt 2 trở đi: Phe nhiều điểm hơn được quyền tự do chọn đối thủ bên phe ít điểm hơn trong 15 giây (khóa mục tiêu First-Come First-Served & kiểm tra luật không lặp đối thủ cũ). Hết 15 giây tự động ghép ngẫu nhiên (Auto-Random Fallback).
+  - Thi đấu đồng loạt: Tất cả các cặp đấu cùng nhận và trả lời câu hỏi đồng thời trên thiết bị cá nhân (1–5 câu hỏi, mặc định 2 câu).
+  - Cơ chế Phân thân (Clone): Chọn ngẫu nhiên 1 học sinh bên phe ít người khi sĩ số lẻ để đấu song song với 2 đối thủ, chỉ làm bài 1 lần duy nhất.
+  - Tính điểm có trọng số Elo: Kèo dưới lật kèo thắng nhận +3đ, cân kèo nhận +2đ, kèo trên nhận +1đ, hòa nhận +0.5đ mỗi bên.
+  - Tùy chọn linh hoạt: Đảo câu hỏi, đảo đáp án A/B/C/D độc lập chống nhìn bài, tự động xoay vòng lấy lại câu cũ khi hết kho đề.
+  - Màn hình Học sinh mobile-first (360x640), Màn hình Màn chiếu (ProjectorView) với thanh kéo co năng lượng Tug-of-War theo thời gian thực và Màn hình Giáo viên điều phối.
+  - Đặt chung vị trí với Kahoot, Quizizz, Đấu Cờ Thụy Sỹ trong Modal Game Hub (`apps/teacher-ui`) dưới tên hiển thị **"Đại Chiến Xanh Đỏ (thử nghiệm)"**.
+
+### Chế Độ Chơi: Giải Đấu Bóng Chuyền (thử nghiệm)
+- **Module Activity Mới (`packages/activities/volleyball-tournament`)**:
+  - Thể thức giải đấu bóng chuyền học đường: Vòng bảng thi đấu vòng tròn 3 lượt tính điểm sau đó bắt cặp xếp hạng phân tầng 4 Cúp (Kim Cương, Vàng, Bạc, Đồng).
+  - Kế thừa cơ chế trận đấu 2 câu hỏi/trận quen thuộc từ Đấu cờ (Thắng 2đ, Hòa 1đ, Thua 0đ).
+  - Thuật toán thích ứng tự động: Tự động chia 4 Bảng (khi 15-23 HS) hoặc 8 Bảng (khi 24-40 HS).
+  - Màn hình Học sinh mobile-first (360x640), Màn hình Giáo viên điều khiển lượt đấu, và Màn chiếu Projector trực quan hóa vòng bảng & cây nhánh đấu Playoff.
+  - Tích hợp vào chung danh mục với Kahoot & Quizizz trong Modal Game Hub (`apps/teacher-ui`) dưới tên hiển thị **"Đấu Bóng Chuyền (thử nghiệm)"**.
+
+
 ## [2.2.18] - 2026-10-27
+
+### Hệ Thống Điểm Trình Độ Ẩn (Hidden Elo / MMR) & Cân Bằng Đội Hình
+
+1. **Lõi Đánh Giá Năng Lực Ẩn (`packages/core/src/elo`)**:
+   - Xây dựng module tính toán Elo thuần túy (`elo.ts`): Điểm mặc định khởi điểm 1000, biên độ an toàn `[100, 3000]`.
+   - `calculateIndividualGameElo`: Tính biến động Elo cho bài thi trắc nghiệm cá nhân (Quizizz, Kahoot / Quiz Live, Đường Đua Tri Thức) dựa trên tương quan kết quả thực tế vs điểm kỳ vọng so với mặt bằng chung của lớp.
+   - `calculateTeamMatchElo`: Tính biến động Elo cho trận đấu đối kháng đồng đội 2 phe (Đại Chiến Lãnh Thổ) dựa trên chênh lệch Elo trung bình giữa hai đội, kết hợp hệ số đóng góp cá nhân (Personal Contribution Modifier: số ô chiếm đóng, gia cố, số câu đúng) để khen thưởng xứng đáng cho MVP và hạn chế người chơi không hoạt động.
+   - `balanceTwoTeamsByElo`: Thuật toán phân bổ quân đội 2 phe Xanh - Đỏ tối ưu kết hợp giữa sắp xếp Elo giảm dần, phân bổ Rắn leo thang (Snake Draft: ABBA BAAB...) và tinh chỉnh hoán vị Greedy Swap (Karmarkar-Karp heuristic) sao cho $|\sum \text{Elo}_{Blue} - \sum \text{Elo}_{Red}| \approx 0$, kèm tham số Jitter tự nhiên chống trùng lặp.
+   - `balanceNTeamsByElo`: Thuật toán chia đều học sinh có phong độ cao vào $N$ tổ/nhóm học tập.
+
+2. **Lưu Trữ Bền Vững & Migration CSDL (`packages/db`)**:
+   - Thêm cột `elo` (mặc định 1000) và index `idx_students_elo` vào bảng `students` qua Migration `0010_student_elo.sql`.
+   - Bổ sung cơ chế bảo vệ tự phục hồi schema guard trong `ensureSchemaIntegrity(sqlite)`.
+   - Mở rộng `StudentRepository`: Hỗ trợ cập nhật `elo`, `updateElo`, `updateEloBatch`.
+
+3. **Cập Nhật Ngầm Sau Mỗi Trận Đấu (`packages/server`)**:
+   - `ActivityEngine.endActivity()`: Tự động phân tích kết quả khi kết thúc hoạt động (`territory-war`, `quiz-live`, `circuit-race`), truy xuất học sinh qua `studentId` hoặc nhóm máy ghép đôi, tính toán và lưu điểm Elo mới vào DB một cách an toàn.
+   - Điểm Elo được ẩn hoàn toàn phía Cổng học sinh, chỉ phục vụ thuật toán phân chia đội hình và giao diện giáo viên để tránh tâm lý so bì tiêu cực.
+
+4. **Tích Hợp Cân Bằng Quân Lực Trong Đại Chiến Lãnh Thổ (`packages/activities/territory-war` & `apps/teacher-ui`)**:
+   - `TerritoryParticipantInitSchema` & `TerritoryParticipantSchema`: Hỗ trợ lưu trữ thuộc tính `elo` cho từng chiến binh.
+   - Thao tác "⚖️ Cân Bằng" (`auto_balance_teams`) trên màn hình Giáo viên tự động gọi thuật toán `balanceTwoTeamsByElo` để tái cân bằng quân số 2 bên theo thực lực.
+   - `ActivityPanel.tsx`: Bổ sung bộ 3 tùy chọn chia đội trực quan trong cả Game Hub và Modal độc lập:
+     * `⚖️ Cân bằng Elo ẩn` (Khuyên dùng)
+     * `🎲 Ngẫu nhiên 50/50`
+     * `👥 Theo tổ / nhóm đã chia`
+
 
 ### Tích Hợp Hệ Thống Tự Động Cập Nhật (Auto-Update On-Demand) & CI/CD GitHub Releases
 

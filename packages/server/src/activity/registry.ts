@@ -12,6 +12,8 @@ import { ProjectGradingActivity } from '@educlass/activity-project-grading';
 import { ArcadeDuelActivity } from '@educlass/activity-arcade-duel';
 import { InteractiveBoardActivity } from '@educlass/activity-interactive-board';
 import { CircuitRaceActivity } from '@educlass/activity-circuit-race';
+import { VolleyballTournamentActivity } from '@educlass/activity-volleyball-tournament';
+import { FactionDuelActivity } from '@educlass/activity-faction-duel';
 
 export class ActivityRegistry {
   private activities = new Map<string, ActivityDefinition>();
@@ -74,3 +76,5 @@ defaultActivityRegistry.register(ProjectGradingActivity as ActivityDefinition);
 defaultActivityRegistry.register(ArcadeDuelActivity as ActivityDefinition);
 defaultActivityRegistry.register(InteractiveBoardActivity as ActivityDefinition);
 defaultActivityRegistry.register(CircuitRaceActivity as ActivityDefinition);
+defaultActivityRegistry.register(VolleyballTournamentActivity as ActivityDefinition);
+defaultActivityRegistry.register(FactionDuelActivity as ActivityDefinition);

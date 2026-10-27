@@ -1212,6 +1212,7 @@ export const App: React.FC = () => {
                 onSendTeacherIntent={handleSendTeacherIntent}
                 onEndActivity={handleEndActivity}
                 participants={participants}
+                students={students}
                 classes={classes}
                 activeSession={activeSession}
               />

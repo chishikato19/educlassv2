@@ -32,16 +32,18 @@ describe('Multi-Student Device Pairing Server Routes (Stage 2)', () => {
       year: 2026,
     });
 
-    // Tạo 3 học sinh
+    // Tạo 3 học sinh (s1, s2 có mã PIN cá nhân)
     const s1 = await studentRepo.create({
       classId: cls.id,
       fullName: 'Đỗ Nam Anh',
+      passwordHash: await hasher.hash('1111'),
       exp: 10,
       level: 1,
     });
     const s2 = await studentRepo.create({
       classId: cls.id,
       fullName: 'Trần Văn Bình',
+      passwordHash: await hasher.hash('2222'),
       exp: 20,
       level: 1,
     });
@@ -103,13 +105,32 @@ describe('Multi-Student Device Pairing Server Routes (Stage 2)', () => {
       });
       expect(joinFailRes.statusCode).toBe(400);
 
-      // 5. Ghép 2 bạn (s1 và s2) trên 1 máy -> thành công
+      // 5. Thử ghép 2 bạn với mã PIN sai -> từ chối 401
+      const joinWrongPinRes = await app.inject({
+        method: 'POST',
+        url: '/api/sessions/join',
+        payload: {
+          joinCode,
+          studentIds: [s1.id, s2.id],
+          pins: {
+            [s1.id]: '9999',
+            [s2.id]: '2222',
+          },
+        },
+      });
+      expect(joinWrongPinRes.statusCode).toBe(401);
+
+      // Ghép 2 bạn (s1 và s2) trên 1 máy với mã PIN đúng -> thành công
       const joinSuccessRes = await app.inject({
         method: 'POST',
         url: '/api/sessions/join',
         payload: {
           joinCode,
           studentIds: [s1.id, s2.id],
+          pins: {
+            [s1.id]: '1111',
+            [s2.id]: '2222',
+          },
         },
       });
       expect(joinSuccessRes.statusCode).toBe(200);

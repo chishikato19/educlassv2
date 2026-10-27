@@ -13,6 +13,7 @@ export * from './activity/validator.js';
 export * from './gamification/costumes.js';
 export * from './gamification/title-evaluator.js';
 export * from './powerups/index.js';
+export * from './elo/index.js';
 
 export function checkCoreProtocolCompatibility(version: unknown): boolean {
   const result = ProtocolVersionSchema.safeParse(version);

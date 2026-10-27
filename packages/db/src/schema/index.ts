@@ -42,6 +42,7 @@ export const students = sqliteTable('students', {
   passwordHash: text('password_hash'),
   exp: integer('exp').notNull().default(0),
   level: integer('level').notNull().default(1),
+  elo: integer('elo').notNull().default(1000),
   avatarJson: text('avatar_json'),
   academicPerformance: text('academic_performance', {
     enum: ['tot', 'kha', 'dat', 'chua_dat'],

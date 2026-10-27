@@ -19,6 +19,7 @@
     { "path": "packages/activities/arcade-duel" },
     { "path": "packages/activities/interactive-board" },
     { "path": "packages/activities/circuit-race" },
+    { "path": "packages/activities/volleyball-tournament" },
     { "path": "apps/teacher-ui" },
     { "path": "apps/student-ui" },
     { "path": "apps/desktop" },

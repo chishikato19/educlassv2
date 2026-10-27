@@ -1,8 +1,10 @@
 import { describe, expect, it } from 'vitest';
 import { createDatabaseConnection } from '../connection.js';
 import { runMigrations } from '../migrator.js';
+import { ClassRepository } from '../repositories/class-repository.js';
 import { ParticipantRepository } from '../repositories/participant-repository.js';
 import { SessionRepository } from '../repositories/session-repository.js';
+import { StudentRepository } from '../repositories/student-repository.js';
 import { TeamRepository } from '../repositories/team-repository.js';
 import { UserRepository } from '../repositories/user-repository.js';
 
@@ -89,25 +91,41 @@ describe('ParticipantRepository & TeamRepository (Task 1.6)', () => {
       expect(teamsAfterOffline[0]?.memberCount).toBe(1);
 
       // Task 1.2: Kiểm tra lưu trữ studentIdsJson cho nhóm học sinh 2-3 bạn trên 1 máy
+      const classRepo = new ClassRepository(db);
+      const studentRepo = new StudentRepository(db);
+      const testClass = await classRepo.create({
+        ownerId: teacher.id,
+        name: 'Lớp 10A1',
+        year: 2026,
+      });
+      const st1 = await studentRepo.create({
+        classId: testClass.id,
+        fullName: 'Nam Anh',
+      });
+      const st2 = await studentRepo.create({
+        classId: testClass.id,
+        fullName: 'Văn Bình',
+      });
+
       const pPair = await participantRepo.create({
         sessionId: session.id,
         displayName: 'Nam Anh & Văn Bình',
-        studentId: 'st_1',
-        studentIdsJson: JSON.stringify(['st_1', 'st_2']),
+        studentId: st1.id,
+        studentIdsJson: JSON.stringify([st1.id, st2.id]),
         identityLevel: 'account',
         status: 'online',
         joinedAt: 3000,
       });
-      expect(pPair.studentIdsJson).toBe('["st_1","st_2"]');
+      expect(pPair.studentIdsJson).toBe(JSON.stringify([st1.id, st2.id]));
 
-      const extractedIds = participantRepo.getStudentIds(pPair);
-      expect(extractedIds).toEqual(['st_1', 'st_2']);
+      const extractedIds = ParticipantRepository.getStudentIds(pPair);
+      expect(extractedIds).toEqual([st1.id, st2.id]);
 
       // Tìm kiếm theo bất kỳ studentId nào
-      const foundBySt2 = await participantRepo.findBySessionAndAnyStudentId(session.id, ['st_2']);
+      const foundBySt2 = await participantRepo.findBySessionAndAnyStudentId(session.id, [st2.id]);
       expect(foundBySt2?.id).toBe(pPair.id);
 
-      const foundOnlineBySt1 = await participantRepo.findOnlineBySessionAndAnyStudentId(session.id, ['st_1']);
+      const foundOnlineBySt1 = await participantRepo.findOnlineBySessionAndAnyStudentId(session.id, [st1.id]);
       expect(foundOnlineBySt1?.id).toBe(pPair.id);
 
       // Không tìm thấy nếu ID không tồn tại

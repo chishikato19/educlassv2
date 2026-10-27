@@ -1,4 +1,4 @@
-import type { ActivityContext, ActivityDefinition } from '@educlass/core';
+import { balanceTwoTeamsByElo, type ActivityContext, type ActivityDefinition } from '@educlass/core';
 import type { ActivityReject } from '@educlass/protocol';
 import {
   type TerritoryQuestion,
@@ -115,6 +115,7 @@ export const TerritoryWarActivity: ActivityDefinition<
             displayName: initP.displayName,
             team: initP.team,
             groupName: initP.groupName ?? null,
+            elo: initP.elo ?? 1000,
             capturedCount: 0,
             fortifiedCount: 0,
             correctCount: 0,
@@ -181,6 +182,7 @@ export const TerritoryWarActivity: ActivityDefinition<
           displayName: `Chiến binh ${Object.keys(st.participants).length + 1}`,
           team: assignedTeam,
           groupName: null,
+          elo: 1000,
           capturedCount: 0,
           fortifiedCount: 0,
           correctCount: 0,
@@ -498,8 +500,16 @@ export const TerritoryWarActivity: ActivityDefinition<
 
         case 'auto_balance_teams': {
           const pList = Object.values(st.participants);
-          pList.forEach((p, idx) => {
-            p.team = idx % 2 === 0 ? 'blue' : 'red';
+          const candidates = pList.map((p) => ({
+            id: p.participantId,
+            displayName: p.displayName,
+            elo: p.elo ?? 1000,
+            groupName: p.groupName ?? null,
+          }));
+          const balanced = balanceTwoTeamsByElo(candidates, { jitter: true });
+          const blueIds = new Set(balanced.blue.map((b) => b.id));
+          pList.forEach((p) => {
+            p.team = blueIds.has(p.participantId) ? 'blue' : 'red';
           });
           return { ...st };
         }

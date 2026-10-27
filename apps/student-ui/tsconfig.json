@@ -18,7 +18,10 @@
     { "path": "../../packages/activities/territory-war" },
     { "path": "../../packages/activities/project-grading" },
     { "path": "../../packages/activities/arcade-duel" },
-    { "path": "../../packages/activities/interactive-board" }
+    { "path": "../../packages/activities/interactive-board" },
+    { "path": "../../packages/activities/circuit-race" },
+    { "path": "../../packages/activities/volleyball-tournament" },
+    { "path": "../../packages/activities/faction-duel" }
   ],
   "include": ["src/**/*"]
 }

@@ -372,6 +372,14 @@ CREATE INDEX IF NOT EXISTS "idx_bank_questions_lesson_diff" ON "bank_questions"(
     name: 'participant_student_ids',
     sql: `ALTER TABLE "participants" ADD COLUMN "student_ids_json" TEXT;`,
   },
+  {
+    version: 10,
+    name: 'student_elo',
+    sql: `
+ALTER TABLE "students" ADD COLUMN "elo" INTEGER NOT NULL DEFAULT 1000;
+CREATE INDEX IF NOT EXISTS "idx_students_elo" ON "students"("elo");
+`,
+  },
 ];
 
 /**
@@ -397,7 +405,7 @@ export function ensureSchemaIntegrity(sqlite: DatabaseType): void {
     CREATE INDEX IF NOT EXISTS "idx_videos_created_at" ON "videos"("created_at");
   `);
 
-  // 2. Đảm bảo cột academic_performance luôn tồn tại trong bảng students
+  // 2. Đảm bảo cột academic_performance và elo luôn tồn tại trong bảng students
   try {
     const studentColumns = sqlite
       .prepare('PRAGMA table_info("students")')
@@ -405,6 +413,11 @@ export function ensureSchemaIntegrity(sqlite: DatabaseType): void {
     const hasAcademicPerformance = studentColumns.some(col => col.name === 'academic_performance');
     if (!hasAcademicPerformance && studentColumns.length > 0) {
       sqlite.exec('ALTER TABLE "students" ADD COLUMN "academic_performance" TEXT NOT NULL DEFAULT \'dat\';');
+    }
+    const hasElo = studentColumns.some(col => col.name === 'elo');
+    if (!hasElo && studentColumns.length > 0) {
+      sqlite.exec('ALTER TABLE "students" ADD COLUMN "elo" INTEGER NOT NULL DEFAULT 1000;');
+      sqlite.exec('CREATE INDEX IF NOT EXISTS "idx_students_elo" ON "students"("elo");');
     }
   } catch {
     // Bỏ qua nếu bảng students chưa được tạo

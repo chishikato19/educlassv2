@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import type { ActivityMeta, ClassDto, ParticipantDto, SessionDetailResponse } from '@educlass/protocol';
+import type { ActivityMeta, ClassDto, ParticipantDto, SessionDetailResponse, StudentDto } from '@educlass/protocol';
+import { balanceTwoTeamsByElo } from '@educlass/core';
 import { QuickPollTeacherPanel } from '@educlass/activity-quick-poll';
 import { QuizLiveTeacherPanel } from '@educlass/activity-quiz-live';
 import { ExamTeacherPanel } from '@educlass/activity-exam';
@@ -45,6 +46,7 @@ export interface ActivityPanelProps {
   onSendTeacherIntent: (intent: unknown) => void;
   onEndActivity: (runId: string) => Promise<void> | void;
   participants?: ParticipantDto[];
+  students?: StudentDto[];
   classes?: ClassDto[];
   activeSession?: SessionDetailResponse | null;
 }
@@ -175,6 +177,130 @@ function parseShortCorrectAnswer(q: Record<string, unknown>): string[] {
   return [''];
 }
 
+function prepareTerritoryParticipants(
+  participants: ParticipantDto[] | undefined,
+  students: StudentDto[] | undefined,
+  balanceMode: 'elo' | 'random' | 'groups'
+): Array<{
+  id: string;
+  displayName: string;
+  team: 'blue' | 'red';
+  groupName: string | null;
+  elo?: number;
+}> {
+  if (!participants || participants.length === 0) return [];
+
+  const studentMap = new Map<string, StudentDto>();
+  if (students) {
+    for (const s of students) {
+      studentMap.set(s.id, s);
+    }
+  }
+
+  // 1. Phân chia theo tổ / nhóm cố định của lớp
+  if (balanceMode === 'groups') {
+    const groupMap = new Map<string, ParticipantDto[]>();
+    const individualStudents: ParticipantDto[] = [];
+
+    for (const p of participants) {
+      const gName = p.teamName?.trim();
+      if (gName) {
+        if (!groupMap.has(gName)) groupMap.set(gName, []);
+        groupMap.get(gName)!.push(p);
+      } else {
+        individualStudents.push(p);
+      }
+    }
+
+    if (groupMap.size > 0) {
+      const result: Array<{
+        id: string;
+        displayName: string;
+        team: 'blue' | 'red';
+        groupName: string | null;
+        elo?: number;
+      }> = [];
+
+      const groupNames = Array.from(groupMap.keys());
+      groupNames.forEach((gName, gIdx) => {
+        const assignedTeam: 'blue' | 'red' = gIdx % 2 === 0 ? 'blue' : 'red';
+        const members = groupMap.get(gName)!;
+        for (const m of members) {
+          const elo = (m.studentId ? studentMap.get(m.studentId)?.elo : undefined) ?? m.elo ?? 1000;
+          result.push({
+            id: m.id,
+            displayName: m.displayName,
+            team: assignedTeam,
+            groupName: gName,
+            elo,
+          });
+        }
+      });
+
+      let currentTeam: 'blue' | 'red' = 'blue';
+      for (const ind of individualStudents) {
+        const elo = (ind.studentId ? studentMap.get(ind.studentId)?.elo : undefined) ?? ind.elo ?? 1000;
+        result.push({
+          id: ind.id,
+          displayName: ind.displayName,
+          team: currentTeam,
+          groupName: null,
+          elo,
+        });
+        currentTeam = currentTeam === 'blue' ? 'red' : 'blue';
+      }
+      return result;
+    }
+  }
+
+  // 2. Chế độ Elo (Cân bằng thực lực) hoặc Ngẫu nhiên
+  const candidates = participants.map((p) => {
+    let elo = 1000;
+    if (p.studentId && studentMap.has(p.studentId)) {
+      elo = studentMap.get(p.studentId)!.elo ?? 1000;
+    } else if (p.studentIds && p.studentIds.length > 0) {
+      const studentElos = p.studentIds
+        .map((id) => studentMap.get(id)?.elo)
+        .filter((e): e is number => typeof e === 'number');
+      if (studentElos.length > 0) {
+        elo = Math.round(studentElos.reduce((a, b) => a + b, 0) / studentElos.length);
+      }
+    } else if (typeof p.elo === 'number') {
+      elo = p.elo;
+    }
+
+    return {
+      id: p.id,
+      displayName: p.displayName,
+      elo,
+      groupName: p.teamName?.trim() || null,
+    };
+  });
+
+  const balanced = balanceTwoTeamsByElo(candidates, {
+    balanceMethod: balanceMode === 'random' ? 'random' : 'elo',
+    jitter: balanceMode === 'elo',
+  });
+
+  const blueInitial = balanced.blue.map((b) => ({
+    id: b.id,
+    displayName: b.displayName,
+    team: 'blue' as const,
+    groupName: b.groupName,
+    elo: b.elo,
+  }));
+
+  const redInitial = balanced.red.map((r) => ({
+    id: r.id,
+    displayName: r.displayName,
+    team: 'red' as const,
+    groupName: r.groupName,
+    elo: r.elo,
+  }));
+
+  return [...blueInitial, ...redInitial];
+}
+
 /**
  * ActivityPanel - Bảng điều khiển Hoạt động & Trò chơi dành cho Giáo viên
  */
@@ -191,6 +317,7 @@ export const ActivityPanel: React.FC<ActivityPanelProps> = ({
   onSendTeacherIntent,
   onEndActivity,
   participants = [],
+  students = [],
   classes = [],
   activeSession,
 }) => {
@@ -212,15 +339,32 @@ export const ActivityPanel: React.FC<ActivityPanelProps> = ({
   const [pollOptions, setPollOptions] = useState('Rất hiểu\nHiểu cơ bản\nCần giải thích lại');
   const [pollAllowMultiple, setPollAllowMultiple] = useState(false);
 
-  // Form cấu hình cho Quiz Live (Bao gồm 5 chế độ: Kahoot, Quizizz, Đấu Cờ Thụy Sỹ, Đại Chiến Lãnh Thổ, Đối Kháng 1vs1)
+  // Form cấu hình cho Quiz Live (Bao gồm các chế độ: Kahoot, Quizizz, Đấu Cờ Thụy Sỹ, Đại Chiến Lãnh Thổ, Đối Kháng 1vs1, Đấu Bóng Chuyền, Đại Chiến Xanh Đỏ)
   const [quizTitle, setQuizTitle] = useState('Thử thách Tri thức Lớp học');
-  const [quizMode, setQuizMode] = useState<'kahoot' | 'quizizz' | 'swiss-duel' | 'territory-war' | 'arcade-duel'>('kahoot');
+  const [quizMode, setQuizMode] = useState<'kahoot' | 'quizizz' | 'swiss-duel' | 'territory-war' | 'arcade-duel' | 'volleyball-tournament' | 'faction-duel'>('kahoot');
   const [quizShuffleQuestions, setQuizShuffleQuestions] = useState(true);
   const [quizShuffleOptions, setQuizShuffleOptions] = useState(true);
   const [quizEnablePowerUps, setQuizEnablePowerUps] = useState(true);
   const [quizShowCorrectAnswer, setQuizShowCorrectAnswer] = useState(true);
   const [quizAllowReplay, setQuizAllowReplay] = useState(true);
   const [selectedQuestionSetId, setSelectedQuestionSetId] = useState<string>('');
+
+  // Cấu hình Đại Chiến Xanh Đỏ (thử nghiệm)
+  const [factionTitle] = useState('Đại Chiến Xanh Đỏ (thử nghiệm)');
+  const [factionTotalRounds, setFactionTotalRounds] = useState(5);
+  const [factionQuestionsPerMatch, setFactionQuestionsPerMatch] = useState(2);
+  const [factionTimeLimitPerQuestion, setFactionTimeLimitPerQuestion] = useState(20);
+  const [factionPickPhaseSeconds, setFactionPickPhaseSeconds] = useState(15);
+  const [factionShuffleQuestions, setFactionShuffleQuestions] = useState(true);
+  const [factionShuffleOptions, setFactionShuffleOptions] = useState(true);
+  const [factionAllowRecycle, setFactionAllowRecycle] = useState(true);
+
+  // Cấu hình Đấu Bóng Chuyền (thử nghiệm)
+  const [volleyballTitle] = useState('Giải Đấu Bóng Chuyền (thử nghiệm)');
+  const [volleyballPoolMode, setVolleyballPoolMode] = useState<'auto' | '4_pools' | '8_pools'>('auto');
+  const [volleyballTimeLimitPerQuestion, setVolleyballTimeLimitPerQuestion] = useState(30);
+  const [volleyballShuffleQuestions, setVolleyballShuffleQuestions] = useState(true);
+  const [volleyballShuffleOptions, setVolleyballShuffleOptions] = useState(true);
 
   // Form cấu hình cho Kỳ thi (Exam)
   const [examTitle, setExamTitle] = useState('Kỳ Thi Khảo Sát');
@@ -243,6 +387,7 @@ export const ActivityPanel: React.FC<ActivityPanelProps> = ({
   const [territoryMapSize, setTerritoryMapSize] = useState<'5x5' | '7x7' | '9x9'>('7x7');
   const [territoryTimeLimitMinutes, setTerritoryTimeLimitMinutes] = useState(5);
   const [territoryEnableSuddenDeath, setTerritoryEnableSuddenDeath] = useState(false);
+  const [territoryBalanceMode, setTerritoryBalanceMode] = useState<'elo' | 'random' | 'groups'>('elo');
 
   // Cấu hình Đường Đua Tri Thức
   const [circuitTitle, setCircuitTitle] = useState('Đường Đua Tri Thức');
@@ -703,63 +848,11 @@ export const ActivityPanel: React.FC<ActivityPanelProps> = ({
             ];
           }
 
-          const initialParticipants: Array<{
-            id: string;
-            displayName: string;
-            team: 'blue' | 'red';
-            groupName: string | null;
-          }> = [];
-
-          if (participants && participants.length > 0) {
-            const groupMap = new Map<string, ParticipantDto[]>();
-            const individualStudents: ParticipantDto[] = [];
-
-            for (const p of participants) {
-              const gName = p.teamName?.trim();
-              if (gName) {
-                if (!groupMap.has(gName)) groupMap.set(gName, []);
-                groupMap.get(gName)!.push(p);
-              } else {
-                individualStudents.push(p);
-              }
-            }
-
-            if (groupMap.size > 0) {
-              const groupNames = Array.from(groupMap.keys());
-              groupNames.forEach((gName, gIdx) => {
-                const assignedTeam: 'blue' | 'red' = gIdx % 2 === 0 ? 'blue' : 'red';
-                const members = groupMap.get(gName)!;
-                for (const m of members) {
-                  initialParticipants.push({
-                    id: m.id,
-                    displayName: m.displayName,
-                    team: assignedTeam,
-                    groupName: gName,
-                  });
-                }
-              });
-
-              let currentTeam: 'blue' | 'red' = 'blue';
-              for (const ind of individualStudents) {
-                initialParticipants.push({
-                  id: ind.id,
-                  displayName: ind.displayName,
-                  team: currentTeam,
-                  groupName: null,
-                });
-                currentTeam = currentTeam === 'blue' ? 'red' : 'blue';
-              }
-            } else {
-              participants.forEach((p, idx) => {
-                initialParticipants.push({
-                  id: p.id,
-                  displayName: p.displayName,
-                  team: idx % 2 === 0 ? 'blue' : 'red',
-                  groupName: null,
-                });
-              });
-            }
-          }
+          const initialParticipants = prepareTerritoryParticipants(
+            participants,
+            students,
+            territoryBalanceMode
+          );
 
           await onStartActivity('territory-war', {
             title: quizTitle.trim() || territoryTitle.trim() || 'Đại Chiến Lãnh Thổ',
@@ -877,6 +970,213 @@ export const ActivityPanel: React.FC<ActivityPanelProps> = ({
           handleCloseConfig();
         } catch (err: unknown) {
           setErrorMsg(err instanceof Error ? err.message : 'Có lỗi khi bắt đầu Đối Kháng 1vs1');
+        }
+        return;
+      }
+
+      if (quizMode === 'volleyball-tournament') {
+        try {
+          let vbQuestions: unknown[] = [];
+          if (selectedQuestionSetId && onLoadQuestionSet) {
+            const loaded = await onLoadQuestionSet(selectedQuestionSetId);
+            const rawList = Array.isArray(loaded)
+              ? loaded
+              : ((loaded as { questions?: unknown[] })?.questions || []);
+            const validRawList = rawList.filter((qItem: unknown) => {
+              const q = qItem as Record<string, unknown>;
+              const qType = String(q['type'] || 'mcq4');
+              return qType !== 'tf_group' && qType !== 'matching' && qType !== 'cloze_drag';
+            });
+            if (validRawList.length > 0) {
+              vbQuestions = validRawList.map((qItem: unknown, idx: number) => {
+                const q = qItem as Record<string, unknown>;
+                const stem = parseStemText(q['stem'], `Câu hỏi ${idx + 1}`);
+                const id = q['id'] ? String(q['id']) : `q_${idx + 1}`;
+                const qType = String(q['type'] || 'mcq4');
+                const image = typeof q['image'] === 'string' ? q['image'] : undefined;
+
+                if (qType === 'tf') {
+                  return {
+                    id,
+                    type: 'tf',
+                    stem,
+                    correctAnswer: parseTfCorrectAnswer(q),
+                    timeLimit: Number(volleyballTimeLimitPerQuestion) || 30,
+                    image,
+                  };
+                }
+                if (qType === 'short') {
+                  return {
+                    id,
+                    type: 'short',
+                    stem,
+                    correctAnswer: parseShortCorrectAnswer(q),
+                    timeLimit: Number(volleyballTimeLimitPerQuestion) || 30,
+                    image,
+                  };
+                }
+
+                const rawOpts = Array.isArray(q['options'])
+                  ? (q['options'] as unknown[])
+                  : ['A', 'B', 'C', 'D'];
+                const options = rawOpts.map((o: unknown, oIdx: number) =>
+                  parseOptionText(o, ['A', 'B', 'C', 'D'][oIdx] || `Phương án ${oIdx + 1}`)
+                );
+                const cAns = parseCorrectAnswer(q, options.length);
+                return {
+                  id,
+                  type: 'mcq4',
+                  stem,
+                  options,
+                  correctAnswer: cAns,
+                  timeLimit: Number(volleyballTimeLimitPerQuestion) || 30,
+                  image,
+                };
+              });
+            }
+          }
+
+          if (vbQuestions.length === 0) {
+            vbQuestions = [
+              {
+                id: 'q1',
+                type: 'mcq4',
+                stem: 'Thủ đô của nước Việt Nam là gì?',
+                options: ['Hà Nội', 'Hồ Chí Minh', 'Đà Nẵng', 'Huế'],
+                correctAnswer: 0,
+                timeLimit: 30,
+              },
+              {
+                id: 'q2',
+                type: 'tf',
+                stem: 'Mặt trời mọc ở hướng Đông.',
+                correctAnswer: true,
+                timeLimit: 30,
+              },
+            ];
+          }
+
+          await onStartActivity('volleyball-tournament', {
+            title: quizTitle.trim() || volleyballTitle.trim() || 'Giải Đấu Bóng Chuyền (thử nghiệm)',
+            poolMode: volleyballPoolMode,
+            questions: vbQuestions,
+            pointsWin: 2,
+            pointsDraw: 1,
+            pointsLoss: 0,
+            timeLimitPerQuestion: Number(volleyballTimeLimitPerQuestion) || 30,
+            shuffleQuestions: volleyballShuffleQuestions,
+            shuffleOptions: volleyballShuffleOptions,
+          });
+          handleCloseConfig();
+        } catch (err: unknown) {
+          setErrorMsg(err instanceof Error ? err.message : 'Có lỗi khi bắt đầu Giải Đấu Bóng Chuyền');
+        }
+        return;
+      }
+
+      if (quizMode === 'faction-duel') {
+        try {
+          let fdQuestions: unknown[] = [];
+          if (selectedQuestionSetId && onLoadQuestionSet) {
+            const loaded = await onLoadQuestionSet(selectedQuestionSetId);
+            const rawList = Array.isArray(loaded)
+              ? loaded
+              : ((loaded as { questions?: unknown[] })?.questions || []);
+            const validRawList = rawList.filter((qItem: unknown) => {
+              const q = qItem as Record<string, unknown>;
+              const qType = String(q['type'] || 'mcq4');
+              return qType !== 'tf_group' && qType !== 'matching' && qType !== 'cloze_drag';
+            });
+            if (validRawList.length > 0) {
+              fdQuestions = validRawList.map((qItem: unknown, idx: number) => {
+                const q = qItem as Record<string, unknown>;
+                const stem = parseStemText(q['stem'], `Câu hỏi ${idx + 1}`);
+                const id = q['id'] ? String(q['id']) : `q_${idx + 1}`;
+                const qType = String(q['type'] || 'mcq4');
+                const image = typeof q['image'] === 'string' ? q['image'] : undefined;
+
+                if (qType === 'tf') {
+                  return {
+                    id,
+                    type: 'tf',
+                    stem: { text: stem, images: image ? [image] : undefined },
+                    correctAnswer: parseTfCorrectAnswer(q),
+                    timeLimitSeconds: Number(factionTimeLimitPerQuestion) || 20,
+                  };
+                }
+                if (qType === 'short') {
+                  return {
+                    id,
+                    type: 'short',
+                    stem: { text: stem, images: image ? [image] : undefined },
+                    correctAnswer: parseShortCorrectAnswer(q),
+                    timeLimitSeconds: Number(factionTimeLimitPerQuestion) || 20,
+                  };
+                }
+
+                const rawOpts = Array.isArray(q['options'])
+                  ? (q['options'] as unknown[])
+                  : ['A', 'B', 'C', 'D'];
+                const options = rawOpts.map((o: unknown, oIdx: number) =>
+                  parseOptionText(o, ['A', 'B', 'C', 'D'][oIdx] || `Phương án ${oIdx + 1}`)
+                );
+                const cAns = parseCorrectAnswer(q, options.length);
+
+                return {
+                  id,
+                  type: 'mcq4',
+                  stem: { text: stem, images: image ? [image] : undefined },
+                  options: options.map((optText, oIdx) => ({
+                    id: String(oIdx),
+                    text: optText,
+                    isCorrect: Number(cAns) === oIdx,
+                  })),
+                  correctAnswer: String(cAns),
+                  timeLimitSeconds: Number(factionTimeLimitPerQuestion) || 20,
+                };
+              });
+            }
+          }
+
+          if (fdQuestions.length === 0) {
+            fdQuestions = [
+              {
+                id: 'q1',
+                type: 'mcq4',
+                stem: { text: 'Thủ đô của nước Việt Nam là gì?' },
+                options: [
+                  { id: '0', text: 'Hà Nội', isCorrect: true },
+                  { id: '1', text: 'Hồ Chí Minh', isCorrect: false },
+                  { id: '2', text: 'Đà Nẵng', isCorrect: false },
+                  { id: '3', text: 'Huế', isCorrect: false },
+                ],
+                correctAnswer: '0',
+                timeLimitSeconds: 20,
+              },
+              {
+                id: 'q2',
+                type: 'tf',
+                stem: { text: 'Mặt trời mọc ở hướng Đông.' },
+                correctAnswer: true,
+                timeLimitSeconds: 20,
+              },
+            ];
+          }
+
+          await onStartActivity('faction-duel', {
+            title: quizTitle.trim() || factionTitle.trim() || 'Đại Chiến Xanh Đỏ (thử nghiệm)',
+            totalRounds: Number(factionTotalRounds) || 5,
+            questionsPerMatch: Number(factionQuestionsPerMatch) || 2,
+            shuffleQuestions: factionShuffleQuestions,
+            shuffleOptions: factionShuffleOptions,
+            allowQuestionRecycle: factionAllowRecycle,
+            answerTimeSeconds: Number(factionTimeLimitPerQuestion) || 20,
+            pickPhaseSeconds: Number(factionPickPhaseSeconds) || 15,
+            questions: fdQuestions,
+          });
+          handleCloseConfig();
+        } catch (err: unknown) {
+          setErrorMsg(err instanceof Error ? err.message : 'Có lỗi khi bắt đầu Đại Chiến Xanh Đỏ');
         }
         return;
       }
@@ -1496,67 +1796,12 @@ export const ActivityPanel: React.FC<ActivityPanelProps> = ({
           ];
         }
 
-        // Tự động phân chia các nhóm / học sinh vào 2 phe Xanh - Đỏ cụ thể
-        const initialParticipants: Array<{
-          id: string;
-          displayName: string;
-          team: 'blue' | 'red';
-          groupName: string | null;
-        }> = [];
-
-        if (participants && participants.length > 0) {
-          const groupMap = new Map<string, ParticipantDto[]>();
-          const individualStudents: ParticipantDto[] = [];
-
-          for (const p of participants) {
-            const gName = p.teamName?.trim();
-            if (gName) {
-              if (!groupMap.has(gName)) groupMap.set(gName, []);
-              groupMap.get(gName)!.push(p);
-            } else {
-              individualStudents.push(p);
-            }
-          }
-
-          if (groupMap.size > 0) {
-            // Có nhóm: phân bổ các nhóm xen kẽ vào Blue và Red
-            const groupNames = Array.from(groupMap.keys());
-            groupNames.forEach((gName, gIdx) => {
-              const assignedTeam: 'blue' | 'red' = gIdx % 2 === 0 ? 'blue' : 'red';
-              const members = groupMap.get(gName)!;
-              for (const m of members) {
-                initialParticipants.push({
-                  id: m.id,
-                  displayName: m.displayName,
-                  team: assignedTeam,
-                  groupName: gName,
-                });
-              }
-            });
-
-            // Học sinh lẻ chưa có nhóm: phân chia đều xen kẽ vào 2 phe
-            let currentTeam: 'blue' | 'red' = 'blue';
-            for (const ind of individualStudents) {
-              initialParticipants.push({
-                id: ind.id,
-                displayName: ind.displayName,
-                team: currentTeam,
-                groupName: null,
-              });
-              currentTeam = currentTeam === 'blue' ? 'red' : 'blue';
-            }
-          } else {
-            // Không có nhóm: chia đều học sinh xen kẽ 50/50 vào 2 phe Xanh - Đỏ
-            participants.forEach((p, idx) => {
-              initialParticipants.push({
-                id: p.id,
-                displayName: p.displayName,
-                team: idx % 2 === 0 ? 'blue' : 'red',
-                groupName: null,
-              });
-            });
-          }
-        }
+        // Tự động phân chia quân đội vào 2 phe Xanh - Đỏ
+        const initialParticipants = prepareTerritoryParticipants(
+          participants,
+          students,
+          territoryBalanceMode
+        );
 
         await onStartActivity('territory-war', {
           title: territoryTitle.trim() || 'Đại Chiến Lãnh Thổ',
@@ -2377,6 +2622,76 @@ export const ActivityPanel: React.FC<ActivityPanelProps> = ({
                           </p>
                         </div>
                       </label>
+
+                      {/* Chế độ 6: Đấu Bóng Chuyền (thử nghiệm) */}
+                      <label
+                        className={`p-3 border-2 rounded-xl flex items-start gap-2.5 cursor-pointer transition ${
+                          quizMode === 'volleyball-tournament'
+                            ? 'border-emerald-600 bg-emerald-50/60 text-emerald-950 shadow-xs'
+                            : 'border-gray-200 hover:border-gray-300 bg-white'
+                        }`}
+                      >
+                        <input
+                          type="radio"
+                          name="quizMode"
+                          value="volleyball-tournament"
+                          checked={quizMode === 'volleyball-tournament'}
+                          onChange={() => {
+                            setQuizMode('volleyball-tournament');
+                            if (selectedQuestionSetId) {
+                              const found = questionSets?.find(s => s.id === selectedQuestionSetId);
+                              if (found) setQuizTitle(`Bóng Chuyền: ${found.title}`);
+                            }
+                          }}
+                          className="w-4 h-4 mt-0.5 accent-emerald-600 text-emerald-600 shrink-0"
+                        />
+                        <div className="flex-1">
+                          <div className="flex items-center gap-1.5">
+                            <span className="text-base">🏐🏆</span>
+                            <p className="font-bold text-sm text-gray-900">
+                              Đấu Bóng Chuyền <span className="text-emerald-700 font-semibold">(thử nghiệm)</span>
+                            </p>
+                          </div>
+                          <p className="text-xs text-gray-600 mt-0.5 leading-snug">
+                            Thi đấu vòng bảng 3 lượt tính điểm sau đó bắt cặp xếp hạng 4 Cúp phân tầng
+                          </p>
+                        </div>
+                      </label>
+
+                      {/* Chế độ 7: Đại Chiến Xanh Đỏ (thử nghiệm) */}
+                      <label
+                        className={`p-3 border-2 rounded-xl flex items-start gap-2.5 cursor-pointer transition ${
+                          quizMode === 'faction-duel'
+                            ? 'border-indigo-600 bg-indigo-50/60 text-indigo-950 shadow-xs'
+                            : 'border-gray-200 hover:border-gray-300 bg-white'
+                        }`}
+                      >
+                        <input
+                          type="radio"
+                          name="quizMode"
+                          value="faction-duel"
+                          checked={quizMode === 'faction-duel'}
+                          onChange={() => {
+                            setQuizMode('faction-duel');
+                            if (selectedQuestionSetId) {
+                              const found = questionSets?.find(s => s.id === selectedQuestionSetId);
+                              if (found) setQuizTitle(`Đại Chiến Xanh Đỏ: ${found.title}`);
+                            }
+                          }}
+                          className="w-4 h-4 mt-0.5 accent-indigo-600 text-indigo-600 shrink-0"
+                        />
+                        <div className="flex-1">
+                          <div className="flex items-center gap-1.5">
+                            <span className="text-base">⚔️🔵🔴</span>
+                            <p className="font-bold text-sm text-gray-900">
+                              Đại Chiến Xanh Đỏ <span className="text-indigo-700 font-semibold">(thử nghiệm)</span>
+                            </p>
+                          </div>
+                          <p className="text-xs text-gray-600 mt-0.5 leading-snug">
+                            Chia 2 phe cân bằng Elo, lượt sau phe thắng chọn đối thủ (15s), tính điểm trọng số lật kèo
+                          </p>
+                        </div>
+                      </label>
                     </div>
                   </div>
 
@@ -2414,6 +2729,10 @@ export const ActivityPanel: React.FC<ActivityPanelProps> = ({
                               setQuizTitle(`Đại Chiến Lãnh Thổ: ${found.title}`);
                             } else if (quizMode === 'arcade-duel') {
                               setQuizTitle(`Đối Kháng 1vs1: ${found.title}`);
+                            } else if (quizMode === 'volleyball-tournament') {
+                              setQuizTitle(`Bóng Chuyền: ${found.title}`);
+                            } else if (quizMode === 'faction-duel') {
+                              setQuizTitle(`Đại Chiến Xanh Đỏ: ${found.title}`);
                             } else {
                               setQuizTitle(found.title);
                             }
@@ -2671,6 +2990,50 @@ export const ActivityPanel: React.FC<ActivityPanelProps> = ({
                           </div>
                         </div>
 
+                        <div>
+                          <label className="block text-xs font-semibold text-gray-600 mb-1">
+                            Phương thức phân chia quân đội 2 phe
+                          </label>
+                          <div className="grid grid-cols-3 gap-2">
+                            <button
+                              type="button"
+                              onClick={() => setTerritoryBalanceMode('elo')}
+                              className={`p-2 rounded-xl border text-center transition cursor-pointer ${
+                                territoryBalanceMode === 'elo'
+                                  ? 'bg-amber-50 border-amber-500 text-amber-900 font-bold shadow-sm'
+                                  : 'bg-white hover:bg-gray-50 border-gray-200 text-gray-700'
+                              }`}
+                            >
+                              <span className="block text-xs font-bold">⚖️ Cân bằng Elo</span>
+                              <span className="text-[10px] text-amber-700 block">(Khuyên dùng)</span>
+                            </button>
+                            <button
+                              type="button"
+                              onClick={() => setTerritoryBalanceMode('random')}
+                              className={`p-2 rounded-xl border text-center transition cursor-pointer ${
+                                territoryBalanceMode === 'random'
+                                  ? 'bg-blue-50 border-blue-500 text-blue-900 font-bold shadow-sm'
+                                  : 'bg-white hover:bg-gray-50 border-gray-200 text-gray-700'
+                              }`}
+                            >
+                              <span className="block text-xs font-bold">🎲 Ngẫu nhiên</span>
+                              <span className="text-[10px] text-gray-500 block">50/50</span>
+                            </button>
+                            <button
+                              type="button"
+                              onClick={() => setTerritoryBalanceMode('groups')}
+                              className={`p-2 rounded-xl border text-center transition cursor-pointer ${
+                                territoryBalanceMode === 'groups'
+                                  ? 'bg-purple-50 border-purple-500 text-purple-900 font-bold shadow-sm'
+                                  : 'bg-white hover:bg-gray-50 border-gray-200 text-gray-700'
+                              }`}
+                            >
+                              <span className="block text-xs font-bold">👥 Theo tổ/nhóm</span>
+                              <span className="text-[10px] text-purple-700 block">Có sẵn</span>
+                            </button>
+                          </div>
+                        </div>
+
                         <p className="text-xs text-blue-800 bg-blue-50 p-2.5 rounded-lg border border-blue-200">
                           💡 Hệ thống tự động chia học sinh / nhóm vào 2 phe Xanh và Đỏ. Trả lời đúng để chiếm cứ điểm bản đồ!
                         </p>
@@ -2838,6 +3201,229 @@ export const ActivityPanel: React.FC<ActivityPanelProps> = ({
                           <p className="font-bold text-amber-300">⌨️ BỐ TRÍ PHÍM BÀN PHÍM GV:</p>
                           <p>🔵 <span className="text-blue-300 font-bold">Đội Xanh:</span> Đáp án <span className="text-white font-bold bg-slate-800 px-1 rounded">A - S - D - F</span>{arcadeDuelEnablePowerUps ? <> | Dùng vật phẩm: <span className="text-amber-300 font-bold bg-slate-800 px-1 rounded">Q</span></> : null}</p>
                           <p>🔴 <span className="text-red-300 font-bold">Đội Đỏ:</span> Đáp án <span className="text-white font-bold bg-slate-800 px-1 rounded">1 - 2 - 3 - 4</span>{arcadeDuelEnablePowerUps ? <> | Dùng vật phẩm: <span className="text-amber-300 font-bold bg-slate-800 px-1 rounded">5</span></> : null}</p>
+                        </div>
+                      </div>
+                    )}
+
+                    {quizMode === 'volleyball-tournament' && (
+                      <div className="space-y-4">
+                        <label className="block text-sm font-bold text-gray-700">
+                          4. Cài đặt Đấu Bóng Chuyền (thử nghiệm)
+                        </label>
+
+                        {/* Chọn chế độ chia bảng */}
+                        <div>
+                          <label className="block text-xs font-semibold text-gray-600 mb-1.5">
+                            Quy mô bảng đấu
+                          </label>
+                          <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5">
+                            <label
+                              className={`p-3 border rounded-xl flex items-start gap-2.5 cursor-pointer transition ${
+                                volleyballPoolMode === 'auto'
+                                  ? 'bg-emerald-50 border-emerald-500 font-bold text-emerald-900 shadow-xs'
+                                  : 'hover:bg-gray-50'
+                              }`}
+                            >
+                              <input
+                                type="radio"
+                                name="volleyballPoolMode"
+                                checked={volleyballPoolMode === 'auto'}
+                                onChange={() => setVolleyballPoolMode('auto')}
+                                className="accent-emerald-600 mt-0.5"
+                              />
+                              <div>
+                                <span className="block text-sm font-bold">✨ Tự động</span>
+                                <span className="text-[11px] text-gray-500 leading-tight block mt-0.5">
+                                  Tự chia 4 hoặc 8 bảng tùy sĩ số
+                                </span>
+                              </div>
+                            </label>
+
+                            <label
+                              className={`p-3 border rounded-xl flex items-start gap-2.5 cursor-pointer transition ${
+                                volleyballPoolMode === '4_pools'
+                                  ? 'bg-emerald-50 border-emerald-500 font-bold text-emerald-900 shadow-xs'
+                                  : 'hover:bg-gray-50'
+                              }`}
+                            >
+                              <input
+                                type="radio"
+                                name="volleyballPoolMode"
+                                checked={volleyballPoolMode === '4_pools'}
+                                onChange={() => setVolleyballPoolMode('4_pools')}
+                                className="accent-emerald-600 mt-0.5"
+                              />
+                              <div>
+                                <span className="block text-sm font-bold">4 Bảng (A-D)</span>
+                                <span className="text-[11px] text-gray-500 leading-tight block mt-0.5">
+                                  Thích hợp cho 15 - 23 học sinh
+                                </span>
+                              </div>
+                            </label>
+
+                            <label
+                              className={`p-3 border rounded-xl flex items-start gap-2.5 cursor-pointer transition ${
+                                volleyballPoolMode === '8_pools'
+                                  ? 'bg-emerald-50 border-emerald-500 font-bold text-emerald-900 shadow-xs'
+                                  : 'hover:bg-gray-50'
+                              }`}
+                            >
+                              <input
+                                type="radio"
+                                name="volleyballPoolMode"
+                                checked={volleyballPoolMode === '8_pools'}
+                                onChange={() => setVolleyballPoolMode('8_pools')}
+                                className="accent-emerald-600 mt-0.5"
+                              />
+                              <div>
+                                <span className="block text-sm font-bold">8 Bảng (A-H)</span>
+                                <span className="text-[11px] text-gray-500 leading-tight block mt-0.5">
+                                  Thích hợp cho 24 - 40 học sinh
+                                </span>
+                              </div>
+                            </label>
+                          </div>
+                        </div>
+
+                        {/* Thời gian làm mỗi câu */}
+                        <div>
+                          <label className="block text-xs font-semibold text-gray-600 mb-1">
+                            Thời gian suy nghĩ mỗi câu hỏi (giây)
+                          </label>
+                          <select
+                            value={volleyballTimeLimitPerQuestion}
+                            onChange={e => setVolleyballTimeLimitPerQuestion(Number(e.target.value))}
+                            className="w-full min-h-[44px] px-3 py-2 border rounded-lg text-sm bg-white"
+                          >
+                            <option value={15}>15 giây (Nhanh)</option>
+                            <option value={20}>20 giây</option>
+                            <option value={30}>30 giây (Mặc định)</option>
+                            <option value={45}>45 giây</option>
+                            <option value={60}>60 giây (Nhiều bài tập tính toán)</option>
+                          </select>
+                        </div>
+
+                        {/* Tùy chọn đảo câu hỏi & phương án */}
+                        <div className="flex flex-wrap gap-4 pt-1">
+                          <label className="flex items-center gap-2 cursor-pointer text-xs font-semibold text-gray-700">
+                            <input
+                              type="checkbox"
+                              checked={volleyballShuffleQuestions}
+                              onChange={e => setVolleyballShuffleQuestions(e.target.checked)}
+                              className="w-4 h-4 text-emerald-600 rounded"
+                            />
+                            <span>🔀 Đảo thứ tự câu hỏi qua các vòng</span>
+                          </label>
+                          <label className="flex items-center gap-2 cursor-pointer text-xs font-semibold text-gray-700">
+                            <input
+                              type="checkbox"
+                              checked={volleyballShuffleOptions}
+                              onChange={e => setVolleyballShuffleOptions(e.target.checked)}
+                              className="w-4 h-4 text-emerald-600 rounded"
+                            />
+                            <span>🔀 Đảo phương án A, B, C, D</span>
+                          </label>
+                        </div>
+                      </div>
+                    )}
+
+                    {quizMode === 'faction-duel' && (
+                      <div className="space-y-4">
+                        <label className="block text-sm font-bold text-gray-700">
+                          4. Cài đặt Đại Chiến Xanh Đỏ (thử nghiệm)
+                        </label>
+
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                          <div>
+                            <label className="block text-xs font-semibold text-gray-600 mb-1">
+                              Số câu hỏi mỗi trận (1 - 5 câu)
+                            </label>
+                            <input
+                              type="number"
+                              min={1}
+                              max={5}
+                              value={factionQuestionsPerMatch}
+                              onChange={e => setFactionQuestionsPerMatch(Math.max(1, Math.min(5, Number(e.target.value) || 2)))}
+                              className="w-full min-h-[44px] px-3 py-2 border rounded-xl text-sm bg-white"
+                            />
+                            <p className="text-[11px] text-gray-500 mt-1">Mặc định: 2 câu hỏi/trận 1v1</p>
+                          </div>
+
+                          <div>
+                            <label className="block text-xs font-semibold text-gray-600 mb-1">
+                              Số vòng đấu toàn trận (1 - 20 vòng)
+                            </label>
+                            <input
+                              type="number"
+                              min={1}
+                              max={20}
+                              value={factionTotalRounds}
+                              onChange={e => setFactionTotalRounds(Math.max(1, Math.min(20, Number(e.target.value) || 5)))}
+                              className="w-full min-h-[44px] px-3 py-2 border rounded-xl text-sm bg-white"
+                            />
+                            <p className="text-[11px] text-gray-500 mt-1">Mặc định: 5 vòng đấu</p>
+                          </div>
+                        </div>
+
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                          <div>
+                            <label className="block text-xs font-semibold text-gray-600 mb-1">
+                              Thời gian làm bài mỗi câu (giây)
+                            </label>
+                            <input
+                              type="number"
+                              min={5}
+                              max={120}
+                              value={factionTimeLimitPerQuestion}
+                              onChange={e => setFactionTimeLimitPerQuestion(Math.max(5, Math.min(120, Number(e.target.value) || 20)))}
+                              className="w-full min-h-[44px] px-3 py-2 border rounded-xl text-sm bg-white"
+                            />
+                          </div>
+
+                          <div>
+                            <label className="block text-xs font-semibold text-gray-600 mb-1">
+                              Thời gian chọn đối thủ (giây)
+                            </label>
+                            <input
+                              type="number"
+                              min={5}
+                              max={60}
+                              value={factionPickPhaseSeconds}
+                              onChange={e => setFactionPickPhaseSeconds(Math.max(5, Math.min(60, Number(e.target.value) || 15)))}
+                              className="w-full min-h-[44px] px-3 py-2 border rounded-xl text-sm bg-white"
+                            />
+                            <p className="text-[11px] text-gray-500 mt-1">Mặc định: 15 giây đếm ngược</p>
+                          </div>
+                        </div>
+
+                        <div className="space-y-2 pt-2 border-t border-gray-100">
+                          <label className="flex items-center gap-2 cursor-pointer text-xs font-semibold text-gray-700">
+                            <input
+                              type="checkbox"
+                              checked={factionShuffleQuestions}
+                              onChange={e => setFactionShuffleQuestions(e.target.checked)}
+                              className="w-4 h-4 text-indigo-600 rounded"
+                            />
+                            <span>🔀 Đảo thứ tự câu hỏi ngẫu nhiên</span>
+                          </label>
+                          <label className="flex items-center gap-2 cursor-pointer text-xs font-semibold text-gray-700">
+                            <input
+                              type="checkbox"
+                              checked={factionShuffleOptions}
+                              onChange={e => setFactionShuffleOptions(e.target.checked)}
+                              className="w-4 h-4 text-indigo-600 rounded"
+                            />
+                            <span>🔀 Đảo phương án A, B, C, D độc lập (chống nhìn bài)</span>
+                          </label>
+                          <label className="flex items-center gap-2 cursor-pointer text-xs font-semibold text-gray-700">
+                            <input
+                              type="checkbox"
+                              checked={factionAllowRecycle}
+                              onChange={e => setFactionAllowRecycle(e.target.checked)}
+                              className="w-4 h-4 text-indigo-600 rounded"
+                            />
+                            <span>🔄 Tự động xoay vòng lấy lại câu cũ khi hết kho đề</span>
+                          </label>
                         </div>
                       </div>
                     )}
@@ -3657,18 +4243,71 @@ export const ActivityPanel: React.FC<ActivityPanelProps> = ({
                   </div>
 
                   {/* Phân chia đội / nhóm tự động */}
-                  <div className="bg-slate-50 p-3.5 rounded-xl border border-slate-200 space-y-2">
+                  <div className="bg-slate-50 p-3.5 rounded-xl border border-slate-200 space-y-3">
                     <div className="flex items-center justify-between">
                       <span className="text-xs font-bold text-slate-700 uppercase flex items-center gap-1.5">
                         <span>👥</span> Phân chia quân đội ({participants.length} học sinh)
                       </span>
                       <span className="text-[11px] text-blue-700 font-bold bg-blue-100/70 px-2 py-0.5 rounded-md">
-                        Tự động chia vào 2 phe Xanh & Đỏ
+                        2 phe Xanh & Đỏ
                       </span>
                     </div>
 
-                    <p className="text-xs text-slate-600 leading-relaxed">
-                      Khi bấm <strong>Bắt đầu ngay</strong>, toàn bộ {participants.length > 0 ? `${participants.length} học sinh trong lớp` : 'học sinh'} sẽ được tự động phân chia cụ thể vào 2 phe <strong>Xanh</strong> và <strong>Đỏ</strong> (theo nhóm nếu có). Sau khi bắt đầu, Thầy/Cô có thể đổi nhóm hoặc từng học sinh qua lại giữa hai phe bất cứ lúc nào!
+                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
+                      <button
+                        type="button"
+                        onClick={() => setTerritoryBalanceMode('elo')}
+                        className={`p-2.5 rounded-xl border text-left transition cursor-pointer ${
+                          territoryBalanceMode === 'elo'
+                            ? 'bg-amber-50 border-amber-500 text-amber-950 font-bold ring-1 ring-amber-400'
+                            : 'bg-white hover:bg-gray-50 border-gray-200 text-gray-700'
+                        }`}
+                      >
+                        <div className="text-xs font-bold flex items-center gap-1">
+                          <span>⚖️ Cân bằng Elo ẩn</span>
+                        </div>
+                        <p className="text-[11px] text-amber-800 font-normal mt-0.5 leading-snug">
+                          Khuyên dùng. Cân bằng thực lực dựa trên phong độ làm bài.
+                        </p>
+                      </button>
+
+                      <button
+                        type="button"
+                        onClick={() => setTerritoryBalanceMode('random')}
+                        className={`p-2.5 rounded-xl border text-left transition cursor-pointer ${
+                          territoryBalanceMode === 'random'
+                            ? 'bg-blue-50 border-blue-500 text-blue-950 font-bold ring-1 ring-blue-400'
+                            : 'bg-white hover:bg-gray-50 border-gray-200 text-gray-700'
+                        }`}
+                      >
+                        <div className="text-xs font-bold flex items-center gap-1">
+                          <span>🎲 Ngẫu nhiên 50/50</span>
+                        </div>
+                        <p className="text-[11px] text-gray-500 font-normal mt-0.5 leading-snug">
+                          Chia may rủi xen kẽ ngẫu nhiên giữa 2 phe.
+                        </p>
+                      </button>
+
+                      <button
+                        type="button"
+                        onClick={() => setTerritoryBalanceMode('groups')}
+                        className={`p-2.5 rounded-xl border text-left transition cursor-pointer ${
+                          territoryBalanceMode === 'groups'
+                            ? 'bg-purple-50 border-purple-500 text-purple-950 font-bold ring-1 ring-purple-400'
+                            : 'bg-white hover:bg-gray-50 border-gray-200 text-gray-700'
+                        }`}
+                      >
+                        <div className="text-xs font-bold flex items-center gap-1">
+                          <span>👥 Theo tổ / nhóm</span>
+                        </div>
+                        <p className="text-[11px] text-purple-800 font-normal mt-0.5 leading-snug">
+                          Giữ nguyên các tổ học tập đã phân của lớp.
+                        </p>
+                      </button>
+                    </div>
+
+                    <p className="text-[11px] text-slate-500 italic">
+                      * Điểm Elo ẩn hoàn toàn với học sinh để tránh so sánh tiêu cực. Sau khi trận đấu bắt đầu, Thầy/Cô vẫn có thể đổi học sinh qua lại giữa hai phe bất cứ lúc nào!
                     </p>
                   </div>
                 </>
