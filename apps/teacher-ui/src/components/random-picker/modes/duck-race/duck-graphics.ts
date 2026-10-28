@@ -90,7 +90,13 @@ export function createDuckDisplayNode(entity: DuckEntity): DuckDisplayNode {
     },
   });
 
-  const textW = Math.max(nameText.width + 10, 32);
+  let textWidth = 32;
+  try {
+    textWidth = nameText.width;
+  } catch {
+    textWidth = shortName.length * 8;
+  }
+  const textW = Math.max(textWidth + 10, 32);
   const textH = 18;
 
   // Nền bảng tên trắng bo tròn viền xám sạch sẽ, đồng nhất cho mọi chú vịt (không lộ vịt nhất)
