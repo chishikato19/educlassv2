@@ -1721,7 +1721,7 @@ export const sessionsRoutes: FastifyPluginAsync<SessionsRoutesOptions> = async (
       }
 
       let anyHasPin = false;
-      let allPinVerified = true;
+      const allPinVerified = true;
       for (const student of loadedStudents) {
         const hasPassword = Boolean(student.passwordHash);
         if (hasPassword) {

@@ -249,7 +249,7 @@ export const CircuitRaceActivity: ActivityDefinition<CircuitConfig, CircuitState
       };
 
       // Đăng ký người chơi nếu chưa có trong state
-      let participant: CircuitParticipant = st.participants[participantId] ?? {
+      const participant: CircuitParticipant = st.participants[participantId] ?? {
         participantId,
         displayName: `HS_${participantId.slice(0, 4)}`,
         avatarJson: null,
