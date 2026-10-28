@@ -41,6 +41,7 @@ export const SwissParticipantStateSchema = z.object({
   displayName: z.string(),
   tournamentPoints: z.number().default(0), // Thắng 2, Hòa 1, Thua 0
   correctCount: z.number().default(0), // Tổng số câu đúng tích lũy
+  totalQuestions: z.number().default(0).optional(), // Tổng số câu hỏi đã thi
   matchesWon: z.number().default(0),
   matchesDrawn: z.number().default(0),
   matchesLost: z.number().default(0),
@@ -49,6 +50,8 @@ export const SwissParticipantStateSchema = z.object({
   history: z.array(z.string()).default([]), // Danh sách participantId đối thủ đã gặp
   currentTable: z.number().nullable().default(null),
   isByeThisRound: z.boolean().default(false),
+  isOnline: z.boolean().default(true).optional(), // Trạng thái kết nối: false nếu học sinh đã thoát/rời phiên
+  lastActiveAt: z.number().optional(),
 });
 export type SwissParticipantState = z.infer<typeof SwissParticipantStateSchema>;
 
@@ -58,12 +61,15 @@ export const SwissLeaderboardEntrySchema = z.object({
   displayName: z.string(),
   tournamentPoints: z.number(),
   correctCount: z.number(),
+  totalQuestions: z.number().default(0).optional(),
+  accuracy: z.number().default(0).optional(),
   buchholz: z.number(), // Tổng điểm của các đối thủ đã từng gặp
   streak: z.number(),
   matchesWon: z.number(),
   matchesDrawn: z.number(),
   matchesLost: z.number(),
   isBye: z.boolean().default(false),
+  isOnline: z.boolean().default(true).optional(),
 });
 export type SwissLeaderboardEntry = z.infer<typeof SwissLeaderboardEntrySchema>;
 
@@ -142,6 +148,22 @@ export const SwissDuelIntentSchema = z.discriminatedUnion('type', [
     type: z.literal('add_time'),
     minutes: z.number().min(1).max(60),
   }),
+  z.object({
+    type: z.literal('timeout_round'),
+  }),
+  z.object({
+    type: z.literal('participant_offline'),
+    participantId: z.string(),
+  }),
+  z.object({
+    type: z.literal('participant_online'),
+    participantId: z.string(),
+  }),
+  z.object({
+    type: z.literal('toggle_participant_active'),
+    participantId: z.string(),
+    isOnline: z.boolean().optional(),
+  }),
 ]);
 export type SwissDuelIntent = z.infer<typeof SwissDuelIntentSchema>;
 
@@ -150,6 +172,8 @@ export const SwissDuelResultSchema = z.object({
   displayName: z.string(),
   tournamentPoints: z.number(),
   correctCount: z.number(),
+  totalQuestions: z.number().default(0).optional(),
+  accuracy: z.number().default(0).optional(),
   matchesWon: z.number(),
   matchesDrawn: z.number(),
   matchesLost: z.number(),

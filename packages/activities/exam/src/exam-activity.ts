@@ -56,6 +56,19 @@ export function generateParticipantReviewData(
 
     let renderedOptions: Array<{ index: number; label: string; text: string }> | undefined =
       undefined;
+    let renderedItems:
+      | Array<{
+          index: number;
+          label: string;
+          text: string;
+          images?: string[];
+          studentAnswer: boolean | null;
+          studentChoiceLabel: string;
+          correctAnswer: boolean;
+          correctChoiceLabel: string;
+          isCorrect: boolean;
+        }>
+      | undefined = undefined;
     let studentChoiceLabel: string | null = null;
     let correctChoiceLabel: string | null = null;
 
@@ -96,6 +109,82 @@ export function generateParticipantReviewData(
         }
         correctChoiceLabel = baseLabels[origQ.correct] ?? `${origQ.correct + 1}`;
       }
+    } else if (origQ.type === 'tf') {
+      correctChoiceLabel = origQ.correct ? 'Đúng' : 'Sai';
+      let studentBool: boolean | null = null;
+      if (typeof studentRawAnswer === 'boolean') {
+        studentBool = studentRawAnswer;
+      } else if (
+        typeof studentRawAnswer === 'object' &&
+        studentRawAnswer !== null &&
+        'selected' in studentRawAnswer
+      ) {
+        studentBool =
+          typeof (studentRawAnswer as { selected: unknown }).selected === 'boolean'
+            ? (studentRawAnswer as { selected: boolean }).selected
+            : null;
+      }
+      studentChoiceLabel = studentBool === true ? 'Đúng' : studentBool === false ? 'Sai' : null;
+      renderedOptions = [
+        { index: 0, label: 'Đúng', text: 'Đúng' },
+        { index: 1, label: 'Sai', text: 'Sai' },
+      ];
+    } else if (origQ.type === 'tf_group' && Array.isArray(origQ.items)) {
+      let studentSelections: Array<boolean | null> = [null, null, null, null];
+      if (Array.isArray(studentRawAnswer)) {
+        studentSelections = studentRawAnswer.map(v => (typeof v === 'boolean' ? v : null));
+      } else if (
+        typeof studentRawAnswer === 'object' &&
+        studentRawAnswer !== null &&
+        'selected' in studentRawAnswer &&
+        Array.isArray((studentRawAnswer as { selected: unknown[] }).selected)
+      ) {
+        studentSelections = (studentRawAnswer as { selected: unknown[] }).selected.map(v =>
+          typeof v === 'boolean' ? v : null
+        );
+      }
+      renderedItems = origQ.items.map((it, itIdx) => {
+        const itLabel = ['a', 'b', 'c', 'd'][itIdx] ?? `${itIdx + 1}`;
+        const itStudent = studentSelections[itIdx] ?? null;
+        const itCorrect = it.correct;
+        const itIsCorrect = itStudent !== null && itStudent === itCorrect;
+        const itImages =
+          typeof it.text === 'object' &&
+          it.text &&
+          Array.isArray((it.text as Record<string, unknown>)['images'])
+            ? ((it.text as Record<string, unknown>)['images'] as string[])
+            : [];
+        return {
+          index: itIdx,
+          label: itLabel,
+          text: richTextToString(it.text),
+          images: itImages,
+          studentAnswer: itStudent,
+          studentChoiceLabel:
+            itStudent === true ? 'Đúng' : itStudent === false ? 'Sai' : 'Chưa chọn',
+          correctAnswer: itCorrect,
+          correctChoiceLabel: itCorrect ? 'Đúng' : 'Sai',
+          isCorrect: itIsCorrect,
+        };
+      });
+      const correctItemCount = renderedItems.filter(it => it.isCorrect).length;
+      studentChoiceLabel = `${correctItemCount}/4 ý đúng`;
+      correctChoiceLabel = '4/4 ý đúng';
+    } else if (origQ.type === 'short') {
+      let studentText = '';
+      if (typeof studentRawAnswer === 'string') {
+        studentText = studentRawAnswer.trim();
+      } else if (
+        typeof studentRawAnswer === 'object' &&
+        studentRawAnswer !== null &&
+        'text' in studentRawAnswer
+      ) {
+        studentText = String((studentRawAnswer as { text: unknown }).text ?? '').trim();
+      }
+      studentChoiceLabel = studentText || null;
+      correctChoiceLabel = Array.isArray(origQ.accepted)
+        ? (origQ.accepted[0] ?? '')
+        : String(origQ.accepted || '');
     }
 
     const stemImages =
@@ -115,17 +204,31 @@ export function generateParticipantReviewData(
       pointsEarned: grade.pointsEarned,
       isCorrect: grade.isCorrect,
       options: renderedOptions,
-      studentAnswer: studentRawAnswer,
+      items: renderedItems,
+      studentAnswer:
+        origQ.type === 'tf_group' && renderedItems
+          ? renderedItems.map(it => `${it.label}) ${it.studentChoiceLabel}`).join(', ')
+          : origQ.type === 'tf'
+            ? (studentChoiceLabel ?? 'Chưa làm')
+            : origQ.type === 'short'
+              ? (studentChoiceLabel ?? 'Chưa làm')
+              : studentRawAnswer,
       studentChoiceLabel,
       correctAnswer:
         origQ.type === 'mcq4'
           ? correctChoiceLabel
           : origQ.type === 'tf'
-            ? origQ.correct
-            : origQ.type === 'short'
-              ? origQ.accepted
-              : (origQ as Record<string, unknown>)['correctAnswer'],
+            ? correctChoiceLabel
+            : origQ.type === 'tf_group' && renderedItems
+              ? renderedItems.map(it => `${it.label}) ${it.correctChoiceLabel}`).join(', ')
+              : origQ.type === 'short'
+                ? Array.isArray(origQ.accepted)
+                  ? origQ.accepted.join(' hoặc ')
+                  : String(origQ.accepted || '')
+                : (origQ as Record<string, unknown>)['correctAnswer'],
       correctChoiceLabel,
+      acceptedAnswers:
+        origQ.type === 'short' && Array.isArray(origQ.accepted) ? origQ.accepted : undefined,
       explanation: origQ.explanation ? richTextToString(origQ.explanation) : undefined,
     };
   });

@@ -500,11 +500,11 @@ export const SessionReportsTab: React.FC<SessionReportsTabProps> = ({
                 style={{ textAlign: 'center', padding: '60px 20px', color: UI_COLORS.textMuted }}
               >
                 <p style={{ fontSize: '18px', fontWeight: 700, color: UI_COLORS.text }}>
-                  Chưa có dữ liệu bài thi Quizizz
+                  Chưa có dữ liệu bài thi hoặc hoạt động
                 </p>
                 <p style={{ fontSize: '14px', maxWidth: '440px', margin: '8px auto 20px' }}>
-                  Khi học sinh hoàn thành bất kỳ lần thi Quizizz nào trong tiết học, kết quả từng
-                  lần sẽ tự động được lưu và hiển thị riêng biệt tại đây.
+                  Khi học sinh hoàn thành bất kỳ bài thi Quizizz hoặc trận Đấu Cờ Thụy Sỹ nào trong
+                  tiết học, kết quả từng lần sẽ tự động được lưu và hiển thị riêng biệt tại đây.
                 </p>
                 {onNewSession && (
                   <Button variant="primary" onClick={onNewSession}>

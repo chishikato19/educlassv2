@@ -81,10 +81,16 @@ export function generateSessionAnalytics(
   for (const run of activityRuns) {
     const results = resultsByRun.get(run.id) ?? [];
     for (const res of results) {
-      let parsedScore: { score?: number; correctCount?: number; totalQuestions?: number } = {};
+      let parsedScore: {
+        score?: number;
+        tournamentPoints?: number;
+        correctCount?: number;
+        totalQuestions?: number;
+      } = {};
       try {
         parsedScore = JSON.parse(res.scoreJson) as {
           score?: number;
+          tournamentPoints?: number;
           correctCount?: number;
           totalQuestions?: number;
         };
@@ -96,7 +102,8 @@ export function generateSessionAnalytics(
         correctCount: 0,
         totalQuestions: 0,
       };
-      current.score += Number(parsedScore.score ?? 0);
+      const scoreVal = Number(parsedScore.score ?? parsedScore.tournamentPoints ?? 0);
+      current.score += scoreVal;
       current.correctCount += Number(parsedScore.correctCount ?? 0);
       current.totalQuestions += Number(parsedScore.totalQuestions ?? 0);
       totalsByParticipant.set(res.participantId, current);

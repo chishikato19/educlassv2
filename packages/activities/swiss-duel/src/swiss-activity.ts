@@ -8,6 +8,8 @@ import {
   SwissDuelResultSchema,
   type SwissDuelState,
   SwissDuelStateSchema,
+  type SwissMatchup,
+  type SwissParticipantState,
   type SwissQuestion,
 } from './swiss-schemas.js';
 import {
@@ -80,11 +82,54 @@ function advanceRound(ctx: ActivityContext, st: SwissDuelState): SwissDuelState 
   const nextRound = st.currentRound + 1;
   const allowRematch = isTimeMode;
 
-  const { matchups, byePlayerId, updatedParticipants } = generateSwissPairings(
-    st.participants,
-    allowRematch,
-    2
-  );
+  // 1. Đồng bộ trạng thái online từ ActivityContext nếu có
+  const onlineIds = ctx.getOnlineParticipantIds ? ctx.getOnlineParticipantIds() : null;
+  const onlineSet = onlineIds ? new Set(onlineIds) : null;
+
+  for (const [id, p] of Object.entries(st.participants)) {
+    if (onlineSet) {
+      p.isOnline = onlineSet.has(id);
+    }
+  }
+
+  // 2. Lọc danh sách học sinh đang ONLINE để ghép cặp vòng tiếp theo
+  const activeParticipants: Record<string, SwissParticipantState> = {};
+  for (const [id, p] of Object.entries(st.participants)) {
+    if (p.isOnline !== false) {
+      activeParticipants[id] = p;
+    } else {
+      // Học sinh offline không tham gia vòng này, không nhận bàn thi đấu
+      p.currentTable = null;
+      p.isByeThisRound = false;
+    }
+  }
+
+  const activeCount = Object.keys(activeParticipants).length;
+  let matchups: SwissMatchup[] = [];
+  let byePlayerId: string | null = null;
+  let updatedParticipants: Record<string, SwissParticipantState> = { ...st.participants };
+
+  if (activeCount === 1) {
+    // Chỉ có đúng 1 học sinh online -> nhận suất BYE danh dự
+    const singleStudent = Object.values(activeParticipants)[0]!;
+    singleStudent.isByeThisRound = true;
+    singleStudent.byeCount += 1;
+    singleStudent.tournamentPoints += 2;
+    singleStudent.matchesWon += 1;
+    singleStudent.streak += 1;
+    singleStudent.currentTable = null;
+    byePlayerId = singleStudent.participantId;
+    matchups = [];
+  } else if (activeCount >= 2) {
+    const res = generateSwissPairings(activeParticipants, allowRematch, 2);
+    matchups = res.matchups;
+    byePlayerId = res.byePlayerId;
+    updatedParticipants = { ...updatedParticipants, ...res.updatedParticipants };
+  } else {
+    // Không có ai online
+    matchups = [];
+    byePlayerId = null;
+  }
 
   const rawQuestions = activeRunQuestions.get(ctx.runId) || [];
   const roundQuestions = getQuestionsForRound(rawQuestions, nextRound - 1, st.mode);
@@ -105,7 +150,7 @@ function advanceRound(ctx: ActivityContext, st: SwissDuelState): SwissDuelState 
 }
 
 /**
- * Tự động chốt điểm cho những bàn chưa nộp bài khi hết thời gian vòng đấu (do học sinh rớt mạng hoặc thoát ra)
+ * Tự động chốt điểm cho những bàn chưa nộp bài khi hết thời gian vòng đấu hoặc khi đối thủ đã thoát/offline
  */
 function checkAndFinalizeRoundTimeout(ctx: ActivityContext, st: SwissDuelState): SwissDuelState {
   if (st.status !== 'in_round' || !st.roundStartedAt) return st;
@@ -120,18 +165,46 @@ function checkAndFinalizeRoundTimeout(ctx: ActivityContext, st: SwissDuelState):
     st.timeLimitPerQuestion * 2 ||
     60;
 
-  // 3s độ trễ mạng dự phòng
-  const deadline = st.roundStartedAt + (roundTotalSeconds + 3) * 1000;
-  if (ctx.now() < deadline) {
-    return st;
+  const now = ctx.now();
+  const deadline = st.roundStartedAt + roundTotalSeconds * 1000;
+  const isTimeOver = now >= deadline;
+
+  // Đồng bộ trạng thái online từ ctx nếu có
+  const onlineIds = ctx.getOnlineParticipantIds ? ctx.getOnlineParticipantIds() : null;
+  const onlineSet = onlineIds ? new Set(onlineIds) : null;
+  if (onlineSet && onlineSet.size > 0) {
+    for (const [id, p] of Object.entries(st.participants)) {
+      p.isOnline = onlineSet.has(id);
+    }
   }
 
-  let anyUnfinished = false;
-  for (const matchup of st.matchups) {
-    if (!matchup.player1Answered || !matchup.player2Answered) {
-      anyUnfinished = true;
+  let stateChanged = false;
 
-      // Chốt player 1 nếu chưa nộp
+  for (const matchup of st.matchups) {
+    if (matchup.result !== 'in_progress') continue;
+
+    const p1 = st.participants[matchup.player1Id];
+    const p2 = st.participants[matchup.player2Id];
+
+    const p1Offline = p1?.isOnline === false;
+    const p2Offline = p2?.isOnline === false;
+
+    // Bàn đấu cần chốt kết quả nếu:
+    // 1. Đã hết thời gian vòng đấu (isTimeOver)
+    // 2. HOẶC cả 2 đều đã nộp bài
+    // 3. HOẶC một bên đã nộp và bên kia đã OFFLINE (đối thủ bỏ cuộc/thoát ra)
+    // 4. HOẶC cả 2 bên đều đã OFFLINE
+    const shouldFinalizeThisTable =
+      isTimeOver ||
+      (matchup.player1Answered && matchup.player2Answered) ||
+      (matchup.player1Answered && p2Offline) ||
+      (matchup.player2Answered && p1Offline) ||
+      (p1Offline && p2Offline);
+
+    if (shouldFinalizeThisTable) {
+      stateChanged = true;
+
+      // Chốt player 1 nếu chưa nộp (tính điểm theo câu đã trả lời hoặc 0đ)
       if (!matchup.player1Answered) {
         let p1Score = 0;
         const p1Results: Record<number, boolean> = {};
@@ -145,14 +218,14 @@ function checkAndFinalizeRoundTimeout(ctx: ActivityContext, st: SwissDuelState):
         matchup.player1Score = p1Score;
         matchup.player1Results = p1Results;
         matchup.player1Answered = true;
-        const p1 = st.participants[matchup.player1Id];
         if (p1) {
           p1.correctCount += p1Score;
+          p1.totalQuestions = (p1.totalQuestions || 0) + (roundOrigQ.length || 2);
           if (p1Score > 0) void ctx.grantReward(p1.participantId, 'correct_answer', p1Score * 5);
         }
       }
 
-      // Chốt player 2 nếu chưa nộp
+      // Chốt player 2 nếu chưa nộp (tính điểm theo câu đã trả lời hoặc 0đ)
       if (!matchup.player2Answered) {
         let p2Score = 0;
         const p2Results: Record<number, boolean> = {};
@@ -166,55 +239,55 @@ function checkAndFinalizeRoundTimeout(ctx: ActivityContext, st: SwissDuelState):
         matchup.player2Score = p2Score;
         matchup.player2Results = p2Results;
         matchup.player2Answered = true;
-        const p2 = st.participants[matchup.player2Id];
         if (p2) {
           p2.correctCount += p2Score;
+          p2.totalQuestions = (p2.totalQuestions || 0) + (roundOrigQ.length || 2);
           if (p2Score > 0) void ctx.grantReward(p2.participantId, 'correct_answer', p2Score * 5);
         }
       }
 
       // Đánh giá kết quả bàn đấu
-      if (matchup.result === 'in_progress') {
-        matchup.result = evaluateMatchupResult(matchup.player1Score, matchup.player2Score);
-        const p1 = st.participants[matchup.player1Id];
-        const p2 = st.participants[matchup.player2Id];
-
-        if (p1 && p2) {
-          if (matchup.result === 'player1_win') {
-            p1.tournamentPoints += 2;
-            p1.matchesWon += 1;
-            p1.streak += 1;
-            p2.matchesLost += 1;
-            p2.streak = 0;
-            void ctx.grantReward(p1.participantId, 'win_match', 15);
-          } else if (matchup.result === 'player2_win') {
-            p2.tournamentPoints += 2;
-            p2.matchesWon += 1;
-            p2.streak += 1;
-            p1.matchesLost += 1;
-            p1.streak = 0;
-            void ctx.grantReward(p2.participantId, 'win_match', 15);
-          } else {
-            p1.tournamentPoints += 1;
-            p1.matchesDrawn += 1;
-            p2.tournamentPoints += 1;
-            p2.matchesDrawn += 1;
-            void ctx.grantReward(p1.participantId, 'draw_match', 8);
-            void ctx.grantReward(p2.participantId, 'draw_match', 8);
-          }
+      matchup.result = evaluateMatchupResult(matchup.player1Score, matchup.player2Score);
+      if (p1 && p2) {
+        if (matchup.result === 'player1_win') {
+          p1.tournamentPoints += 2;
+          p1.matchesWon += 1;
+          p1.streak += 1;
+          p2.matchesLost += 1;
+          p2.streak = 0;
+          void ctx.grantReward(p1.participantId, 'win_match', 15);
+        } else if (matchup.result === 'player2_win') {
+          p2.tournamentPoints += 2;
+          p2.matchesWon += 1;
+          p2.streak += 1;
+          p1.matchesLost += 1;
+          p1.streak = 0;
+          void ctx.grantReward(p2.participantId, 'win_match', 15);
+        } else {
+          p1.tournamentPoints += 1;
+          p1.matchesDrawn += 1;
+          p2.tournamentPoints += 1;
+          p2.matchesDrawn += 1;
+          void ctx.grantReward(p1.participantId, 'draw_match', 8);
+          void ctx.grantReward(p2.participantId, 'draw_match', 8);
         }
       }
     }
   }
 
-  if (
-    anyUnfinished ||
-    (st.matchups.length > 0 && st.matchups.every(m => m.player1Answered && m.player2Answered))
-  ) {
+  // Kiểm tra xem tất cả các bàn đã hoàn thành chưa HOẶC đã hết giờ cả ván đấu
+  const allMatchesDone =
+    st.matchups.length > 0 && st.matchups.every(m => m.result !== 'in_progress');
+
+  if (isTimeOver || allMatchesDone || (st.matchups.length === 0 && st.byePlayerId)) {
     st.status = 'round_review';
-    st.countdownEndsAt = ctx.now() + 10000;
-    st.leaderboard = calculateSwissLeaderboard(st.participants);
-    st.roundQuestions = roundOrigQ;
+    st.countdownEndsAt = ctx.now() + 10000; // 10 giây chuẩn bị qua vòng mới
+    st.leaderboard = calculateSwissLeaderboard(st.participants, st.currentRound);
+    st.roundQuestions = roundOrigQ.length > 0 ? roundOrigQ : st.roundQuestions;
+    return { ...st };
+  } else if (stateChanged) {
+    st.leaderboard = calculateSwissLeaderboard(st.participants, st.currentRound);
+    return { ...st };
   }
 
   return st;
@@ -327,6 +400,7 @@ export const SwissDuelActivity: ActivityDefinition<
           displayName: studentName,
           tournamentPoints: 0,
           correctCount: 0,
+          totalQuestions: 0,
           matchesWon: 0,
           matchesDrawn: 0,
           matchesLost: 0,
@@ -335,22 +409,33 @@ export const SwissDuelActivity: ActivityDefinition<
           history: [],
           currentTable: null,
           isByeThisRound: false,
+          isOnline: true,
+          lastActiveAt: ctx.now(),
         };
 
-        // Ở Vòng 1: Nếu chưa có bàn nào hoàn thành bài thi, tự động re-pair lại cho toàn bộ học sinh
+        // Ở Vòng 1: Nếu chưa có bàn nào hoàn thành bài thi, tự động re-pair lại cho toàn bộ học sinh đang online
         const isRound1 = st.currentRound === 1;
         const noOneFinishedYet = st.matchups.every(m => !m.player1Answered && !m.player2Answered);
-        if (isRound1 && noOneFinishedYet && Object.keys(st.participants).length >= 2) {
-          const { matchups, byePlayerId, updatedParticipants } = generateSwissPairings(
-            st.participants,
-            st.mode === 'time',
-            2
+        if (isRound1 && noOneFinishedYet) {
+          const activeParts = Object.fromEntries(
+            Object.entries(st.participants).filter(([_, p]) => p.isOnline !== false)
           );
-          st.matchups = matchups;
-          st.byePlayerId = byePlayerId;
-          st.participants = updatedParticipants;
-          st.leaderboard = calculateSwissLeaderboard(updatedParticipants);
+          if (Object.keys(activeParts).length >= 2) {
+            const { matchups, byePlayerId, updatedParticipants } = generateSwissPairings(
+              activeParts,
+              st.mode === 'time',
+              2
+            );
+            st.matchups = matchups;
+            st.byePlayerId = byePlayerId;
+            st.participants = { ...st.participants, ...updatedParticipants };
+            st.leaderboard = calculateSwissLeaderboard(st.participants);
+          }
         }
+      } else {
+        // Cập nhật trạng thái online khi học sinh có tương tác
+        st.participants[participantId]!.isOnline = true;
+        st.participants[participantId]!.lastActiveAt = ctx.now();
       }
 
       if (parsed.data.type === 'join_tournament') {
@@ -408,6 +493,8 @@ export const SwissDuelActivity: ActivityDefinition<
           matchup.player1Score = score;
           matchup.player1Answered = true;
           st.participants[participantId]!.correctCount += score;
+          st.participants[participantId]!.totalQuestions =
+            (st.participants[participantId]!.totalQuestions || 0) + (roundOrigQ.length || 2);
           if (score > 0) void ctx.grantReward(participantId, 'correct_answer', score * 5);
         } else {
           matchup.player2Answers = submittedAnswers;
@@ -415,6 +502,8 @@ export const SwissDuelActivity: ActivityDefinition<
           matchup.player2Score = score;
           matchup.player2Answered = true;
           st.participants[participantId]!.correctCount += score;
+          st.participants[participantId]!.totalQuestions =
+            (st.participants[participantId]!.totalQuestions || 0) + (roundOrigQ.length || 2);
           if (score > 0) void ctx.grantReward(participantId, 'correct_answer', score * 5);
         }
 
@@ -460,9 +549,9 @@ export const SwissDuelActivity: ActivityDefinition<
         if (allMatchesDone) {
           st.status = 'round_review';
           st.countdownEndsAt = ctx.now() + 10000;
-          st.leaderboard = calculateSwissLeaderboard(st.participants);
+          st.leaderboard = calculateSwissLeaderboard(st.participants, st.currentRound);
           // Gửi kèm câu hỏi gốc đầy đủ đáp án để học sinh xem lại sau vòng
-          st.roundQuestions = roundOrigQ;
+          st.roundQuestions = roundOrigQ.length > 0 ? roundOrigQ : st.roundQuestions;
         }
 
         return { ...st };
@@ -510,17 +599,55 @@ export const SwissDuelActivity: ActivityDefinition<
 
       switch (parsed.data.type) {
         case 'repair_round': {
-          // Bốc thăm lại cho vòng hiện tại nếu chưa ai làm xong
+          // Bốc thăm lại cho vòng hiện tại chỉ với các bạn đang ONLINE nếu chưa ai làm xong
+          const activeParticipants = Object.fromEntries(
+            Object.entries(st.participants).filter(([_, p]) => p.isOnline !== false)
+          );
           const { matchups, byePlayerId, updatedParticipants } = generateSwissPairings(
-            st.participants,
+            activeParticipants,
             st.mode === 'time',
             2
           );
           st.matchups = matchups;
           st.byePlayerId = byePlayerId;
-          st.participants = updatedParticipants;
-          st.leaderboard = calculateSwissLeaderboard(updatedParticipants);
+          st.participants = { ...st.participants, ...updatedParticipants };
+          st.leaderboard = calculateSwissLeaderboard(st.participants);
           return { ...st };
+        }
+
+        case 'timeout_round': {
+          return st;
+        }
+
+        case 'participant_offline': {
+          const p = st.participants[parsed.data.participantId];
+          if (p) {
+            p.isOnline = false;
+            p.lastActiveAt = ctx.now();
+            return checkAndFinalizeRoundTimeout(ctx, st);
+          }
+          return st;
+        }
+
+        case 'participant_online': {
+          const p = st.participants[parsed.data.participantId];
+          if (p) {
+            p.isOnline = true;
+            p.lastActiveAt = ctx.now();
+          }
+          return st;
+        }
+
+        case 'toggle_participant_active': {
+          const p = st.participants[parsed.data.participantId];
+          if (p) {
+            p.isOnline = parsed.data.isOnline !== undefined ? parsed.data.isOnline : !p.isOnline;
+            p.lastActiveAt = ctx.now();
+          }
+          return {
+            ...st,
+            leaderboard: calculateSwissLeaderboard(st.participants),
+          };
         }
 
         case 'skip_countdown':
@@ -597,6 +724,8 @@ export const SwissDuelActivity: ActivityDefinition<
         displayName: s.displayName,
         tournamentPoints: s.tournamentPoints,
         correctCount: s.correctCount,
+        totalQuestions: s.totalQuestions,
+        accuracy: s.accuracy,
         matchesWon: s.matchesWon,
         matchesDrawn: s.matchesDrawn,
         matchesLost: s.matchesLost,

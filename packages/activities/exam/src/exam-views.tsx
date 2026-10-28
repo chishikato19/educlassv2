@@ -49,6 +49,7 @@ export const ExamTeacherPanel: React.FC<ExamTeacherPanelProps> = ({
   const [currentTime, setCurrentTime] = useState(() => Date.now());
   const [selectedStudentForReview, setSelectedStudentForReview] =
     useState<ParticipantExamStatus | null>(null);
+  const [expandedAnalysisQuestionId, setExpandedAnalysisQuestionId] = useState<string | null>(null);
 
   const doSend = sendIntent || onSendIntent || (() => {});
   const doEnd = onEnd || onEndActivity;
@@ -758,42 +759,208 @@ export const ExamTeacherPanel: React.FC<ExamTeacherPanelProps> = ({
                   .sort((a, b) => b.errorRate - a.errorRate)
                   .map(q => {
                     const isHighError = q.errorRate >= 50;
+                    const isExpanded = expandedAnalysisQuestionId === q.questionId;
                     return (
                       <div
                         key={q.questionId}
-                        className={`p-3 flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 ${
+                        className={`p-3 flex flex-col gap-2 transition ${
                           isHighError ? 'bg-rose-50/30' : 'bg-white'
-                        }`}
+                        } hover:bg-slate-50`}
                       >
-                        <div className="flex-1 min-w-0">
-                          <div className="flex items-center gap-2">
-                            <span className="font-bold text-xs text-slate-700">Câu {q.order}</span>
-                            <span className="text-xs text-slate-500 truncate max-w-md">
-                              {q.stemText || `Mã: ${q.questionId}`}
+                        <div
+                          className="flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 cursor-pointer select-none"
+                          onClick={() =>
+                            setExpandedAnalysisQuestionId(isExpanded ? null : q.questionId)
+                          }
+                          title="Nhấn để xem chi tiết câu hỏi và phân tích đáp án"
+                        >
+                          <div className="flex-1 min-w-0">
+                            <div className="flex items-center gap-2">
+                              <span className="text-slate-400 text-xs">
+                                {isExpanded ? '▼' : '▶'}
+                              </span>
+                              <span className="font-bold text-xs text-slate-700">
+                                Câu {q.order}
+                              </span>
+                              <span className="text-xs text-slate-500 truncate max-w-md">
+                                {q.stemText || `Mã: ${q.questionId}`}
+                              </span>
+                              <span className="text-[10px] uppercase font-bold text-slate-400 px-1.5 py-0.5 rounded bg-slate-100">
+                                {q.type}
+                              </span>
+                            </div>
+                          </div>
+
+                          <div className="flex items-center gap-3 text-xs shrink-0">
+                            <span className="text-slate-500">
+                              Đúng: <strong className="text-emerald-600">{q.correctCount}</strong>
                             </span>
-                            <span className="text-[10px] uppercase font-bold text-slate-400 px-1.5 py-0.5 rounded bg-slate-100">
-                              {q.type}
+                            <span className="text-slate-500">
+                              Sai: <strong className="text-rose-600">{q.incorrectCount}</strong>
+                            </span>
+                            <span
+                              className={`px-2 py-0.5 rounded-md font-bold text-[11px] ${
+                                isHighError
+                                  ? 'bg-rose-100 text-rose-700'
+                                  : 'bg-slate-100 text-slate-700'
+                              }`}
+                            >
+                              Tỷ lệ sai: {q.errorRate}%
                             </span>
                           </div>
                         </div>
 
-                        <div className="flex items-center gap-3 text-xs shrink-0">
-                          <span className="text-slate-500">
-                            Đúng: <strong className="text-emerald-600">{q.correctCount}</strong>
-                          </span>
-                          <span className="text-slate-500">
-                            Sai: <strong className="text-rose-600">{q.incorrectCount}</strong>
-                          </span>
-                          <span
-                            className={`px-2 py-0.5 rounded-md font-bold text-[11px] ${
-                              isHighError
-                                ? 'bg-rose-100 text-rose-700'
-                                : 'bg-slate-100 text-slate-700'
-                            }`}
-                          >
-                            Tỷ lệ sai: {q.errorRate}%
-                          </span>
-                        </div>
+                        {/* Chi tiết nội dung khi giáo viên bấm vào câu hỏi để thảo luận */}
+                        {isExpanded && (
+                          <div className="mt-2 pt-3 border-t border-slate-200 text-xs">
+                            <div
+                              className="font-medium text-slate-800 mb-2 leading-relaxed"
+                              dangerouslySetInnerHTML={{ __html: renderLatexInText(q.stemText) }}
+                            />
+
+                            {/* 1. Trắc nghiệm MCQ4 */}
+                            {q.type === 'mcq4' && q.options && (
+                              <div className="space-y-1.5 mt-2">
+                                {q.options.map(opt => (
+                                  <div
+                                    key={opt.index}
+                                    className={`p-2 rounded-lg border flex items-center justify-between text-xs ${
+                                      opt.isCorrect
+                                        ? 'bg-emerald-50 border-emerald-300 font-bold text-emerald-950'
+                                        : 'bg-slate-50 border-slate-200 text-slate-700'
+                                    }`}
+                                  >
+                                    <div className="flex items-center gap-2 flex-1 min-w-0">
+                                      <span className="w-5 h-5 rounded-full bg-slate-200 flex items-center justify-center font-bold text-[10px] shrink-0">
+                                        {opt.label}
+                                      </span>
+                                      <span
+                                        className="flex-1"
+                                        dangerouslySetInnerHTML={{
+                                          __html: renderLatexInText(opt.text),
+                                        }}
+                                      />
+                                    </div>
+                                    <div className="flex items-center gap-2 shrink-0">
+                                      <span className="text-slate-500">
+                                        {opt.selectedCount} lượt ({opt.percentage}%)
+                                      </span>
+                                      {opt.isCorrect && (
+                                        <span className="text-emerald-700 font-extrabold">
+                                          ✓ Đáp án đúng
+                                        </span>
+                                      )}
+                                    </div>
+                                  </div>
+                                ))}
+                              </div>
+                            )}
+
+                            {/* 2. Đúng / Sai đơn (TF) */}
+                            {q.type === 'tf' && (
+                              <div className="grid grid-cols-2 gap-2 mt-2">
+                                {(
+                                  q.options || [
+                                    {
+                                      index: 0,
+                                      label: 'Đúng',
+                                      text: 'Đúng',
+                                      isCorrect: false,
+                                      selectedCount: 0,
+                                      percentage: 0,
+                                    },
+                                    {
+                                      index: 1,
+                                      label: 'Sai',
+                                      text: 'Sai',
+                                      isCorrect: false,
+                                      selectedCount: 0,
+                                      percentage: 0,
+                                    },
+                                  ]
+                                ).map(opt => (
+                                  <div
+                                    key={opt.index}
+                                    className={`p-2 rounded-lg border flex items-center justify-between text-xs ${
+                                      opt.isCorrect
+                                        ? 'bg-emerald-50 border-emerald-300 font-bold text-emerald-950'
+                                        : 'bg-slate-50 border-slate-200 text-slate-700'
+                                    }`}
+                                  >
+                                    <span>{opt.label === 'Đúng' ? '✔ Đúng' : '✖ Sai'}</span>
+                                    <div className="flex items-center gap-1.5">
+                                      <span className="text-slate-500">
+                                        {opt.selectedCount} lượt ({opt.percentage}%)
+                                      </span>
+                                      {opt.isCorrect && (
+                                        <span className="text-emerald-700 font-extrabold">
+                                          ✓ Đúng
+                                        </span>
+                                      )}
+                                    </div>
+                                  </div>
+                                ))}
+                              </div>
+                            )}
+
+                            {/* 3. Đúng / Sai chùm (TF_GROUP) */}
+                            {q.type === 'tf_group' && q.items && (
+                              <div className="space-y-1.5 mt-2">
+                                <div className="font-bold text-slate-600 text-[11px] mb-1">
+                                  Chi tiết 4 mệnh đề Đúng / Sai (Barem Bộ Giáo dục 0.1 - 0.25 - 0.5
+                                  - 1.0):
+                                </div>
+                                {q.items.map(it => (
+                                  <div
+                                    key={it.index}
+                                    className="p-2 rounded-lg border border-slate-200 bg-slate-50/80 flex flex-col sm:flex-row sm:items-center justify-between gap-2 text-xs"
+                                  >
+                                    <div className="flex items-start gap-1.5 flex-1 min-w-0">
+                                      <span className="font-extrabold text-slate-800">
+                                        {it.label})
+                                      </span>
+                                      <span
+                                        className="flex-1"
+                                        dangerouslySetInnerHTML={{
+                                          __html: renderLatexInText(it.text),
+                                        }}
+                                      />
+                                    </div>
+                                    <div className="flex items-center gap-2 shrink-0">
+                                      <span
+                                        className={`px-2 py-0.5 rounded font-bold ${
+                                          it.correct
+                                            ? 'bg-emerald-100 text-emerald-800'
+                                            : 'bg-rose-100 text-rose-800'
+                                        }`}
+                                      >
+                                        Đáp án: {it.correctChoiceLabel}
+                                      </span>
+                                      <span className="text-slate-500 text-[11px]">
+                                        Đúng: <strong>{it.correctCount}</strong>/{q.totalAttempts} (
+                                        {100 - it.errorRate}%)
+                                      </span>
+                                    </div>
+                                  </div>
+                                ))}
+                              </div>
+                            )}
+
+                            {/* 4. Trả lời ngắn (SHORT) */}
+                            {q.type === 'short' && (
+                              <div className="mt-2 p-2.5 rounded-lg border border-emerald-200 bg-emerald-50/60 text-xs flex items-center gap-2 flex-wrap">
+                                <span className="font-bold text-emerald-900">
+                                  Đáp án chấp nhận:
+                                </span>
+                                <span className="font-extrabold text-emerald-700">
+                                  {q.acceptedAnswers && q.acceptedAnswers.length > 0
+                                    ? q.acceptedAnswers.join(' hoặc ')
+                                    : '—'}
+                                </span>
+                              </div>
+                            )}
+                          </div>
+                        )}
                       </div>
                     );
                   })
@@ -990,42 +1157,94 @@ export const ExamTeacherPanel: React.FC<ExamTeacherPanelProps> = ({
                             </div>
                           )}
 
-                        {/* Các lựa chọn nếu là trắc nghiệm */}
-                        {Boolean(rev['options']) && Array.isArray(rev['options']) && (
-                          <div className="space-y-1.5 mb-2.5">
-                            {(rev['options'] as Array<Record<string, unknown>>).map(opt => {
+                        {/* 1. Các lựa chọn nếu là trắc nghiệm MCQ4 */}
+                        {rev['type'] === 'mcq4' &&
+                          Boolean(rev['options']) &&
+                          Array.isArray(rev['options']) && (
+                            <div className="space-y-1.5 mb-2.5">
+                              {(rev['options'] as Array<Record<string, unknown>>).map(opt => {
+                                const isStudentPick =
+                                  rev['studentChoiceLabel'] === opt['label'] ||
+                                  rev['studentAnswer'] === opt['index'];
+                                const isCorrectOpt = rev['correctChoiceLabel'] === opt['label'];
+                                return (
+                                  <div
+                                    key={String(opt['index'])}
+                                    className={`p-2.5 rounded-lg text-xs flex items-center gap-2.5 border transition ${
+                                      isCorrectOpt
+                                        ? 'bg-emerald-100/80 border-emerald-400 font-bold text-emerald-950 shadow-xs'
+                                        : isStudentPick
+                                          ? 'bg-rose-100/80 border-rose-400 font-bold text-rose-950 shadow-xs'
+                                          : 'bg-white border-slate-200 text-slate-700'
+                                    }`}
+                                  >
+                                    <span className="w-5 h-5 rounded-full flex items-center justify-center bg-slate-200/90 font-bold text-[11px] shrink-0">
+                                      {String(opt['label'] || '')}
+                                    </span>
+                                    <span
+                                      className="flex-1 leading-relaxed"
+                                      dangerouslySetInnerHTML={{
+                                        __html: renderLatexInText(String(opt['text'] || '')),
+                                      }}
+                                    />
+                                    {isCorrectOpt && (
+                                      <span className="text-emerald-700 text-xs font-extrabold shrink-0">
+                                        ✓ Đáp án đúng
+                                      </span>
+                                    )}
+                                    {isStudentPick && !isCorrectOpt && (
+                                      <span className="text-rose-700 text-xs font-extrabold shrink-0">
+                                        ✗ Đã chọn
+                                      </span>
+                                    )}
+                                    {isStudentPick && isCorrectOpt && (
+                                      <span className="text-emerald-700 text-xs font-extrabold shrink-0">
+                                        ✓ Bạn đã chọn
+                                      </span>
+                                    )}
+                                  </div>
+                                );
+                              })}
+                            </div>
+                          )}
+
+                        {/* 2. Đúng / Sai đơn (TF) */}
+                        {rev['type'] === 'tf' && (
+                          <div className="grid grid-cols-2 gap-2.5 mb-2.5">
+                            {['Đúng', 'Sai'].map(valLabel => {
+                              const isCorrectOpt =
+                                rev['correctChoiceLabel'] === valLabel ||
+                                (valLabel === 'Đúng' && rev['correctAnswer'] === true) ||
+                                (valLabel === 'Sai' && rev['correctAnswer'] === false);
                               const isStudentPick =
-                                rev['studentChoiceLabel'] === opt['label'] ||
-                                rev['studentAnswer'] === opt['index'];
-                              const isCorrectOpt = rev['correctChoiceLabel'] === opt['label'];
+                                rev['studentChoiceLabel'] === valLabel ||
+                                (valLabel === 'Đúng' && rev['studentAnswer'] === true) ||
+                                (valLabel === 'Sai' && rev['studentAnswer'] === false);
                               return (
                                 <div
-                                  key={String(opt['index'])}
-                                  className={`p-2.5 rounded-lg text-xs flex items-center gap-2.5 border transition ${
+                                  key={valLabel}
+                                  className={`p-2.5 rounded-lg text-xs flex items-center justify-between border font-bold transition ${
                                     isCorrectOpt
-                                      ? 'bg-emerald-100/80 border-emerald-400 font-bold text-emerald-950 shadow-xs'
+                                      ? 'bg-emerald-100/80 border-emerald-400 text-emerald-950 shadow-xs'
                                       : isStudentPick
-                                        ? 'bg-rose-100/80 border-rose-400 font-bold text-rose-950 shadow-xs'
+                                        ? 'bg-rose-100/80 border-rose-400 text-rose-950 shadow-xs'
                                         : 'bg-white border-slate-200 text-slate-700'
                                   }`}
                                 >
-                                  <span className="w-5 h-5 rounded-full flex items-center justify-center bg-slate-200/90 font-bold text-[11px] shrink-0">
-                                    {String(opt['label'] || '')}
-                                  </span>
-                                  <span
-                                    className="flex-1 leading-relaxed"
-                                    dangerouslySetInnerHTML={{
-                                      __html: renderLatexInText(String(opt['text'] || '')),
-                                    }}
-                                  />
+                                  <span>{valLabel === 'Đúng' ? '✔ Đúng' : '✖ Sai'}</span>
                                   {isCorrectOpt && (
-                                    <span className="text-emerald-700 text-xs font-extrabold shrink-0">
+                                    <span className="text-emerald-700 text-[11px] font-extrabold">
                                       ✓ Đáp án đúng
                                     </span>
                                   )}
                                   {isStudentPick && !isCorrectOpt && (
-                                    <span className="text-rose-700 text-xs font-extrabold shrink-0">
+                                    <span className="text-rose-700 text-[11px] font-extrabold">
                                       ✗ Đã chọn
+                                    </span>
+                                  )}
+                                  {isStudentPick && isCorrectOpt && (
+                                    <span className="text-emerald-700 text-[11px] font-extrabold">
+                                      ✓ Bạn đã chọn
                                     </span>
                                   )}
                                 </div>
@@ -1034,18 +1253,199 @@ export const ExamTeacherPanel: React.FC<ExamTeacherPanelProps> = ({
                           </div>
                         )}
 
-                        {/* Nếu không có options (câu đúng/sai hoặc câu ngắn) */}
-                        {(!rev['options'] || !Array.isArray(rev['options'])) && (
-                          <div className="text-xs space-y-1.5 bg-white p-3 rounded-lg border border-slate-200">
-                            <div>
-                              HS đã chọn:{' '}
-                              <strong>{String(rev['studentAnswer'] ?? 'Chưa làm')}</strong>
+                        {/* 3. Đúng / Sai chùm (TF_GROUP) */}
+                        {rev['type'] === 'tf_group' && (
+                          <div className="space-y-2 mb-2.5">
+                            <div className="text-xs font-bold text-slate-600 mb-1">
+                              Xét tính Đúng / Sai của từng mệnh đề (Barem Bộ Giáo dục 0.1 - 0.25 -
+                              0.5 - 1.0):
                             </div>
-                            <div className="text-emerald-700 font-semibold">
-                              Đáp án đúng: <strong>{String(rev['correctAnswer'] ?? '—')}</strong>
+                            {(() => {
+                              // Lấy danh sách items từ reviewData hoặc từ câu hỏi gốc trong state.publicQuestions
+                              const revItems = (
+                                Array.isArray(rev['items']) ? rev['items'] : []
+                              ) as Array<Record<string, unknown>>;
+                              const fallbackQ = state.publicQuestions?.find(
+                                item => item.id === rev['questionId']
+                              ) as Record<string, unknown> | undefined;
+                              const fallbackItems = (
+                                fallbackQ && Array.isArray(fallbackQ['items'])
+                                  ? fallbackQ['items']
+                                  : []
+                              ) as Array<Record<string, unknown>>;
+                              const itemsToRender = revItems.length > 0 ? revItems : fallbackItems;
+
+                              let rawSelections: Array<boolean | null> = [null, null, null, null];
+                              if (Array.isArray(rev['studentAnswer'])) {
+                                rawSelections = rev['studentAnswer'].map(v =>
+                                  typeof v === 'boolean' ? v : null
+                                );
+                              }
+
+                              return itemsToRender.map((it, itIdx) => {
+                                const itLabel = String(
+                                  it['label'] || ['a', 'b', 'c', 'd'][itIdx] || itIdx + 1
+                                );
+                                const itText =
+                                  typeof it['text'] === 'object' && it['text']
+                                    ? String((it['text'] as Record<string, unknown>)['text'] || '')
+                                    : String(it['text'] || '');
+                                const itImages = Array.isArray(it['images'])
+                                  ? (it['images'] as string[])
+                                  : [];
+                                const itStudent =
+                                  it['studentAnswer'] !== undefined
+                                    ? (it['studentAnswer'] as boolean | null)
+                                    : (rawSelections[itIdx] ?? null);
+                                const itCorrect =
+                                  it['correctAnswer'] !== undefined
+                                    ? Boolean(it['correctAnswer'])
+                                    : Boolean(it['correct']);
+                                const itIsCorrect =
+                                  it['isCorrect'] !== undefined
+                                    ? Boolean(it['isCorrect'])
+                                    : itStudent !== null && itStudent === itCorrect;
+
+                                return (
+                                  <div
+                                    key={itIdx}
+                                    className={`p-2.5 rounded-lg border text-xs flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 ${
+                                      itIsCorrect
+                                        ? 'bg-emerald-50/60 border-emerald-300 text-emerald-950'
+                                        : itStudent !== null
+                                          ? 'bg-rose-50/60 border-rose-300 text-rose-950'
+                                          : 'bg-white border-slate-200 text-slate-700'
+                                    }`}
+                                  >
+                                    <div className="flex-1 min-w-0">
+                                      <div className="flex items-start gap-1.5">
+                                        <span className="font-extrabold text-slate-800">
+                                          {itLabel})
+                                        </span>
+                                        <span
+                                          className="flex-1 leading-relaxed"
+                                          dangerouslySetInnerHTML={{
+                                            __html: renderLatexInText(itText),
+                                          }}
+                                        />
+                                      </div>
+                                      {itImages.length > 0 && (
+                                        <div className="flex flex-wrap gap-2 mt-2 ml-4">
+                                          {itImages.map((imgUrl, imgIdx) => (
+                                            <img
+                                              key={imgIdx}
+                                              src={resolveAssetUrl(imgUrl)}
+                                              alt={`Ảnh ý ${itLabel}`}
+                                              className="max-h-24 rounded border border-slate-200 object-contain bg-white"
+                                            />
+                                          ))}
+                                        </div>
+                                      )}
+                                    </div>
+
+                                    <div className="flex items-center gap-2 shrink-0">
+                                      <div className="flex items-center gap-1.5 text-xs">
+                                        <span className="text-slate-500">HS chọn:</span>
+                                        <span
+                                          className={`px-2 py-0.5 rounded font-bold ${
+                                            itStudent === true
+                                              ? 'bg-emerald-100 text-emerald-800'
+                                              : itStudent === false
+                                                ? 'bg-rose-100 text-rose-800'
+                                                : 'bg-slate-100 text-slate-500'
+                                          }`}
+                                        >
+                                          {itStudent === true
+                                            ? 'Đúng'
+                                            : itStudent === false
+                                              ? 'Sai'
+                                              : 'Chưa chọn'}
+                                        </span>
+                                      </div>
+                                      <div className="flex items-center gap-1.5 text-xs">
+                                        <span className="text-slate-500">Đáp án:</span>
+                                        <span
+                                          className={`px-2 py-0.5 rounded font-bold ${
+                                            itCorrect
+                                              ? 'bg-emerald-600 text-white'
+                                              : 'bg-rose-600 text-white'
+                                          }`}
+                                        >
+                                          {itCorrect ? 'Đúng' : 'Sai'}
+                                        </span>
+                                      </div>
+                                      <span className="text-sm font-extrabold">
+                                        {itIsCorrect ? '✅' : itStudent !== null ? '❌' : '⚪'}
+                                      </span>
+                                    </div>
+                                  </div>
+                                );
+                              });
+                            })()}
+                          </div>
+                        )}
+
+                        {/* 4. Trả lời ngắn (SHORT) */}
+                        {rev['type'] === 'short' && (
+                          <div className="text-xs space-y-2 bg-white p-3 rounded-lg border border-slate-200 mb-2.5">
+                            <div className="flex items-center gap-2 flex-wrap">
+                              <span className="text-slate-600 font-semibold">
+                                Học sinh trả lời:
+                              </span>
+                              <span
+                                className={`px-2.5 py-1 rounded-md font-bold text-sm ${
+                                  rev['isCorrect']
+                                    ? 'bg-emerald-100 text-emerald-900 border border-emerald-300'
+                                    : rev['studentAnswer'] &&
+                                        String(rev['studentAnswer']).trim() &&
+                                        String(rev['studentAnswer']) !== 'Chưa làm'
+                                      ? 'bg-rose-100 text-rose-900 border border-rose-300'
+                                      : 'bg-slate-100 text-slate-500 border border-slate-200'
+                                }`}
+                              >
+                                {rev['studentAnswer'] && String(rev['studentAnswer']) !== 'Chưa làm'
+                                  ? String(rev['studentAnswer'])
+                                  : 'Chưa trả lời'}
+                              </span>
+                              {rev['isCorrect'] ? (
+                                <span className="text-emerald-700 font-extrabold text-xs">
+                                  ✓ Chính xác
+                                </span>
+                              ) : rev['studentAnswer'] &&
+                                String(rev['studentAnswer']).trim() &&
+                                String(rev['studentAnswer']) !== 'Chưa làm' ? (
+                                <span className="text-rose-700 font-extrabold text-xs">
+                                  ✗ Chưa chính xác
+                                </span>
+                              ) : null}
+                            </div>
+                            <div className="flex items-center gap-2 flex-wrap pt-1 border-t border-slate-100">
+                              <span className="text-emerald-800 font-bold">Đáp án chấp nhận:</span>
+                              <span
+                                className="font-extrabold text-emerald-700 text-sm"
+                                dangerouslySetInnerHTML={{
+                                  __html: renderLatexInText(String(rev['correctAnswer'] || '—')),
+                                }}
+                              />
                             </div>
                           </div>
                         )}
+
+                        {/* 5. Dạng câu hỏi khác (fallback) */}
+                        {rev['type'] !== 'mcq4' &&
+                          rev['type'] !== 'tf' &&
+                          rev['type'] !== 'tf_group' &&
+                          rev['type'] !== 'short' && (
+                            <div className="text-xs space-y-1.5 bg-white p-3 rounded-lg border border-slate-200 mb-2.5">
+                              <div>
+                                HS đã chọn:{' '}
+                                <strong>{String(rev['studentAnswer'] ?? 'Chưa làm')}</strong>
+                              </div>
+                              <div className="text-emerald-700 font-semibold">
+                                Đáp án đúng: <strong>{String(rev['correctAnswer'] ?? '—')}</strong>
+                              </div>
+                            </div>
+                          )}
 
                         {Boolean(rev['explanation']) && (
                           <div
@@ -1206,16 +1606,142 @@ export const ExamTeacherPanel: React.FC<ExamTeacherPanelProps> = ({
                               );
                             })()}
 
-                          <div className="text-xs bg-white p-2.5 rounded-lg border border-slate-200">
-                            <span>Câu trả lời của HS: </span>
-                            <strong className="text-blue-700">
-                              {hasAnswered
-                                ? q['type'] === 'mcq4'
-                                  ? `Lựa chọn (${['A', 'B', 'C', 'D'][Number(studentRawAnswer)] || studentRawAnswer})`
-                                  : String(studentRawAnswer)
-                                : 'Chưa làm'}
-                            </strong>
-                          </div>
+                          {/* 2. Đúng / Sai đơn (TF) */}
+                          {q['type'] === 'tf' && (
+                            <div className="grid grid-cols-2 gap-2.5 mb-2.5">
+                              {['Đúng', 'Sai'].map(valLabel => {
+                                const isPicked =
+                                  (valLabel === 'Đúng' && studentRawAnswer === true) ||
+                                  (valLabel === 'Sai' && studentRawAnswer === false);
+                                return (
+                                  <div
+                                    key={valLabel}
+                                    className={`p-2.5 rounded-lg text-xs flex items-center justify-between border font-bold ${
+                                      isPicked
+                                        ? 'bg-blue-50 border-blue-400 text-blue-950 shadow-xs'
+                                        : 'bg-white border-slate-200 text-slate-700'
+                                    }`}
+                                  >
+                                    <span>{valLabel === 'Đúng' ? '✔ Đúng' : '✖ Sai'}</span>
+                                    {isPicked && (
+                                      <span className="text-blue-700 text-xs font-extrabold">
+                                        ✓ Đã chọn
+                                      </span>
+                                    )}
+                                  </div>
+                                );
+                              })}
+                            </div>
+                          )}
+
+                          {/* 3. Đúng / Sai chùm (TF_GROUP) */}
+                          {q['type'] === 'tf_group' && Array.isArray(q['items']) && (
+                            <div className="space-y-2 mb-2.5">
+                              <div className="text-xs font-bold text-slate-600 mb-1">
+                                Câu trả lời 4 mệnh đề Đúng / Sai của học sinh:
+                              </div>
+                              {(() => {
+                                let rawSelections: Array<boolean | null> = [null, null, null, null];
+                                if (Array.isArray(studentRawAnswer)) {
+                                  rawSelections = studentRawAnswer.map(v =>
+                                    typeof v === 'boolean' ? v : null
+                                  );
+                                }
+                                return (q['items'] as Array<Record<string, unknown>>).map(
+                                  (it, itIdx) => {
+                                    const itLabel = ['a', 'b', 'c', 'd'][itIdx] ?? `${itIdx + 1}`;
+                                    const itText =
+                                      typeof it['text'] === 'object' && it['text']
+                                        ? String(
+                                            (it['text'] as Record<string, unknown>)['text'] || ''
+                                          )
+                                        : String(it['text'] || '');
+                                    const itImages = Array.isArray(it['images'])
+                                      ? (it['images'] as string[])
+                                      : [];
+                                    const itVal = rawSelections[itIdx];
+
+                                    return (
+                                      <div
+                                        key={itIdx}
+                                        className="p-2.5 rounded-lg border border-slate-200 bg-white text-xs flex flex-col sm:flex-row sm:items-center justify-between gap-2.5"
+                                      >
+                                        <div className="flex-1 min-w-0">
+                                          <div className="flex items-start gap-1.5">
+                                            <span className="font-extrabold text-slate-800">
+                                              {itLabel})
+                                            </span>
+                                            <span
+                                              className="flex-1 leading-relaxed"
+                                              dangerouslySetInnerHTML={{
+                                                __html: renderLatexInText(itText),
+                                              }}
+                                            />
+                                          </div>
+                                          {itImages.length > 0 && (
+                                            <div className="flex flex-wrap gap-2 mt-2 ml-4">
+                                              {itImages.map((imgUrl, imgIdx) => (
+                                                <img
+                                                  key={imgIdx}
+                                                  src={resolveAssetUrl(imgUrl)}
+                                                  alt={`Ảnh ý ${itLabel}`}
+                                                  className="max-h-24 rounded border border-slate-200 object-contain bg-white"
+                                                />
+                                              ))}
+                                            </div>
+                                          )}
+                                        </div>
+
+                                        <div className="flex items-center gap-2 shrink-0">
+                                          <span className="text-slate-500">Đã chọn:</span>
+                                          <span
+                                            className={`px-2.5 py-1 rounded font-bold ${
+                                              itVal === true
+                                                ? 'bg-blue-100 text-blue-900 border border-blue-300'
+                                                : itVal === false
+                                                  ? 'bg-amber-100 text-amber-900 border border-amber-300'
+                                                  : 'bg-slate-100 text-slate-500'
+                                            }`}
+                                          >
+                                            {itVal === true
+                                              ? 'Đúng'
+                                              : itVal === false
+                                                ? 'Sai'
+                                                : 'Chưa làm'}
+                                          </span>
+                                        </div>
+                                      </div>
+                                    );
+                                  }
+                                );
+                              })()}
+                            </div>
+                          )}
+
+                          {/* 4. Trả lời ngắn (SHORT) */}
+                          {q['type'] === 'short' && (
+                            <div className="p-3 bg-white rounded-lg border border-slate-200 text-xs mb-2.5">
+                              <span className="text-slate-600 font-semibold">
+                                Học sinh trả lời:{' '}
+                              </span>
+                              <strong className="text-blue-700 text-sm ml-1 font-extrabold">
+                                {hasAnswered ? String(studentRawAnswer) : 'Chưa làm'}
+                              </strong>
+                            </div>
+                          )}
+
+                          {/* Dòng tổng kết câu trả lời cho các dạng khác */}
+                          {q['type'] !== 'mcq4' &&
+                            q['type'] !== 'tf' &&
+                            q['type'] !== 'tf_group' &&
+                            q['type'] !== 'short' && (
+                              <div className="text-xs bg-white p-2.5 rounded-lg border border-slate-200">
+                                <span>Câu trả lời của HS: </span>
+                                <strong className="text-blue-700">
+                                  {hasAnswered ? String(studentRawAnswer) : 'Chưa làm'}
+                                </strong>
+                              </div>
+                            )}
                         </div>
                       );
                     });
@@ -1300,6 +1826,7 @@ export const ExamStudentView: React.FC<ExamStudentViewProps> = ({
   const [showGridModal, setShowGridModal] = useState(false);
   const [showFocusWarning, setShowFocusWarning] = useState(false);
   const [currentTime, setCurrentTime] = useState(() => Date.now());
+  const [showStudentReview, setShowStudentReview] = useState(false);
   const autoSubmittedRef = React.useRef(false);
 
   // Đồng bộ đáp án từ server khi có cập nhật (hỗ trợ khôi phục khi tải lại trang / rớt mạng)
@@ -1475,13 +2002,276 @@ export const ExamStudentView: React.FC<ExamStudentViewProps> = ({
     );
   }
 
+  // Hàm hiển thị xem lại bài làm cho học sinh
+  const renderStudentReviewSection = () => {
+    const reviewList = currentParticipant?.reviewData;
+    if (!reviewList || reviewList.length === 0) return null;
+    return (
+      <div className="w-full text-left space-y-3 mt-4 max-h-[60vh] overflow-y-auto pr-1">
+        {reviewList.map((revItem, idx) => {
+          const rev = revItem as Record<string, unknown>;
+          const qOrder = String(rev['order'] ?? idx + 1);
+          const qPoints = String(rev['points'] ?? 1);
+          const isCorrect = Boolean(rev['isCorrect']);
+          const stemText = String(rev['stemText'] || '');
+          const stemImages = Array.isArray(rev['stemImages'])
+            ? (rev['stemImages'] as string[])
+            : [];
+
+          return (
+            <div
+              key={String(rev['questionId'] || idx)}
+              className={`p-3.5 rounded-xl border text-xs shadow-xs ${
+                isCorrect ? 'bg-emerald-50/60 border-emerald-300' : 'bg-rose-50/60 border-rose-300'
+              }`}
+            >
+              <div className="flex items-center justify-between font-bold mb-2">
+                <span className="text-slate-800">
+                  Câu {qOrder} ({qPoints} điểm)
+                </span>
+                <span
+                  className={`px-2 py-0.5 rounded font-extrabold ${
+                    isCorrect ? 'bg-emerald-100 text-emerald-800' : 'bg-rose-100 text-rose-800'
+                  }`}
+                >
+                  {isCorrect ? '✓ Đúng' : '✗ Sai'}
+                </span>
+              </div>
+
+              <div
+                className="text-sm font-medium text-slate-900 mb-2 leading-relaxed"
+                dangerouslySetInnerHTML={{ __html: renderLatexInText(stemText) }}
+              />
+
+              {stemImages.length > 0 && (
+                <div className="flex flex-wrap gap-2 my-2">
+                  {stemImages.map((imgUrl, imgIdx) => (
+                    <img
+                      key={imgIdx}
+                      src={resolveAssetUrl(imgUrl)}
+                      alt="Hình ảnh câu hỏi"
+                      className="max-h-40 rounded-lg border border-slate-200 object-contain bg-white"
+                    />
+                  ))}
+                </div>
+              )}
+
+              {/* MCQ4 */}
+              {rev['type'] === 'mcq4' && Array.isArray(rev['options']) && (
+                <div className="space-y-1.5 my-2">
+                  {(rev['options'] as Array<Record<string, unknown>>).map(opt => {
+                    const isStudentPick =
+                      rev['studentChoiceLabel'] === opt['label'] ||
+                      rev['studentAnswer'] === opt['index'];
+                    const isCorrectOpt = rev['correctChoiceLabel'] === opt['label'];
+                    return (
+                      <div
+                        key={String(opt['index'])}
+                        className={`p-2 rounded-lg border flex items-center justify-between gap-2 text-xs ${
+                          isCorrectOpt
+                            ? 'bg-emerald-100/80 border-emerald-400 font-bold text-emerald-950'
+                            : isStudentPick
+                              ? 'bg-rose-100/80 border-rose-400 font-bold text-rose-950'
+                              : 'bg-white border-slate-200 text-slate-700'
+                        }`}
+                      >
+                        <div className="flex items-center gap-2 flex-1">
+                          <span className="w-5 h-5 rounded-full bg-slate-200/90 flex items-center justify-center font-bold text-[10px]">
+                            {String(opt['label'] || '')}
+                          </span>
+                          <span
+                            dangerouslySetInnerHTML={{
+                              __html: renderLatexInText(String(opt['text'] || '')),
+                            }}
+                          />
+                        </div>
+                        {isCorrectOpt && (
+                          <span className="text-emerald-700 font-extrabold">✓ Đáp án đúng</span>
+                        )}
+                        {isStudentPick && !isCorrectOpt && (
+                          <span className="text-rose-700 font-extrabold">✗ Bạn đã chọn</span>
+                        )}
+                      </div>
+                    );
+                  })}
+                </div>
+              )}
+
+              {/* TF */}
+              {rev['type'] === 'tf' && (
+                <div className="grid grid-cols-2 gap-2 my-2">
+                  {['Đúng', 'Sai'].map(valLabel => {
+                    const isCorrectOpt =
+                      rev['correctChoiceLabel'] === valLabel ||
+                      (valLabel === 'Đúng' && rev['correctAnswer'] === true) ||
+                      (valLabel === 'Sai' && rev['correctAnswer'] === false);
+                    const isStudentPick =
+                      rev['studentChoiceLabel'] === valLabel ||
+                      (valLabel === 'Đúng' && rev['studentAnswer'] === true) ||
+                      (valLabel === 'Sai' && rev['studentAnswer'] === false);
+                    return (
+                      <div
+                        key={valLabel}
+                        className={`p-2 rounded-lg border flex items-center justify-between font-bold text-xs ${
+                          isCorrectOpt
+                            ? 'bg-emerald-100/80 border-emerald-400 text-emerald-950'
+                            : isStudentPick
+                              ? 'bg-rose-100/80 border-rose-400 text-rose-950'
+                              : 'bg-white border-slate-200 text-slate-700'
+                        }`}
+                      >
+                        <span>{valLabel === 'Đúng' ? '✔ Đúng' : '✖ Sai'}</span>
+                        {isCorrectOpt && (
+                          <span className="text-emerald-700 text-[11px] font-extrabold">
+                            ✓ Đáp án đúng
+                          </span>
+                        )}
+                        {isStudentPick && !isCorrectOpt && (
+                          <span className="text-rose-700 text-[11px] font-extrabold">
+                            ✗ Bạn đã chọn
+                          </span>
+                        )}
+                      </div>
+                    );
+                  })}
+                </div>
+              )}
+
+              {/* TF_GROUP */}
+              {rev['type'] === 'tf_group' && (
+                <div className="space-y-1.5 my-2">
+                  <div className="font-bold text-slate-600 text-[11px]">
+                    Xét tính Đúng / Sai của từng mệnh đề:
+                  </div>
+                  {(() => {
+                    const revItems = (Array.isArray(rev['items']) ? rev['items'] : []) as Array<
+                      Record<string, unknown>
+                    >;
+                    const fallbackQ = state.publicQuestions?.find(
+                      item => item.id === rev['questionId']
+                    ) as Record<string, unknown> | undefined;
+                    const fallbackItems = (
+                      fallbackQ && Array.isArray(fallbackQ['items']) ? fallbackQ['items'] : []
+                    ) as Array<Record<string, unknown>>;
+                    const itemsToRender = revItems.length > 0 ? revItems : fallbackItems;
+                    let rawSelections: Array<boolean | null> = [null, null, null, null];
+                    if (Array.isArray(rev['studentAnswer'])) {
+                      rawSelections = rev['studentAnswer'].map(v =>
+                        typeof v === 'boolean' ? v : null
+                      );
+                    }
+                    return itemsToRender.map((it, itIdx) => {
+                      const itLabel = String(
+                        it['label'] || ['a', 'b', 'c', 'd'][itIdx] || itIdx + 1
+                      );
+                      const itText =
+                        typeof it['text'] === 'object' && it['text']
+                          ? String((it['text'] as Record<string, unknown>)['text'] || '')
+                          : String(it['text'] || '');
+                      const itStudent =
+                        it['studentAnswer'] !== undefined
+                          ? (it['studentAnswer'] as boolean | null)
+                          : (rawSelections[itIdx] ?? null);
+                      const itCorrect =
+                        it['correctAnswer'] !== undefined
+                          ? Boolean(it['correctAnswer'])
+                          : Boolean(it['correct']);
+                      const itIsCorrect =
+                        it['isCorrect'] !== undefined
+                          ? Boolean(it['isCorrect'])
+                          : itStudent !== null && itStudent === itCorrect;
+
+                      return (
+                        <div
+                          key={itIdx}
+                          className={`p-2 rounded-lg border text-xs flex flex-col sm:flex-row sm:items-center justify-between gap-2 ${
+                            itIsCorrect
+                              ? 'bg-emerald-50 border-emerald-300 text-emerald-950'
+                              : 'bg-rose-50 border-rose-300 text-rose-950'
+                          }`}
+                        >
+                          <div className="flex items-start gap-1 flex-1 min-w-0">
+                            <span className="font-extrabold">{itLabel})</span>
+                            <span dangerouslySetInnerHTML={{ __html: renderLatexInText(itText) }} />
+                          </div>
+                          <div className="flex items-center gap-2 shrink-0">
+                            <span className="text-slate-500">Bạn chọn:</span>
+                            <span className="font-bold">
+                              {itStudent === true
+                                ? 'Đúng'
+                                : itStudent === false
+                                  ? 'Sai'
+                                  : 'Chưa chọn'}
+                            </span>
+                            <span className="text-slate-400">|</span>
+                            <span className="text-slate-500">Đáp án:</span>
+                            <span
+                              className={`px-1.5 py-0.5 rounded font-bold ${itCorrect ? 'bg-emerald-600 text-white' : 'bg-rose-600 text-white'}`}
+                            >
+                              {itCorrect ? 'Đúng' : 'Sai'}
+                            </span>
+                            <span>{itIsCorrect ? '✅' : '❌'}</span>
+                          </div>
+                        </div>
+                      );
+                    });
+                  })()}
+                </div>
+              )}
+
+              {/* SHORT */}
+              {rev['type'] === 'short' && (
+                <div className="p-2.5 bg-white rounded-lg border border-slate-200 text-xs my-2 space-y-1.5">
+                  <div>
+                    <span className="text-slate-600">Bạn trả lời: </span>
+                    <strong className={isCorrect ? 'text-emerald-700' : 'text-rose-700'}>
+                      {rev['studentAnswer'] && String(rev['studentAnswer']) !== 'Chưa làm'
+                        ? String(rev['studentAnswer'])
+                        : 'Chưa trả lời'}
+                    </strong>
+                  </div>
+                  <div className="text-emerald-800 font-bold">
+                    Đáp án chấp nhận:{' '}
+                    <span className="font-extrabold text-emerald-700">
+                      {String(rev['correctAnswer'] || '—')}
+                    </span>
+                  </div>
+                </div>
+              )}
+
+              {Boolean(rev['explanation']) && (
+                <div
+                  className="mt-2 text-xs text-slate-700 bg-amber-50 p-2 rounded-lg border border-amber-200 leading-relaxed"
+                  dangerouslySetInnerHTML={{
+                    __html:
+                      '💡 <strong>Giải thích:</strong> ' +
+                      renderLatexInText(String(rev['explanation'])),
+                  }}
+                />
+              )}
+            </div>
+          );
+        })}
+      </div>
+    );
+  };
+
   // 2. Nếu đã hoàn thành / nộp bài
   if (isSubmitted) {
     const answeredCount = Object.keys(answers).length;
     const res = currentParticipant?.result;
     const allowScore = state?.allowViewScore !== false;
+    const allowReview = state?.allowViewReview !== false;
+    const hasReviewData = Boolean(
+      currentParticipant?.reviewData && currentParticipant.reviewData.length > 0
+    );
+
     return (
-      <div className="flex flex-col items-center justify-center p-6 text-center max-w-sm mx-auto min-h-[400px]">
+      <div
+        className={`flex flex-col items-center justify-center p-6 text-center ${
+          showStudentReview ? 'max-w-xl' : 'max-w-sm'
+        } mx-auto min-h-[400px] transition-all`}
+      >
         <div className="w-20 h-20 rounded-full bg-emerald-50 text-emerald-600 flex items-center justify-center text-4xl mb-4 shadow-sm">
           ✅
         </div>
@@ -1511,9 +2301,26 @@ export const ExamStudentView: React.FC<ExamStudentViewProps> = ({
           </div>
         )}
 
-        <div className="px-4 py-3 bg-emerald-50 border border-emerald-200/80 rounded-xl text-emerald-800 text-sm font-semibold">
-          Vui lòng đợi thầy/cô tổng kết và công bố kết quả.
-        </div>
+        {/* Nút Xem lại bài làm */}
+        {allowReview && hasReviewData && (
+          <button
+            type="button"
+            onClick={() => setShowStudentReview(prev => !prev)}
+            className="w-full py-2.5 px-4 rounded-xl font-bold text-xs border flex items-center justify-center gap-1.5 transition cursor-pointer mb-3 bg-white border-blue-300 text-blue-700 hover:bg-blue-50 shadow-xs"
+          >
+            <span>
+              {showStudentReview ? '🙈 Ẩn xem lại bài làm' : '👁️ Xem lại bài làm & Đáp án đúng'}
+            </span>
+          </button>
+        )}
+
+        {showStudentReview && renderStudentReviewSection()}
+
+        {!showStudentReview && (
+          <div className="px-4 py-3 bg-emerald-50 border border-emerald-200/80 rounded-xl text-emerald-800 text-sm font-semibold">
+            Vui lòng đợi thầy/cô tổng kết và công bố kết quả.
+          </div>
+        )}
       </div>
     );
   }
@@ -1544,8 +2351,17 @@ export const ExamStudentView: React.FC<ExamStudentViewProps> = ({
   if (state?.status === 'closed') {
     const res = currentParticipant?.result;
     const allowScore = state?.allowViewScore !== false;
+    const allowReview = state?.allowViewReview !== false;
+    const hasReviewData = Boolean(
+      currentParticipant?.reviewData && currentParticipant.reviewData.length > 0
+    );
+
     return (
-      <div className="flex flex-col items-center justify-center p-6 text-center max-w-sm mx-auto min-h-[400px]">
+      <div
+        className={`flex flex-col items-center justify-center p-6 text-center ${
+          showStudentReview ? 'max-w-xl' : 'max-w-sm'
+        } mx-auto min-h-[400px] transition-all`}
+      >
         <div className="w-16 h-16 rounded-full bg-slate-100 text-slate-500 flex items-center justify-center text-3xl mb-4">
           🏁
         </div>
@@ -1571,6 +2387,21 @@ export const ExamStudentView: React.FC<ExamStudentViewProps> = ({
             </div>
           </div>
         )}
+
+        {/* Nút Xem lại bài làm */}
+        {allowReview && hasReviewData && (
+          <button
+            type="button"
+            onClick={() => setShowStudentReview(prev => !prev)}
+            className="w-full py-2.5 px-4 rounded-xl font-bold text-xs border flex items-center justify-center gap-1.5 transition cursor-pointer mb-3 bg-white border-blue-300 text-blue-700 hover:bg-blue-50 shadow-xs"
+          >
+            <span>
+              {showStudentReview ? '🙈 Ẩn xem lại bài làm' : '👁️ Xem lại bài làm & Đáp án đúng'}
+            </span>
+          </button>
+        )}
+
+        {showStudentReview && renderStudentReviewSection()}
       </div>
     );
   }

@@ -26,8 +26,8 @@ describe('packages/protocol exports', () => {
     expect(ParticipantStatusSchema).toBeDefined();
     expect(ErrorCodeSchema).toBeDefined();
     expect(ERROR_CODES.BAD_CODE).toBe('BAD_CODE');
-    expect(APP_VERSION).toBe('2.2.0');
-    expect(EDUCLASS_VERSION).toBe('2.2.0');
+    expect(APP_VERSION).toBe('2.2.22');
+    expect(EDUCLASS_VERSION).toBe('2.2.22');
     expect(DEFAULT_DISCOVERY_PORT).toBe(54321);
     expect(DiscoveryBeaconPayloadSchema).toBeDefined();
 

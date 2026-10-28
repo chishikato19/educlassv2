@@ -13,6 +13,8 @@ export interface ActivityContext {
   broadcast(patchOrEvent: unknown): void;
   sendToParticipant(participantId: string, payload: unknown): void;
   grantReward(participantId: string, trigger: string, qty?: number): Promise<void> | void;
+  isParticipantOnline?(participantId: string): boolean;
+  getOnlineParticipantIds?(): string[];
 }
 
 /**

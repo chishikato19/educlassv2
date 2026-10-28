@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { renderLatexInText } from '@educlass/question-kit';
 import type { TerritoryStudentIntent, TerritoryWarState } from '../territory-schemas.js';
 import { TerritoryGrid } from './TerritoryGrid.js';
 import { territorySound } from './TerritorySound.js';
@@ -297,9 +298,19 @@ export const TerritoryStudentView: React.FC<StudentViewProps> = ({
 
             {/* Câu hỏi */}
             <div className="p-3 bg-slate-800/80 rounded-2xl border border-slate-700">
-              <h3 className="text-base font-bold text-white leading-snug">
-                {currentQuestion.stem}
-              </h3>
+              <h3
+                className="text-base font-bold text-white leading-snug break-words rich-content"
+                dangerouslySetInnerHTML={{ __html: renderLatexInText(currentQuestion.stem) }}
+              />
+              {currentQuestion.image && (
+                <div className="mt-3 flex justify-center">
+                  <img
+                    src={currentQuestion.image}
+                    alt="Hình ảnh câu hỏi"
+                    className="max-h-40 object-contain rounded-xl border border-slate-700"
+                  />
+                </div>
+              )}
             </div>
 
             {/* Các nút phương án A B C D chuẩn Kahoot */}
@@ -326,7 +337,10 @@ export const TerritoryStudentView: React.FC<StudentViewProps> = ({
                       <span className="w-8 h-8 rounded-xl bg-black/25 flex items-center justify-center text-base font-black shrink-0">
                         {shape}
                       </span>
-                      <span className="flex-1 leading-tight">{opt}</span>
+                      <span
+                        className="flex-1 leading-tight break-words"
+                        dangerouslySetInnerHTML={{ __html: renderLatexInText(opt) }}
+                      />
                     </button>
                   );
                 })}

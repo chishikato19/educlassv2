@@ -48,6 +48,18 @@ export interface QuestionErrorAnalysisItem {
   errorRate: number;
   unansweredCount: number;
   options?: QuestionOptionBreakdown[] | undefined;
+  items?:
+    | Array<{
+        index: number;
+        label: string;
+        text: string;
+        correct: boolean;
+        correctChoiceLabel: string;
+        correctCount: number;
+        errorRate: number;
+      }>
+    | undefined;
+  acceptedAnswers?: string[] | undefined;
 }
 
 /**
@@ -273,6 +285,9 @@ export function calculateQuestionAnalysis(
 
     // Phân tích các phương án cho câu trắc nghiệm mcq4
     const mcqSelections: number[] = [0, 0, 0, 0];
+    let tfTrueCount = 0;
+    let tfFalseCount = 0;
+    const tfGroupItemCorrect = [0, 0, 0, 0];
 
     for (const p of participantList) {
       const studentRawAnswer = p.answers[origQ.id];
@@ -313,6 +328,41 @@ export function calculateQuestionAnalysis(
         if (selIdx >= 0 && selIdx < 4) {
           mcqSelections[selIdx] = (mcqSelections[selIdx] ?? 0) + 1;
         }
+      } else if (origQ.type === 'tf') {
+        if (
+          studentRawAnswer === true ||
+          (typeof studentRawAnswer === 'object' &&
+            studentRawAnswer !== null &&
+            (studentRawAnswer as { selected?: unknown }).selected === true)
+        ) {
+          tfTrueCount++;
+        } else if (
+          studentRawAnswer === false ||
+          (typeof studentRawAnswer === 'object' &&
+            studentRawAnswer !== null &&
+            (studentRawAnswer as { selected?: unknown }).selected === false)
+        ) {
+          tfFalseCount++;
+        }
+      } else if (origQ.type === 'tf_group' && Array.isArray(origQ.items)) {
+        let selections: Array<boolean | null> = [null, null, null, null];
+        if (Array.isArray(studentRawAnswer)) {
+          selections = studentRawAnswer.map(v => (typeof v === 'boolean' ? v : null));
+        } else if (
+          typeof studentRawAnswer === 'object' &&
+          studentRawAnswer !== null &&
+          'selected' in studentRawAnswer &&
+          Array.isArray((studentRawAnswer as { selected: unknown[] }).selected)
+        ) {
+          selections = (studentRawAnswer as { selected: unknown[] }).selected.map(v =>
+            typeof v === 'boolean' ? v : null
+          );
+        }
+        origQ.items.forEach((it, itIdx) => {
+          if (selections[itIdx] !== null && selections[itIdx] === it.correct) {
+            tfGroupItemCorrect[itIdx] = (tfGroupItemCorrect[itIdx] ?? 0) + 1;
+          }
+        });
       }
     }
 
@@ -337,7 +387,62 @@ export function calculateQuestionAnalysis(
           percentage: totalAttempts > 0 ? Math.round((count / totalAttempts) * 100) : 0,
         };
       });
+    } else if (origQ.type === 'tf') {
+      options = [
+        {
+          index: 0,
+          label: 'Đúng',
+          text: 'Đúng',
+          isCorrect: origQ.correct === true,
+          selectedCount: tfTrueCount,
+          percentage: totalAttempts > 0 ? Math.round((tfTrueCount / totalAttempts) * 100) : 0,
+        },
+        {
+          index: 1,
+          label: 'Sai',
+          text: 'Sai',
+          isCorrect: origQ.correct === false,
+          selectedCount: tfFalseCount,
+          percentage: totalAttempts > 0 ? Math.round((tfFalseCount / totalAttempts) * 100) : 0,
+        },
+      ];
     }
+
+    let items:
+      | Array<{
+          index: number;
+          label: string;
+          text: string;
+          correct: boolean;
+          correctChoiceLabel: string;
+          correctCount: number;
+          errorRate: number;
+        }>
+      | undefined;
+
+    if (origQ.type === 'tf_group' && Array.isArray(origQ.items)) {
+      items = origQ.items.map((it, itIdx) => {
+        const cCount = tfGroupItemCorrect[itIdx] ?? 0;
+        const errR =
+          totalAttempts > 0 ? Math.round(((totalAttempts - cCount) / totalAttempts) * 100) : 0;
+        return {
+          index: itIdx,
+          label: ['a', 'b', 'c', 'd'][itIdx] ?? `${itIdx + 1}`,
+          text: richTextToString(it.text),
+          correct: it.correct,
+          correctChoiceLabel: it.correct ? 'Đúng' : 'Sai',
+          correctCount: cCount,
+          errorRate: errR,
+        };
+      });
+    }
+
+    const acceptedAnswers =
+      origQ.type === 'short' && Array.isArray(origQ.accepted)
+        ? origQ.accepted
+        : origQ.type === 'short' && origQ.accepted
+          ? [String(origQ.accepted)]
+          : undefined;
 
     return {
       questionId: origQ.id,
@@ -351,6 +456,8 @@ export function calculateQuestionAnalysis(
       errorRate,
       unansweredCount,
       options,
+      items,
+      acceptedAnswers,
     };
   });
 }

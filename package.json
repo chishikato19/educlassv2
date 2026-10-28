@@ -1,6 +1,6 @@
 {
   "name": "educlassv2-monorepo",
-  "version": "2.2.20",
+  "version": "2.2.22",
   "private": true,
   "type": "module",
   "scripts": {

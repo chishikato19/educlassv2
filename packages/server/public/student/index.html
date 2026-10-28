@@ -316,6 +316,21 @@
         flex-shrink: 0;
         opacity: 0.95;
       }
+      .btn-quiz-letter {
+        font-size: clamp(20px, 2.5vw, 30px);
+        font-weight: 900;
+        min-width: clamp(36px, 4.2vw, 48px);
+        height: clamp(36px, 4.2vw, 48px);
+        border-radius: 12px;
+        background: rgba(255, 255, 255, 0.25);
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+        box-shadow: inset 0 1px 2px rgba(255, 255, 255, 0.3);
+        margin-right: 8px;
+        line-height: 1;
+      }
       .btn-kahoot-text {
         font-size: clamp(17px, 2.2vw, 26px);
         font-weight: 800;
@@ -1621,8 +1636,12 @@
           </button>
         </div>
 
-        <div id="tw-modal-stem" style="font-size: 16px; font-weight: 700; color: #f8fafc; margin-bottom: 16px; line-height: 1.5; min-height: 48px;">
+        <div id="tw-modal-stem" style="font-size: 16px; font-weight: 700; color: #f8fafc; margin-bottom: 16px; line-height: 1.5; min-height: 48px; word-break: break-word;">
           Đang tải câu hỏi...
+        </div>
+
+        <div id="tw-modal-image-wrap" class="hidden" style="text-align: center; margin-bottom: 14px;">
+          <img id="tw-modal-image" src="" alt="Hình ảnh câu hỏi" style="max-width: 100%; max-height: 180px; object-fit: contain; border-radius: 12px; border: 1px solid #334155; margin: 0 auto; display: block;" />
         </div>
 
         <div id="tw-modal-options" style="display: flex; flex-direction: column; gap: 10px; margin-bottom: 16px;">

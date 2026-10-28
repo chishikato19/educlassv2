@@ -1,6 +1,150 @@
 # CHANGELOG
 
-## [2.2.20] - 2026-10-28
+## [2.2.26] - 2026-10-28
+
+### Thảo Luận Kì Thi: Hiển Thị Đầy Đủ Câu Trả Lời Ngắn, Đúng/Sai Đơn & Đúng/Sai Chùm (BGD)
+
+1. **Hiển Thị Chi Tiết & Barem Đúng / Sai Chùm 4 Ý Chuẩn Bộ GD (`tf_group`)**:
+   - Bổ sung cấu trúc `items` vào dữ liệu sinh `generateParticipantReviewData` và `QuestionErrorAnalysisItem`.
+   - Hiển thị từng ý a, b, c, d với nội dung câu hỏi, ảnh minh họa, lựa chọn của học sinh (Đúng/Sai/Chưa chọn), đáp án chính xác và trạng thái đúng sai.
+   - Hỗ trợ barem điểm bậc thang chuẩn Bộ GD (1 ý: 0.1 | 2 ý: 0.25 | 3 ý: 0.5 | 4 ý: 1.0) và huy hiệu "Đúng 1 phần" kèm số điểm nhận được.
+
+2. **Hỗ Trợ Câu Hỏi Đúng / Sai Đơn (`tf`) & Câu Trả Lời Ngắn (`short`)**:
+   - **Đúng / Sai (`tf`)**: Hiển thị lưới 2 phương án Đúng / Sai trực quan kèm huy hiệu "Bạn chọn" và "Đáp án đúng", thống kê % chọn Đúng / Sai của cả lớp.
+   - **Trả lời ngắn (`short`)**: Hiển thị chuỗi câu trả lời học sinh đã nhập, so sánh trực quan với danh sách các đáp án chấp nhận (`acceptedAnswers`).
+
+3. **Đồng Bộ Giao Diện Toàn Diện Trên Mọi Màn Hình**:
+   - **Màn thảo luận & phân tích đề của giáo viên (`ExamTeacherPanel`)**: Cho phép click mở rộng từng câu trong danh sách phân tích câu hỏi để chiếu lên bảng thảo luận cùng cả lớp.
+   - **Modal chi tiết bài làm học sinh cho giáo viên (`StudentExamReviewModal`)**: Hiển thị đầy đủ 4 dạng câu hỏi, hỗ trợ KaTeX, phóng to ảnh đính kèm và lọc theo Đúng / Sai / Một phần.
+   - **Màn xem lại bài làm của học sinh (`ExamStudentView` & `public/student/js/exam.js`)**: Cho phép học sinh xem lại chi tiết bài làm với đầy đủ các mệnh đề a, b, c, d của câu chùm, đáp án đúng sai và câu trả lời ngắn.
+
+
+
+## [2.2.25] - 2026-10-28
+
+### Đấu Cờ Thụy Sỹ: Bỏ Đếm Ngược Từng Câu & Tự Động Ép Qua Vòng Tiếp Theo Khi Quá Giờ Ván Đấu
+
+1. **Bỏ Cơ Chế Đếm Ngược Từng Câu & Cho Phép Học Sinh Tự Do Làm Cả Ván Đấu (`SwissDuelStudentView.tsx`)**:
+   - Gỡ bỏ cơ chế đếm ngược riêng từng câu và không ép tự động nhảy câu 1 sang câu 2.
+   - Trong suốt thời gian của hiệp đấu (ví dụ 60s), học sinh được tự do làm và bấm chuyển đổi qua lại giữa Câu 1 và Câu 2 để kiểm tra hoặc thay đổi câu trả lời.
+   - Đồng hồ và thanh tiến trình đếm ngược trên giao diện học sinh hiển thị **tổng thời gian của cả ván đấu**.
+   - Cảnh báo trực quan khi còn dưới 10 giây (đổi màu đỏ nhấp nháy).
+
+2. **Chống Treo Hệ Thống Khi Học Sinh Không Chọn Phương Án / Quá Giờ Ván Đấu**:
+   - **Tự động nộp bài Client-side**: Khi đồng hồ ván đấu về 0, nếu học sinh chưa nộp bài, client tự động gửi lệnh `submit_round` với các phương án đã chọn (hoặc bỏ trống), không để học sinh dừng lại chờ.
+   - **Ép chốt ván đấu và chuyển vòng Server-side (`swiss-activity.ts`)**:
+     - Trong `checkAndFinalizeRoundTimeout`: Khi `now >= deadline` (hết giờ hiệp đấu), server lập tức ép chốt toàn bộ các bàn đấu chưa hoàn thành (tính điểm theo câu đã làm hoặc 0 điểm nếu chưa chọn).
+     - Ngay lập tức chuyển trạng thái sang `st.status = 'round_review'` và bắt đầu đếm ngược 10 giây chuẩn bị (`st.countdownEndsAt = now + 10000`).
+     - Khi hết 10 giây đếm ngược (`now >= st.countdownEndsAt`), server ticker tự động gọi `advanceRound` bốc thăm và chuyển cả lớp sang vòng đấu mới mà không cần bất kỳ ai bấm nút.
+   - **Đảm bảo Background Server Ticker (`engine.ts`)**: Tự động kích hoạt ticker định kỳ 1s ngay từ `ActivityEngine.constructor`, bảo đảm luôn quét timeout hiệp đấu và tự động chuyển vòng.
+   - **Hiển Thị Thời Gian Ván Đấu Trên Máy Chiếu & Giáo Viên**:
+     - Bổ sung đồng hồ đếm ngược thời gian ván đấu trên bảng điều khiển giáo viên (`SwissDuelTeacherPanel.tsx`) và màn hình máy chiếu (`SwissDuelProjectorView.tsx`).
+     - Client giáo viên hỗ trợ gửi lệnh timeout fallback nếu quá giờ hiệp đấu, bảo đảm hệ thống vận hành liên tục 100%.
+
+## [2.2.24] - 2026-10-28
+
+### Đấu Cờ Thụy Sỹ: Khắc Phục Triệt Để Kẹt Bàn Đấu & Loại Trừ Học Sinh Đã Thoát Khỏi Danh Sách Ghép Cặp Vòng Sau
+
+1. **Loại Trừ Học Sinh Offline Khỏi Ghép Cặp Vòng Sau (`@educlass/activity-swiss-duel`)**:
+   - **Nguyên nhân**: Trong `advanceRound`, hàm `generateSwissPairings` trước đây nhận toàn bộ `st.participants` (kể cả những học sinh đã đóng tab / ngắt kết nối). Do đó, ở các vòng sau, hệ thống vẫn tiếp tục ghép học sinh vắng mặt này với học sinh khác đang online, khiến học sinh online mới tiếp tục bị kẹt.
+   - **Giải pháp**:
+     - Lọc danh sách `activeParticipants` chỉ gồm các học sinh có `isOnline !== false`.
+     - Học sinh offline giữ nguyên điểm số tích lũy trong `st.participants`, nhưng được đặt `currentTable = null` và `isByeThisRound = false`.
+     - Nếu chỉ còn đúng 1 bạn online, bạn này tự động nhận suất BYE (+2 điểm).
+     - Khi học sinh kết nối lại phòng học, trạng thái `isOnline` tự động chuyển thành `true` và em sẽ được đưa lại vào danh sách bốc thăm ở vòng tiếp theo.
+
+2. **Xử Lý Chốt Điểm Tự Động & Chống Treo Bàn Đấu Khi Có Bạn Đã Thoát (`checkAndFinalizeRoundTimeout`)**:
+   - Trước đây nếu 1 bạn thoát ra và bạn cùng bàn đã làm xong, bàn đấu bị treo vô tận nếu không có intent nào từ client gửi lên.
+   - Cơ chế mới tự động chốt kết quả bàn đấu nếu: hết thời gian hiệp đấu HOẶC một bên đã nộp và bên kia đã offline (bạn online nhận kết quả thắng sau khi nộp, không phải chờ đợi hết giờ hiệp đấu) HOẶC cả 2 bên đều đã offline.
+   - Khi tất cả bàn đấu đều hoàn thành hoặc đối thủ offline, hệ thống tự động chuyển sang `round_review` và bắt đầu đếm ngược 10 giây chuyển vòng.
+
+3. **Server-Side Ticker & Đồng Bộ Vòng Đời Kết Nối WebSocket (`packages/server`)**:
+   - Trong `WsGatewayManager`: Thêm `isParticipantConnected` và `getConnectedParticipantIds`.
+   - Trong `wsGatewayRoutes`: Khi socket đóng (`socket.on('close')`), nếu học sinh không còn kết nối nào khác trong phiên, tự động cập nhật CSDL và gọi `activityEngine.handleParticipantOffline(sId, pId)`. Khi học sinh kết nối lại, gọi `activityEngine.handleParticipantOnline(sId, pId)`.
+   - Trong `ActivityEngine`: Tích hợp Server Ticker chu kỳ 1s (`tickActiveRuns`) tự động gửi `timeout_round` cho các hoạt động như `swiss-duel` để chốt giờ hiệp đấu và chuyển vòng hoàn toàn tự động trên server.
+
+4. **Giao Diện Bảng Điều Khiển Giáo Viên (`SwissDuelTeacherPanel.tsx`)**:
+   - Hiển thị nhãn `[Đã thoát]` màu đỏ bên cạnh tên học sinh bị offline trong các bàn cờ.
+   - Hiển thị banner thông báo số lượng học sinh offline không tham gia bốc thăm vòng kế tiếp.
+   - Hiển thị trạng thái `[Đã thoát]` trong Tab Bảng Xếp Hạng Thụy Sỹ để giáo viên dễ dàng theo dõi.
+
+5. **Bổ Sung Số Câu Đúng & Phần Trăm Đúng Trong Bảng Xếp Hạng (`8/10 (80%)`)**:
+   - Thêm trường `totalQuestions` (tổng số câu hỏi đã thi) và `accuracy` (tỉ lệ chính xác %) vào `SwissParticipantStateSchema`, `SwissLeaderboardEntrySchema` và `SwissDuelResultSchema`.
+   - Xây dựng hàm `formatSwissAccuracy`: Định dạng kết quả dạng `8/10 (80%)`, tự động tính toán chính xác số câu đã nộp hoặc số câu chốt theo thời gian.
+   - Cập nhật hiển thị cột `Câu đúng / Tỉ lệ` trong Tab Bảng Xếp Hạng Thụy Sỹ (`SwissDuelTeacherPanel.tsx`).
+   - Cập nhật hiển thị trên màn hình Máy chiếu (`SwissDuelProjectorView.tsx`) và màn hình Tổng kết cá nhân của Học sinh (`SwissDuelStudentView.tsx`).
+
+6. **Tích Hợp Dữ Liệu Đấu Cờ Thụy Sỹ Vào Tab Thống Kê Báo Cáo Phiên Học (`SessionReportsTab`)**:
+   - Mở rộng các endpoint API báo cáo (`GET /api/sessions/:id/quiz-runs`, `POST /api/sessions/:id/close`, `GET /api/session-reports`) để tự động thu thập và hiển thị cả các lượt thi `swiss-duel` bên cạnh `quiz-live`.
+   - Cập nhật hàm `buildQuizSummaryFromRun` và `generateSessionAnalytics` để đọc chính xác điểm cờ (`tournamentPoints`), số câu đúng (`correctCount`), tổng câu (`totalQuestions`), tỉ lệ chính xác (`accuracy`) và EXP nhận được.
+   - Hỗ trợ xem chi tiết bảng điểm kỳ thủ và xuất file Excel cho từng lượt chơi Đấu Cờ Thụy Sỹ trực tiếp trong Tab Báo Cáo Phiên Học.
+
+7. **Sửa Lỗi Hết Giờ Câu Hỏi Không Tự Động Chuyển & Kẹt Ván Đấu**:
+   - **Giao diện Học sinh (`SwissDuelStudentView.tsx`)**:
+     - Bổ sung bộ đếm thời gian thực và thanh tiến trình đếm ngược sinh động cho từng câu hỏi (`questionTimeLeft`).
+     - **Tự động chuyển câu tiếp theo**: Khi hết thời gian quy định của Câu 1, hệ thống tự động chuyển sang Câu 2 ngay cả khi học sinh chưa chọn phương án.
+     - **Tự động nộp bài khi hết giờ hiệp**: Khi hết thời gian của Câu 2 (hết cả hiệp đấu), hệ thống tự động gửi bài (`submit_round`), không để học sinh bị dừng lại chờ.
+   - **Xử lý phía Server (`swiss-activity.ts`)**:
+     - Khắc phục lỗi tham chiếu object trong `checkAndFinalizeRoundTimeout`: Trả về bản sao trạng thái mới (`{ ...st }`) khi có bàn đấu chốt kết quả hoặc chuyển sang `round_review`, giúp `ActivityEngine` nhận diện và phát sóng WebSocket ngay lập tức cho toàn bộ lớp học.
+
+
+
+### Khắc Phục Lỗi Không Hiển Thị Công Thức Toán Học Trong Đại Chiến Lãnh Thổ (Territory War)
+
+1. **Hiển Thị Công Thức Toán KaTeX Trên Cổng Web Học Sinh (`packages/server/public/student/js/territory.js` & `index.html`)**:
+   - **Nguyên nhân**: Hàm `renderTerritoryQuestionModal` trong `territory.js` trước đây gán trực tiếp chuỗi văn bản qua thuộc tính `textContent` (`stemEl.textContent = question.stem` và `btn.textContent = ...`). Do đó, các công thức toán KaTeX (kẹp giữa `$formula$` hoặc `$$formula$$`) bị hiển thị dưới dạng văn bản thô, không được thông qua bộ dịch KaTeX. Đồng thời modal thiếu thành phần hiển thị hình ảnh câu hỏi và xử lý câu hỏi trả lời ngắn (`short`).
+   - **Giải pháp**:
+     - Nhập hàm `renderMath` từ `./utils.js`.
+     - Cập nhật đề bài gán qua `stemEl.innerHTML = renderMath(question.stem || 'Câu hỏi công thành:')`.
+     - Cập nhật phương án trắc nghiệm A/B/C/D và Đúng/Sai gán qua `btn.innerHTML` có chứa `renderMath(optText)`.
+     - Bổ sung khung `#tw-modal-image-wrap` và thẻ ảnh `#tw-modal-image` trong `index.html` để hiển thị hình ảnh minh họa câu hỏi nếu có.
+     - Hỗ trợ đầy đủ định dạng câu hỏi dạng tự luận ngắn (`short`): ô nhập câu trả lời kèm nút xác nhận và phím tắt Enter.
+
+2. **Render Công Thức KaTeX Trên Giao Diện React Của Học Sinh (`packages/activities/territory-war/src/components/TerritoryStudentView.tsx`)**:
+   - Nhập hàm `renderLatexInText` từ `@educlass/question-kit`.
+   - Cập nhật thẻ hiển thị đề bài `h3` sử dụng `dangerouslySetInnerHTML={{ __html: renderLatexInText(currentQuestion.stem) }}`.
+   - Cập nhật nội dung các phương án lựa chọn trắc nghiệm sử dụng `dangerouslySetInnerHTML={{ __html: renderLatexInText(opt) }}`.
+   - Thêm hiển thị hình ảnh minh họa `currentQuestion.image` nếu câu hỏi có đính kèm sơ đồ / hình vẽ.
+
+
+
+## [2.2.22] - 2026-10-28
+
+### Khắc Phục Lỗi Học Sinh Bị Đóng Băng Không Tự Động Thoát Trạng Thái Đóng Băng
+
+1. **Khắc Phục Thiếu Timer Tự Động Giải Băng Trên Cổng Web Học Sinh (`packages/server/public/student/js/quiz.js`)**:
+   - **Nguyên nhân**: Khi học sinh bị dính vật phẩm Đóng Băng (`freeze`), server thiết lập hiệu ứng hết hạn sau 2 giây (`expiresAt = now + 2000`). Tuy nhiên, do học sinh đang bị đóng băng không thể nhấn gửi intent, và server không gửi bản tin WebSocket định kỳ nếu không có sự kiện mới, client của học sinh không có bộ đếm thời gian thực (`setInterval`). Lớp phủ `#quiz-freeze-overlay` (z-index 60) cùng dòng thông báo `Đang giải băng sau 2s...` đứng yên vĩnh viễn, khiến học sinh bị kẹt mãi mãi trong trạng thái đóng băng. Ngoài ra, code cũ thiếu khối lệnh `else` mở lại nút cho học sinh sau khi giải băng.
+   - **Giải pháp**:
+     - Xây dựng hàm `setQuizInputFrozen(frozen, hiddenOpts)`: Khóa hoặc mở lại toàn bộ các phương thức tương tác khi đóng băng / giải băng (các nút chọn Kahoot/Quizizz `.btn-kahoot`, các nút gửi câu trả lời `#btn-submit-matching`, `#btn-submit-cloze`, `#btn-submit-short`, `#btn-submit-tfgroup`, ô input câu trả lời ngắn `#quiz-short-input`, nút Đúng/Sai chùm `#btn-tfgroup-*`, thẻ select điền từ và ghép cột, nút kích hoạt vật phẩm). Khi giải băng, tự động khôi phục tương tác nhưng vẫn bảo toàn trạng thái 50/50 (`hiddenOpts`) và không mở lại nếu học sinh đã nộp câu trả lời đó.
+     - Trong `updateQuizCombatUI`: Thiết lập bộ đếm thời gian thực `combatEffectInterval` chạy chu kỳ mỗi 150ms để đếm ngược chính xác theo `Date.now()`.
+     - Tự động đếm lùi thời gian còn lại (2s -> 1s) và ngay khi hết thời gian (`Date.now() >= expiresAt`), tự động ẩn overlay đóng băng (`freezeOverlay.classList.add('hidden')`), mở khóa toàn bộ các nút/ô nhập để học sinh tiếp tục làm bài bình thường.
+     - Tự động hủy interval khi cả hiệu ứng đóng băng và bom khói đều kết thúc.
+     - Thêm cơ chế bảo vệ trong `handleSelectAnswer` và `handleUsePowerUp` chống race-condition khi đang bị đóng băng.
+
+2. **Cập Nhật Đồng Bộ Trên Giao Diện React Học Sinh (`packages/activities/quiz-live/src/quiz-views.tsx`)**:
+   - Bổ sung state `now` và hook `useEffect` đếm thời gian thực mỗi 150ms khi có hiệu ứng đóng băng hoặc bom khói đang hoạt động.
+   - Tự động kích hoạt re-render để đếm lùi số giây và giải phóng tương tác, gỡ bỏ lớp phủ đóng băng ngay khi hết hạn.
+
+
+## [2.2.21] - 2026-10-28
+
+### Sửa Lỗi Vật Phẩm 50/50 & Tối Ưu Giao Diện Quizizz Học Sinh
+
+1. **Khắc Phục Triệt Để Lỗi Vật Phẩm Kính Soi 50/50 (`@educlass/activity-quiz-live`)**:
+   - **Nguyên nhân**: Khi học sinh kích hoạt vật phẩm `eraser_5050`, server trước đây lấy `currentQIndex = existingProgress.currentIndex` (thứ tự câu đã nộp), bị lệch hoàn toàn với câu hỏi `qIdx` học sinh đang nhìn trên màn hình khi giáo viên bật xáo trộn câu hỏi (`shuffleQuestions`). Ngoài ra, nếu phương án bị đảo (`shuffleOptions`) hoặc đáp án lưu dạng chữ cái `'A'`, việc ép kiểu `Number(q.correctAnswer)` trả về `NaN` dẫn đến `correctAnswer` không được cập nhật đúng vị trí sau xáo trộn, khiến server coi nhầm một phương án sai là đúng và đưa đáp án đúng vào danh sách phương án bị ẩn (`hiddenOptions`).
+   - **Giải pháp**:
+     - Cập nhật client gửi kèm `questionIndex: state.currentQuestionIdx` trong intent `use_powerup`.
+     - Xây dựng hàm `getQuestionCorrectOptionIndex` hỗ trợ chuẩn hóa index đáp án đúng (từ số, chữ cái A/B/C/D, chuỗi số, hoặc khớp nội dung text phương án).
+     - Cập nhật thuật toán xáo trộn phương án ở `onStart` dùng `paired.findIndex(p => p.isCorrect)` để vị trí đáp án đúng luôn được cập nhật chính xác 100%.
+     - Thuật toán `eraser_5050` lọc mảng `wrongIndices` (chắc chắn loại trừ `correctIdx`), xáo trộn ngẫu nhiên và lấy đúng 2 phương án sai để đưa vào `hiddenOptions`.
+     - Client `quiz.js` áp dụng hiệu ứng mờ và vô hiệu hóa (`opacity: 0.15`, `pointer-events: none`, `filter: grayscale(100%)`) cho đúng 2 phương án sai, đồng thời đảm bảo phương án đúng và 1 phương án sai còn lại hiển thị rõ ràng và tương tác bình thường.
+     - Bổ sung unit test toàn diện trong `quiz-activity.test.ts` đảm bảo vật phẩm 50/50 luôn giữ lại đáp án đúng và 1 phương án sai.
+
+2. **Loại Bỏ Ký Hiệu Tam Giác, Tròn, Vuông, Thoi Ở Chế Độ Quizizz**:
+   - `packages/server/public/student/js/quiz.js`: Khi `quizState.mode === 'quizizz'`, loại bỏ hoàn toàn các ký hiệu hình khối `▲, ◆, ●, ■` trên các nút chọn câu trả lời của học sinh. Thay vào đó hiển thị huy hiệu chữ cái `A, B, C, D` bo góc thanh lịch, hiện đại chuẩn phong cách Quizizz.
+   - `packages/server/public/student/index.html`: Bổ sung class `.btn-quiz-letter` công thái học, hỗ trợ hiển thị đẹp trên mọi màn hình di động và máy tính.
+   - Phần đối chiếu kết quả sau mỗi câu (`showQuizizzAnswerReview`): Bỏ các ký hiệu hình học `▲, ◆, ●, ■`, chuyển sang tiền tố chữ cái `A., B., C., D.` trực quan.
+   - `packages/activities/quiz-live/src/quiz-views.tsx`: Đồng bộ giao diện Quizizz cho học sinh, chuyển ký hiệu hình khối sang nhãn chữ cái `A, B, C, D`.
 
 ### Khắc Phục Lỗi Hiển Thị Hệ Phương Trình Bị Dồn Trên 1 Dòng (`@educlass/question-kit`)
 

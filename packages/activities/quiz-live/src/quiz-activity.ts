@@ -28,16 +28,34 @@ import { calculateQuizScore } from './quiz-scoring.js';
 // Lưu trữ danh sách câu hỏi gốc kèm đáp án đúng cho từng lượt chạy theo runId
 const activeRunQuestions = new Map<string, QuizQuestion[]>();
 
-function toOptionIndex(val: unknown): number {
+function toOptionIndex(val: unknown, options?: string[]): number {
   if (typeof val === 'number') return val;
   if (typeof val === 'string') {
     const s = val.trim().toUpperCase();
     const map: Record<string, number> = { A: 0, B: 1, C: 2, D: 3, '0': 0, '1': 1, '2': 2, '3': 3 };
     if (s in map) return map[s]!;
     const n = Number(s);
-    if (!isNaN(n)) return n;
+    if (!isNaN(n) && n >= 0) return n;
+
+    if (options && Array.isArray(options)) {
+      const trimmedLower = val.trim().toLowerCase();
+      const idx = options.findIndex(opt => {
+        const optText = (typeof opt === 'string' ? opt : String(opt ?? '')).trim().toLowerCase();
+        return optText === trimmedLower;
+      });
+      if (idx >= 0) return idx;
+    }
   }
   return -1;
+}
+
+export function getQuestionCorrectOptionIndex(question: QuizQuestion): number {
+  const rawAns =
+    question.correctAnswer !== undefined
+      ? question.correctAnswer
+      : (question as unknown as Record<string, unknown>).correct;
+  const idx = toOptionIndex(rawAns, question.options);
+  return idx >= 0 ? idx : 0;
 }
 
 function toBooleanVal(val: unknown): boolean {
@@ -210,20 +228,21 @@ export const QuizLiveActivity: ActivityDefinition<QuizLiveConfig, QuizLiveState,
       if (cfg.shuffleOptions) {
         questionsToUse = questionsToUse.map(q => {
           if (q.type === 'mcq4' && q.options && q.options.length > 0) {
-            const correctOptText = q.options[Number(q.correctAnswer)] ?? '';
+            const oldCorrectIdx = getQuestionCorrectOptionIndex(q);
             const paired = q.options.map((opt, i) => ({
               opt,
               img: q.optionImages?.[i],
+              isCorrect: i === oldCorrectIdx,
             }));
             paired.sort(() => ctx.rng() - 0.5);
             const shuffledOptions = paired.map(p => p.opt);
             const shuffledOptionImages = q.optionImages ? paired.map(p => p.img) : undefined;
-            const newCorrectIndex = shuffledOptions.indexOf(correctOptText);
+            const newCorrectIndex = paired.findIndex(p => p.isCorrect);
             return {
               ...q,
               options: shuffledOptions,
               optionImages: shuffledOptionImages,
-              correctAnswer: newCorrectIndex >= 0 ? newCorrectIndex : q.correctAnswer,
+              correctAnswer: newCorrectIndex >= 0 ? newCorrectIndex : 0,
             };
           }
           return q;
@@ -296,7 +315,7 @@ export const QuizLiveActivity: ActivityDefinition<QuizLiveConfig, QuizLiveState,
         };
       }
 
-      const intentObj = intent as { type?: string };
+      const intentObj = intent as { type?: string; questionIndex?: number };
 
       // 1. TẮT THÔNG BÁO CHIẾN SỰ CÁ NHÂN
       if (intentObj?.type === 'dismiss_notification') {
@@ -508,17 +527,30 @@ export const QuizLiveActivity: ActivityDefinition<QuizLiveConfig, QuizLiveState,
             ...newCombatFeed.slice(0, 19),
           ];
         } else if (item.type === 'eraser_5050') {
-          // 🎯 Kính Soi 50/50: Loại bỏ 2 phương án sai ở câu hiện tại
+          // 🎯 Kính Soi 50/50: Loại bỏ chính xác 2 phương án SAI ở câu hiện tại của học sinh
           const rawQuestions = activeRunQuestions.get(ctx.runId);
-          const currentQIndex = existingProgress.currentIndex;
+          const currentQIndex =
+            typeof intentObj?.questionIndex === 'number' && intentObj.questionIndex >= 0
+              ? intentObj.questionIndex
+              : st.mode === 'quizizz'
+                ? existingProgress.currentIndex
+                : st.currentQuestionIndex;
           const curRawQ = rawQuestions ? rawQuestions[currentQIndex] : undefined;
           let eliminated: number[] = [];
           if (curRawQ && curRawQ.type === 'mcq4' && curRawQ.options && curRawQ.options.length > 2) {
-            const correctIdx = toOptionIndex(curRawQ.correctAnswer);
-            const wrongIndices = Array.from({ length: curRawQ.options.length }, (_, i) => i).filter(
-              i => i !== correctIdx
-            );
-            eliminated = wrongIndices.slice(0, 2);
+            const correctIdx = getQuestionCorrectOptionIndex(curRawQ);
+            const totalOpts = curRawQ.options.length;
+            // Chỉ lấy các phương án sai (chắc chắn KHÔNG bao gồm đáp án đúng correctIdx)
+            const wrongIndices: number[] = [];
+            for (let i = 0; i < totalOpts; i++) {
+              if (i !== correctIdx) {
+                wrongIndices.push(i);
+              }
+            }
+            // Xáo trộn ngẫu nhiên danh sách phương án sai
+            const shuffledWrongs = [...wrongIndices].sort(() => ctx.rng() - 0.5);
+            // Chọn đúng 2 phương án sai để loại bỏ
+            eliminated = shuffledWrongs.slice(0, 2);
           }
           updatedSender.hiddenOptions = eliminated;
           updatedSender.personalNotification = {

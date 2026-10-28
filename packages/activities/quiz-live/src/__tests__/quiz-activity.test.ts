@@ -307,4 +307,115 @@ describe('Quiz Live Activity Server Lifecycle (Task 3.3)', () => {
     expect(p?.bestScore).toBe(firstScore);
     expect(p?.answers).toEqual({});
   });
+
+  it('guarantees eraser_5050 power-up removes 2 WRONG options and NEVER removes the correct answer', () => {
+    const ctx = createMockContext('run_quizizz_5050');
+    const config5050: QuizLiveConfig = {
+      ...mockQuizConfig,
+      mode: 'quizizz',
+      enablePowerUps: true,
+      questions: [
+        {
+          id: 'q1',
+          type: 'mcq4',
+          stem: 'Thủ đô của Việt Nam là gì?',
+          options: ['Hà Nội', 'Đà Nẵng', 'Huế', 'TP.HCM'],
+          correctAnswer: 0, // 'Hà Nội'
+          timeLimit: 20,
+          points: 1000,
+        },
+        {
+          id: 'q2',
+          type: 'mcq4',
+          stem: 'Đỉnh Phan Xi Păng cao bao nhiêu?',
+          options: ['3000m', '3143m', '3200m', '2900m'],
+          correctAnswer: 1, // '3143m'
+          timeLimit: 20,
+          points: 1000,
+        },
+      ],
+    };
+
+    let state = QuizLiveActivity.server.onStart(ctx, config5050);
+
+    // Chuẩn bị học sinh có sẵn vật phẩm eraser_5050 trong túi đồ
+    state = {
+      ...state,
+      participants: {
+        hs_5050: {
+          participantId: 'hs_5050',
+          displayName: 'Học sinh Quang',
+          score: 0,
+          correctCount: 0,
+          currentStreak: 0,
+          maxStreak: 0,
+          currentIndex: 0,
+          isCompleted: false,
+          answers: {},
+          lastAnswer: null,
+          inventory: {
+            queue: [
+              {
+                id: 'item_eraser',
+                type: 'eraser_5050',
+                name: 'Kính Soi 50/50',
+                description: 'Loại bỏ 2 phương án sai',
+                icon: '🎯',
+                targetScope: 'self',
+              },
+            ],
+            maxCapacity: 2,
+          },
+          activeEffects: [],
+          hiddenOptions: [],
+        },
+      },
+    };
+
+    // Học sinh dùng vật phẩm 50/50 ở câu hỏi q1 (correctAnswer = 0)
+    state = QuizLiveActivity.server.onStudentIntent(ctx, state, 'hs_5050', {
+      type: 'use_powerup',
+      questionIndex: 0,
+    }) as typeof state;
+
+    const prog1 = state.participants['hs_5050'];
+    expect(prog1).toBeDefined();
+    expect(prog1?.hiddenOptions).toBeDefined();
+    expect(prog1?.hiddenOptions).toHaveLength(2);
+    // ĐÁP ÁN ĐÚNG LÀ 0 (Hà Nội) -> TUYỆT ĐỐI KHÔNG ĐƯỢC CÓ TRONG hiddenOptions!
+    expect(prog1?.hiddenOptions).not.toContain(0);
+    // 2 phương án bị loại phải thuộc [1, 2, 3] (các phương án sai)
+    prog1?.hiddenOptions?.forEach(opt => {
+      expect([1, 2, 3]).toContain(opt);
+    });
+
+    // Thử nghiệm câu q2 (correctAnswer = 1) khi truyền questionIndex = 1
+    state.participants['hs_5050']!.inventory = {
+      queue: [
+        {
+          id: 'item_eraser_2',
+          type: 'eraser_5050',
+          name: 'Kính Soi 50/50',
+          description: 'Loại bỏ 2 phương án sai',
+          icon: '🎯',
+          targetScope: 'self',
+        },
+      ],
+      maxCapacity: 2,
+    };
+
+    state = QuizLiveActivity.server.onStudentIntent(ctx, state, 'hs_5050', {
+      type: 'use_powerup',
+      questionIndex: 1,
+    }) as typeof state;
+
+    const prog2 = state.participants['hs_5050'];
+    expect(prog2?.hiddenOptions).toHaveLength(2);
+    // ĐÁP ÁN ĐÚNG LÀ 1 (3143m) -> TUYỆT ĐỐI KHÔNG ĐƯỢC CÓ TRONG hiddenOptions!
+    expect(prog2?.hiddenOptions).not.toContain(1);
+    // 2 phương án bị loại phải thuộc [0, 2, 3]
+    prog2?.hiddenOptions?.forEach(opt => {
+      expect([0, 2, 3]).toContain(opt);
+    });
+  });
 });

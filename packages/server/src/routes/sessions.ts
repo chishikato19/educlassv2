@@ -180,7 +180,7 @@ export function buildQuizSummaryFromRun(
   className?: string | null,
   runIndex?: number
 ): QuizSummaryReport {
-  let quizTitle = 'Quizizz Live';
+  let quizTitle = run.activityId === 'swiss-duel' ? 'Đấu Cờ Thụy Sỹ' : 'Quizizz Live';
   let totalQuestions = 0;
   try {
     const cfg = JSON.parse(run.configJson) as { title?: string; questions?: unknown[] };
@@ -208,6 +208,7 @@ export function buildQuizSummaryFromRun(
       const item = JSON.parse(res.scoreJson) as {
         displayName?: string;
         score?: number;
+        tournamentPoints?: number;
         correctCount?: number;
         totalQuestions?: number;
         accuracy?: number;
@@ -226,12 +227,14 @@ export function buildQuizSummaryFromRun(
             ? Math.round((cCount / sCount) * 100)
             : 0;
 
+      const effectiveScore = Number(item.score ?? item.tournamentPoints ?? 0);
+
       scoreboard.push({
         participantId: res.participantId,
         displayName: item.displayName || 'Học sinh',
         identityLevel: (item.identityLevel as 'account' | 'roster' | 'guest') || 'roster',
         teamName: item.teamName ?? null,
-        score: Number(item.score || 0),
+        score: effectiveScore,
         correctCount: cCount,
         totalQuestions: sCount,
         accuracy: acc,
@@ -754,7 +757,9 @@ export const sessionsRoutes: FastifyPluginAsync<SessionsRoutesOptions> = async (
       });
 
       const quizRuns: QuizSummaryReport[] = [];
-      const quizLiveRuns = activityRuns.filter(r => r.activityId === 'quiz-live');
+      const quizLiveRuns = activityRuns.filter(
+        r => r.activityId === 'quiz-live' || r.activityId === 'swiss-duel'
+      );
       quizLiveRuns.forEach((r, idx) => {
         const runResults = resultsByRun.get(r.id) ?? [];
         quizRuns.push(buildQuizSummaryFromRun(r, runResults, session.joinCode, className, idx + 1));
@@ -1062,7 +1067,9 @@ export const sessionsRoutes: FastifyPluginAsync<SessionsRoutesOptions> = async (
         let quizRuns = snapshot.quizRuns;
         if ((!quizRuns || quizRuns.length === 0) && activityRunRepo) {
           const rawRuns = await activityRunRepo.listRunsBySessionId(r.sessionId);
-          const rawQuizRuns = rawRuns.filter(ar => ar.activityId === 'quiz-live');
+          const rawQuizRuns = rawRuns.filter(
+            ar => ar.activityId === 'quiz-live' || ar.activityId === 'swiss-duel'
+          );
           quizRuns = [];
           for (let i = 0; i < rawQuizRuns.length; i++) {
             const ar = rawQuizRuns[i]!;
@@ -1263,7 +1270,9 @@ export const sessionsRoutes: FastifyPluginAsync<SessionsRoutesOptions> = async (
       }
 
       const runs = await activityRunRepo.listRunsBySessionId(id);
-      const quizRuns = runs.filter(r => r.activityId === 'quiz-live');
+      const quizRuns = runs.filter(
+        r => r.activityId === 'quiz-live' || r.activityId === 'swiss-duel'
+      );
       const items: QuizSummaryReport[] = [];
 
       for (let i = 0; i < quizRuns.length; i++) {

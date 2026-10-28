@@ -52,8 +52,11 @@ export interface ActivityEngineOptions {
 export class ActivityEngine {
   private activeRuns = new Map<string, ActiveSessionRun>(); // runId -> ActiveSessionRun
   private broadcastTimers = new Map<string, NodeJS.Timeout>(); // `${sessionId}:${runId}` -> Timeout
+  private tickerTimer: NodeJS.Timeout | null = null;
 
-  constructor(private options: ActivityEngineOptions) {}
+  constructor(private options: ActivityEngineOptions) {
+    this.ensureTickerStarted();
+  }
 
   /**
    * Phát sóng cập nhật trạng thái tới các clients qua WebSocket (hỗ trợ gom/throttle khi có nhiều intent đồng thời)
@@ -99,6 +102,115 @@ export class ActivityEngine {
     if (!this.broadcastTimers.has(timerKey)) {
       const timer = setTimeout(doBroadcast, 25);
       this.broadcastTimers.set(timerKey, timer);
+    }
+  }
+
+  /**
+   * Bắt đầu background ticker (chu kỳ 1s) kiểm tra timeout cho các activity như swiss-duel
+   */
+  private ensureTickerStarted(): void {
+    if (this.tickerTimer) return;
+    this.tickerTimer = setInterval(() => {
+      this.tickActiveRuns();
+    }, 1000);
+  }
+
+  private stopTickerIfEmpty(): void {
+    if (this.activeRuns.size === 0 && this.tickerTimer) {
+      clearInterval(this.tickerTimer);
+      this.tickerTimer = null;
+    }
+  }
+
+  /**
+   * Dừng toàn bộ ticker và broadcast timers khi tắt server
+   */
+  stop(): void {
+    if (this.tickerTimer) {
+      clearInterval(this.tickerTimer);
+      this.tickerTimer = null;
+    }
+    for (const timer of this.broadcastTimers.values()) {
+      clearTimeout(timer);
+    }
+    this.broadcastTimers.clear();
+  }
+
+  /**
+   * Quét và xử lý tự động cho các hoạt động cần kiểm tra định kỳ (timeout hiệp đấu, đếm ngược chuyển vòng)
+   */
+  private tickActiveRuns(): void {
+    for (const active of this.activeRuns.values()) {
+      if (active.run.activityId === 'swiss-duel') {
+        const sessionId = active.run.sessionId;
+        const ctx = this.createContext(sessionId, active.run.id, active.run.activityId);
+        try {
+          const prevState = active.state;
+          const nextState = active.activity.server.onTeacherIntent(ctx, prevState, {
+            type: 'timeout_round',
+          });
+          if (nextState !== prevState) {
+            active.activity.stateSchema.parse(nextState);
+            active.state = nextState;
+            active.revision++;
+            this.broadcastActiveState(sessionId, active, false);
+          }
+        } catch (err) {
+          console.warn('[ActivityEngine] Lỗi tickActiveRuns swiss-duel:', err);
+        }
+      }
+    }
+  }
+
+  /**
+   * Xử lý khi có học sinh ngắt kết nối WebSocket
+   */
+  async handleParticipantOffline(sessionId: string, participantId: string): Promise<void> {
+    for (const active of this.activeRuns.values()) {
+      if (active.run.sessionId === sessionId && active.run.activityId === 'swiss-duel') {
+        const ctx = this.createContext(sessionId, active.run.id, active.run.activityId);
+        try {
+          const prevState = active.state;
+          const nextState = active.activity.server.onTeacherIntent(ctx, prevState, {
+            type: 'participant_offline',
+            participantId,
+          });
+          if (nextState !== prevState) {
+            active.activity.stateSchema.parse(nextState);
+            active.state = nextState;
+            active.revision++;
+            this.broadcastActiveState(sessionId, active, true);
+          }
+        } catch (err) {
+          console.warn('[ActivityEngine] Lỗi handleParticipantOffline swiss-duel:', err);
+        }
+      }
+    }
+  }
+
+  /**
+   * Xử lý khi có học sinh kết nối lại WebSocket
+   */
+  async handleParticipantOnline(sessionId: string, participantId: string): Promise<void> {
+    for (const active of this.activeRuns.values()) {
+      if (active.run.sessionId === sessionId && active.run.activityId === 'swiss-duel') {
+        const ctx = this.createContext(sessionId, active.run.id, active.run.activityId);
+        try {
+          const prevState = active.state;
+          const nextState = active.activity.server.onTeacherIntent(ctx, prevState, {
+            type: 'participant_online',
+            participantId,
+          });
+          if (nextState !== prevState) {
+            active.activity.stateSchema.parse(nextState);
+            active.state = nextState;
+            active.revision++;
+            this.broadcastActiveState(sessionId, active, true);
+          }
+        } catch (err) {
+          console.warn('[ActivityEngine] Lỗi handleParticipantOnline swiss-duel:', err);
+        }
+      }
     }
   }
 
@@ -183,6 +295,14 @@ export class ActivityEngine {
           });
           this.options.wsManager.broadcastToSession(sessionId, env);
         }
+      },
+      isParticipantOnline: (participantId: string) => {
+        if (!this.options.wsManager) return true;
+        return this.options.wsManager.isParticipantConnected(sessionId, participantId);
+      },
+      getOnlineParticipantIds: () => {
+        if (!this.options.wsManager) return [];
+        return Array.from(this.options.wsManager.getConnectedParticipantIds(sessionId));
       },
       sendToParticipant: (_participantId: string, _payload: unknown) => {
         // Có thể mở rộng gửi riêng qua WS client
@@ -703,6 +823,7 @@ export class ActivityEngine {
       state: initialState,
       revision: 0,
     });
+    this.ensureTickerStarted();
 
     // 8. Phát sóng WebSocket thông báo bắt đầu
     if (this.options.wsManager) {
@@ -1037,6 +1158,7 @@ export class ActivityEngine {
 
     // 5. Xóa khỏi bộ nhớ theo runId
     this.activeRuns.delete(targetRunId);
+    this.stopTickerIfEmpty();
 
     // 5. Phát sóng thông báo kết thúc
     if (this.options.wsManager) {

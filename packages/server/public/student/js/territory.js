@@ -4,6 +4,7 @@
  */
 
 import { state } from './state.js';
+import { renderMath } from './utils.js';
 
 // Âm thanh tổng hợp Web Audio API (Offline 100%, không cần file mp3 ngoài)
 const audioCtx = typeof window !== 'undefined' && (window.AudioContext || window.webkitAudioContext)
@@ -476,11 +477,72 @@ function renderTerritoryQuestionModal(territoryState, me) {
   modal.classList.remove('hidden');
 
   const stemEl = document.getElementById('tw-modal-stem');
-  if (stemEl) stemEl.textContent = question.stem || 'Câu hỏi công thành:';
+  if (stemEl) {
+    stemEl.innerHTML = renderMath(question.stem || 'Câu hỏi công thành:');
+  }
+
+  // Hiển thị hình ảnh minh họa nếu có
+  const imgWrap = document.getElementById('tw-modal-image-wrap');
+  const imgEl = document.getElementById('tw-modal-image');
+  if (imgWrap && imgEl) {
+    if (question.image) {
+      imgEl.src = question.image;
+      imgWrap.classList.remove('hidden');
+    } else {
+      imgWrap.classList.add('hidden');
+      imgEl.src = '';
+    }
+  }
 
   const optionsContainer = document.getElementById('tw-modal-options');
   if (!optionsContainer) return;
   optionsContainer.innerHTML = '';
+
+  // Dạng câu hỏi ngắn (short text)
+  if (question.type === 'short') {
+    const inputWrap = document.createElement('div');
+    inputWrap.style.cssText = 'display: flex; flex-direction: column; gap: 12px; width: 100%;';
+
+    const input = document.createElement('input');
+    input.type = 'text';
+    input.placeholder = 'Nhập câu trả lời...';
+    input.style.cssText = `
+      width: 100%; min-height: 48px; padding: 10px 14px; border-radius: 12px;
+      background: #1e293b; border: 2px solid #334155; color: #ffffff;
+      font-size: 15px; outline: none; box-sizing: border-box;
+    `;
+
+    const subBtn = document.createElement('button');
+    subBtn.type = 'button';
+    subBtn.className = 'btn';
+    subBtn.style.cssText = `
+      width: 100%; min-height: 48px; border-radius: 12px;
+      background: #f59e0b; color: #0f172a; font-weight: 800; font-size: 15px;
+      border: none; cursor: pointer; transition: all 0.15s ease;
+    `;
+    subBtn.textContent = 'XÁC NHẬN TẤN CÔNG';
+
+    const doSubmit = () => {
+      const val = input.value.trim();
+      if (!val) return;
+      territorySound.attack();
+      window.handleSubmitTerritoryAnswer(val);
+    };
+
+    subBtn.onclick = doSubmit;
+    input.onkeydown = (e) => {
+      if (e.key === 'Enter') {
+        e.preventDefault();
+        doSubmit();
+      }
+    };
+
+    inputWrap.appendChild(input);
+    inputWrap.appendChild(subBtn);
+    optionsContainer.appendChild(inputWrap);
+    setTimeout(() => input.focus(), 50);
+    return;
+  }
 
   let opts = [];
   if (question.type === 'tf') {
@@ -497,9 +559,17 @@ function renderTerritoryQuestionModal(territoryState, me) {
       width: 100%; min-height: 48px; padding: 12px 14px; border-radius: 14px;
       font-size: 15px; font-weight: 700; text-align: left; cursor: pointer;
       border: 2px solid #334155; background-color: #1e293b; color: #ffffff;
-      transition: all 0.15s ease;
+      transition: all 0.15s ease; display: flex; align-items: center; gap: 8px;
     `;
-    btn.textContent = `${String.fromCharCode(65 + oIdx)}. ${optText}`;
+
+    const prefix = question.type === 'tf'
+      ? (optText === 'Đúng' ? '✓ ' : '✕ ')
+      : `${String.fromCharCode(65 + oIdx)}. `;
+
+    btn.innerHTML = `
+      <span style="font-weight: 800; color: #38bdf8; flex-shrink: 0;">${prefix}</span>
+      <span style="flex: 1; word-break: break-word;">${renderMath(optText)}</span>
+    `;
 
     btn.onclick = () => {
       territorySound.attack();

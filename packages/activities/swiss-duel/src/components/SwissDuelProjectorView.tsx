@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef, useMemo } from 'react';
 import type { SwissDuelState } from '../swiss-schemas.js';
+import { formatSwissAccuracy } from '../swiss-scoring.js';
 import {
   CHESS_PIECES,
   CHESS_SCALE_MAP,
@@ -16,6 +17,7 @@ export interface ProjectorViewProps {
 export const SwissDuelProjectorView: React.FC<ProjectorViewProps> = ({ state }) => {
   const [remainingCountdown, setRemainingCountdown] = useState<number>(10);
   const [tournamentTimeLeft, setTournamentTimeLeft] = useState<string>('');
+  const [roundTimeLeft, setRoundTimeLeft] = useState<string>('');
 
   useEffect(() => {
     if (state.status === 'round_review' && state.countdownEndsAt) {
@@ -29,6 +31,35 @@ export const SwissDuelProjectorView: React.FC<ProjectorViewProps> = ({ state }) 
     }
     return undefined;
   }, [state.status, state.countdownEndsAt]);
+
+  // Đếm ngược thời gian của ván đấu khi đang trong hiệp đấu
+  useEffect(() => {
+    if (state.status === 'in_round' && state.roundStartedAt) {
+      const totalSec =
+        (state.roundQuestions || []).reduce(
+          (acc, q) => acc + (q.timeLimit || state.timeLimitPerQuestion || 30),
+          0
+        ) ||
+        state.timeLimitPerQuestion * 2 ||
+        60;
+      const deadlineRound = state.roundStartedAt + totalSec * 1000;
+
+      const updateRoundTimer = () => {
+        const diffMs = deadlineRound - Date.now();
+        const remainSec = Math.max(0, Math.ceil(diffMs / 1000));
+        const mins = Math.floor(remainSec / 60);
+        const secs = remainSec % 60;
+        setRoundTimeLeft(`${String(mins).padStart(2, '0')}:${String(secs).padStart(2, '0')}`);
+      };
+
+      updateRoundTimer();
+      const interval = setInterval(updateRoundTimer, 1000);
+      return () => clearInterval(interval);
+    } else {
+      setRoundTimeLeft('');
+    }
+    return undefined;
+  }, [state.status, state.roundStartedAt, state.roundQuestions, state.timeLimitPerQuestion]);
 
   useEffect(() => {
     if (state.mode === 'time' && state.endTime && state.status !== 'finished') {
@@ -164,7 +195,13 @@ export const SwissDuelProjectorView: React.FC<ProjectorViewProps> = ({ state }) 
                         {entry.displayName}
                       </span>
                       <span className="text-xs text-amber-200/80">
-                        {badge.icon} {badge.title} • {entry.correctCount} câu đúng
+                        {badge.icon} {badge.title} •{' '}
+                        {formatSwissAccuracy(
+                          entry.correctCount,
+                          entry.totalQuestions,
+                          entry.accuracy
+                        )}{' '}
+                        đúng
                       </span>
                     </div>
                   </div>
@@ -243,9 +280,14 @@ export const SwissDuelProjectorView: React.FC<ProjectorViewProps> = ({ state }) 
         </div>
 
         <div className="flex items-center gap-2">
+          {state.status === 'in_round' && roundTimeLeft && (
+            <div className="px-3.5 py-1.5 bg-amber-950/90 border border-amber-500 rounded-xl text-sm text-amber-300 font-mono font-bold shadow-md">
+              ⏱️ Thời gian ván: {roundTimeLeft}
+            </div>
+          )}
           {state.mode === 'time' && tournamentTimeLeft && (
             <div className="px-3 py-1.5 bg-amber-950 border border-amber-400 rounded-xl text-xs text-amber-300 font-mono font-bold">
-              ⏱️ Thời gian: {tournamentTimeLeft}
+              ⏱️ Toàn giải: {tournamentTimeLeft}
             </div>
           )}
           {byeStudent && (

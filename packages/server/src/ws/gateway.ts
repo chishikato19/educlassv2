@@ -7,6 +7,7 @@ import {
   type Envelope,
 } from '@educlass/protocol';
 import { generateId, type ParticipantRepository } from '@educlass/db';
+import type { ActivityEngine } from '../activity/engine.js';
 
 export interface ConnectedClient {
   id: string;
@@ -45,6 +46,33 @@ export class WsGatewayManager {
 
   getClientCount(): number {
     return this.clients.size;
+  }
+
+  isParticipantConnected(sessionId: string, participantId: string): boolean {
+    for (const client of this.clients.values()) {
+      if (
+        client.sessionId === sessionId &&
+        client.participantId === participantId &&
+        client.socket.readyState === client.socket.OPEN
+      ) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  getConnectedParticipantIds(sessionId: string): Set<string> {
+    const ids = new Set<string>();
+    for (const client of this.clients.values()) {
+      if (
+        client.sessionId === sessionId &&
+        client.participantId &&
+        client.socket.readyState === client.socket.OPEN
+      ) {
+        ids.add(client.participantId);
+      }
+    }
+    return ids;
   }
 
   send(clientId: string, envelope: Envelope): boolean {
@@ -99,6 +127,7 @@ export class WsGatewayManager {
 export interface WsGatewayOptions {
   manager?: WsGatewayManager | undefined;
   participantRepo?: ParticipantRepository | undefined;
+  activityEngine?: ActivityEngine | undefined;
 }
 
 interface WsQuery {
@@ -117,6 +146,12 @@ export const wsGatewayRoutes: FastifyPluginAsync<WsGatewayOptions> = async (fast
     const initialParticipantId =
       typeof query?.participantId === 'string' && query.participantId ? query.participantId : null;
     const client = manager.addClient(socket, initialSessionId, initialParticipantId);
+
+    if (initialSessionId && initialParticipantId) {
+      options.activityEngine
+        ?.handleParticipantOnline(initialSessionId, initialParticipantId)
+        .catch(() => {});
+    }
 
     socket.on('message', (messageBuffer: Buffer) => {
       let rawJson: unknown;
@@ -166,6 +201,11 @@ export const wsGatewayRoutes: FastifyPluginAsync<WsGatewayOptions> = async (fast
         const candidatePId = (participantObj?.id || p.participantId) as string | undefined;
         if (candidatePId && typeof candidatePId === 'string') {
           client.participantId = candidatePId;
+          if (client.sessionId) {
+            options.activityEngine
+              ?.handleParticipantOnline(client.sessionId, candidatePId)
+              .catch(() => {});
+          }
         }
       }
 
@@ -192,29 +232,33 @@ export const wsGatewayRoutes: FastifyPluginAsync<WsGatewayOptions> = async (fast
       if (client.sessionId && client.participantId) {
         const sId = client.sessionId;
         const pId = client.participantId;
-        try {
-          if (options.participantRepo) {
-            await options.participantRepo.update(pId, {
-              status: 'offline',
-              leftAt: Date.now(),
-            });
+        const isStillConnected = manager.isParticipantConnected(sId, pId);
+        if (!isStillConnected) {
+          try {
+            if (options.participantRepo) {
+              await options.participantRepo.update(pId, {
+                status: 'offline',
+                leftAt: Date.now(),
+              });
+            }
+          } catch {
+            // Bỏ qua lỗi cập nhật CSDL nếu đã xử lý
           }
-        } catch {
-          // Bỏ qua lỗi cập nhật CSDL nếu đã xử lý
+          options.activityEngine?.handleParticipantOffline(sId, pId).catch(() => {});
+          manager.broadcastToSession(
+            sId,
+            createEnvelope({
+              id: generateId(),
+              type: 'participant_left',
+              sessionId: sId,
+              payload: {
+                participantId: pId,
+                status: 'offline',
+                leftAt: Date.now(),
+              },
+            })
+          );
         }
-        manager.broadcastToSession(
-          sId,
-          createEnvelope({
-            id: generateId(),
-            type: 'participant_left',
-            sessionId: sId,
-            payload: {
-              participantId: pId,
-              status: 'offline',
-              leftAt: Date.now(),
-            },
-          })
-        );
       }
     });
 

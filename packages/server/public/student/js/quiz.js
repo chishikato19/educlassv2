@@ -6,7 +6,13 @@
 import { state } from './state.js';
 import { renderMath } from './utils.js';
 
+let combatEffectInterval = null;
+
 export function resetQuizState() {
+  if (combatEffectInterval) {
+    clearInterval(combatEffectInterval);
+    combatEffectInterval = null;
+  }
   state.currentQuestionIdx = -1;
   state.renderedQuestionIdx = -1;
   state.hasAnsweredCurrentQuestion = false;
@@ -37,6 +43,9 @@ export function resetQuizState() {
     b.style.outline = '';
     b.style.boxShadow = '';
     b.style.opacity = '';
+    b.style.pointerEvents = '';
+    b.style.transform = '';
+    b.style.filter = '';
   });
   const footerStatus = document.getElementById('quiz-footer-status');
   if (footerStatus) footerStatus.textContent = 'Nhấn nút màu tương ứng với đáp án đúng!';
@@ -161,6 +170,9 @@ export function showQuizQuestion(quizState) {
       b.style.outline = '';
       b.style.boxShadow = '';
       b.style.opacity = '';
+      b.style.pointerEvents = '';
+      b.style.transform = '';
+      b.style.filter = '';
     });
     const footerStatus = document.getElementById('quiz-footer-status');
     if (footerStatus) footerStatus.textContent = 'Nhấn nút màu tương ứng với đáp án đúng!';
@@ -369,16 +381,23 @@ export function showQuizQuestion(quizState) {
         optionsContainer.style.gap = 'clamp(12px, 1.8vw, 22px)';
         const options = q.options || ['A', 'B', 'C', 'D'];
         const optImages = Array.isArray(q.optionImages) ? q.optionImages : [];
+        const isQuizizz = quizState.mode === 'quizizz';
         const symbols = ['▲', '◆', '●', '■'];
         const colors = ['btn-kahoot-red', 'btn-kahoot-blue', 'btn-kahoot-yellow', 'btn-kahoot-green'];
         optionsContainer.innerHTML = options
           .map((opt, idx) => {
             const optImg = optImages[idx];
+            const letter = String.fromCharCode(65 + idx);
+            // Ở chế độ Quizizz, bỏ các ký hiệu tam giác, tròn, vuông, thoi và hiển thị huy hiệu chữ cái A, B, C, D
+            const prefixHtml = isQuizizz
+              ? `<span class="btn-quiz-letter" style="font-size: clamp(20px, 2.5vw, 30px); font-weight: 900; min-width: clamp(36px, 4.2vw, 48px); height: clamp(36px, 4.2vw, 48px); border-radius: 12px; background: rgba(255, 255, 255, 0.25); display: inline-flex; align-items: center; justify-content: center; flex-shrink: 0; box-shadow: inset 0 1px 2px rgba(255,255,255,0.3); margin-right: 8px;">${letter}</span>`
+              : `<span class="btn-kahoot-shape">${symbols[idx % symbols.length]}</span>`;
+
             return `
               <button class="btn-kahoot btn-kahoot-large ${colors[idx % colors.length]}" onclick="handleSelectAnswer(${idx})">
-                <span class="btn-kahoot-shape">${symbols[idx % symbols.length]}</span>
+                ${prefixHtml}
                 ${optImg ? `<img src="${optImg}" class="btn-kahoot-opt-image" alt="Ảnh phương án" />` : ''}
-                <span id="opt-text-${idx}" class="btn-kahoot-text">${renderMath(opt || String.fromCharCode(65 + idx))}</span>
+                <span id="opt-text-${idx}" class="btn-kahoot-text">${renderMath(opt || letter)}</span>
               </button>
             `;
           })
@@ -497,6 +516,111 @@ if (typeof window !== 'undefined') {
   window.handleUsePowerUp = handleUsePowerUp;
 }
 
+export function setQuizInputFrozen(frozen, hiddenOpts = []) {
+  if (typeof document === 'undefined') return;
+
+  // 1. MCQ & TF nút chọn Kahoot/Quizizz
+  document.querySelectorAll('.btn-kahoot').forEach((b, idx) => {
+    if (frozen) {
+      b.classList.add('disabled');
+      b.disabled = true;
+      b.style.pointerEvents = 'none';
+    } else {
+      if (hiddenOpts.includes(idx)) {
+        b.classList.add('disabled');
+        b.disabled = true;
+        b.style.pointerEvents = 'none';
+        b.style.opacity = '0.15';
+        b.style.transform = 'scale(0.95)';
+        b.style.filter = 'grayscale(100%)';
+      } else if (!state.hasAnsweredCurrentQuestion) {
+        b.classList.remove('disabled');
+        b.disabled = false;
+        b.style.pointerEvents = 'auto';
+        b.style.opacity = '1';
+        b.style.transform = '';
+        b.style.filter = 'none';
+      }
+    }
+  });
+
+  // 2. Nút submit các loại câu hỏi khác
+  const submitBtnIds = [
+    'btn-submit-matching',
+    'btn-submit-cloze',
+    'btn-submit-short',
+    'btn-submit-tfgroup'
+  ];
+  submitBtnIds.forEach(id => {
+    const btn = document.getElementById(id);
+    if (btn) {
+      if (frozen) {
+        btn.classList.add('disabled');
+        btn.disabled = true;
+        btn.style.pointerEvents = 'none';
+        btn.style.opacity = '0.5';
+      } else if (!state.hasAnsweredCurrentQuestion) {
+        btn.classList.remove('disabled');
+        btn.disabled = false;
+        btn.style.pointerEvents = 'auto';
+        btn.style.opacity = '1';
+      }
+    }
+  });
+
+  // 3. Ô input câu trả lời ngắn
+  const shortInput = document.getElementById('quiz-short-input');
+  if (shortInput) {
+    if (frozen) {
+      shortInput.disabled = true;
+      shortInput.style.pointerEvents = 'none';
+      shortInput.style.opacity = '0.6';
+    } else if (!state.hasAnsweredCurrentQuestion) {
+      shortInput.disabled = false;
+      shortInput.style.pointerEvents = 'auto';
+      shortInput.style.opacity = '1';
+    }
+  }
+
+  // 4. Các nút chọn Đúng / Sai của chùm Đúng/Sai
+  document.querySelectorAll('[id^="btn-tfgroup-"]').forEach(btn => {
+    if (frozen) {
+      btn.disabled = true;
+      btn.style.pointerEvents = 'none';
+      btn.style.opacity = '0.6';
+    } else if (!state.hasAnsweredCurrentQuestion) {
+      btn.disabled = false;
+      btn.style.pointerEvents = 'auto';
+      btn.style.opacity = '1';
+    }
+  });
+
+  // 5. Thẻ select ghép nối và điền từ
+  const optionsContainer = document.getElementById('quiz-options-container');
+  if (optionsContainer) {
+    optionsContainer.querySelectorAll('select').forEach(sel => {
+      if (frozen) {
+        sel.disabled = true;
+        sel.style.pointerEvents = 'none';
+        sel.style.opacity = '0.6';
+      } else if (!state.hasAnsweredCurrentQuestion) {
+        sel.disabled = false;
+        sel.style.pointerEvents = 'auto';
+        sel.style.opacity = '1';
+      }
+    });
+  }
+
+  // 6. Nút kích hoạt vật phẩm
+  const usePowerUpBtn = document.getElementById('btn-quiz-use-powerup');
+  if (usePowerUpBtn) {
+    if (frozen) {
+      usePowerUpBtn.disabled = true;
+      usePowerUpBtn.style.pointerEvents = 'none';
+    }
+  }
+}
+
 export function updateQuizCombatUI(quizState, myProgress) {
   if (typeof document === 'undefined') return;
 
@@ -509,53 +633,99 @@ export function updateQuizCombatUI(quizState, myProgress) {
   // Chỉ hiển thị ở chế độ Quizizz có bật vật phẩm
   const isQuizizzWithPowerUps = quizState?.mode === 'quizizz' && quizState?.enablePowerUps !== false;
   if (!isQuizizzWithPowerUps) {
+    if (combatEffectInterval) {
+      clearInterval(combatEffectInterval);
+      combatEffectInterval = null;
+    }
     if (invBar) invBar.classList.add('hidden');
     if (freezeOverlay) freezeOverlay.classList.add('hidden');
     if (smokeOverlay) smokeOverlay.classList.add('hidden');
     if (notifEl) notifEl.classList.add('hidden');
     if (buffsEl) buffsEl.classList.add('hidden');
+    setQuizInputFrozen(false);
     return;
   }
 
+  // Dọn dẹp interval cũ trước khi cập nhật chu kỳ mới
+  if (combatEffectInterval) {
+    clearInterval(combatEffectInterval);
+    combatEffectInterval = null;
+  }
+
+  const hiddenOpts = Array.isArray(myProgress?.hiddenOptions) ? myProgress.hiddenOptions : [];
+  const queue = myProgress?.inventory?.queue || [];
+
+  const applyCombatTick = () => {
+    const tickNow = Date.now();
+    const activeEffects = Array.isArray(myProgress?.activeEffects) ? myProgress.activeEffects : [];
+    const validEffects = activeEffects.filter(e => e.expiresAt > tickNow);
+
+    // 1. Kiểm tra Đóng Băng (Freeze)
+    const freezeEffect = validEffects.find(e => e.powerUpType === 'freeze');
+    const isFrozen = Boolean(freezeEffect);
+    if (freezeOverlay) {
+      if (isFrozen) {
+        freezeOverlay.classList.remove('hidden');
+        const remSec = Math.max(1, Math.ceil((freezeEffect.expiresAt - tickNow) / 1000));
+        const timerEl = document.getElementById('quiz-freeze-timer');
+        if (timerEl) timerEl.textContent = `Đang giải băng sau ${remSec}s...`;
+        setQuizInputFrozen(true);
+      } else {
+        freezeOverlay.classList.add('hidden');
+        setQuizInputFrozen(false, hiddenOpts);
+      }
+    }
+
+    // 2. Kiểm tra Bom Khói (Smoke)
+    const smokeEffect = validEffects.find(e => e.powerUpType === 'smoke');
+    const isSmoked = Boolean(smokeEffect);
+    if (smokeOverlay) {
+      if (isSmoked) {
+        smokeOverlay.classList.remove('hidden');
+        const remSec = Math.max(1, Math.ceil((smokeEffect.expiresAt - tickNow) / 1000));
+        const timerEl = document.getElementById('quiz-smoke-timer');
+        if (timerEl) timerEl.textContent = `Khói mù tan dần sau ${remSec}s...`;
+      } else {
+        smokeOverlay.classList.add('hidden');
+      }
+    }
+
+    // 3. Cập nhật nút sử dụng vật phẩm theo trạng thái đóng băng
+    const useBtn = document.getElementById('btn-quiz-use-powerup');
+    if (useBtn) {
+      const hasItem = queue.length > 0;
+      const canUse = hasItem && !isFrozen && !state.hasAnsweredCurrentQuestion;
+      useBtn.disabled = !canUse;
+      useBtn.style.opacity = canUse ? '1' : '0.45';
+      useBtn.style.cursor = canUse ? 'pointer' : 'not-allowed';
+      if (hasItem) {
+        useBtn.innerHTML = `<span>⚡</span> <span>DÙNG [${queue[0].name}]</span>`;
+      } else {
+        useBtn.innerHTML = `<span>⚡</span> <span>TÚI TRỐNG</span>`;
+      }
+    }
+
+    // 4. Nếu không còn hiệu ứng đóng băng hoặc bom khói nào còn hiệu lực -> dừng đếm ngược
+    if (!isFrozen && !isSmoked) {
+      if (combatEffectInterval) {
+        clearInterval(combatEffectInterval);
+        combatEffectInterval = null;
+      }
+    }
+  };
+
+  // Kích hoạt tick đầu tiên ngay lập tức
+  applyCombatTick();
+
+  // Thiết lập interval đếm ngược nếu còn hiệu ứng đóng băng hoặc bom khói
+  const initialActive = Array.isArray(myProgress?.activeEffects) ? myProgress.activeEffects : [];
+  const needsTimer = initialActive.some(e => (e.powerUpType === 'freeze' || e.powerUpType === 'smoke') && e.expiresAt > Date.now());
+  if (needsTimer) {
+    combatEffectInterval = setInterval(applyCombatTick, 150);
+  }
+
   const now = Date.now();
-  const activeEffects = Array.isArray(myProgress?.activeEffects) ? myProgress.activeEffects : [];
-  const validEffects = activeEffects.filter(e => e.expiresAt > now);
-
-  // 1. Kiểm tra Đóng Băng (Freeze)
-  const freezeEffect = validEffects.find(e => e.powerUpType === 'freeze');
-  const isFrozen = Boolean(freezeEffect);
-  if (freezeOverlay) {
-    if (isFrozen) {
-      freezeOverlay.classList.remove('hidden');
-      const remSec = Math.max(1, Math.ceil((freezeEffect.expiresAt - now) / 1000));
-      const timerEl = document.getElementById('quiz-freeze-timer');
-      if (timerEl) timerEl.textContent = `Đang giải băng sau ${remSec}s...`;
-    } else {
-      freezeOverlay.classList.add('hidden');
-    }
-  }
-
-  // 2. Kiểm tra Bom Khói (Smoke)
-  const smokeEffect = validEffects.find(e => e.powerUpType === 'smoke');
-  const isSmoked = Boolean(smokeEffect);
-  if (smokeOverlay) {
-    if (isSmoked) {
-      smokeOverlay.classList.remove('hidden');
-      const remSec = Math.max(1, Math.ceil((smokeEffect.expiresAt - now) / 1000));
-      const timerEl = document.getElementById('quiz-smoke-timer');
-      if (timerEl) timerEl.textContent = `Khói mù tan dần sau ${remSec}s...`;
-    } else {
-      smokeOverlay.classList.add('hidden');
-    }
-  }
-
-  // Khóa tương tác nếu đang bị đóng băng
-  if (isFrozen) {
-    document.querySelectorAll('.btn-kahoot').forEach(b => {
-      b.classList.add('disabled');
-      b.disabled = true;
-    });
-  }
+  const validEffects = initialActive.filter(e => e.expiresAt > now);
 
   // 3. Hiển thị Buffs trạng thái (Khiên, Phản đòn, Sấm sét x2)
   if (buffsEl) {
@@ -583,14 +753,20 @@ export function updateQuizCombatUI(quizState, myProgress) {
   }
 
   // 4. Kính soi 50/50: Ẩn các option bị loại
-  const hiddenOpts = Array.isArray(myProgress?.hiddenOptions) ? myProgress.hiddenOptions : [];
   if (hiddenOpts.length > 0) {
     document.querySelectorAll('.btn-kahoot').forEach((b, idx) => {
       if (hiddenOpts.includes(idx)) {
         b.style.opacity = '0.15';
         b.style.pointerEvents = 'none';
         b.style.transform = 'scale(0.95)';
+        b.style.filter = 'grayscale(100%)';
         b.classList.add('disabled');
+      } else {
+        b.style.opacity = '1';
+        b.style.pointerEvents = 'auto';
+        b.style.transform = '';
+        b.style.filter = 'none';
+        b.classList.remove('disabled');
       }
     });
   }
@@ -599,9 +775,7 @@ export function updateQuizCombatUI(quizState, myProgress) {
   if (invBar) {
     invBar.classList.remove('hidden');
     const capacity = quizState.powerUpCapacity || 2;
-    const queue = myProgress?.inventory?.queue || [];
     const slotsEl = document.getElementById('quiz-inventory-slots');
-    const useBtn = document.getElementById('btn-quiz-use-powerup');
 
     if (slotsEl) {
       let slotsHtml = '';
@@ -627,19 +801,6 @@ export function updateQuizCombatUI(quizState, myProgress) {
         }
       }
       slotsEl.innerHTML = slotsHtml;
-    }
-
-    if (useBtn) {
-      const hasItem = queue.length > 0;
-      const canUse = hasItem && !isFrozen && !state.hasAnsweredCurrentQuestion;
-      useBtn.disabled = !canUse;
-      useBtn.style.opacity = canUse ? '1' : '0.45';
-      useBtn.style.cursor = canUse ? 'pointer' : 'not-allowed';
-      if (hasItem) {
-        useBtn.innerHTML = `<span>⚡</span> <span>DÙNG [${queue[0].name}]</span>`;
-      } else {
-        useBtn.innerHTML = `<span>⚡</span> <span>TÚI TRỐNG</span>`;
-      }
     }
   }
 
@@ -674,6 +835,12 @@ export function updateQuizCombatUI(quizState, myProgress) {
 
 export async function handleUsePowerUp() {
   if (!state.currentRunId || !state.sessionData) return;
+  const myProg = state.quizState?.participants?.[state.participantId];
+  const activeEffects = Array.isArray(myProg?.activeEffects) ? myProg.activeEffects : [];
+  if (activeEffects.some(e => e.powerUpType === 'freeze' && e.expiresAt > Date.now())) {
+    console.warn('[Quiz] Đang bị đóng băng, không thể kích hoạt vật phẩm!');
+    return;
+  }
   const useBtn = document.getElementById('btn-quiz-use-powerup');
   if (useBtn) useBtn.disabled = true;
 
@@ -686,6 +853,7 @@ export async function handleUsePowerUp() {
         runId: state.currentRunId,
         intent: {
           type: 'use_powerup',
+          questionIndex: state.currentQuestionIdx,
         },
       }),
     });
@@ -705,6 +873,14 @@ export async function handleUsePowerUp() {
 
 export async function handleSelectAnswer(answer) {
   if (state.hasAnsweredCurrentQuestion || !state.currentRunId || !state.sessionData) return;
+
+  // Kiểm tra nếu đang bị đóng băng thì không nộp bài
+  const myProg = state.quizState?.participants?.[state.participantId];
+  const activeEffects = Array.isArray(myProg?.activeEffects) ? myProg.activeEffects : [];
+  if (activeEffects.some(e => e.powerUpType === 'freeze' && e.expiresAt > Date.now())) {
+    console.warn('[Quiz] Đang bị đóng băng, vui lòng chờ giải băng!');
+    return;
+  }
 
   state.hasAnsweredCurrentQuestion = true;
   const responseTimeMs = Date.now() - state.questionStartTime;
@@ -870,7 +1046,7 @@ export function showQuizizzAnswerReview(quizState, lastAns, selectedAnswer) {
 
             return `
               <div class="${cardClass}">
-                <span style="font-size: 22px; color: ${colors[idx % colors.length]}; flex-shrink: 0;">${symbols[idx % symbols.length]}</span>
+                <span style="font-size: 18px; font-weight: 900; color: ${colors[idx % colors.length]}; flex-shrink: 0; min-width: 28px;">${String.fromCharCode(65 + idx)}.</span>
                 <span style="font-size: 16px; font-weight: 800; color: #1e293b;">${renderMath(opt || String.fromCharCode(65 + idx))}</span>
                 ${tagBadge}
               </div>

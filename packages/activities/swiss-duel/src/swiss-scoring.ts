@@ -154,27 +154,59 @@ export function calculateBuchholz(
 }
 
 /**
+ * Định dạng số câu đúng và tỉ lệ phần trăm, ví dụ: 8/10 (80%)
+ */
+export function formatSwissAccuracy(
+  correctCount: number,
+  totalQuestions?: number,
+  accuracy?: number
+): string {
+  const total =
+    typeof totalQuestions === 'number' && totalQuestions > 0 ? totalQuestions : correctCount;
+  if (total <= 0) return '0/0 (0%)';
+  const pct =
+    typeof accuracy === 'number' && !isNaN(accuracy)
+      ? accuracy
+      : Math.round((correctCount / total) * 100);
+  return `${correctCount}/${total} (${pct}%)`;
+}
+
+/**
  * Tính toán và sắp xếp Bảng Xếp Hạng Thụy Sỹ
  */
 export function calculateSwissLeaderboard(
-  participants: Record<string, SwissParticipantState>
+  participants: Record<string, SwissParticipantState>,
+  currentRound = 1
 ): SwissLeaderboardEntry[] {
   const list = Object.values(participants);
 
   const entries: SwissLeaderboardEntry[] = list.map(p => {
     const buchholz = calculateBuchholz(p, participants);
+    // Tính tổng số câu hỏi đã thi của thí sinh này
+    const playedMatches = p.matchesWon + p.matchesDrawn + p.matchesLost;
+    const computedTotal =
+      p.totalQuestions && p.totalQuestions > 0
+        ? p.totalQuestions
+        : Math.max(playedMatches * 2, p.correctCount);
+    const totalQuestions =
+      computedTotal > 0 ? computedTotal : Math.max(p.correctCount, currentRound * 2);
+    const accuracy = totalQuestions > 0 ? Math.round((p.correctCount / totalQuestions) * 100) : 0;
+
     return {
       rank: 0,
       participantId: p.participantId,
       displayName: p.displayName,
       tournamentPoints: p.tournamentPoints,
       correctCount: p.correctCount,
+      totalQuestions,
+      accuracy,
       buchholz,
       streak: p.streak,
       matchesWon: p.matchesWon,
       matchesDrawn: p.matchesDrawn,
       matchesLost: p.matchesLost,
       isBye: p.isByeThisRound,
+      isOnline: p.isOnline !== false,
     };
   });
 

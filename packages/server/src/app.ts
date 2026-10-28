@@ -412,7 +412,11 @@ export async function buildServer(options: BuildServerOptions = {}): Promise<Fas
   });
 
   // Đăng ký WebSocket gateway
-  await app.register(wsGatewayRoutes, { manager: wsManager, participantRepo });
+  await app.register(wsGatewayRoutes, {
+    manager: wsManager,
+    participantRepo,
+    activityEngine,
+  });
 
   // Đăng ký phục vụ static assets cho 2 giao diện Teacher UI và Student UI
   const serveUiOpts: ServeUiOptions = {};
@@ -426,6 +430,7 @@ export async function buildServer(options: BuildServerOptions = {}): Promise<Fas
   await app.register(serveUiPlugin, serveUiOpts);
 
   app.addHook('onClose', async () => {
+    activityEngine.stop();
     await beaconService.stop();
   });
 

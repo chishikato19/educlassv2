@@ -741,25 +741,140 @@ export function toggleExamReview() {
   container.innerHTML = `<div style="padding: 8px 12px; margin-bottom: 12px; background: #eff6ff; border: 1px solid #bfdbfe; border-radius: 10px; font-size: 13px; font-weight: 700; color: #1e40af;">👤 Bài làm của thí sinh: ${currentStudentName}</div>`;
   reviewData.forEach((rev, idx) => {
     const card = document.createElement('div');
+    const isPartial = !rev.isCorrect && typeof rev.pointsEarned === 'number' && rev.pointsEarned > 0;
+    const hasStudentAns =
+      rev.studentAnswer !== undefined &&
+      rev.studentAnswer !== null &&
+      rev.studentAnswer !== '' &&
+      rev.studentAnswer !== 'Chưa làm' &&
+      (Array.isArray(rev.studentAnswer) ? rev.studentAnswer.some((x) => x !== null) : true);
+
     card.style.cssText = `
-      padding: 12px; margin-bottom: 12px; border-radius: 12px; border: 1px solid ${
+      padding: 12px; margin-bottom: 12px; border-radius: 12px; border: 1.5px solid ${
         rev.isCorrect
-          ? '#bbf7d0'
-          : rev.studentAnswer !== undefined && rev.studentAnswer !== null && rev.studentAnswer !== ''
-            ? '#fecaca'
-            : '#e2e8f0'
+          ? '#86efac'
+          : isPartial
+            ? '#fcd34d'
+            : hasStudentAns
+              ? '#fca5a5'
+              : '#e2e8f0'
       };
       background-color: ${
         rev.isCorrect
           ? '#f0fdf4'
-          : rev.studentAnswer !== undefined && rev.studentAnswer !== null && rev.studentAnswer !== ''
-            ? '#fff1f2'
-            : '#f8fafc'
+          : isPartial
+            ? '#fffbeb'
+            : hasStudentAns
+              ? '#fff1f2'
+              : '#f8fafc'
       };
     `;
 
     let optionsHtml = '';
-    if (rev.options && Array.isArray(rev.options)) {
+    if (rev.type === 'tf_group' && Array.isArray(rev.items)) {
+      optionsHtml = `
+        <div style="margin-top:6px; display:flex; flex-direction:column; gap:6px;">
+          <div style="font-size:11px; font-weight:700; color:#475569; margin-bottom:2px;">
+            Mệnh đề Đúng / Sai (Barem Bộ Giáo dục 0.1 - 0.25 - 0.5 - 1.0):
+          </div>
+          ${rev.items
+            .map((it) => {
+              const itCorrect = Boolean(it.correctAnswer ?? it.correct);
+              const itStudent = it.studentAnswer !== undefined ? it.studentAnswer : null;
+              const itIsCorrect =
+                it.isCorrect !== undefined
+                  ? Boolean(it.isCorrect)
+                  : itStudent !== null && itStudent === itCorrect;
+              let imgStr = '';
+              if (Array.isArray(it.images) && it.images.length > 0) {
+                imgStr = it.images
+                  .map(
+                    (img) =>
+                      `<img src="${img}" style="max-height:80px; max-width:100%; border-radius:4px; margin-top:4px;" />`
+                  )
+                  .join('');
+              }
+              const itemText =
+                typeof it.text === 'object' && it.text ? it.text.text || '' : String(it.text || '');
+              return `
+              <div style="display:flex; flex-direction:column; gap:4px; padding:8px 10px; border-radius:8px; border:1px solid ${
+                itIsCorrect ? '#86efac' : itStudent !== null ? '#fca5a5' : '#e2e8f0'
+              }; background-color: ${
+                itIsCorrect ? '#f0fdf4' : itStudent !== null ? '#fff1f2' : '#ffffff'
+              }; font-size:12.5px;">
+                <div style="display:flex; align-items:flex-start; gap:6px;">
+                  <strong style="color:var(--color-text);">${it.label || ''})</strong>
+                  <div style="flex:1;">${renderMath(itemText)}</div>
+                </div>
+                ${imgStr}
+                <div style="display:flex; align-items:center; justify-content:space-between; gap:8px; font-size:11.5px; border-top:1px dashed #e2e8f0; padding-top:4px; margin-top:2px;">
+                  <span>Bạn chọn: <strong style="color:${itStudent === true ? '#15803d' : itStudent === false ? '#b91c1c' : '#64748b'}">${itStudent === true ? 'Đúng' : itStudent === false ? 'Sai' : 'Chưa chọn'}</strong></span>
+                  <span>Đáp án: <strong style="color:${itCorrect ? '#15803d' : '#b91c1c'}">${itCorrect ? 'Đúng' : 'Sai'}</strong></span>
+                  <span style="font-weight:800; color:${itIsCorrect ? '#15803d' : '#b91c1c'}">${itIsCorrect ? '✓ Đúng' : itStudent !== null ? '✗ Sai' : '⚪'}</span>
+                </div>
+              </div>
+            `;
+            })
+            .join('')}
+        </div>
+      `;
+    } else if (rev.type === 'tf') {
+      const isStudentTrue = rev.studentChoiceLabel === 'Đúng' || rev.studentAnswer === true;
+      const isStudentFalse = rev.studentChoiceLabel === 'Sai' || rev.studentAnswer === false;
+      const isCorrectTrue = rev.correctChoiceLabel === 'Đúng' || rev.correctAnswer === true;
+      const isCorrectFalse = rev.correctChoiceLabel === 'Sai' || rev.correctAnswer === false;
+
+      optionsHtml = `
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-top:6px;">
+          <div style="padding:8px 10px; border-radius:8px; font-size:13px; border:1.5px solid ${
+            isCorrectTrue ? '#86efac' : isStudentTrue ? '#fca5a5' : '#e2e8f0'
+          }; background-color:${
+            isCorrectTrue ? '#dcfce7' : isStudentTrue ? '#fee2e2' : '#ffffff'
+          }; display:flex; align-items:center; justify-content:space-between;">
+            <strong>✔ Đúng</strong>
+            <span style="font-size:11px; font-weight:800; color:${isCorrectTrue ? '#15803d' : '#b91c1c'}">
+              ${isCorrectTrue ? '✓ Đáp án đúng' : isStudentTrue ? '✗ Bạn đã chọn' : ''}
+            </span>
+          </div>
+          <div style="padding:8px 10px; border-radius:8px; font-size:13px; border:1.5px solid ${
+            isCorrectFalse ? '#86efac' : isStudentFalse ? '#fca5a5' : '#e2e8f0'
+          }; background-color:${
+            isCorrectFalse ? '#dcfce7' : isStudentFalse ? '#fee2e2' : '#ffffff'
+          }; display:flex; align-items:center; justify-content:space-between;">
+            <strong>✖ Sai</strong>
+            <span style="font-size:11px; font-weight:800; color:${isCorrectFalse ? '#15803d' : '#b91c1c'}">
+              ${isCorrectFalse ? '✓ Đáp án đúng' : isStudentFalse ? '✗ Bạn đã chọn' : ''}
+            </span>
+          </div>
+        </div>
+      `;
+    } else if (rev.type === 'short') {
+      const studentAnsText =
+        rev.studentAnswer !== undefined &&
+        rev.studentAnswer !== null &&
+        String(rev.studentAnswer).trim() !== '' &&
+        String(rev.studentAnswer) !== 'Chưa làm'
+          ? String(rev.studentAnswer)
+          : 'Chưa trả lời';
+      const acceptedText =
+        Array.isArray(rev.acceptedAnswers) && rev.acceptedAnswers.length > 0
+          ? rev.acceptedAnswers.join(' hoặc ')
+          : String(rev.correctAnswer ?? '—');
+
+      optionsHtml = `
+        <div style="font-size: 13px; padding: 10px 12px; background: #ffffff; border-radius: 8px; border: 1px solid #e2e8f0; margin-top: 6px; display: flex; flex-direction: column; gap: 6px;">
+          <div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
+            <span style="color: #64748b; font-weight: 600;">Bạn đã trả lời:</span>
+            <strong style="color: ${rev.isCorrect ? '#15803d' : '#b91c1c'}; background: ${rev.isCorrect ? '#dcfce7' : '#fee2e2'}; padding: 2px 8px; border-radius: 6px; font-size: 13px;">${studentAnsText}</strong>
+            <span style="font-size: 11px; font-weight: 800; color: ${rev.isCorrect ? '#15803d' : '#b91c1c'}">${rev.isCorrect ? '✓ Chính xác (+điểm)' : '✗ Chưa đúng'}</span>
+          </div>
+          <div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
+            <span style="color: #64748b; font-weight: 600;">Đáp án chấp nhận:</span>
+            <strong style="color: #15803d; font-size: 13px;">${acceptedText}</strong>
+          </div>
+        </div>
+      `;
+    } else if (rev.options && Array.isArray(rev.options) && rev.options.length > 0) {
       optionsHtml = rev.options
         .map((opt) => {
           const isPicked = rev.studentChoiceLabel === opt.label || rev.studentAnswer === opt.index;
@@ -817,21 +932,25 @@ export function toggleExamReview() {
 
     card.innerHTML = `
       <div style="display:flex; justify-content:space-between; align-items:center; font-size:12px; font-weight:800; margin-bottom:6px;">
-        <span style="color: var(--color-text);">Câu ${rev.order || idx + 1} (${rev.points || 1} điểm)</span>
+        <span style="color: var(--color-text);">Câu ${rev.order || idx + 1} (${typeof rev.pointsEarned === 'number' && rev.pointsEarned > 0 ? `+${rev.pointsEarned}đ / ` : ''}${rev.points || 1} điểm)</span>
         <span style="padding:2px 8px; border-radius:6px; font-size:11px; font-weight:800; color: ${
           rev.isCorrect
             ? '#15803d'
-            : rev.studentAnswer !== undefined && rev.studentAnswer !== null && rev.studentAnswer !== ''
-              ? '#b91c1c'
-              : '#64748b'
+            : isPartial
+              ? '#92400e'
+              : hasStudentAns
+                ? '#b91c1c'
+                : '#64748b'
         }; background: ${
           rev.isCorrect
             ? '#dcfce7'
-            : rev.studentAnswer !== undefined && rev.studentAnswer !== null && rev.studentAnswer !== ''
-              ? '#fee2e2'
-              : '#e2e8f0'
+            : isPartial
+              ? '#fef3c7'
+              : hasStudentAns
+                ? '#fee2e2'
+                : '#e2e8f0'
         };">
-          ${rev.isCorrect ? '✓ Đúng' : rev.studentAnswer !== undefined && rev.studentAnswer !== null && rev.studentAnswer !== '' ? '✗ Sai' : '⚪ Chưa làm'}
+          ${rev.isCorrect ? '✓ Đúng' : isPartial ? `✓ Đúng 1 phần (+${rev.pointsEarned}đ)` : hasStudentAns ? '✗ Sai' : '⚪ Chưa làm'}
         </span>
       </div>
       <div style="font-size:14px; font-weight:700; color:var(--color-text); margin-bottom:8px;">${renderMath(rev.stemText)}</div>

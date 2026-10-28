@@ -21,7 +21,23 @@ interface ParsedQuestionReview {
   points: number;
   pointsEarned: number;
   isCorrect: boolean;
-  options: Array<{ index: number; label: string; text: string; images?: string[] }>;
+  options?:
+    | Array<{ index: number; label: string; text: string; images?: string[] | undefined }>
+    | undefined;
+  items?:
+    | Array<{
+        index: number;
+        label: string;
+        text: string;
+        images?: string[] | undefined;
+        studentAnswer: boolean | null;
+        studentChoiceLabel: string;
+        correctAnswer: boolean;
+        correctChoiceLabel: string;
+        isCorrect: boolean;
+      }>
+    | undefined;
+  acceptedAnswers?: string[] | undefined;
   studentChoiceLabel: string | null;
   correctChoiceLabel: string | null;
   studentRawAnswer: unknown;
@@ -143,6 +159,35 @@ export const StudentExamReviewModal: React.FC<StudentExamReviewModalProps> = ({
           });
         }
 
+        const items = Array.isArray(item['items'])
+          ? (item['items'] as Array<Record<string, unknown>>).map((it, idx) => ({
+              index: typeof it['index'] === 'number' ? it['index'] : idx,
+              label: String(it['label'] || ['a', 'b', 'c', 'd'][idx] || `${idx + 1}`),
+              text: richTextToString(it['text'] || it),
+              images: Array.isArray(it['images']) ? (it['images'] as string[]) : undefined,
+              studentAnswer: typeof it['studentAnswer'] === 'boolean' ? it['studentAnswer'] : null,
+              studentChoiceLabel: String(
+                it['studentChoiceLabel'] ||
+                  (it['studentAnswer'] === true
+                    ? 'Đúng'
+                    : it['studentAnswer'] === false
+                      ? 'Sai'
+                      : '—')
+              ),
+              correctAnswer: it['correctAnswer'] === true,
+              correctChoiceLabel: String(
+                it['correctChoiceLabel'] || (it['correctAnswer'] === true ? 'Đúng' : 'Sai')
+              ),
+              isCorrect: it['isCorrect'] === true,
+            }))
+          : undefined;
+
+        const acceptedAnswers = Array.isArray(item['acceptedAnswers'])
+          ? (item['acceptedAnswers'] as string[])
+          : origQ && Array.isArray((origQ as Record<string, unknown>)['acceptedAnswers'])
+            ? ((origQ as Record<string, unknown>)['acceptedAnswers'] as string[])
+            : undefined;
+
         const studentChoiceLabel = item['studentChoiceLabel']
           ? String(item['studentChoiceLabel'])
           : null;
@@ -166,6 +211,8 @@ export const StudentExamReviewModal: React.FC<StudentExamReviewModalProps> = ({
           pointsEarned,
           isCorrect,
           options,
+          items,
+          acceptedAnswers,
           studentChoiceLabel,
           correctChoiceLabel,
           studentRawAnswer: item['studentAnswer'],
@@ -195,9 +242,12 @@ export const StudentExamReviewModal: React.FC<StudentExamReviewModalProps> = ({
       const rawAns = answers[qId] ?? answers[`q_${order}`] ?? answers[`q${order}`];
 
       let options: Array<{ index: number; label: string; text: string; images?: string[] }> = [];
+      let items: ParsedQuestionReview['items'] = undefined;
+      let acceptedAnswers: string[] | undefined = undefined;
       let studentChoiceLabel: string | null = null;
       let correctChoiceLabel: string | null = null;
       let isCorrect = false;
+      let pointsEarned = 0;
 
       const correctRaw = q['correct'] ?? (q as Record<string, unknown>)['correctAnswer'];
 
@@ -236,6 +286,98 @@ export const StudentExamReviewModal: React.FC<StudentExamReviewModalProps> = ({
         } else if (rawAns !== undefined && correctRaw !== undefined && rawAns === correctRaw) {
           isCorrect = true;
         }
+        pointsEarned = isCorrect ? points : 0;
+      } else if (type === 'tf') {
+        options = [
+          { index: 0, label: 'Đúng', text: 'Đúng' },
+          { index: 1, label: 'Sai', text: 'Sai' },
+        ];
+        const studentBool =
+          typeof rawAns === 'boolean'
+            ? rawAns
+            : rawAns === 'true' || rawAns === 1
+              ? true
+              : rawAns === 'false' || rawAns === 0
+                ? false
+                : null;
+        const correctBool =
+          typeof correctRaw === 'boolean'
+            ? correctRaw
+            : correctRaw === 'true' || correctRaw === 1
+              ? true
+              : false;
+
+        studentChoiceLabel = studentBool === true ? 'Đúng' : studentBool === false ? 'Sai' : null;
+        correctChoiceLabel = correctBool ? 'Đúng' : 'Sai';
+        isCorrect = studentBool !== null && studentBool === correctBool;
+        pointsEarned = isCorrect ? points : 0;
+      } else if (type === 'tf_group') {
+        const origItems = Array.isArray(q['items'])
+          ? (q['items'] as Array<Record<string, unknown>>)
+          : [];
+        let rawArr: Array<boolean | null> = [null, null, null, null];
+        if (Array.isArray(rawAns)) {
+          rawArr = rawAns.map(v =>
+            typeof v === 'boolean' ? v : v === 'true' ? true : v === 'false' ? false : null
+          );
+        } else if (
+          rawAns &&
+          typeof rawAns === 'object' &&
+          Array.isArray((rawAns as Record<string, unknown>)['selected'])
+        ) {
+          rawArr = ((rawAns as Record<string, unknown>)['selected'] as unknown[]).map(v =>
+            typeof v === 'boolean' ? v : v === 'true' ? true : v === 'false' ? false : null
+          );
+        }
+
+        let countCorrect = 0;
+        items = origItems.map((it, itIdx) => {
+          const itStudent = rawArr[itIdx] ?? null;
+          const itCorrect = Boolean(it['correct']);
+          const itIsCorrect = itStudent !== null && itStudent === itCorrect;
+          if (itIsCorrect) countCorrect++;
+          return {
+            index: itIdx,
+            label: ['a', 'b', 'c', 'd'][itIdx] || `${itIdx + 1}`,
+            text: richTextToString(it['text'] || it),
+            images: Array.isArray(it['images']) ? (it['images'] as string[]) : undefined,
+            studentAnswer: itStudent,
+            studentChoiceLabel: itStudent === true ? 'Đúng' : itStudent === false ? 'Sai' : '—',
+            correctAnswer: itCorrect,
+            correctChoiceLabel: itCorrect ? 'Đúng' : 'Sai',
+            isCorrect: itIsCorrect,
+          };
+        });
+
+        // Barem Bộ GD: 1 ý = 0.1, 2 ý = 0.25, 3 ý = 0.5, 4 ý = 1.0 (nhân hệ số points / 1.0)
+        const fraction =
+          countCorrect === 4
+            ? 1.0
+            : countCorrect === 3
+              ? 0.5
+              : countCorrect === 2
+                ? 0.25
+                : countCorrect === 1
+                  ? 0.1
+                  : 0;
+        pointsEarned = points * fraction;
+        isCorrect = countCorrect === 4;
+      } else if (type === 'short') {
+        acceptedAnswers = Array.isArray(q['acceptedAnswers'])
+          ? (q['acceptedAnswers'] as string[])
+          : correctRaw !== undefined
+            ? [String(correctRaw)]
+            : [];
+        const studentStr = rawAns !== undefined && rawAns !== null ? String(rawAns).trim() : '';
+        const normStudent = studentStr.toLowerCase().replace(/\s+/g, ' ');
+        isCorrect =
+          normStudent !== '' &&
+          acceptedAnswers.some(
+            acc => acc.trim().toLowerCase().replace(/\s+/g, ' ') === normStudent
+          );
+        pointsEarned = isCorrect ? points : 0;
+        studentChoiceLabel = studentStr || null;
+        correctChoiceLabel = acceptedAnswers.join(' hoặc ');
       } else {
         if (
           rawAns !== undefined &&
@@ -244,6 +386,7 @@ export const StudentExamReviewModal: React.FC<StudentExamReviewModalProps> = ({
         ) {
           isCorrect = true;
         }
+        pointsEarned = isCorrect ? points : 0;
       }
 
       return {
@@ -253,9 +396,11 @@ export const StudentExamReviewModal: React.FC<StudentExamReviewModalProps> = ({
         stemImages,
         type,
         points,
-        pointsEarned: isCorrect ? points : 0,
+        pointsEarned,
         isCorrect,
         options,
+        items,
+        acceptedAnswers,
         studentChoiceLabel,
         correctChoiceLabel,
         studentRawAnswer: rawAns,
@@ -454,14 +599,20 @@ export const StudentExamReviewModal: React.FC<StudentExamReviewModalProps> = ({
             </div>
           ) : (
             filteredReviews.map(q => {
-              const hasAnswered = q.studentChoiceLabel !== null || q.studentRawAnswer !== undefined;
+              const hasAnswered =
+                q.studentChoiceLabel !== null ||
+                (q.studentRawAnswer !== undefined &&
+                  q.studentRawAnswer !== null &&
+                  q.studentRawAnswer !== '') ||
+                (q.items && q.items.some(it => it.studentAnswer !== null));
+              const isPartial = !q.isCorrect && q.pointsEarned > 0;
 
               return (
                 <div
                   key={q.questionId}
                   style={{
                     backgroundColor: '#FFFFFF',
-                    border: `1px solid ${q.isCorrect ? '#BBF7D0' : '#FECACA'}`,
+                    border: `1px solid ${q.isCorrect ? '#BBF7D0' : isPartial ? '#FDE68A' : hasAnswered ? '#FECACA' : '#E2E8F0'}`,
                     borderRadius: UI_RADII.card,
                     padding: '16px',
                     display: 'flex',
@@ -506,15 +657,41 @@ export const StudentExamReviewModal: React.FC<StudentExamReviewModalProps> = ({
                         fontWeight: 700,
                         padding: '3px 10px',
                         borderRadius: '6px',
-                        backgroundColor: q.isCorrect ? '#DCFCE7' : '#FEE2E2',
-                        color: q.isCorrect ? '#166534' : '#991B1B',
-                        border: `1px solid ${q.isCorrect ? '#86EFAC' : '#FCA5A5'}`,
+                        backgroundColor: q.isCorrect
+                          ? '#DCFCE7'
+                          : isPartial
+                            ? '#FEF3C7'
+                            : hasAnswered
+                              ? '#FEE2E2'
+                              : '#F1F5F9',
+                        color: q.isCorrect
+                          ? '#166534'
+                          : isPartial
+                            ? '#92400E'
+                            : hasAnswered
+                              ? '#991B1B'
+                              : '#475569',
+                        border: `1px solid ${
+                          q.isCorrect
+                            ? '#86EFAC'
+                            : isPartial
+                              ? '#FCD34D'
+                              : hasAnswered
+                                ? '#FCA5A5'
+                                : '#CBD5E1'
+                        }`,
                         display: 'inline-flex',
                         alignItems: 'center',
                         gap: '4px',
                       }}
                     >
-                      {q.isCorrect ? '✓ ĐÚNG' : hasAnswered ? '✗ SAI' : '⚪ CHƯA LÀM'}
+                      {q.isCorrect
+                        ? '✓ ĐÚNG'
+                        : isPartial
+                          ? `✓ ĐÚNG 1 PHẦN (+${q.pointsEarned}đ)`
+                          : hasAnswered
+                            ? '✗ SAI'
+                            : '⚪ CHƯA LÀM'}
                     </span>
                   </div>
 
@@ -561,113 +738,210 @@ export const StudentExamReviewModal: React.FC<StudentExamReviewModalProps> = ({
                     </div>
                   )}
 
-                  {/* Danh sách các lựa chọn đáp án (Trắc nghiệm A, B, C, D) */}
-                  {q.options && q.options.length > 0 ? (
+                  {/* 1. Trắc nghiệm 4 lựa chọn (MCQ4) */}
+                  {(q.type === 'mcq4' ||
+                    (!q.items && q.type !== 'tf' && q.type !== 'short' && q.type !== 'tf_group')) &&
+                    q.options &&
+                    q.options.length > 0 && (
+                      <div
+                        style={{
+                          display: 'flex',
+                          flexDirection: 'column',
+                          gap: '6px',
+                          marginTop: '4px',
+                        }}
+                      >
+                        {q.options.map(opt => {
+                          const isStudentPick = q.studentChoiceLabel === opt.label;
+                          const isCorrectOpt = q.correctChoiceLabel === opt.label;
+
+                          let optBg = '#F8FAFC';
+                          let optBorder = '#E2E8F0';
+                          let optColor = '#334155';
+
+                          if (isCorrectOpt) {
+                            optBg = '#F0FDF4';
+                            optBorder = '#86EFAC';
+                            optColor = '#166534';
+                          }
+                          if (isStudentPick && !isCorrectOpt) {
+                            optBg = '#FEF2F2';
+                            optBorder = '#FCA5A5';
+                            optColor = '#991B1B';
+                          }
+
+                          return (
+                            <div
+                              key={opt.index}
+                              style={{
+                                display: 'flex',
+                                alignItems: 'flex-start',
+                                gap: '10px',
+                                padding: '8px 12px',
+                                borderRadius: '6px',
+                                backgroundColor: optBg,
+                                border: `1.5px solid ${optBorder}`,
+                                color: optColor,
+                                fontSize: '13.5px',
+                                lineHeight: 1.4,
+                              }}
+                            >
+                              <span
+                                style={{
+                                  fontWeight: 800,
+                                  width: '22px',
+                                  height: '22px',
+                                  display: 'inline-flex',
+                                  alignItems: 'center',
+                                  justifyContent: 'center',
+                                  borderRadius: '50%',
+                                  backgroundColor: isCorrectOpt
+                                    ? '#16A34A'
+                                    : isStudentPick
+                                      ? '#DC2626'
+                                      : '#CBD5E1',
+                                  color: isCorrectOpt || isStudentPick ? '#FFFFFF' : '#334155',
+                                  fontSize: '12px',
+                                  flexShrink: 0,
+                                  marginTop: '1px',
+                                }}
+                              >
+                                {opt.label}
+                              </span>
+                              <div style={{ flex: 1, minWidth: 0, wordBreak: 'break-word' }}>
+                                <div
+                                  dangerouslySetInnerHTML={{
+                                    __html: renderLatexInText(opt.text),
+                                  }}
+                                />
+                                {opt.images && opt.images.length > 0 && (
+                                  <div
+                                    style={{
+                                      display: 'flex',
+                                      gap: '8px',
+                                      flexWrap: 'wrap',
+                                      marginTop: '6px',
+                                    }}
+                                  >
+                                    {opt.images.map((imgUrl, oImgIdx) => {
+                                      const optResolved = resolveAssetUrl(imgUrl);
+                                      return (
+                                        <img
+                                          key={oImgIdx}
+                                          src={optResolved}
+                                          alt={`Hình phương án ${opt.label}`}
+                                          onClick={() => setPreviewImg(optResolved)}
+                                          title="Nhấn để phóng to ảnh"
+                                          style={{
+                                            maxHeight: '120px',
+                                            maxWidth: '100%',
+                                            objectFit: 'contain',
+                                            borderRadius: '4px',
+                                            border: '1px solid #CBD5E1',
+                                            cursor: 'zoom-in',
+                                            backgroundColor: '#FFFFFF',
+                                          }}
+                                        />
+                                      );
+                                    })}
+                                  </div>
+                                )}
+                              </div>
+                              <div style={{ display: 'flex', gap: '6px', flexShrink: 0 }}>
+                                {isStudentPick && (
+                                  <span
+                                    style={{
+                                      fontSize: '11px',
+                                      fontWeight: 700,
+                                      padding: '2px 6px',
+                                      borderRadius: '4px',
+                                      backgroundColor: isCorrectOpt ? '#DCFCE7' : '#FEE2E2',
+                                      color: isCorrectOpt ? '#166534' : '#DC2626',
+                                      border: `1px solid ${isCorrectOpt ? '#86EFAC' : '#FCA5A5'}`,
+                                    }}
+                                  >
+                                    {isCorrectOpt ? '✓ Bạn chọn (Đúng)' : '✗ Bạn chọn'}
+                                  </span>
+                                )}
+                                {isCorrectOpt && !isStudentPick && (
+                                  <span
+                                    style={{
+                                      fontSize: '11px',
+                                      fontWeight: 700,
+                                      padding: '2px 6px',
+                                      borderRadius: '4px',
+                                      backgroundColor: '#DCFCE7',
+                                      color: '#166534',
+                                      border: '1px solid #86EFAC',
+                                    }}
+                                  >
+                                    ✓ Đáp án đúng
+                                  </span>
+                                )}
+                              </div>
+                            </div>
+                          );
+                        })}
+                      </div>
+                    )}
+
+                  {/* 2. Đúng / Sai đơn (TF) */}
+                  {q.type === 'tf' && (
                     <div
                       style={{
-                        display: 'flex',
-                        flexDirection: 'column',
-                        gap: '6px',
+                        display: 'grid',
+                        gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))',
+                        gap: '8px',
                         marginTop: '4px',
                       }}
                     >
-                      {q.options.map(opt => {
-                        const isStudentPick = q.studentChoiceLabel === opt.label;
-                        const isCorrectOpt = q.correctChoiceLabel === opt.label;
+                      {[
+                        { val: true, label: 'Đúng', icon: '✔' },
+                        { val: false, label: 'Sai', icon: '✖' },
+                      ].map(item => {
+                        const isCorrectOpt =
+                          q.correctChoiceLabel === item.label ||
+                          (item.val ? q.correctRawAnswer === true : q.correctRawAnswer === false);
+                        const isStudentPick =
+                          q.studentChoiceLabel === item.label ||
+                          (item.val ? q.studentRawAnswer === true : q.studentRawAnswer === false);
 
-                        let optBg = '#F8FAFC';
-                        let optBorder = '#E2E8F0';
-                        let optColor = '#334155';
+                        let bg = '#F8FAFC';
+                        let border = '#E2E8F0';
+                        let color = '#334155';
 
                         if (isCorrectOpt) {
-                          optBg = '#F0FDF4';
-                          optBorder = '#86EFAC';
-                          optColor = '#166534';
+                          bg = '#F0FDF4';
+                          border = '#86EFAC';
+                          color = '#166534';
                         }
                         if (isStudentPick && !isCorrectOpt) {
-                          optBg = '#FEF2F2';
-                          optBorder = '#FCA5A5';
-                          optColor = '#991B1B';
+                          bg = '#FEF2F2';
+                          border = '#FCA5A5';
+                          color = '#991B1B';
                         }
 
                         return (
                           <div
-                            key={opt.index}
+                            key={item.label}
                             style={{
                               display: 'flex',
-                              alignItems: 'flex-start',
-                              gap: '10px',
-                              padding: '8px 12px',
+                              alignItems: 'center',
+                              justifyContent: 'space-between',
+                              padding: '10px 14px',
                               borderRadius: '6px',
-                              backgroundColor: optBg,
-                              border: `1.5px solid ${optBorder}`,
-                              color: optColor,
+                              backgroundColor: bg,
+                              border: `1.5px solid ${border}`,
+                              color,
                               fontSize: '13.5px',
-                              lineHeight: 1.4,
+                              fontWeight: 700,
                             }}
                           >
-                            <span
-                              style={{
-                                fontWeight: 800,
-                                width: '22px',
-                                height: '22px',
-                                display: 'inline-flex',
-                                alignItems: 'center',
-                                justifyContent: 'center',
-                                borderRadius: '50%',
-                                backgroundColor: isCorrectOpt
-                                  ? '#16A34A'
-                                  : isStudentPick
-                                    ? '#DC2626'
-                                    : '#CBD5E1',
-                                color: isCorrectOpt || isStudentPick ? '#FFFFFF' : '#334155',
-                                fontSize: '12px',
-                                flexShrink: 0,
-                                marginTop: '1px',
-                              }}
-                            >
-                              {opt.label}
+                            <span style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                              <span>{item.icon}</span>
+                              <span>{item.label}</span>
                             </span>
-                            <div style={{ flex: 1, minWidth: 0, wordBreak: 'break-word' }}>
-                              <div
-                                dangerouslySetInnerHTML={{
-                                  __html: renderLatexInText(opt.text),
-                                }}
-                              />
-                              {opt.images && opt.images.length > 0 && (
-                                <div
-                                  style={{
-                                    display: 'flex',
-                                    gap: '8px',
-                                    flexWrap: 'wrap',
-                                    marginTop: '6px',
-                                  }}
-                                >
-                                  {opt.images.map((imgUrl, oImgIdx) => {
-                                    const optResolved = resolveAssetUrl(imgUrl);
-                                    return (
-                                      <img
-                                        key={oImgIdx}
-                                        src={optResolved}
-                                        alt={`Hình phương án ${opt.label}`}
-                                        onClick={() => setPreviewImg(optResolved)}
-                                        title="Nhấn để phóng to ảnh"
-                                        style={{
-                                          maxHeight: '120px',
-                                          maxWidth: '100%',
-                                          objectFit: 'contain',
-                                          borderRadius: '4px',
-                                          border: '1px solid #CBD5E1',
-                                          cursor: 'zoom-in',
-                                          backgroundColor: '#FFFFFF',
-                                        }}
-                                      />
-                                    );
-                                  })}
-                                </div>
-                              )}
-                            </div>
-                            <div style={{ display: 'flex', gap: '6px', flexShrink: 0 }}>
+                            <div style={{ display: 'flex', gap: '6px' }}>
                               {isStudentPick && (
                                 <span
                                   style={{
@@ -703,50 +977,318 @@ export const StudentExamReviewModal: React.FC<StudentExamReviewModalProps> = ({
                         );
                       })}
                     </div>
-                  ) : (
-                    /* Dạng câu hỏi khác (Điền từ / Tự luận) */
+                  )}
+
+                  {/* 3. Đúng / Sai chùm (TF_GROUP) */}
+                  {q.type === 'tf_group' && (
+                    <div
+                      style={{
+                        display: 'flex',
+                        flexDirection: 'column',
+                        gap: '8px',
+                        marginTop: '4px',
+                      }}
+                    >
+                      <div
+                        style={{
+                          fontSize: '11.5px',
+                          fontWeight: 700,
+                          color: '#475569',
+                          marginBottom: '2px',
+                        }}
+                      >
+                        Chi tiết 4 mệnh đề Đúng / Sai (Barem Bộ Giáo dục 0.1 - 0.25 - 0.5 - 1.0):
+                      </div>
+                      {(q.items || []).map((it, itIdx) => {
+                        const itStudent = it.studentAnswer;
+                        const itCorrect = it.correctAnswer;
+                        const itIsCorrect = it.isCorrect;
+
+                        let itemBg = '#F8FAFC';
+                        let itemBorder = '#E2E8F0';
+                        let itemColor = '#334155';
+
+                        if (itIsCorrect) {
+                          itemBg = '#F0FDF4';
+                          itemBorder = '#86EFAC';
+                          itemColor = '#166534';
+                        } else if (itStudent !== null) {
+                          itemBg = '#FEF2F2';
+                          itemBorder = '#FCA5A5';
+                          itemColor = '#991B1B';
+                        }
+
+                        return (
+                          <div
+                            key={itIdx}
+                            style={{
+                              display: 'flex',
+                              flexDirection: 'column',
+                              gap: '6px',
+                              padding: '10px 12px',
+                              borderRadius: '6px',
+                              backgroundColor: itemBg,
+                              border: `1.5px solid ${itemBorder}`,
+                              color: itemColor,
+                              fontSize: '13px',
+                              lineHeight: 1.4,
+                            }}
+                          >
+                            <div style={{ display: 'flex', alignItems: 'flex-start', gap: '8px' }}>
+                              <span
+                                style={{
+                                  fontWeight: 800,
+                                  width: '20px',
+                                  height: '20px',
+                                  display: 'inline-flex',
+                                  alignItems: 'center',
+                                  justifyContent: 'center',
+                                  borderRadius: '50%',
+                                  backgroundColor: itIsCorrect
+                                    ? '#16A34A'
+                                    : itStudent !== null
+                                      ? '#DC2626'
+                                      : '#CBD5E1',
+                                  color: itIsCorrect || itStudent !== null ? '#FFFFFF' : '#334155',
+                                  fontSize: '11px',
+                                  flexShrink: 0,
+                                  marginTop: '1px',
+                                }}
+                              >
+                                {it.label}
+                              </span>
+                              <div style={{ flex: 1, minWidth: 0, wordBreak: 'break-word' }}>
+                                <div
+                                  dangerouslySetInnerHTML={{
+                                    __html: renderLatexInText(it.text),
+                                  }}
+                                />
+                                {it.images && it.images.length > 0 && (
+                                  <div
+                                    style={{
+                                      display: 'flex',
+                                      gap: '8px',
+                                      flexWrap: 'wrap',
+                                      marginTop: '6px',
+                                    }}
+                                  >
+                                    {it.images.map((imgUrl, imgIdx) => {
+                                      const imgResolved = resolveAssetUrl(imgUrl);
+                                      return (
+                                        <img
+                                          key={imgIdx}
+                                          src={imgResolved}
+                                          alt={`Hình ý ${it.label}`}
+                                          onClick={() => setPreviewImg(imgResolved)}
+                                          title="Nhấn để phóng to ảnh"
+                                          style={{
+                                            maxHeight: '100px',
+                                            maxWidth: '100%',
+                                            objectFit: 'contain',
+                                            borderRadius: '4px',
+                                            border: '1px solid #CBD5E1',
+                                            cursor: 'zoom-in',
+                                            backgroundColor: '#FFFFFF',
+                                          }}
+                                        />
+                                      );
+                                    })}
+                                  </div>
+                                )}
+                              </div>
+                            </div>
+                            {/* Thanh trạng thái lựa chọn của học sinh vs đáp án */}
+                            <div
+                              style={{
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'space-between',
+                                gap: '8px',
+                                fontSize: '11.5px',
+                                borderTop: '1px dashed #CBD5E1',
+                                paddingTop: '4px',
+                                marginTop: '2px',
+                              }}
+                            >
+                              <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                                <span style={{ color: UI_COLORS.textMuted }}>HS chọn:</span>
+                                <span
+                                  style={{
+                                    fontWeight: 700,
+                                    padding: '1px 6px',
+                                    borderRadius: '4px',
+                                    backgroundColor:
+                                      itStudent === true
+                                        ? '#DCFCE7'
+                                        : itStudent === false
+                                          ? '#FEE2E2'
+                                          : '#F1F5F9',
+                                    color:
+                                      itStudent === true
+                                        ? '#166534'
+                                        : itStudent === false
+                                          ? '#991B1B'
+                                          : '#64748b',
+                                    border: `1px solid ${itStudent === true ? '#86EFAC' : itStudent === false ? '#FCA5A5' : '#E2E8F0'}`,
+                                  }}
+                                >
+                                  {it.studentChoiceLabel ||
+                                    (itStudent === true
+                                      ? 'Đúng'
+                                      : itStudent === false
+                                        ? 'Sai'
+                                        : 'Chưa chọn')}
+                                </span>
+                              </div>
+                              <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                                <span style={{ color: UI_COLORS.textMuted }}>Đáp án đúng:</span>
+                                <span
+                                  style={{
+                                    fontWeight: 700,
+                                    padding: '1px 6px',
+                                    borderRadius: '4px',
+                                    backgroundColor: itCorrect ? '#16A34A' : '#DC2626',
+                                    color: '#FFFFFF',
+                                  }}
+                                >
+                                  {itCorrect ? 'Đúng' : 'Sai'}
+                                </span>
+                              </div>
+                              <span style={{ fontWeight: 800, fontSize: '13px' }}>
+                                {itIsCorrect
+                                  ? '✅ Đúng'
+                                  : itStudent !== null
+                                    ? '❌ Sai'
+                                    : '⚪ Chưa làm'}
+                              </span>
+                            </div>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  )}
+
+                  {/* 4. Trả lời ngắn (SHORT) */}
+                  {q.type === 'short' && (
                     <div
                       style={{
                         backgroundColor: '#F8FAFC',
                         border: '1px solid #E2E8F0',
                         borderRadius: '6px',
-                        padding: '10px 12px',
+                        padding: '12px 14px',
                         fontSize: '13px',
                         display: 'flex',
                         flexDirection: 'column',
-                        gap: '6px',
+                        gap: '8px',
+                        marginTop: '4px',
                       }}
                     >
-                      <div style={{ display: 'flex', gap: '8px', alignItems: 'baseline' }}>
+                      <div
+                        style={{
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: '8px',
+                          flexWrap: 'wrap',
+                        }}
+                      >
                         <span style={{ fontWeight: 600, color: UI_COLORS.textMuted }}>
                           Học sinh trả lời:
                         </span>
-                        <strong
-                          style={{ color: q.isCorrect ? '#16A34A' : '#DC2626' }}
-                          dangerouslySetInnerHTML={{
-                            __html:
-                              q.studentRawAnswer !== undefined
-                                ? renderLatexInText(String(q.studentRawAnswer))
-                                : 'Chưa có câu trả lời',
+                        <span
+                          style={{
+                            fontWeight: 700,
+                            padding: '2px 8px',
+                            borderRadius: '4px',
+                            backgroundColor: q.isCorrect ? '#DCFCE7' : '#FEE2E2',
+                            color: q.isCorrect ? '#166534' : '#991B1B',
+                            border: `1px solid ${q.isCorrect ? '#86EFAC' : '#FCA5A5'}`,
                           }}
-                        />
-                      </div>
-                      <div style={{ display: 'flex', gap: '8px', alignItems: 'baseline' }}>
-                        <span style={{ fontWeight: 600, color: UI_COLORS.textMuted }}>
-                          Đáp án chính xác:
+                        >
+                          {q.studentRawAnswer !== undefined &&
+                          q.studentRawAnswer !== null &&
+                          String(q.studentRawAnswer).trim() !== ''
+                            ? String(q.studentRawAnswer)
+                            : 'Chưa trả lời'}
                         </span>
-                        <strong
-                          style={{ color: '#16A34A' }}
-                          dangerouslySetInnerHTML={{
-                            __html:
-                              q.correctRawAnswer !== undefined
-                                ? renderLatexInText(String(q.correctRawAnswer))
-                                : '—',
+                        <span
+                          style={{
+                            fontSize: '11.5px',
+                            fontWeight: 700,
+                            color: q.isCorrect ? '#16A34A' : '#DC2626',
                           }}
-                        />
+                        >
+                          {q.isCorrect ? '✓ Chính xác (+điểm)' : '✗ Chưa chính xác'}
+                        </span>
+                      </div>
+                      <div
+                        style={{
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: '8px',
+                          flexWrap: 'wrap',
+                        }}
+                      >
+                        <span style={{ fontWeight: 600, color: UI_COLORS.textMuted }}>
+                          Đáp án chấp nhận:
+                        </span>
+                        <strong style={{ color: '#16A34A', fontSize: '13.5px' }}>
+                          {q.acceptedAnswers && q.acceptedAnswers.length > 0
+                            ? q.acceptedAnswers.join(' hoặc ')
+                            : q.correctChoiceLabel ||
+                              (q.correctRawAnswer !== undefined ? String(q.correctRawAnswer) : '—')}
+                        </strong>
                       </div>
                     </div>
                   )}
+
+                  {/* 5. Dạng câu hỏi khác (Điền từ / Tự luận dự phòng nếu không thuộc 4 loại trên) */}
+                  {q.type !== 'mcq4' &&
+                    q.type !== 'tf' &&
+                    q.type !== 'tf_group' &&
+                    q.type !== 'short' &&
+                    (!q.options || q.options.length === 0) && (
+                      <div
+                        style={{
+                          backgroundColor: '#F8FAFC',
+                          border: '1px solid #E2E8F0',
+                          borderRadius: '6px',
+                          padding: '10px 12px',
+                          fontSize: '13px',
+                          display: 'flex',
+                          flexDirection: 'column',
+                          gap: '6px',
+                        }}
+                      >
+                        <div style={{ display: 'flex', gap: '8px', alignItems: 'baseline' }}>
+                          <span style={{ fontWeight: 600, color: UI_COLORS.textMuted }}>
+                            Học sinh trả lời:
+                          </span>
+                          <strong
+                            style={{ color: q.isCorrect ? '#16A34A' : '#DC2626' }}
+                            dangerouslySetInnerHTML={{
+                              __html:
+                                q.studentRawAnswer !== undefined
+                                  ? renderLatexInText(String(q.studentRawAnswer))
+                                  : 'Chưa có câu trả lời',
+                            }}
+                          />
+                        </div>
+                        <div style={{ display: 'flex', gap: '8px', alignItems: 'baseline' }}>
+                          <span style={{ fontWeight: 600, color: UI_COLORS.textMuted }}>
+                            Đáp án chính xác:
+                          </span>
+                          <strong
+                            style={{ color: '#16A34A' }}
+                            dangerouslySetInnerHTML={{
+                              __html:
+                                q.correctRawAnswer !== undefined
+                                  ? renderLatexInText(String(q.correctRawAnswer))
+                                  : '—',
+                            }}
+                          />
+                        </div>
+                      </div>
+                    )}
 
                   {/* Lời giải thích / Ghi chú nếu có (Render KaTeX) */}
                   {q.explanation && (

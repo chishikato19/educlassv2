@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef, useMemo } from 'react';
 import type { SwissDuelIntent, SwissDuelState } from '../swiss-schemas.js';
+import { formatSwissAccuracy } from '../swiss-scoring.js';
 import {
   CHESS_PIECES,
   CHESS_SCALE_MAP,
@@ -23,6 +24,7 @@ export const SwissDuelTeacherPanel: React.FC<TeacherPanelProps> = ({
   const [remainingCountdown, setRemainingCountdown] = useState<number>(10);
   const [activeTab, setActiveTab] = useState<'tables' | 'standings'>('tables');
   const [tournamentTimeLeft, setTournamentTimeLeft] = useState<string>('');
+  const [roundTimeLeft, setRoundTimeLeft] = useState<string>('');
   const [isTimeExpired, setIsTimeExpired] = useState<boolean>(false);
 
   // Đếm ngược 10s khi sang round_review & Tự động bốc thăm vòng kế tiếp khi hết giờ
@@ -41,6 +43,46 @@ export const SwissDuelTeacherPanel: React.FC<TeacherPanelProps> = ({
     }
     return undefined;
   }, [state.status, state.countdownEndsAt, onSendIntent]);
+
+  // Đếm ngược thời gian của ván đấu khi đang trong hiệp đấu
+  useEffect(() => {
+    if (state.status === 'in_round' && state.roundStartedAt) {
+      const totalSec =
+        (state.roundQuestions || []).reduce(
+          (acc, q) => acc + (q.timeLimit || state.timeLimitPerQuestion || 30),
+          0
+        ) ||
+        state.timeLimitPerQuestion * 2 ||
+        60;
+      const deadlineRound = state.roundStartedAt + totalSec * 1000;
+
+      const updateRoundTimer = () => {
+        const diffMs = deadlineRound - Date.now();
+        const remainSec = Math.max(0, Math.ceil(diffMs / 1000));
+        const mins = Math.floor(remainSec / 60);
+        const secs = remainSec % 60;
+        setRoundTimeLeft(`${String(mins).padStart(2, '0')}:${String(secs).padStart(2, '0')}`);
+
+        // Nếu hết giờ mà server chưa chốt kịp, gửi intent timeout_round để kích hoạt chốt hiệp
+        if (diffMs <= 0) {
+          onSendIntent({ type: 'timeout_round' });
+        }
+      };
+
+      updateRoundTimer();
+      const interval = setInterval(updateRoundTimer, 1000);
+      return () => clearInterval(interval);
+    } else {
+      setRoundTimeLeft('');
+    }
+    return undefined;
+  }, [
+    state.status,
+    state.roundStartedAt,
+    state.roundQuestions,
+    state.timeLimitPerQuestion,
+    onSendIntent,
+  ]);
 
   // Đếm ngược thời gian toàn bộ giải đấu ở chế độ time mode
   useEffect(() => {
@@ -74,11 +116,15 @@ export const SwissDuelTeacherPanel: React.FC<TeacherPanelProps> = ({
 
   const byeStudent = state.byePlayerId ? state.participants[state.byePlayerId] : null;
 
+  const offlineStudents = Object.values(state.participants).filter(p => p.isOnline === false);
+
   const unpairedStudents = Object.values(state.participants).filter(
     p =>
+      p.isOnline !== false &&
       !state.matchups.some(
         m => m.player1Id === p.participantId || m.player2Id === p.participantId
-      ) && state.byePlayerId !== p.participantId
+      ) &&
+      state.byePlayerId !== p.participantId
   );
 
   const containerRef = useRef<HTMLDivElement>(null);
@@ -258,6 +304,12 @@ export const SwissDuelTeacherPanel: React.FC<TeacherPanelProps> = ({
               {state.currentRound} / {state.totalRounds}
             </span>
           </div>
+          {state.status === 'in_round' && roundTimeLeft && (
+            <div className="px-2.5 py-0.5 rounded-full text-xs font-mono font-bold bg-amber-950/80 border border-amber-500/50 text-amber-300 flex items-center gap-1.5 shadow-sm">
+              <span>⏱️ Ván đấu:</span>
+              <span className="text-white font-black">{roundTimeLeft}</span>
+            </div>
+          )}
           <div className="text-amber-200/80">
             Tiến độ:{' '}
             <span className="font-bold text-white">
@@ -334,6 +386,25 @@ export const SwissDuelTeacherPanel: React.FC<TeacherPanelProps> = ({
         </div>
       )}
 
+      {/* 3.2 Hiển thị học sinh đã thoát mạng (offline) không tham gia bốc thăm vòng tới */}
+      {offlineStudents.length > 0 && (
+        <div className="px-3 py-1.5 bg-rose-950/70 border border-rose-500/50 rounded-xl flex items-center justify-between text-xs text-rose-200 shrink-0">
+          <div className="flex items-center gap-1.5 flex-wrap">
+            <span className="text-base">⚠️</span>
+            <span>
+              Có <b>{offlineStudents.length} học sinh đã thoát (offline)</b>:{' '}
+              <b className="text-rose-300 font-bold">
+                {offlineStudents.map(p => p.displayName).join(', ')}
+              </b>
+              . Hệ thống tự động bỏ qua không ghép cặp các bạn này ở các vòng tiếp theo!
+            </span>
+          </div>
+          <span className="text-[10px] text-rose-300/80 hidden sm:inline">
+            (Tự động xếp bàn lại khi học sinh vào lại)
+          </span>
+        </div>
+      )}
+
       {/* 4. Tab 1: Sơ đồ các Bàn đấu cờ (Tables Matrix) */}
       {activeTab === 'tables' && (
         <div ref={containerRef} className="flex-1 min-h-0 w-full overflow-y-auto pr-0.5">
@@ -406,6 +477,14 @@ export const SwissDuelTeacherPanel: React.FC<TeacherPanelProps> = ({
                           >
                             {p1?.displayName || 'P1'}
                           </span>
+                          {p1?.isOnline === false && (
+                            <span
+                              className="px-1 py-0.2 rounded text-[9px] bg-rose-950/90 text-rose-300 border border-rose-500/50 shrink-0 font-bold"
+                              title="Học sinh đã thoát/offline"
+                            >
+                              Đã thoát
+                            </span>
+                          )}
                           {p1Win && (
                             <span className="text-[10px] shrink-0" title="Chiến thắng">
                               👑
@@ -431,6 +510,14 @@ export const SwissDuelTeacherPanel: React.FC<TeacherPanelProps> = ({
                           >
                             {p2?.displayName || 'P2'}
                           </span>
+                          {p2?.isOnline === false && (
+                            <span
+                              className="px-1 py-0.2 rounded text-[9px] bg-rose-950/90 text-rose-300 border border-rose-500/50 shrink-0 font-bold"
+                              title="Học sinh đã thoát/offline"
+                            >
+                              Đã thoát
+                            </span>
+                          )}
                           {p2Win && (
                             <span className="text-[10px] shrink-0" title="Chiến thắng">
                               👑
@@ -482,7 +569,7 @@ export const SwissDuelTeacherPanel: React.FC<TeacherPanelProps> = ({
                 <th className="py-2 px-3 text-center">Điểm Cờ</th>
                 <th className="py-2 px-3 text-center">Hệ số Buchholz</th>
                 <th className="py-2 px-3 text-center">Thắng/Hòa/Thua</th>
-                <th className="py-2 px-3 text-center">Số câu đúng</th>
+                <th className="py-2 px-3 text-center">Câu đúng / Tỉ lệ</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-[#3d2413]">
@@ -493,7 +580,19 @@ export const SwissDuelTeacherPanel: React.FC<TeacherPanelProps> = ({
                     <td className="py-2.5 px-3 text-center font-black text-amber-300">
                       #{entry.rank}
                     </td>
-                    <td className="py-2.5 px-3 font-bold text-white">{entry.displayName}</td>
+                    <td className="py-2.5 px-3 font-bold text-white">
+                      <div className="flex items-center gap-1.5 flex-wrap">
+                        <span>{entry.displayName}</span>
+                        {entry.isOnline === false && (
+                          <span
+                            className="px-1.5 py-0.2 rounded text-[9px] bg-rose-950/90 text-rose-300 border border-rose-500/50 font-bold"
+                            title="Học sinh đã thoát (offline) - không ghép cặp vòng tới"
+                          >
+                            Đã thoát
+                          </span>
+                        )}
+                      </div>
+                    </td>
                     <td className="py-2.5 px-3 text-center text-amber-200">
                       <span>
                         {badge.icon} {badge.title}
@@ -508,8 +607,12 @@ export const SwissDuelTeacherPanel: React.FC<TeacherPanelProps> = ({
                     <td className="py-2.5 px-3 text-center text-slate-300 font-medium">
                       {entry.matchesWon}T - {entry.matchesDrawn}H - {entry.matchesLost}B
                     </td>
-                    <td className="py-2.5 px-3 text-center text-emerald-400 font-bold">
-                      {entry.correctCount}
+                    <td className="py-2.5 px-3 text-center text-emerald-400 font-bold font-mono">
+                      {formatSwissAccuracy(
+                        entry.correctCount,
+                        entry.totalQuestions,
+                        entry.accuracy
+                      )}
                     </td>
                   </tr>
                 );

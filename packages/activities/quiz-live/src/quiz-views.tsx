@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { renderLatexInText } from '@educlass/question-kit';
 import {
   hasActiveReflectShield,
@@ -184,6 +184,7 @@ export const QuizLiveStudentView: React.FC<StudentViewProps> = ({
   const [shortAnswerInput, setShortAnswerInput] = useState('');
   const [tfGroupSelected, setTfGroupSelected] = useState<Record<number, boolean>>({});
   const [dismissedFeedbackIndex, setDismissedFeedbackIndex] = useState<number | null>(null);
+  const [now, setNow] = useState(() => Date.now());
 
   const myProgress = state.participants[participantId];
   const qIndex =
@@ -193,8 +194,29 @@ export const QuizLiveStudentView: React.FC<StudentViewProps> = ({
   const alreadyAnswered = myProgress ? Boolean(myProgress.answers[String(qIndex)]) : false;
   const lastAnswer = myProgress?.lastAnswer;
 
-  const now = Date.now();
   const activeEffects = myProgress?.activeEffects ?? [];
+
+  // Vòng lặp đếm ngược thời gian thực cho các hiệu ứng chiến đấu (Đóng băng, Bom khói, Khiên...)
+  useEffect(() => {
+    const hasExpiring = activeEffects.some(
+      e => e.expiresAt !== undefined && e.expiresAt > Date.now()
+    );
+    if (!hasExpiring) return;
+
+    const timer = setInterval(() => {
+      const current = Date.now();
+      setNow(current);
+      const stillHasExpiring = activeEffects.some(
+        e => e.expiresAt !== undefined && e.expiresAt > current
+      );
+      if (!stillHasExpiring) {
+        clearInterval(timer);
+      }
+    }, 150);
+
+    return () => clearInterval(timer);
+  }, [activeEffects]);
+
   const freezeCheck = isPlayerFrozen(activeEffects, now);
   const smokeCheck = isPlayerSmoked(activeEffects, now);
   const hasReflect = hasActiveReflectShield(activeEffects, now);
@@ -712,6 +734,8 @@ export const QuizLiveStudentView: React.FC<StudentViewProps> = ({
             {currentQ.options.map((opt, idx) => {
               const theme = KAHOOT_THEMES[idx % KAHOOT_THEMES.length]!;
               const isEliminated = (myProgress?.hiddenOptions ?? []).includes(idx);
+              const isQuizizz = state.mode === 'quizizz';
+              const letter = String.fromCharCode(65 + idx);
               return (
                 <button
                   key={idx}
@@ -722,10 +746,12 @@ export const QuizLiveStudentView: React.FC<StudentViewProps> = ({
                       ? 'opacity-20 grayscale pointer-events-none bg-gray-200 text-gray-400'
                       : `${theme.bg} ${theme.hover} ${theme.text}`
                   }`}
-                  aria-label={`Lựa chọn ${theme.shape}: ${opt}`}
+                  aria-label={
+                    isQuizizz ? `Lựa chọn ${letter}: ${opt}` : `Lựa chọn ${theme.shape}: ${opt}`
+                  }
                 >
-                  <span className="text-2xl sm:text-3xl md:text-4xl leading-none shrink-0">
-                    {isEliminated ? '🚫' : theme.shape}
+                  <span className="text-2xl sm:text-3xl md:text-4xl leading-none shrink-0 font-black">
+                    {isEliminated ? '🚫' : isQuizizz ? letter : theme.shape}
                   </span>
                   <div className="flex flex-col flex-1 min-w-0">
                     <span
@@ -735,7 +761,7 @@ export const QuizLiveStudentView: React.FC<StudentViewProps> = ({
                     {currentQ.optionImages?.[idx] && (
                       <img
                         src={currentQ.optionImages[idx]!}
-                        alt={`Ảnh đáp án ${theme.shape}`}
+                        alt={isQuizizz ? `Ảnh đáp án ${letter}` : `Ảnh đáp án ${theme.shape}`}
                         className="max-h-16 object-contain rounded-lg border border-white/40 shadow-xs mt-1 bg-white/20 p-1"
                       />
                     )}

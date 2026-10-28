@@ -1,5 +1,6 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import type { SwissDuelIntent, SwissDuelState } from '../swiss-schemas.js';
+import { formatSwissAccuracy } from '../swiss-scoring.js';
 import {
   CHESS_PIECES,
   ChessWoodCard,
@@ -23,6 +24,13 @@ export const SwissDuelStudentView: React.FC<StudentViewProps> = ({
   const [activeQuestionIndex, setActiveQuestionIndex] = useState<number>(0);
   const [remainingCountdown, setRemainingCountdown] = useState<number>(10);
   const [roundTimeLeft, setRoundTimeLeft] = useState<string>('');
+  const [roundSecondsLeft, setRoundSecondsLeft] = useState<number>(60);
+  const [roundTotalSecondsState, setRoundTotalSecondsState] = useState<number>(60);
+
+  const selectedAnswersRef = useRef<Record<number, unknown>>(selectedAnswers);
+  selectedAnswersRef.current = selectedAnswers;
+
+  const autoSubmittedRef = useRef<boolean>(false);
 
   const myState = state.participants[participantId];
   const isByeThisRound = state.byePlayerId === participantId || Boolean(myState?.isByeThisRound);
@@ -71,40 +79,62 @@ export const SwissDuelStudentView: React.FC<StudentViewProps> = ({
     return undefined;
   }, [state.status, state.countdownEndsAt]);
 
-  // Đếm ngược tổng thời gian của các câu hỏi trong vòng đấu hiện tại (không hiện thời gian cả giải đấu)
+  // Đếm ngược thời gian của cả hiệp đấu, tự động nộp bài khi hết giờ ván đấu
   useEffect(() => {
     if (state.status === 'in_round' && state.roundStartedAt) {
-      const roundTotalSeconds =
+      const totalSec =
         (state.roundQuestions || []).reduce(
           (acc, q) => acc + (q.timeLimit || state.timeLimitPerQuestion || 30),
           0
         ) ||
         state.timeLimitPerQuestion * 2 ||
         60;
+      setRoundTotalSecondsState(totalSec);
+      const deadlineRound = state.roundStartedAt + totalSec * 1000;
 
-      const deadline = state.roundStartedAt + roundTotalSeconds * 1000;
+      const updateTimers = () => {
+        const now = Date.now();
+        const diffRoundMs = deadlineRound - now;
+        const remainRoundSec = Math.max(0, Math.ceil(diffRoundMs / 1000));
+        setRoundSecondsLeft(remainRoundSec);
 
-      const updateRoundTimer = () => {
-        const diffMs = deadline - Date.now();
-        const remainSec = Math.max(0, Math.ceil(diffMs / 1000));
-        const mins = Math.floor(remainSec / 60);
-        const secs = remainSec % 60;
+        const mins = Math.floor(remainRoundSec / 60);
+        const secs = remainRoundSec % 60;
         setRoundTimeLeft(`${String(mins).padStart(2, '0')}:${String(secs).padStart(2, '0')}`);
+
+        // TỰ ĐỘNG NỘP BÀI KHI HẾT GIỜ HIỆP ĐẤU (nếu chưa nộp)
+        if (now >= deadlineRound && !myAnsweredAll && !autoSubmittedRef.current) {
+          autoSubmittedRef.current = true;
+          onSendIntent({
+            type: 'submit_round',
+            answers: selectedAnswersRef.current,
+            displayName: myState?.displayName,
+          });
+        }
       };
 
-      updateRoundTimer();
-      const interval = setInterval(updateRoundTimer, 1000);
+      updateTimers();
+      const interval = setInterval(updateTimers, 250);
       return () => clearInterval(interval);
     } else {
       setRoundTimeLeft('');
     }
     return undefined;
-  }, [state.status, state.roundStartedAt, state.roundQuestions, state.timeLimitPerQuestion]);
+  }, [
+    state.status,
+    state.roundStartedAt,
+    state.roundQuestions,
+    state.timeLimitPerQuestion,
+    myAnsweredAll,
+    myState?.displayName,
+    onSendIntent,
+  ]);
 
-  // Reset câu trả lời chọn tạm khi đổi vòng
+  // Reset câu trả lời chọn tạm và flags khi đổi vòng
   useEffect(() => {
     setSelectedAnswers({});
     setActiveQuestionIndex(0);
+    autoSubmittedRef.current = false;
   }, [state.currentRound]);
 
   // Chọn đáp án tạm thời (chưa tính điểm cho đến khi bấm nộp bài)
@@ -160,7 +190,9 @@ export const SwissDuelStudentView: React.FC<StudentViewProps> = ({
             </div>
             <div className="p-2.5 bg-black/30 rounded-lg border border-amber-900/40">
               <span className="text-slate-400 block">Số câu đúng</span>
-              <strong className="text-xl text-emerald-400">{myState?.correctCount || 0} câu</strong>
+              <strong className="text-base text-emerald-400 font-mono">
+                {formatSwissAccuracy(myState?.correctCount || 0, myState?.totalQuestions)}
+              </strong>
             </div>
           </div>
 
@@ -430,6 +462,14 @@ export const SwissDuelStudentView: React.FC<StudentViewProps> = ({
               Đang đợi đối thủ <b>{opponentState?.displayName || 'đối thủ'}</b> hoàn thành nước đi
               để phân định kết quả...
             </p>
+            {roundTimeLeft && (
+              <div className="mt-3 p-2 bg-black/40 rounded-xl border border-amber-500/30 text-xs text-amber-300 font-mono">
+                ⏱️ Thời gian ván đấu còn lại: <b>{roundTimeLeft}</b>
+              </div>
+            )}
+            <p className="text-[11px] text-amber-200/60 italic pt-1">
+              Hết giờ ván đấu hệ thống sẽ tự động chốt kết quả và chuyển vòng tiếp theo.
+            </p>
           </ChessWoodCard>
         </div>
       ) : (
@@ -456,6 +496,36 @@ export const SwissDuelStudentView: React.FC<StudentViewProps> = ({
                 </button>
               );
             })}
+          </div>
+
+          {/* Thanh tiến trình đếm ngược thời gian toàn bộ ván đấu */}
+          <div className="space-y-1">
+            <div className="w-full bg-black/50 rounded-full h-2.5 overflow-hidden border border-amber-900/60">
+              <div
+                className={`h-full transition-all duration-300 ${
+                  roundSecondsLeft <= 10
+                    ? 'bg-rose-500 animate-pulse'
+                    : roundSecondsLeft <= 20
+                      ? 'bg-amber-400'
+                      : 'bg-emerald-400'
+                }`}
+                style={{
+                  width: `${Math.min(100, Math.max(0, (roundSecondsLeft / (roundTotalSecondsState || 60)) * 100))}%`,
+                }}
+              />
+            </div>
+            <div className="flex justify-between items-center text-[11px] text-amber-200/80 px-1">
+              <span>⏱️ Thời gian ván đấu:</span>
+              <span
+                className={`font-mono font-bold ${
+                  roundSecondsLeft <= 10
+                    ? 'text-rose-400 text-xs animate-pulse font-black'
+                    : 'text-amber-300'
+                }`}
+              >
+                {roundTimeLeft || `${roundSecondsLeft}s`}
+              </span>
+            </div>
           </div>
 
           {currentQ ? (

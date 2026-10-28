@@ -48,6 +48,11 @@ export const UpdateModal: React.FC<UpdateModalProps> = ({ isOpen, onClose, curre
   const [releaseNotes, setReleaseNotes] = useState<string | null>(null);
   const [downloadPercent, setDownloadPercent] = useState<number>(0);
   const [errorMessage, setErrorMessage] = useState<string>('');
+  const [displayVersion, setDisplayVersion] = useState<string>(currentVersion);
+
+  useEffect(() => {
+    setDisplayVersion(currentVersion);
+  }, [currentVersion]);
 
   const getElectronApi = (): ElectronUpdateApi | undefined => {
     return (window as unknown as { electronAPI?: ElectronUpdateApi }).electronAPI;
@@ -64,6 +69,9 @@ export const UpdateModal: React.FC<UpdateModalProps> = ({ isOpen, onClose, curre
     setErrorMessage('');
     try {
       const res = await api.checkForUpdate();
+      if (res.currentVersion) {
+        setDisplayVersion(res.currentVersion);
+      }
       if (res.error) {
         setStatus('error');
         setErrorMessage(res.error);
@@ -171,7 +179,7 @@ export const UpdateModal: React.FC<UpdateModalProps> = ({ isOpen, onClose, curre
               Bạn đang sử dụng phiên bản mới nhất!
             </div>
             <div style={{ fontSize: '14px', color: '#475569', marginBottom: '16px' }}>
-              Phiên bản hiện tại: <strong>v{currentVersion}</strong>
+              Phiên bản hiện tại: <strong>v{displayVersion}</strong>
             </div>
             {errorMessage && (
               <div style={{ fontSize: '12px', color: '#64748B', marginBottom: '16px' }}>
@@ -204,7 +212,7 @@ export const UpdateModal: React.FC<UpdateModalProps> = ({ isOpen, onClose, curre
                   Đã có bản cập nhật mới: v{latestVersion}
                 </div>
                 <div style={{ fontSize: '13px', color: '#3B82F6' }}>
-                  Phiên bản hiện tại của bạn: v{currentVersion}
+                  Phiên bản hiện tại của bạn: v{displayVersion}
                 </div>
               </div>
             </div>
