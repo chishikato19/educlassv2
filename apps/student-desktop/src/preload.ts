@@ -20,12 +20,12 @@ export interface StudentDesktopBridge {
 }
 
 const bridge: StudentDesktopBridge = {
-  onSessionDetected: (callback) => {
+  onSessionDetected: callback => {
     ipcRenderer.on('session-detected', (_event, session) => {
       callback(session);
     });
   },
-  onSessionClosed: (callback) => {
+  onSessionClosed: callback => {
     ipcRenderer.on('session-closed', () => {
       callback();
     });
@@ -41,7 +41,7 @@ const bridge: StudentDesktopBridge = {
     ipcRenderer.send('kiosk-unlock');
   },
   isKioskLocked: () => ipcRenderer.invoke('kiosk-is-locked'),
-  onKioskStatusChanged: (callback) => {
+  onKioskStatusChanged: callback => {
     ipcRenderer.on('kiosk-status-changed', (_event, locked) => {
       callback(locked);
     });

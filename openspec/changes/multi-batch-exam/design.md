@@ -3,6 +3,7 @@
 ## 1. Kiến trúc Tổng thể (Architecture Overview)
 
 Tách biệt rõ 2 tầng:
+
 - **Tầng Phiên học Thời gian thực (Real-time Session):** Quản lý kết nối WebSocket, người dùng online/offline, mã vào lớp 6 ký tự.
 - **Tầng Kỳ thi Lâu dài (Persistent Exam Management):** Quản lý thực thể kỳ thi, các ca thi liên phiên, chốt kết quả và báo cáo theo lớp.
 
@@ -40,6 +41,7 @@ Tách biệt rõ 2 tầng:
 Được định nghĩa trong `packages/db/src/schema/index.ts`:
 
 ### 2.1 Bảng `exams`
+
 ```ts
 export const exams = sqliteTable('exams', {
   id: text('id').primaryKey(), // ULID
@@ -56,7 +58,9 @@ export const exams = sqliteTable('exams', {
   questionsSnapshotJson: text('questions_snapshot_json').notNull(), // Lưu cứng đề thi gốc tại lúc tạo
   status: text('status', {
     enum: ['ready', 'in_progress', 'waiting_next_batch', 'finished'],
-  }).notNull().default('ready'),
+  })
+    .notNull()
+    .default('ready'),
   currentBatch: integer('current_batch').notNull().default(1),
   activeSessionId: text('active_session_id').references(() => sessions.id, {
     onDelete: 'set null',
@@ -67,6 +71,7 @@ export const exams = sqliteTable('exams', {
 ```
 
 ### 2.2 Bảng `exam_records`
+
 ```ts
 export const examRecords = sqliteTable('exam_records', {
   id: text('id').primaryKey(), // ULID
@@ -80,7 +85,9 @@ export const examRecords = sqliteTable('exam_records', {
   batchIndex: integer('batch_index').notNull().default(1),
   status: text('status', {
     enum: ['in_progress', 'submitted'],
-  }).notNull().default('submitted'),
+  })
+    .notNull()
+    .default('submitted'),
   score: real('score').notNull().default(0),
   maxScore: real('max_score').notNull().default(10),
   percentage: real('percentage').notNull().default(0),
@@ -127,6 +134,7 @@ export const examRecords = sqliteTable('exam_records', {
 ## 5. Thiết kế Giao diện Giáo viên (Teacher UI)
 
 Thêm Tab `exam-reports` vào `apps/teacher-ui`:
+
 - **Thanh lọc:** Tất cả · Đang mở ca · Chờ ca tiếp theo · Đã hoàn thành.
 - **Thẻ kỳ thi (Exam Card):**
   - Tên đề thi, môn học, lớp học.

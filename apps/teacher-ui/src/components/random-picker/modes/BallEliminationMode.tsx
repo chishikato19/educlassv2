@@ -19,25 +19,75 @@ interface BallItem {
 // Bảng màu 10 quả bóng số sống động, tương phản sắc nét theo phong cách hiện đại
 const BALL_PALETTES = [
   // 0: Đỏ Ruby
-  { bg: 'from-rose-500 via-red-600 to-rose-800', border: 'border-rose-300', text: 'text-white', glow: 'shadow-rose-500/50' },
+  {
+    bg: 'from-rose-500 via-red-600 to-rose-800',
+    border: 'border-rose-300',
+    text: 'text-white',
+    glow: 'shadow-rose-500/50',
+  },
   // 1: Xanh Dương Đại Dương
-  { bg: 'from-sky-500 via-blue-600 to-indigo-800', border: 'border-sky-300', text: 'text-white', glow: 'shadow-blue-500/50' },
+  {
+    bg: 'from-sky-500 via-blue-600 to-indigo-800',
+    border: 'border-sky-300',
+    text: 'text-white',
+    glow: 'shadow-blue-500/50',
+  },
   // 2: Xanh Lục Bảo
-  { bg: 'from-emerald-400 via-green-600 to-teal-800', border: 'border-emerald-300', text: 'text-white', glow: 'shadow-emerald-500/50' },
+  {
+    bg: 'from-emerald-400 via-green-600 to-teal-800',
+    border: 'border-emerald-300',
+    text: 'text-white',
+    glow: 'shadow-emerald-500/50',
+  },
   // 3: Vàng Hổ Phách
-  { bg: 'from-amber-400 via-amber-500 to-orange-700', border: 'border-yellow-200', text: 'text-amber-950', glow: 'shadow-amber-500/50' },
+  {
+    bg: 'from-amber-400 via-amber-500 to-orange-700',
+    border: 'border-yellow-200',
+    text: 'text-amber-950',
+    glow: 'shadow-amber-500/50',
+  },
   // 4: Tím Thạch Anh
-  { bg: 'from-purple-500 via-violet-600 to-indigo-900', border: 'border-purple-300', text: 'text-white', glow: 'shadow-purple-500/50' },
+  {
+    bg: 'from-purple-500 via-violet-600 to-indigo-900',
+    border: 'border-purple-300',
+    text: 'text-white',
+    glow: 'shadow-purple-500/50',
+  },
   // 5: Hồng Neon
-  { bg: 'from-pink-400 via-rose-500 to-pink-800', border: 'border-pink-200', text: 'text-white', glow: 'shadow-pink-500/50' },
+  {
+    bg: 'from-pink-400 via-rose-500 to-pink-800',
+    border: 'border-pink-200',
+    text: 'text-white',
+    glow: 'shadow-pink-500/50',
+  },
   // 6: Xanh Ngọc Cyan
-  { bg: 'from-cyan-400 via-teal-500 to-cyan-800', border: 'border-cyan-200', text: 'text-white', glow: 'shadow-cyan-500/50' },
+  {
+    bg: 'from-cyan-400 via-teal-500 to-cyan-800',
+    border: 'border-cyan-200',
+    text: 'text-white',
+    glow: 'shadow-cyan-500/50',
+  },
   // 7: Cam Rực Rỡ
-  { bg: 'from-orange-400 via-amber-600 to-red-700', border: 'border-orange-200', text: 'text-white', glow: 'shadow-orange-500/50' },
+  {
+    bg: 'from-orange-400 via-amber-600 to-red-700',
+    border: 'border-orange-200',
+    text: 'text-white',
+    glow: 'shadow-orange-500/50',
+  },
   // 8: Xanh Chanh Lime
-  { bg: 'from-lime-400 via-emerald-500 to-green-800', border: 'border-lime-200', text: 'text-emerald-950', glow: 'shadow-lime-500/50' },
+  {
+    bg: 'from-lime-400 via-emerald-500 to-green-800',
+    border: 'border-lime-200',
+    text: 'text-emerald-950',
+    glow: 'shadow-lime-500/50',
+  },
   // 9: Tím Fuchsia Huyền Bí
-  { bg: 'from-fuchsia-500 via-pink-600 to-purple-900', border: 'border-fuchsia-300', text: 'text-white', glow: 'shadow-fuchsia-500/50' },
+  {
+    bg: 'from-fuchsia-500 via-pink-600 to-purple-900',
+    border: 'border-fuchsia-300',
+    text: 'text-white',
+    glow: 'shadow-fuchsia-500/50',
+  },
 ];
 
 type Phase = 'idle' | 'ready' | 'eliminating' | 'suspense' | 'merging' | 'revealed';
@@ -71,7 +121,7 @@ export const BallEliminationMode: React.FC<RandomPickerModeProps> = ({
   const timeoutsRef = useRef<number[]>([]);
 
   const clearAllTimeouts = () => {
-    timeoutsRef.current.forEach((t) => window.clearTimeout(t));
+    timeoutsRef.current.forEach(t => window.clearTimeout(t));
     timeoutsRef.current = [];
   };
 
@@ -119,7 +169,7 @@ export const BallEliminationMode: React.FC<RandomPickerModeProps> = ({
     setPhase('ready');
 
     // 1. Xác định số thứ tự của học sinh trúng đích trong danh sách
-    const targetIdx = candidates.findIndex((s) => s.id === selectedStudent.id);
+    const targetIdx = candidates.findIndex(s => s.id === selectedStudent.id);
     const studentNum = targetIdx >= 0 ? targetIdx + 1 : 1;
     setTargetStudentNum(studentNum);
 
@@ -146,8 +196,8 @@ export const BallEliminationMode: React.FC<RandomPickerModeProps> = ({
     }
 
     const allDigits = [
-      ...requiredDigits.map((d) => ({ digit: d, isTarget: true })),
-      ...dummyPool.map((d) => ({ digit: d, isTarget: false })),
+      ...requiredDigits.map(d => ({ digit: d, isTarget: true })),
+      ...dummyPool.map(d => ({ digit: d, isTarget: false })),
     ];
 
     // Xáo trộn vị trí 10 quả bóng hoàn toàn ngẫu nhiên
@@ -166,7 +216,7 @@ export const BallEliminationMode: React.FC<RandomPickerModeProps> = ({
 
     // 4. Kích hoạt chuỗi nổ từng quả một
     // Danh sách các quả bóng cần nổ = những quả có isTarget === false
-    const dummyBallIds = generatedBalls.filter((b) => !b.isTarget).map((b) => b.id);
+    const dummyBallIds = generatedBalls.filter(b => !b.isTarget).map(b => b.id);
     // Xáo trộn thứ tự nổ ngẫu nhiên
     const popOrder = shuffleArray(dummyBallIds);
 
@@ -191,20 +241,20 @@ export const BallEliminationMode: React.FC<RandomPickerModeProps> = ({
       addTimeout(() => {
         setPhase('eliminating');
         const remainingCount = popOrder.length - stepIndex;
-        setStatusMessage(`💥 Đang nổ bóng ngẫu nhiên... Còn ${remainingCount + requiredDigits.length} quả`);
+        setStatusMessage(
+          `💥 Đang nổ bóng ngẫu nhiên... Còn ${remainingCount + requiredDigits.length} quả`
+        );
 
         // Đánh dấu quả bóng đang nổ
-        setBalls((prev) =>
-          prev.map((b) => (b.id === ballIdToPop ? { ...b, isPopping: true } : b))
-        );
+        setBalls(prev => prev.map(b => (b.id === ballIdToPop ? { ...b, isPopping: true } : b)));
 
         soundManager.playBalloonPop();
         soundManager.playEliminationTick();
 
         // Sau 180ms biến mất hoàn toàn
         addTimeout(() => {
-          setBalls((prev) =>
-            prev.map((b) => (b.id === ballIdToPop ? { ...b, isAlive: false, isPopping: false } : b))
+          setBalls(prev =>
+            prev.map(b => (b.id === ballIdToPop ? { ...b, isAlive: false, isPopping: false } : b))
           );
         }, 180);
       }, accumulatedDelay);
@@ -234,7 +284,9 @@ export const BallEliminationMode: React.FC<RandomPickerModeProps> = ({
     accumulatedDelay += 1200;
     addTimeout(() => {
       setPhase('revealed');
-      setStatusMessage(`👑 CHIẾN THẮNG: STT ${studentNum < 10 ? `0${studentNum}` : studentNum} — ${selectedStudent.name}!`);
+      setStatusMessage(
+        `👑 CHIẾN THẮNG: STT ${studentNum < 10 ? `0${studentNum}` : studentNum} — ${selectedStudent.name}!`
+      );
       soundManager.playWinner();
       soundManager.playFireworkBurst();
 
@@ -247,14 +299,15 @@ export const BallEliminationMode: React.FC<RandomPickerModeProps> = ({
 
   // Lọc các quả bóng còn sống
   const survivingBalls = useMemo(() => {
-    return balls.filter((b) => b.isAlive);
+    return balls.filter(b => b.isAlive);
   }, [balls]);
 
-  const displayStudentNumFormatted = targetStudentNum > 0
-    ? targetStudentNum < 10
-      ? `0${targetStudentNum}`
-      : `${targetStudentNum}`
-    : '--';
+  const displayStudentNumFormatted =
+    targetStudentNum > 0
+      ? targetStudentNum < 10
+        ? `0${targetStudentNum}`
+        : `${targetStudentNum}`
+      : '--';
 
   return (
     <div className="w-full flex flex-col items-center justify-center py-4 select-none min-h-[460px] relative px-2">
@@ -287,7 +340,7 @@ export const BallEliminationMode: React.FC<RandomPickerModeProps> = ({
         <div className="w-full max-w-5xl bg-slate-900/60 border border-slate-800/80 rounded-3xl p-6 sm:p-8 backdrop-blur-xl shadow-2xl flex flex-col items-center justify-center min-h-[280px]">
           {/* Hàng 10 quả bóng dàn ngang */}
           <div className="flex flex-wrap items-center justify-center gap-3 sm:gap-4 md:gap-5 w-full">
-            {balls.map((ball) => {
+            {balls.map(ball => {
               if (!ball.isAlive && !ball.isPopping) {
                 // Quả bóng đã nổ hoàn toàn: Giữ chỗ mờ tàn tích
                 return (
@@ -343,7 +396,9 @@ export const BallEliminationMode: React.FC<RandomPickerModeProps> = ({
           {/* Dòng chú thích bên dưới dãy bóng */}
           <div className="mt-8 text-xs sm:text-sm text-slate-400 flex items-center gap-2">
             <span>✨</span>
-            <span>Mỗi lượt nổ ngẫu nhiên 1 quả bóng. 2 quả (hoặc 1 quả) cuối cùng sẽ ghép thành STT!</span>
+            <span>
+              Mỗi lượt nổ ngẫu nhiên 1 quả bóng. 2 quả (hoặc 1 quả) cuối cùng sẽ ghép thành STT!
+            </span>
           </div>
         </div>
       )}
@@ -353,7 +408,9 @@ export const BallEliminationMode: React.FC<RandomPickerModeProps> = ({
         <div className="w-full max-w-2xl bg-gradient-to-b from-slate-900/95 via-indigo-950/90 to-slate-950/95 border-2 border-amber-400/60 rounded-3xl p-8 backdrop-blur-2xl shadow-[0_0_50px_rgba(251,191,36,0.25)] flex flex-col items-center justify-center animate-in fade-in zoom-in-95 duration-500">
           <div className="text-amber-400 text-xs sm:text-sm font-bold tracking-widest uppercase mb-4 flex items-center gap-2">
             <span>✨</span>
-            <span>{phase === 'merging' ? 'HAI QUẢ BÓNG SỐ HỢP NHẤT' : 'SỐ THỨ TỰ HỌC SINH CHIẾN THẮNG'}</span>
+            <span>
+              {phase === 'merging' ? 'HAI QUẢ BÓNG SỐ HỢP NHẤT' : 'SỐ THỨ TỰ HỌC SINH CHIẾN THẮNG'}
+            </span>
             <span>✨</span>
           </div>
 
@@ -372,7 +429,8 @@ export const BallEliminationMode: React.FC<RandomPickerModeProps> = ({
                     ring-4 ring-amber-300/60 animate-bounce
                   `}
                   style={{
-                    boxShadow: '0 0 35px rgba(251, 191, 36, 0.6), inset 0 3px 8px rgba(255, 255, 255, 0.6)',
+                    boxShadow:
+                      '0 0 35px rgba(251, 191, 36, 0.6), inset 0 3px 8px rgba(255, 255, 255, 0.6)',
                   }}
                 >
                   {/* Điểm sáng 3D */}

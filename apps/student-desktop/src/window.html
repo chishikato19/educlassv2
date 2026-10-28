@@ -1,325 +1,335 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="vi">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>EduClass — Học Sinh (Đang chờ phiên học)</title>
-  <style>
-    :root {
-      --bg: #FFF9F0;
-      --card-bg: #FFFFFF;
-      --primary: #4F8CFF;
-      --primary-hover: #3A75E6;
-      --success: #2ECC8F;
-      --text: #2D3748;
-      --text-muted: #718096;
-      --border: #E2E8F0;
-    }
-
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
-    }
-
-    body {
-      background: var(--bg);
-      color: var(--text);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      min-height: 100vh;
-      padding: 24px;
-      user-select: none;
-    }
-
-    .container {
-      background: var(--card-bg);
-      border-radius: 28px;
-      box-shadow: 0 12px 36px rgba(0, 0, 0, 0.06);
-      width: 100%;
-      max-width: 520px;
-      padding: 44px 36px;
-      text-align: center;
-      border: 1px solid rgba(226, 232, 240, 0.8);
-      position: relative;
-      overflow: hidden;
-    }
-
-    /* Radar Pulse Animation */
-    .radar-wrapper {
-      position: relative;
-      width: 100px;
-      height: 100px;
-      margin: 0 auto 24px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-
-    .radar-circle {
-      position: absolute;
-      width: 100%;
-      height: 100%;
-      border-radius: 50%;
-      background: rgba(79, 140, 255, 0.15);
-      animation: pulse 2.2s infinite ease-out;
-    }
-
-    .radar-circle:nth-child(2) {
-      animation-delay: 0.7s;
-    }
-
-    .radar-icon {
-      position: relative;
-      z-index: 2;
-      width: 68px;
-      height: 68px;
-      border-radius: 50%;
-      background: linear-gradient(135deg, #4F8CFF, #2ECC8F);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      color: white;
-      font-size: 30px;
-      box-shadow: 0 8px 20px rgba(79, 140, 255, 0.35);
-    }
-
-    @keyframes pulse {
-      0% {
-        transform: scale(0.6);
-        opacity: 0.9;
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>EduClass — Học Sinh (Đang chờ phiên học)</title>
+    <style>
+      :root {
+        --bg: #fff9f0;
+        --card-bg: #ffffff;
+        --primary: #4f8cff;
+        --primary-hover: #3a75e6;
+        --success: #2ecc8f;
+        --text: #2d3748;
+        --text-muted: #718096;
+        --border: #e2e8f0;
       }
-      100% {
-        transform: scale(1.6);
-        opacity: 0;
+
+      * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+        font-family:
+          -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
       }
-    }
 
-    h1 {
-      font-size: 26px;
-      font-weight: 800;
-      color: #1A202C;
-      margin-bottom: 8px;
-    }
+      body {
+        background: var(--bg);
+        color: var(--text);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        min-height: 100vh;
+        padding: 24px;
+        user-select: none;
+      }
 
-    .badge {
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-      background: #EBF8F2;
-      color: #237A53;
-      padding: 6px 16px;
-      border-radius: 20px;
-      font-size: 14px;
-      font-weight: 600;
-      margin-bottom: 20px;
-    }
+      .container {
+        background: var(--card-bg);
+        border-radius: 28px;
+        box-shadow: 0 12px 36px rgba(0, 0, 0, 0.06);
+        width: 100%;
+        max-width: 520px;
+        padding: 44px 36px;
+        text-align: center;
+        border: 1px solid rgba(226, 232, 240, 0.8);
+        position: relative;
+        overflow: hidden;
+      }
 
-    .badge-dot {
-      width: 8px;
-      height: 8px;
-      border-radius: 50%;
-      background: var(--success);
-      box-shadow: 0 0 8px var(--success);
-      animation: blink 1.5s infinite;
-    }
+      /* Radar Pulse Animation */
+      .radar-wrapper {
+        position: relative;
+        width: 100px;
+        height: 100px;
+        margin: 0 auto 24px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
 
-    @keyframes blink {
-      0%, 100% { opacity: 1; }
-      50% { opacity: 0.3; }
-    }
+      .radar-circle {
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        border-radius: 50%;
+        background: rgba(79, 140, 255, 0.15);
+        animation: pulse 2.2s infinite ease-out;
+      }
 
-    p.guide {
-      font-size: 15px;
-      line-height: 1.6;
-      color: var(--text-muted);
-      margin-bottom: 28px;
-    }
+      .radar-circle:nth-child(2) {
+        animation-delay: 0.7s;
+      }
 
-    /* Detected Banner */
-    .detected-banner {
-      display: none;
-      background: linear-gradient(135deg, #EBF3FF, #E6FFFA);
-      border: 1px solid #BEE3F8;
-      border-radius: 16px;
-      padding: 16px;
-      margin-bottom: 24px;
-      text-align: left;
-    }
+      .radar-icon {
+        position: relative;
+        z-index: 2;
+        width: 68px;
+        height: 68px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, #4f8cff, #2ecc8f);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-size: 30px;
+        box-shadow: 0 8px 20px rgba(79, 140, 255, 0.35);
+      }
 
-    .detected-title {
-      font-size: 15px;
-      font-weight: 700;
-      color: var(--primary);
-      margin-bottom: 4px;
-    }
+      @keyframes pulse {
+        0% {
+          transform: scale(0.6);
+          opacity: 0.9;
+        }
+        100% {
+          transform: scale(1.6);
+          opacity: 0;
+        }
+      }
 
-    .detected-sub {
-      font-size: 13px;
-      color: var(--text);
-    }
+      h1 {
+        font-size: 26px;
+        font-weight: 800;
+        color: #1a202c;
+        margin-bottom: 8px;
+      }
 
-    /* Manual Toggle */
-    .manual-btn {
-      background: transparent;
-      border: none;
-      color: var(--text-muted);
-      font-size: 14px;
-      font-weight: 600;
-      cursor: pointer;
-      text-decoration: underline;
-      padding: 8px;
-    }
+      .badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        background: #ebf8f2;
+        color: #237a53;
+        padding: 6px 16px;
+        border-radius: 20px;
+        font-size: 14px;
+        font-weight: 600;
+        margin-bottom: 20px;
+      }
 
-    .manual-btn:hover {
-      color: var(--primary);
-    }
+      .badge-dot {
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        background: var(--success);
+        box-shadow: 0 0 8px var(--success);
+        animation: blink 1.5s infinite;
+      }
 
-    .manual-form {
-      display: none;
-      margin-top: 20px;
-      padding-top: 20px;
-      border-top: 1px dashed var(--border);
-      text-align: left;
-    }
+      @keyframes blink {
+        0%,
+        100% {
+          opacity: 1;
+        }
+        50% {
+          opacity: 0.3;
+        }
+      }
 
-    .form-group {
-      margin-bottom: 14px;
-    }
+      p.guide {
+        font-size: 15px;
+        line-height: 1.6;
+        color: var(--text-muted);
+        margin-bottom: 28px;
+      }
 
-    label {
-      display: block;
-      font-size: 13px;
-      font-weight: 600;
-      margin-bottom: 6px;
-      color: var(--text);
-    }
+      /* Detected Banner */
+      .detected-banner {
+        display: none;
+        background: linear-gradient(135deg, #ebf3ff, #e6fffa);
+        border: 1px solid #bee3f8;
+        border-radius: 16px;
+        padding: 16px;
+        margin-bottom: 24px;
+        text-align: left;
+      }
 
-    input {
-      width: 100%;
-      padding: 12px 14px;
-      border: 1.5px solid var(--border);
-      border-radius: 12px;
-      font-size: 15px;
-      outline: none;
-      transition: border-color 0.2s;
-    }
+      .detected-title {
+        font-size: 15px;
+        font-weight: 700;
+        color: var(--primary);
+        margin-bottom: 4px;
+      }
 
-    input:focus {
-      border-color: var(--primary);
-    }
+      .detected-sub {
+        font-size: 13px;
+        color: var(--text);
+      }
 
-    .submit-btn {
-      width: 100%;
-      padding: 14px;
-      background: var(--primary);
-      color: white;
-      border: none;
-      border-radius: 14px;
-      font-size: 16px;
-      font-weight: 700;
-      cursor: pointer;
-      transition: background 0.2s;
-    }
+      /* Manual Toggle */
+      .manual-btn {
+        background: transparent;
+        border: none;
+        color: var(--text-muted);
+        font-size: 14px;
+        font-weight: 600;
+        cursor: pointer;
+        text-decoration: underline;
+        padding: 8px;
+      }
 
-    .submit-btn:hover {
-      background: var(--primary-hover);
-    }
+      .manual-btn:hover {
+        color: var(--primary);
+      }
 
-    .footer {
-      margin-top: 24px;
-      font-size: 12px;
-      color: #A0AEC0;
-    }
-  </style>
-</head>
-<body>
-  <div class="container">
-    <div class="radar-wrapper">
-      <div class="radar-circle"></div>
-      <div class="radar-circle"></div>
-      <div class="radar-icon">📡</div>
-    </div>
+      .manual-form {
+        display: none;
+        margin-top: 20px;
+        padding-top: 20px;
+        border-top: 1px dashed var(--border);
+        text-align: left;
+      }
 
-    <h1>EduClass Học Sinh</h1>
-    <div class="badge">
-      <span class="badge-dot"></span>
-      Đang chờ tiết học...
-    </div>
+      .form-group {
+        margin-bottom: 14px;
+      }
 
-    <div id="detected-banner" class="detected-banner">
-      <div id="detected-title" class="detected-title">🎉 Đã tìm thấy lớp học!</div>
-      <div id="detected-sub" class="detected-sub">Đang tự động kết nối...</div>
-    </div>
+      label {
+        display: block;
+        font-size: 13px;
+        font-weight: 600;
+        margin-bottom: 6px;
+        color: var(--text);
+      }
 
-    <p class="guide">
-      Máy tính đang chạy nền và tự động lắng nghe mạng phòng học.<br>
-      <strong>Khi thầy/cô bấm mở phiên, màn hình sẽ tự động chuyển vào lớp ngay lập tức!</strong>
-    </p>
+      input {
+        width: 100%;
+        padding: 12px 14px;
+        border: 1.5px solid var(--border);
+        border-radius: 12px;
+        font-size: 15px;
+        outline: none;
+        transition: border-color 0.2s;
+      }
 
-    <button id="toggle-manual" class="manual-btn" type="button">
-      Nhập địa chỉ máy chủ thủ công (nếu cần)
-    </button>
+      input:focus {
+        border-color: var(--primary);
+      }
 
-    <div id="manual-form" class="manual-form">
-      <div class="form-group">
-        <label for="server-url">Địa chỉ IP hoặc URL máy Giáo Viên:</label>
-        <input type="text" id="server-url" placeholder="Ví dụ: 192.168.1.15 hoặc http://192.168.1.15:3000" />
+      .submit-btn {
+        width: 100%;
+        padding: 14px;
+        background: var(--primary);
+        color: white;
+        border: none;
+        border-radius: 14px;
+        font-size: 16px;
+        font-weight: 700;
+        cursor: pointer;
+        transition: background 0.2s;
+      }
+
+      .submit-btn:hover {
+        background: var(--primary-hover);
+      }
+
+      .footer {
+        margin-top: 24px;
+        font-size: 12px;
+        color: #a0aec0;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <div class="radar-wrapper">
+        <div class="radar-circle"></div>
+        <div class="radar-circle"></div>
+        <div class="radar-icon">📡</div>
       </div>
-      <div class="form-group">
-        <label for="join-code">Mã vào lớp (6 số - tùy chọn):</label>
-        <input type="text" id="join-code" placeholder="Ví dụ: 829104" maxlength="6" />
+
+      <h1>EduClass Học Sinh</h1>
+      <div class="badge">
+        <span class="badge-dot"></span>
+        Đang chờ tiết học...
       </div>
-      <button id="connect-btn" class="submit-btn" type="button">Vào Lớp Ngay</button>
+
+      <div id="detected-banner" class="detected-banner">
+        <div id="detected-title" class="detected-title">🎉 Đã tìm thấy lớp học!</div>
+        <div id="detected-sub" class="detected-sub">Đang tự động kết nối...</div>
+      </div>
+
+      <p class="guide">
+        Máy tính đang chạy nền và tự động lắng nghe mạng phòng học.<br />
+        <strong>Khi thầy/cô bấm mở phiên, màn hình sẽ tự động chuyển vào lớp ngay lập tức!</strong>
+      </p>
+
+      <button id="toggle-manual" class="manual-btn" type="button">
+        Nhập địa chỉ máy chủ thủ công (nếu cần)
+      </button>
+
+      <div id="manual-form" class="manual-form">
+        <div class="form-group">
+          <label for="server-url">Địa chỉ IP hoặc URL máy Giáo Viên:</label>
+          <input
+            type="text"
+            id="server-url"
+            placeholder="Ví dụ: 192.168.1.15 hoặc http://192.168.1.15:3000"
+          />
+        </div>
+        <div class="form-group">
+          <label for="join-code">Mã vào lớp (6 số - tùy chọn):</label>
+          <input type="text" id="join-code" placeholder="Ví dụ: 829104" maxlength="6" />
+        </div>
+        <button id="connect-btn" class="submit-btn" type="button">Vào Lớp Ngay</button>
+      </div>
+
+      <div class="footer">EduClass v2 Managed Student Client · Tự động đánh thức qua LAN</div>
     </div>
 
-    <div class="footer">
-      EduClass v2 Managed Student Client · Tự động đánh thức qua LAN
-    </div>
-  </div>
+    <script>
+      const detectedBanner = document.getElementById('detected-banner');
+      const detectedTitle = document.getElementById('detected-title');
+      const detectedSub = document.getElementById('detected-sub');
+      const toggleManualBtn = document.getElementById('toggle-manual');
+      const manualForm = document.getElementById('manual-form');
+      const serverUrlInput = document.getElementById('server-url');
+      const joinCodeInput = document.getElementById('join-code');
+      const connectBtn = document.getElementById('connect-btn');
 
-  <script>
-    const detectedBanner = document.getElementById('detected-banner');
-    const detectedTitle = document.getElementById('detected-title');
-    const detectedSub = document.getElementById('detected-sub');
-    const toggleManualBtn = document.getElementById('toggle-manual');
-    const manualForm = document.getElementById('manual-form');
-    const serverUrlInput = document.getElementById('server-url');
-    const joinCodeInput = document.getElementById('join-code');
-    const connectBtn = document.getElementById('connect-btn');
+      toggleManualBtn.addEventListener('click', () => {
+        const isHidden = manualForm.style.display !== 'block';
+        manualForm.style.display = isHidden ? 'block' : 'none';
+        toggleManualBtn.textContent = isHidden
+          ? 'Ẩn cài đặt thủ công'
+          : 'Nhập địa chỉ máy chủ thủ công (nếu cần)';
+      });
 
-    toggleManualBtn.addEventListener('click', () => {
-      const isHidden = manualForm.style.display !== 'block';
-      manualForm.style.display = isHidden ? 'block' : 'none';
-      toggleManualBtn.textContent = isHidden ? 'Ẩn cài đặt thủ công' : 'Nhập địa chỉ máy chủ thủ công (nếu cần)';
-    });
+      connectBtn.addEventListener('click', () => {
+        const url = serverUrlInput.value.trim();
+        const code = joinCodeInput.value.trim();
+        if (!url) {
+          alert('Vui lòng nhập IP hoặc URL của máy Giáo Viên!');
+          return;
+        }
+        if (window.educlassStudent) {
+          window.educlassStudent.manualConnect(url, code);
+        }
+      });
 
-    connectBtn.addEventListener('click', () => {
-      const url = serverUrlInput.value.trim();
-      const code = joinCodeInput.value.trim();
-      if (!url) {
-        alert('Vui lòng nhập IP hoặc URL của máy Giáo Viên!');
-        return;
-      }
+      // Lắng nghe tín hiệu từ Electron Main
       if (window.educlassStudent) {
-        window.educlassStudent.manualConnect(url, code);
+        window.educlassStudent.onSessionDetected(session => {
+          detectedBanner.style.display = 'block';
+          detectedTitle.textContent = `🎉 Tìm thấy: ${session.className || 'Phiên học'} (${session.teacherName || 'Giáo viên'})`;
+          detectedSub.textContent = `Mã lớp: ${session.joinCode} — Đang chuyển hướng vào bài học...`;
+        });
+
+        window.educlassStudent.onSessionClosed(() => {
+          detectedBanner.style.display = 'none';
+        });
       }
-    });
-
-    // Lắng nghe tín hiệu từ Electron Main
-    if (window.educlassStudent) {
-      window.educlassStudent.onSessionDetected((session) => {
-        detectedBanner.style.display = 'block';
-        detectedTitle.textContent = `🎉 Tìm thấy: ${session.className || 'Phiên học'} (${session.teacherName || 'Giáo viên'})`;
-        detectedSub.textContent = `Mã lớp: ${session.joinCode} — Đang chuyển hướng vào bài học...`;
-      });
-
-      window.educlassStudent.onSessionClosed(() => {
-        detectedBanner.style.display = 'none';
-      });
-    }
-  </script>
-</body>
+    </script>
+  </body>
 </html>

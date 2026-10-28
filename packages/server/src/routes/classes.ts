@@ -29,7 +29,7 @@ export function toClassDto(cls: ClassSelect): ClassDto {
 export const classesRoutes: FastifyPluginAsync<ClassesRoutesOptions> = async (fastify, options) => {
   const { authService, classRepo } = options;
   const authenticate = createAuthenticateHook(authService);
-  const classOwnerGuard = createOwnerGuard(authService, async (request) => {
+  const classOwnerGuard = createOwnerGuard(authService, async request => {
     const { id } = request.params as { id: string };
     return classRepo.findById(id);
   });

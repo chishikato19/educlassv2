@@ -2,10 +2,7 @@
 import { fireEvent, render, screen } from '@testing-library/react';
 import { describe, expect, it, vi } from 'vitest';
 import type { ProjectGradingState } from '@educlass/protocol';
-import {
-  ProjectGradingProjectorView,
-  ProjectGradingTeacherPanel,
-} from '../index.js';
+import { ProjectGradingProjectorView, ProjectGradingTeacherPanel } from '../index.js';
 
 describe('ProjectGrading UI Views (@educlass/activity-project-grading)', () => {
   const sampleState: ProjectGradingState = {

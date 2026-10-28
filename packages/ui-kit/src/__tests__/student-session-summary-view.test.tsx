@@ -7,7 +7,11 @@ import { StudentSessionSummaryView } from '../components/StudentSessionSummaryVi
 describe('StudentSessionSummaryView Component (Task 5.3 - Mobile-first 360x640)', () => {
   beforeEach(() => {
     Object.defineProperty(window, 'innerWidth', { writable: true, configurable: true, value: 360 });
-    Object.defineProperty(window, 'innerHeight', { writable: true, configurable: true, value: 640 });
+    Object.defineProperty(window, 'innerHeight', {
+      writable: true,
+      configurable: true,
+      value: 640,
+    });
     window.dispatchEvent(new Event('resize'));
   });
 
@@ -29,9 +33,7 @@ describe('StudentSessionSummaryView Component (Task 5.3 - Mobile-first 360x640)'
       { reason: 'Hoàn thành kỳ thi', exp: 40, ts: 1700002000000 },
       { reason: 'Thưởng phát biểu tích cực', exp: 20, ts: 1700003000000 },
     ],
-    newTitlesAwarded: [
-      { key: 'sieu_cap', name: 'Siêu cấp tiến bộ', iconKey: 'rocket' },
-    ],
+    newTitlesAwarded: [{ key: 'sieu_cap', name: 'Siêu cấp tiến bộ', iconKey: 'rocket' }],
     avatar: {
       base: 'fox',
       color: '#FF6B6B',
@@ -46,12 +48,7 @@ describe('StudentSessionSummaryView Component (Task 5.3 - Mobile-first 360x640)'
 
   it('renders student summary correctly with avatar, EXP, breakdown and new titles for account', () => {
     const handleRejoin = vi.fn();
-    render(
-      <StudentSessionSummaryView
-        summary={baseAccountSummary}
-        onRejoin={handleRejoin}
-      />
-    );
+    render(<StudentSessionSummaryView summary={baseAccountSummary} onRejoin={handleRejoin} />);
 
     // Header info
     expect(screen.getByTestId('student-session-summary-view')).toBeDefined();

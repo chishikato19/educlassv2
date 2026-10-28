@@ -1,5 +1,11 @@
 import React, { useState, useEffect } from 'react';
-import type { ActivityMeta, ClassDto, ParticipantDto, SessionDetailResponse, StudentDto } from '@educlass/protocol';
+import type {
+  ActivityMeta,
+  ClassDto,
+  ParticipantDto,
+  SessionDetailResponse,
+  StudentDto,
+} from '@educlass/protocol';
 import { balanceTwoTeamsByElo } from '@educlass/core';
 import { QuickPollTeacherPanel } from '@educlass/activity-quick-poll';
 import { QuizLiveTeacherPanel } from '@educlass/activity-quiz-live';
@@ -63,18 +69,40 @@ const teacherPanelRegistry: Record<
   string,
   React.ComponentType<TeacherPanelComponentProps<never>>
 > = {
-  'quick-poll': QuickPollTeacherPanel as unknown as React.ComponentType<TeacherPanelComponentProps<never>>,
-  'quiz-live': QuizLiveTeacherPanel as unknown as React.ComponentType<TeacherPanelComponentProps<never>>,
-  'exam': ExamTeacherPanel as unknown as React.ComponentType<TeacherPanelComponentProps<never>>,
-  'swiss-duel': SwissDuelTeacherPanel as unknown as React.ComponentType<TeacherPanelComponentProps<never>>,
-  'assignment-hub': AssignmentTeacherPanel as unknown as React.ComponentType<TeacherPanelComponentProps<never>>,
-  'pdf-presenter': PdfPresenterTeacherPanel as unknown as React.ComponentType<TeacherPanelComponentProps<never>>,
-  'object-camera': ObjectCameraTeacherPanel as unknown as React.ComponentType<TeacherPanelComponentProps<never>>,
-  'territory-war': TerritoryTeacherPanel as unknown as React.ComponentType<TeacherPanelComponentProps<never>>,
-  'project-grading': ProjectGradingTeacherPanel as unknown as React.ComponentType<TeacherPanelComponentProps<never>>,
-  'arcade-duel': ArcadeDuelTeacherPanel as unknown as React.ComponentType<TeacherPanelComponentProps<never>>,
-  'interactive-board': InteractiveBoardTeacherPanel as unknown as React.ComponentType<TeacherPanelComponentProps<never>>,
-  'circuit-race': CircuitTeacherPanel as unknown as React.ComponentType<TeacherPanelComponentProps<never>>,
+  'quick-poll': QuickPollTeacherPanel as unknown as React.ComponentType<
+    TeacherPanelComponentProps<never>
+  >,
+  'quiz-live': QuizLiveTeacherPanel as unknown as React.ComponentType<
+    TeacherPanelComponentProps<never>
+  >,
+  exam: ExamTeacherPanel as unknown as React.ComponentType<TeacherPanelComponentProps<never>>,
+  'swiss-duel': SwissDuelTeacherPanel as unknown as React.ComponentType<
+    TeacherPanelComponentProps<never>
+  >,
+  'assignment-hub': AssignmentTeacherPanel as unknown as React.ComponentType<
+    TeacherPanelComponentProps<never>
+  >,
+  'pdf-presenter': PdfPresenterTeacherPanel as unknown as React.ComponentType<
+    TeacherPanelComponentProps<never>
+  >,
+  'object-camera': ObjectCameraTeacherPanel as unknown as React.ComponentType<
+    TeacherPanelComponentProps<never>
+  >,
+  'territory-war': TerritoryTeacherPanel as unknown as React.ComponentType<
+    TeacherPanelComponentProps<never>
+  >,
+  'project-grading': ProjectGradingTeacherPanel as unknown as React.ComponentType<
+    TeacherPanelComponentProps<never>
+  >,
+  'arcade-duel': ArcadeDuelTeacherPanel as unknown as React.ComponentType<
+    TeacherPanelComponentProps<never>
+  >,
+  'interactive-board': InteractiveBoardTeacherPanel as unknown as React.ComponentType<
+    TeacherPanelComponentProps<never>
+  >,
+  'circuit-race': CircuitTeacherPanel as unknown as React.ComponentType<
+    TeacherPanelComponentProps<never>
+  >,
 };
 
 /**
@@ -110,7 +138,12 @@ function extractQuestionImage(q: Record<string, unknown>): string | undefined {
     return q['image'].trim();
   }
   const stemObj = q['stem'] as { images?: unknown[] } | undefined;
-  if (stemObj && typeof stemObj === 'object' && Array.isArray(stemObj.images) && stemObj.images.length > 0) {
+  if (
+    stemObj &&
+    typeof stemObj === 'object' &&
+    Array.isArray(stemObj.images) &&
+    stemObj.images.length > 0
+  ) {
     const firstImg = stemObj.images[0];
     if (typeof firstImg === 'string' && firstImg.trim()) {
       const trimmed = firstImg.trim();
@@ -239,7 +272,8 @@ function prepareTerritoryParticipants(
 
       let currentTeam: 'blue' | 'red' = 'blue';
       for (const ind of individualStudents) {
-        const elo = (ind.studentId ? studentMap.get(ind.studentId)?.elo : undefined) ?? ind.elo ?? 1000;
+        const elo =
+          (ind.studentId ? studentMap.get(ind.studentId)?.elo : undefined) ?? ind.elo ?? 1000;
         result.push({
           id: ind.id,
           displayName: ind.displayName,
@@ -254,13 +288,13 @@ function prepareTerritoryParticipants(
   }
 
   // 2. Chế độ Elo (Cân bằng thực lực) hoặc Ngẫu nhiên
-  const candidates = participants.map((p) => {
+  const candidates = participants.map(p => {
     let elo = 1000;
     if (p.studentId && studentMap.has(p.studentId)) {
       elo = studentMap.get(p.studentId)!.elo ?? 1000;
     } else if (p.studentIds && p.studentIds.length > 0) {
       const studentElos = p.studentIds
-        .map((id) => studentMap.get(id)?.elo)
+        .map(id => studentMap.get(id)?.elo)
         .filter((e): e is number => typeof e === 'number');
       if (studentElos.length > 0) {
         elo = Math.round(studentElos.reduce((a, b) => a + b, 0) / studentElos.length);
@@ -282,7 +316,7 @@ function prepareTerritoryParticipants(
     jitter: balanceMode === 'elo',
   });
 
-  const blueInitial = balanced.blue.map((b) => ({
+  const blueInitial = balanced.blue.map(b => ({
     id: b.id,
     displayName: b.displayName,
     team: 'blue' as const,
@@ -290,7 +324,7 @@ function prepareTerritoryParticipants(
     elo: b.elo,
   }));
 
-  const redInitial = balanced.red.map((r) => ({
+  const redInitial = balanced.red.map(r => ({
     id: r.id,
     displayName: r.displayName,
     team: 'red' as const,
@@ -325,7 +359,10 @@ export const ActivityPanel: React.FC<ActivityPanelProps> = ({
   const [isConfigModalOpen, setIsConfigModalOpen] = useState(false);
 
   // Lớp học liên kết cho Kỳ thi
-  const sessionClassId = (activeSession?.session as { classId?: string })?.classId || (activeSession as unknown as { classId?: string })?.classId || '';
+  const sessionClassId =
+    (activeSession?.session as { classId?: string })?.classId ||
+    (activeSession as unknown as { classId?: string })?.classId ||
+    '';
   const [examClassId, setExamClassId] = useState<string>(sessionClassId || (classes[0]?.id ?? ''));
 
   useEffect(() => {
@@ -341,7 +378,15 @@ export const ActivityPanel: React.FC<ActivityPanelProps> = ({
 
   // Form cấu hình cho Quiz Live (Bao gồm các chế độ: Kahoot, Quizizz, Đấu Cờ Thụy Sỹ, Đại Chiến Lãnh Thổ, Đối Kháng 1vs1, Đấu Bóng Chuyền, Đại Chiến Xanh Đỏ)
   const [quizTitle, setQuizTitle] = useState('Thử thách Tri thức Lớp học');
-  const [quizMode, setQuizMode] = useState<'kahoot' | 'quizizz' | 'swiss-duel' | 'territory-war' | 'arcade-duel' | 'volleyball-tournament' | 'faction-duel'>('kahoot');
+  const [quizMode, setQuizMode] = useState<
+    | 'kahoot'
+    | 'quizizz'
+    | 'swiss-duel'
+    | 'territory-war'
+    | 'arcade-duel'
+    | 'volleyball-tournament'
+    | 'faction-duel'
+  >('kahoot');
   const [quizShuffleQuestions, setQuizShuffleQuestions] = useState(true);
   const [quizShuffleOptions, setQuizShuffleOptions] = useState(true);
   const [quizEnablePowerUps, setQuizEnablePowerUps] = useState(true);
@@ -361,7 +406,9 @@ export const ActivityPanel: React.FC<ActivityPanelProps> = ({
 
   // Cấu hình Đấu Bóng Chuyền (thử nghiệm)
   const [volleyballTitle] = useState('Giải Đấu Bóng Chuyền (thử nghiệm)');
-  const [volleyballPoolMode, setVolleyballPoolMode] = useState<'auto' | '4_pools' | '8_pools'>('auto');
+  const [volleyballPoolMode, setVolleyballPoolMode] = useState<'auto' | '4_pools' | '8_pools'>(
+    'auto'
+  );
   const [volleyballTimeLimitPerQuestion, setVolleyballTimeLimitPerQuestion] = useState(30);
   const [volleyballShuffleQuestions, setVolleyballShuffleQuestions] = useState(true);
   const [volleyballShuffleOptions, setVolleyballShuffleOptions] = useState(true);
@@ -387,7 +434,9 @@ export const ActivityPanel: React.FC<ActivityPanelProps> = ({
   const [territoryMapSize, setTerritoryMapSize] = useState<'5x5' | '7x7' | '9x9'>('7x7');
   const [territoryTimeLimitMinutes, setTerritoryTimeLimitMinutes] = useState(5);
   const [territoryEnableSuddenDeath, setTerritoryEnableSuddenDeath] = useState(false);
-  const [territoryBalanceMode, setTerritoryBalanceMode] = useState<'elo' | 'random' | 'groups'>('elo');
+  const [territoryBalanceMode, setTerritoryBalanceMode] = useState<'elo' | 'random' | 'groups'>(
+    'elo'
+  );
 
   // Cấu hình Đường Đua Tri Thức
   const [circuitTitle, setCircuitTitle] = useState('Đường Đua Tri Thức');
@@ -450,10 +499,12 @@ export const ActivityPanel: React.FC<ActivityPanelProps> = ({
         name: `Nhóm ${i + 1}`,
         leaderParticipantId: parts[i]?.id ?? null,
         leaderDisplayName: parts[i]?.displayName ?? null,
-        memberParticipantIds: parts.filter((_, idx) => idx % count === i).map((p) => p.id),
+        memberParticipantIds: parts.filter((_, idx) => idx % count === i).map(p => p.id),
       }));
       setProjectGradingGroups(fallbackGroups);
-      setClassGroupsLoadedMsg(`✓ Đã tạo ${fallbackGroups.length} nhóm từ danh sách học sinh hiện tại!`);
+      setClassGroupsLoadedMsg(
+        `✓ Đã tạo ${fallbackGroups.length} nhóm từ danh sách học sinh hiện tại!`
+      );
       return;
     }
 
@@ -466,10 +517,11 @@ export const ActivityPanel: React.FC<ActivityPanelProps> = ({
         return;
       }
 
-      const mappedGroups: ProjectGradingGroupConfig[] = res.groups.map((g) => {
-        const leaderPart = participants?.find((p) => p.studentId === g.leaderStudentId);
-        const memberPartIds = g.members
-          .map((m) => participants?.find((p) => p.studentId === m.id)?.id || m.id);
+      const mappedGroups: ProjectGradingGroupConfig[] = res.groups.map(g => {
+        const leaderPart = participants?.find(p => p.studentId === g.leaderStudentId);
+        const memberPartIds = g.members.map(
+          m => participants?.find(p => p.studentId === m.id)?.id || m.id
+        );
 
         return {
           id: g.id,
@@ -549,7 +601,7 @@ export const ActivityPanel: React.FC<ActivityPanelProps> = ({
           const loaded = await onLoadQuestionSet(selectedQuestionSetId);
           rawList = Array.isArray(loaded)
             ? loaded
-            : ((loaded as { questions?: unknown[] })?.questions || []);
+            : (loaded as { questions?: unknown[] })?.questions || [];
         }
 
         if (rawList.length === 0) {
@@ -595,9 +647,10 @@ export const ActivityPanel: React.FC<ActivityPanelProps> = ({
     };
   }, [isConfigModalOpen, selectedActivity?.id, selectedQuestionSetId, onLoadQuestionSet]);
 
-  const totalCalculatedPoints = Math.round(
-    examPreviewQuestions.reduce((sum, q) => sum + (examCustomPoints[q.id] ?? q.points), 0) * 100
-  ) / 100;
+  const totalCalculatedPoints =
+    Math.round(
+      examPreviewQuestions.reduce((sum, q) => sum + (examCustomPoints[q.id] ?? q.points), 0) * 100
+    ) / 100;
 
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
 
@@ -656,7 +709,7 @@ export const ActivityPanel: React.FC<ActivityPanelProps> = ({
             const loaded = await onLoadQuestionSet(selectedQuestionSetId);
             const rawList = Array.isArray(loaded)
               ? loaded
-              : ((loaded as { questions?: unknown[] })?.questions || []);
+              : (loaded as { questions?: unknown[] })?.questions || [];
             const validRawList = rawList.filter((qItem: unknown) => {
               const q = qItem as Record<string, unknown>;
               const qType = String(q['type'] || 'mcq4');
@@ -759,7 +812,7 @@ export const ActivityPanel: React.FC<ActivityPanelProps> = ({
             const loaded = await onLoadQuestionSet(selectedQuestionSetId);
             const rawList = Array.isArray(loaded)
               ? loaded
-              : ((loaded as { questions?: unknown[] })?.questions || []);
+              : (loaded as { questions?: unknown[] })?.questions || [];
             const validRawList = rawList.filter((qItem: unknown) => {
               const q = qItem as Record<string, unknown>;
               const qType = String(q['type'] || 'mcq4');
@@ -798,8 +851,12 @@ export const ActivityPanel: React.FC<ActivityPanelProps> = ({
                 }
 
                 // mcq4
-                const rawOpts = (q['options'] || (q['contentJson'] as { options?: unknown[] })?.options || []) as unknown[];
-                const options = rawOpts.map((opt, oIdx) => parseOptionText(opt, `Phương án ${oIdx + 1}`));
+                const rawOpts = (q['options'] ||
+                  (q['contentJson'] as { options?: unknown[] })?.options ||
+                  []) as unknown[];
+                const options = rawOpts.map((opt, oIdx) =>
+                  parseOptionText(opt, `Phương án ${oIdx + 1}`)
+                );
                 let correctAnswer: unknown = options[0];
                 if (typeof q['correct'] === 'number') {
                   correctAnswer = options[q['correct']] || options[0];
@@ -892,7 +949,7 @@ export const ActivityPanel: React.FC<ActivityPanelProps> = ({
             const loaded = await onLoadQuestionSet(selectedQuestionSetId);
             const rawList = Array.isArray(loaded)
               ? loaded
-              : ((loaded as { questions?: unknown[] })?.questions || []);
+              : (loaded as { questions?: unknown[] })?.questions || [];
             if (rawList.length > 0) {
               duelQuestions = rawList.map((qItem: unknown, idx: number) => {
                 const q = qItem as Record<string, unknown>;
@@ -903,7 +960,11 @@ export const ActivityPanel: React.FC<ActivityPanelProps> = ({
                   ? (q['options'] as unknown[])
                   : ['Phương án A', 'Phương án B', 'Phương án C', 'Phương án D'];
                 const options = rawOpts.map((o: unknown, oIdx: number) =>
-                  parseOptionText(o, ['Phương án A', 'Phương án B', 'Phương án C', 'Phương án D'][oIdx] || `Phương án ${oIdx + 1}`)
+                  parseOptionText(
+                    o,
+                    ['Phương án A', 'Phương án B', 'Phương án C', 'Phương án D'][oIdx] ||
+                      `Phương án ${oIdx + 1}`
+                  )
                 );
                 const cAns = parseCorrectAnswer(q, options.length);
                 return {
@@ -930,7 +991,12 @@ export const ActivityPanel: React.FC<ActivityPanelProps> = ({
               {
                 id: 'q2',
                 stem: 'Mặt trời mọc ở hướng nào và lặn ở hướng nào?',
-                options: ['Mọc Đông - Lặn Tây', 'Mọc Tây - Lặn Đông', 'Mọc Nam - Lặn Bắc', 'Mọc Bắc - Lặn Nam'],
+                options: [
+                  'Mọc Đông - Lặn Tây',
+                  'Mọc Tây - Lặn Đông',
+                  'Mọc Nam - Lặn Bắc',
+                  'Mọc Bắc - Lặn Nam',
+                ],
                 correctAnswer: 0,
                 points: 100,
               },
@@ -981,7 +1047,7 @@ export const ActivityPanel: React.FC<ActivityPanelProps> = ({
             const loaded = await onLoadQuestionSet(selectedQuestionSetId);
             const rawList = Array.isArray(loaded)
               ? loaded
-              : ((loaded as { questions?: unknown[] })?.questions || []);
+              : (loaded as { questions?: unknown[] })?.questions || [];
             const validRawList = rawList.filter((qItem: unknown) => {
               const q = qItem as Record<string, unknown>;
               const qType = String(q['type'] || 'mcq4');
@@ -1057,7 +1123,8 @@ export const ActivityPanel: React.FC<ActivityPanelProps> = ({
           }
 
           await onStartActivity('volleyball-tournament', {
-            title: quizTitle.trim() || volleyballTitle.trim() || 'Giải Đấu Bóng Chuyền (thử nghiệm)',
+            title:
+              quizTitle.trim() || volleyballTitle.trim() || 'Giải Đấu Bóng Chuyền (thử nghiệm)',
             poolMode: volleyballPoolMode,
             questions: vbQuestions,
             pointsWin: 2,
@@ -1069,7 +1136,9 @@ export const ActivityPanel: React.FC<ActivityPanelProps> = ({
           });
           handleCloseConfig();
         } catch (err: unknown) {
-          setErrorMsg(err instanceof Error ? err.message : 'Có lỗi khi bắt đầu Giải Đấu Bóng Chuyền');
+          setErrorMsg(
+            err instanceof Error ? err.message : 'Có lỗi khi bắt đầu Giải Đấu Bóng Chuyền'
+          );
         }
         return;
       }
@@ -1081,7 +1150,7 @@ export const ActivityPanel: React.FC<ActivityPanelProps> = ({
             const loaded = await onLoadQuestionSet(selectedQuestionSetId);
             const rawList = Array.isArray(loaded)
               ? loaded
-              : ((loaded as { questions?: unknown[] })?.questions || []);
+              : (loaded as { questions?: unknown[] })?.questions || [];
             const validRawList = rawList.filter((qItem: unknown) => {
               const q = qItem as Record<string, unknown>;
               const qType = String(q['type'] || 'mcq4');
@@ -1202,7 +1271,7 @@ export const ActivityPanel: React.FC<ActivityPanelProps> = ({
           const loaded = await onLoadQuestionSet(selectedQuestionSetId);
           const rawList = Array.isArray(loaded)
             ? loaded
-            : ((loaded as { questions?: unknown[] })?.questions || []);
+            : (loaded as { questions?: unknown[] })?.questions || [];
 
           if (rawList.length > 0) {
             questionsToUse = rawList.map((qItem: unknown, idx: number) => {
@@ -1230,7 +1299,9 @@ export const ActivityPanel: React.FC<ActivityPanelProps> = ({
                   : [];
                 const items = rawItems.map((it, itemIdx) => {
                   const text =
-                    typeof it.text === 'object' && it.text && 'text' in (it.text as Record<string, unknown>)
+                    typeof it.text === 'object' &&
+                    it.text &&
+                    'text' in (it.text as Record<string, unknown>)
                       ? String((it.text as { text: unknown }).text)
                       : String(it.text || `Ý ${['a', 'b', 'c', 'd'][itemIdx] || itemIdx + 1}`);
                   const correct =
@@ -1270,21 +1341,36 @@ export const ActivityPanel: React.FC<ActivityPanelProps> = ({
               }
 
               if (qType === 'matching') {
-                const rawLeft = Array.isArray(q['leftItems']) ? (q['leftItems'] as Array<{ id: string; text: unknown }>) : [];
-                const rawRight = Array.isArray(q['rightItems']) ? (q['rightItems'] as Array<{ id: string; text: unknown }>) : [];
+                const rawLeft = Array.isArray(q['leftItems'])
+                  ? (q['leftItems'] as Array<{ id: string; text: unknown }>)
+                  : [];
+                const rawRight = Array.isArray(q['rightItems'])
+                  ? (q['rightItems'] as Array<{ id: string; text: unknown }>)
+                  : [];
                 const leftItems = rawLeft.map(it => ({
                   id: String(it.id),
-                  text: typeof it.text === 'object' && it.text && 'text' in (it.text as Record<string, unknown>) ? String((it.text as { text: unknown }).text) : String(it.text || ''),
+                  text:
+                    typeof it.text === 'object' &&
+                    it.text &&
+                    'text' in (it.text as Record<string, unknown>)
+                      ? String((it.text as { text: unknown }).text)
+                      : String(it.text || ''),
                 }));
                 const rightItems = rawRight.map(it => ({
                   id: String(it.id),
-                  text: typeof it.text === 'object' && it.text && 'text' in (it.text as Record<string, unknown>) ? String((it.text as { text: unknown }).text) : String(it.text || ''),
+                  text:
+                    typeof it.text === 'object' &&
+                    it.text &&
+                    'text' in (it.text as Record<string, unknown>)
+                      ? String((it.text as { text: unknown }).text)
+                      : String(it.text || ''),
                 }));
-                const cAns = typeof q['correctPairs'] === 'object' && q['correctPairs'] !== null
-                  ? (q['correctPairs'] as Record<string, string>)
-                  : typeof q['correctAnswer'] === 'object' && q['correctAnswer'] !== null
-                    ? (q['correctAnswer'] as Record<string, string>)
-                    : {};
+                const cAns =
+                  typeof q['correctPairs'] === 'object' && q['correctPairs'] !== null
+                    ? (q['correctPairs'] as Record<string, string>)
+                    : typeof q['correctAnswer'] === 'object' && q['correctAnswer'] !== null
+                      ? (q['correctAnswer'] as Record<string, string>)
+                      : {};
 
                 return {
                   id,
@@ -1301,7 +1387,9 @@ export const ActivityPanel: React.FC<ActivityPanelProps> = ({
 
               if (qType === 'cloze_drag') {
                 const template = String(q['template'] || '');
-                const rawBlanks = Array.isArray(q['blanks']) ? (q['blanks'] as Array<{ id: string; answer?: string; position?: number }>) : [];
+                const rawBlanks = Array.isArray(q['blanks'])
+                  ? (q['blanks'] as Array<{ id: string; answer?: string; position?: number }>)
+                  : [];
                 const blanks = rawBlanks.map(b => {
                   const item: { id: string; position?: number } = { id: String(b.id) };
                   if (typeof b.position === 'number') {
@@ -1310,11 +1398,12 @@ export const ActivityPanel: React.FC<ActivityPanelProps> = ({
                   return item;
                 });
                 const wordBank = Array.isArray(q['wordBank']) ? (q['wordBank'] as string[]) : [];
-                const correctBlanksMap = typeof q['correctBlanks'] === 'object' && q['correctBlanks'] !== null
-                  ? (q['correctBlanks'] as Record<string, string>)
-                  : typeof q['correctAnswer'] === 'object' && q['correctAnswer'] !== null
-                    ? (q['correctAnswer'] as Record<string, string>)
-                    : {};
+                const correctBlanksMap =
+                  typeof q['correctBlanks'] === 'object' && q['correctBlanks'] !== null
+                    ? (q['correctBlanks'] as Record<string, string>)
+                    : typeof q['correctAnswer'] === 'object' && q['correctAnswer'] !== null
+                      ? (q['correctAnswer'] as Record<string, string>)
+                      : {};
                 const cAns: Record<string, string> = { ...correctBlanksMap };
                 for (const b of rawBlanks) {
                   if (b.answer && !cAns[b.id]) {
@@ -1406,14 +1495,20 @@ export const ActivityPanel: React.FC<ActivityPanelProps> = ({
           const loaded = await onLoadQuestionSet(selectedQuestionSetId);
           const rawList = Array.isArray(loaded)
             ? loaded
-            : ((loaded as { questions?: unknown[] })?.questions || []);
+            : (loaded as { questions?: unknown[] })?.questions || [];
           if (rawList.length > 0) {
             examQuestions = rawList.map((qItem: unknown, idx: number) => {
               const q = qItem as Record<string, unknown>;
-              const stem = typeof q['stem'] === 'object' && q['stem'] ? q['stem'] : { text: parseStemText(q['stem'], `Câu hỏi ${idx + 1}`), images: [] };
+              const stem =
+                typeof q['stem'] === 'object' && q['stem']
+                  ? q['stem']
+                  : { text: parseStemText(q['stem'], `Câu hỏi ${idx + 1}`), images: [] };
               const id = q['id'] ? String(q['id']) : `q_${idx + 1}`;
               const qType = String(q['type'] || 'mcq4');
-              const points = examCustomPoints[id] !== undefined ? Number(examCustomPoints[id]) : (Number(q['points']) || 1);
+              const points =
+                examCustomPoints[id] !== undefined
+                  ? Number(examCustomPoints[id])
+                  : Number(q['points']) || 1;
 
               if (qType === 'tf') {
                 return {
@@ -1434,21 +1529,32 @@ export const ActivityPanel: React.FC<ActivityPanelProps> = ({
                 };
               }
               if (qType === 'matching') {
-                const rawLeft = Array.isArray(q['leftItems']) ? (q['leftItems'] as Array<{ id: string; text: unknown }>) : [];
-                const rawRight = Array.isArray(q['rightItems']) ? (q['rightItems'] as Array<{ id: string; text: unknown }>) : [];
+                const rawLeft = Array.isArray(q['leftItems'])
+                  ? (q['leftItems'] as Array<{ id: string; text: unknown }>)
+                  : [];
+                const rawRight = Array.isArray(q['rightItems'])
+                  ? (q['rightItems'] as Array<{ id: string; text: unknown }>)
+                  : [];
                 const leftItems = rawLeft.map(it => ({
                   id: String(it.id),
-                  text: typeof it.text === 'object' && it.text ? it.text : { text: String(it.text || ''), images: [] },
+                  text:
+                    typeof it.text === 'object' && it.text
+                      ? it.text
+                      : { text: String(it.text || ''), images: [] },
                 }));
                 const rightItems = rawRight.map(it => ({
                   id: String(it.id),
-                  text: typeof it.text === 'object' && it.text ? it.text : { text: String(it.text || ''), images: [] },
+                  text:
+                    typeof it.text === 'object' && it.text
+                      ? it.text
+                      : { text: String(it.text || ''), images: [] },
                 }));
-                const correctPairs = typeof q['correctPairs'] === 'object' && q['correctPairs'] !== null
-                  ? (q['correctPairs'] as Record<string, string>)
-                  : typeof q['correctAnswer'] === 'object' && q['correctAnswer'] !== null
-                    ? (q['correctAnswer'] as Record<string, string>)
-                    : {};
+                const correctPairs =
+                  typeof q['correctPairs'] === 'object' && q['correctPairs'] !== null
+                    ? (q['correctPairs'] as Record<string, string>)
+                    : typeof q['correctAnswer'] === 'object' && q['correctAnswer'] !== null
+                      ? (q['correctAnswer'] as Record<string, string>)
+                      : {};
 
                 return {
                   id,
@@ -1462,12 +1568,15 @@ export const ActivityPanel: React.FC<ActivityPanelProps> = ({
               }
               if (qType === 'cloze_drag') {
                 const template = String(q['template'] || '');
-                const rawBlanks = Array.isArray(q['blanks']) ? (q['blanks'] as Array<{ id: string; answer?: string; hint?: string }>) : [];
-                const correctBlanksMap = typeof q['correctBlanks'] === 'object' && q['correctBlanks'] !== null
-                  ? (q['correctBlanks'] as Record<string, string>)
-                  : typeof q['correctAnswer'] === 'object' && q['correctAnswer'] !== null
-                    ? (q['correctAnswer'] as Record<string, string>)
-                    : {};
+                const rawBlanks = Array.isArray(q['blanks'])
+                  ? (q['blanks'] as Array<{ id: string; answer?: string; hint?: string }>)
+                  : [];
+                const correctBlanksMap =
+                  typeof q['correctBlanks'] === 'object' && q['correctBlanks'] !== null
+                    ? (q['correctBlanks'] as Record<string, string>)
+                    : typeof q['correctAnswer'] === 'object' && q['correctAnswer'] !== null
+                      ? (q['correctAnswer'] as Record<string, string>)
+                      : {};
                 const blanks = rawBlanks.map(b => {
                   const item: { id: string; answer: string; hint?: string } = {
                     id: String(b.id),
@@ -1492,7 +1601,9 @@ export const ActivityPanel: React.FC<ActivityPanelProps> = ({
               }
 
               // mcq4
-              const rawOpts = Array.isArray(q['options']) ? (q['options'] as unknown[]) : ['A', 'B', 'C', 'D'];
+              const rawOpts = Array.isArray(q['options'])
+                ? (q['options'] as unknown[])
+                : ['A', 'B', 'C', 'D'];
               const options = rawOpts.map((o: unknown) => {
                 if (typeof o === 'object' && o) return o;
                 return { text: String(o), images: [] };
@@ -1557,7 +1668,7 @@ export const ActivityPanel: React.FC<ActivityPanelProps> = ({
           const loaded = await onLoadQuestionSet(selectedQuestionSetId);
           const rawList = Array.isArray(loaded)
             ? loaded
-            : ((loaded as { questions?: unknown[] })?.questions || []);
+            : (loaded as { questions?: unknown[] })?.questions || [];
           const validRawList = rawList.filter((qItem: unknown) => {
             const q = qItem as Record<string, unknown>;
             const qType = String(q['type'] || 'mcq4');
@@ -1673,16 +1784,19 @@ export const ActivityPanel: React.FC<ActivityPanelProps> = ({
                 reader.onerror = reject;
                 reader.readAsDataURL(file);
               });
-              const res = await fetch('/api/sessions/active/activities/current/assignment/materials', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                  name: file.name,
-                  size: file.size,
-                  mime: file.type || 'application/octet-stream',
-                  base64: base64Data,
-                }),
-              });
+              const res = await fetch(
+                '/api/sessions/active/activities/current/assignment/materials',
+                {
+                  method: 'POST',
+                  headers: { 'Content-Type': 'application/json' },
+                  body: JSON.stringify({
+                    name: file.name,
+                    size: file.size,
+                    mime: file.type || 'application/octet-stream',
+                    base64: base64Data,
+                  }),
+                }
+              );
               if (res.ok) {
                 const material = await res.json();
                 onSendTeacherIntent({
@@ -1707,7 +1821,7 @@ export const ActivityPanel: React.FC<ActivityPanelProps> = ({
           const loaded = await onLoadQuestionSet(selectedQuestionSetId);
           const rawList = Array.isArray(loaded)
             ? loaded
-            : ((loaded as { questions?: unknown[] })?.questions || []);
+            : (loaded as { questions?: unknown[] })?.questions || [];
           const validRawList = rawList.filter((qItem: unknown) => {
             const q = qItem as Record<string, unknown>;
             const qType = String(q['type'] || 'mcq4');
@@ -1746,8 +1860,12 @@ export const ActivityPanel: React.FC<ActivityPanelProps> = ({
               }
 
               // mcq4
-              const rawOpts = (q['options'] || (q['contentJson'] as { options?: unknown[] })?.options || []) as unknown[];
-              const options = rawOpts.map((opt, oIdx) => parseOptionText(opt, `Phương án ${oIdx + 1}`));
+              const rawOpts = (q['options'] ||
+                (q['contentJson'] as { options?: unknown[] })?.options ||
+                []) as unknown[];
+              const options = rawOpts.map((opt, oIdx) =>
+                parseOptionText(opt, `Phương án ${oIdx + 1}`)
+              );
               let correctAnswer: unknown = options[0];
               if (typeof q['correct'] === 'number') {
                 correctAnswer = options[q['correct']] || options[0];
@@ -1834,7 +1952,7 @@ export const ActivityPanel: React.FC<ActivityPanelProps> = ({
             name: `Nhóm ${i + 1}`,
             leaderParticipantId: parts[i]?.id ?? null,
             leaderDisplayName: parts[i]?.displayName ?? null,
-            memberParticipantIds: parts.filter((_, idx) => idx % count === i).map((p) => p.id),
+            memberParticipantIds: parts.filter((_, idx) => idx % count === i).map(p => p.id),
           }));
         }
 
@@ -1862,8 +1980,8 @@ export const ActivityPanel: React.FC<ActivityPanelProps> = ({
           const loaded = await onLoadQuestionSet(boardQuestionSetId);
           const rawQuestions = Array.isArray(loaded)
             ? loaded
-            : ((loaded as { questions?: unknown[] })?.questions || []);
-          const targetSet = questionSets.find((s) => s.id === boardQuestionSetId);
+            : (loaded as { questions?: unknown[] })?.questions || [];
+          const targetSet = questionSets.find(s => s.id === boardQuestionSetId);
 
           worksheetConfig = {
             enabled: true,
@@ -1896,7 +2014,7 @@ export const ActivityPanel: React.FC<ActivityPanelProps> = ({
           const loaded = await onLoadQuestionSet(selectedQuestionSetId);
           const rawList = Array.isArray(loaded)
             ? loaded
-            : ((loaded as { questions?: unknown[] })?.questions || []);
+            : (loaded as { questions?: unknown[] })?.questions || [];
           if (rawList.length > 0) {
             circuitQuestions = rawList.map((qItem: unknown, idx: number) => {
               const q = qItem as Record<string, unknown>;
@@ -1926,7 +2044,9 @@ export const ActivityPanel: React.FC<ActivityPanelProps> = ({
                 };
               }
               if (qType === 'tf_group') {
-                const rawItems = (q['items'] || (q['contentJson'] as { items?: unknown[] })?.items || []) as unknown[];
+                const rawItems = (q['items'] ||
+                  (q['contentJson'] as { items?: unknown[] })?.items ||
+                  []) as unknown[];
                 const items = rawItems.map((it: unknown) => {
                   const itRec = it as Record<string, unknown>;
                   return {
@@ -1945,9 +2065,15 @@ export const ActivityPanel: React.FC<ActivityPanelProps> = ({
               }
 
               // mcq4
-              const rawOpts = (q['options'] || (q['contentJson'] as { options?: unknown[] })?.options || []) as unknown[];
-              const options = rawOpts.map((opt, oIdx) => parseOptionText(opt, `Phương án ${oIdx + 1}`));
-              const correctIdx = Number(q['correct'] ?? (q['answerJson'] as { correct?: unknown })?.correct ?? 0);
+              const rawOpts = (q['options'] ||
+                (q['contentJson'] as { options?: unknown[] })?.options ||
+                []) as unknown[];
+              const options = rawOpts.map((opt, oIdx) =>
+                parseOptionText(opt, `Phương án ${oIdx + 1}`)
+              );
+              const correctIdx = Number(
+                q['correct'] ?? (q['answerJson'] as { correct?: unknown })?.correct ?? 0
+              );
               return {
                 id,
                 stem,
@@ -2038,52 +2164,113 @@ export const ActivityPanel: React.FC<ActivityPanelProps> = ({
   // 1. Lấy Teacher Panel tương ứng nếu đang có hoạt động chạy
   const PanelComponent = activeRun
     ? (teacherPanelRegistry[activeRun.activityId] as
-        | React.ComponentType<TeacherPanelComponentProps<unknown>>
-        | undefined)
+        React.ComponentType<TeacherPanelComponentProps<unknown>> | undefined)
     : undefined;
 
   return (
     <>
       {activeRun ? (
         <div className="space-y-4" data-testid="activity-panel-running">
-        {/* Banner cửa sổ trình chiếu độc lập */}
-        <div className="bg-gradient-to-r from-blue-50 via-indigo-50 to-purple-50 border border-blue-200 rounded-2xl p-4 shadow-xs flex flex-wrap items-center justify-between gap-3">
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-blue-600 text-white flex items-center justify-center text-xl shadow-xs shrink-0">
-              🪟
-            </div>
-            <div>
-              <div className="font-extrabold text-slate-800 text-sm flex items-center gap-2">
-                <span>Hoạt động đang diễn ra trong cửa sổ trình chiếu riêng biệt</span>
-                <span className="px-2 py-0.5 rounded-full text-[11px] font-bold bg-blue-100 text-blue-700">
-                  2 Màn hình
-                </span>
+          {/* Banner cửa sổ trình chiếu độc lập */}
+          <div className="bg-gradient-to-r from-blue-50 via-indigo-50 to-purple-50 border border-blue-200 rounded-2xl p-4 shadow-xs flex flex-wrap items-center justify-between gap-3">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 rounded-xl bg-blue-600 text-white flex items-center justify-center text-xl shadow-xs shrink-0">
+                🪟
               </div>
-              <div className="text-xs text-slate-500">
-                Bạn có thể kéo cửa sổ trình chiếu sang máy chiếu/màn hình phụ (nhấn F11 để chiếu toàn màn hình).
+              <div>
+                <div className="font-extrabold text-slate-800 text-sm flex items-center gap-2">
+                  <span>Hoạt động đang diễn ra trong cửa sổ trình chiếu riêng biệt</span>
+                  <span className="px-2 py-0.5 rounded-full text-[11px] font-bold bg-blue-100 text-blue-700">
+                    2 Màn hình
+                  </span>
+                </div>
+                <div className="text-xs text-slate-500">
+                  Bạn có thể kéo cửa sổ trình chiếu sang máy chiếu/màn hình phụ (nhấn F11 để chiếu
+                  toàn màn hình).
+                </div>
               </div>
             </div>
-          </div>
-          <div className="flex items-center gap-2">
-            {['exam', 'quiz-live', 'swiss-duel'].includes(activeRun.activityId) &&
-              !activeRuns.some((r) => r.activityId === 'assignment-hub') && (
+            <div className="flex items-center gap-2">
+              {['exam', 'quiz-live', 'swiss-duel'].includes(activeRun.activityId) &&
+                !activeRuns.some(r => r.activityId === 'assignment-hub') && (
+                  <button
+                    type="button"
+                    onClick={() => {
+                      const assMeta = activities.find(a => a.id === 'assignment-hub') || {
+                        id: 'assignment-hub',
+                        name: 'Thu - phát bài tập',
+                        version: 1,
+                        icon: '📁',
+                        capabilities: [],
+                        rewardTriggers: ['submit'],
+                      };
+                      handleOpenConfig(assMeta);
+                    }}
+                    style={{
+                      backgroundColor: '#059669',
+                      color: '#FFFFFF',
+                      border: 'none',
+                      borderRadius: '12px',
+                      padding: '8px 16px',
+                      fontWeight: 700,
+                      fontSize: '13px',
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '6px',
+                      cursor: 'pointer',
+                      minHeight: '44px',
+                    }}
+                    className="transition hover:bg-emerald-700 shadow-xs"
+                    title="Mở thêm Cổng Thu - phát bài tập chạy song song cùng hoạt động hiện tại"
+                  >
+                    <span>📁</span>
+                    <span>Mở thêm Thu - phát bài (Song song)</span>
+                  </button>
+                )}
+              {activeRun.activityId === 'assignment-hub' &&
+                !activeRuns.some(r => r.activityId === 'exam') && (
+                  <button
+                    type="button"
+                    onClick={() => {
+                      const examMeta = activities.find(a => a.id === 'exam') || {
+                        id: 'exam',
+                        name: 'Kỳ thi trắc nghiệm',
+                        version: 1,
+                        icon: '📝',
+                        capabilities: ['chat-lock'],
+                        rewardTriggers: ['finish', 'high_score'],
+                      };
+                      handleOpenConfig(examMeta);
+                    }}
+                    style={{
+                      backgroundColor: '#2563EB',
+                      color: '#FFFFFF',
+                      border: 'none',
+                      borderRadius: '12px',
+                      padding: '8px 16px',
+                      fontWeight: 700,
+                      fontSize: '13px',
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '6px',
+                      cursor: 'pointer',
+                      minHeight: '44px',
+                    }}
+                    className="transition hover:bg-blue-700 shadow-xs"
+                    title="Khởi chạy thêm Kì thi trắc nghiệm song song cùng Cổng thu bài"
+                  >
+                    <span>📝</span>
+                    <span>Khởi chạy thêm Kì thi (Song song)</span>
+                  </button>
+                )}
+              {onOpenActivityWindow && (
                 <button
                   type="button"
-                  onClick={() => {
-                    const assMeta = activities.find((a) => a.id === 'assignment-hub') || {
-                      id: 'assignment-hub',
-                      name: 'Thu - phát bài tập',
-                      version: 1,
-                      icon: '📁',
-                      capabilities: [],
-                      rewardTriggers: ['submit'],
-                    };
-                    handleOpenConfig(assMeta);
-                  }}
+                  onClick={onOpenActivityWindow}
                   style={{
-                    backgroundColor: '#059669',
-                    color: '#FFFFFF',
-                    border: 'none',
+                    backgroundColor: '#FFFFFF',
+                    color: '#1D4ED8',
+                    border: '2px solid #93C5FD',
                     borderRadius: '12px',
                     padding: '8px 16px',
                     fontWeight: 700,
@@ -2094,57 +2281,19 @@ export const ActivityPanel: React.FC<ActivityPanelProps> = ({
                     cursor: 'pointer',
                     minHeight: '44px',
                   }}
-                  className="transition hover:bg-emerald-700 shadow-xs"
-                  title="Mở thêm Cổng Thu - phát bài tập chạy song song cùng hoạt động hiện tại"
+                  className="transition hover:bg-blue-50 shadow-xs"
+                  title="Mở lại cửa sổ trình chiếu nếu bạn đã lỡ tắt"
                 >
-                  <span>📁</span>
-                  <span>Mở thêm Thu - phát bài (Song song)</span>
+                  <span>🪟 Mở cửa sổ trình chiếu (Màn hình 2)</span>
                 </button>
               )}
-            {activeRun.activityId === 'assignment-hub' &&
-              !activeRuns.some((r) => r.activityId === 'exam') && (
-                <button
-                  type="button"
-                  onClick={() => {
-                    const examMeta = activities.find((a) => a.id === 'exam') || {
-                      id: 'exam',
-                      name: 'Kỳ thi trắc nghiệm',
-                      version: 1,
-                      icon: '📝',
-                      capabilities: ['chat-lock'],
-                      rewardTriggers: ['finish', 'high_score'],
-                    };
-                    handleOpenConfig(examMeta);
-                  }}
-                  style={{
-                    backgroundColor: '#2563EB',
-                    color: '#FFFFFF',
-                    border: 'none',
-                    borderRadius: '12px',
-                    padding: '8px 16px',
-                    fontWeight: 700,
-                    fontSize: '13px',
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: '6px',
-                    cursor: 'pointer',
-                    minHeight: '44px',
-                  }}
-                  className="transition hover:bg-blue-700 shadow-xs"
-                  title="Khởi chạy thêm Kì thi trắc nghiệm song song cùng Cổng thu bài"
-                >
-                  <span>📝</span>
-                  <span>Khởi chạy thêm Kì thi (Song song)</span>
-                </button>
-              )}
-            {onOpenActivityWindow && (
               <button
                 type="button"
-                onClick={onOpenActivityWindow}
+                onClick={() => onEndActivity(activeRun.runId)}
                 style={{
-                  backgroundColor: '#FFFFFF',
-                  color: '#1D4ED8',
-                  border: '2px solid #93C5FD',
+                  backgroundColor: '#DC2626',
+                  color: '#FFFFFF',
+                  border: 'none',
                   borderRadius: '12px',
                   padding: '8px 16px',
                   fontWeight: 700,
@@ -2155,235 +2304,218 @@ export const ActivityPanel: React.FC<ActivityPanelProps> = ({
                   cursor: 'pointer',
                   minHeight: '44px',
                 }}
-                className="transition hover:bg-blue-50 shadow-xs"
-                title="Mở lại cửa sổ trình chiếu nếu bạn đã lỡ tắt"
+                className="transition hover:bg-red-700 shadow-xs"
               >
-                <span>🪟 Mở cửa sổ trình chiếu (Màn hình 2)</span>
+                <span>⏹️ Kết thúc hoạt động này</span>
               </button>
-            )}
-            <button
-              type="button"
-              onClick={() => onEndActivity(activeRun.runId)}
-              style={{
-                backgroundColor: '#DC2626',
-                color: '#FFFFFF',
-                border: 'none',
-                borderRadius: '12px',
-                padding: '8px 16px',
-                fontWeight: 700,
-                fontSize: '13px',
-                display: 'flex',
-                alignItems: 'center',
-                gap: '6px',
-                cursor: 'pointer',
-                minHeight: '44px',
-              }}
-              className="transition hover:bg-red-700 shadow-xs"
-            >
-              <span>⏹️ Kết thúc hoạt động này</span>
-            </button>
-          </div>
-        </div>
-
-        {/* Thanh chuyển đổi Tab khi có nhiều hoạt động song song */}
-        {activeRuns && activeRuns.length > 1 && (
-          <div className="flex items-center gap-2 p-1.5 bg-slate-100 border border-slate-200 rounded-xl overflow-x-auto shadow-2xs">
-            <div className="text-xs font-extrabold text-slate-500 uppercase px-2 shrink-0">
-              Hoạt động song song:
             </div>
-            {activeRuns.map((r) => {
-              const isSelected = r.runId === activeRun.runId;
-              const meta = activities.find((a) => a.id === r.activityId);
-              const icon =
-                meta?.icon ||
-                (r.activityId === 'exam'
-                  ? '📝'
-                  : r.activityId === 'assignment-hub'
-                  ? '📁'
-                  : '⚡');
-              const name = meta?.name || r.activityId;
-              return (
-                <button
-                  key={r.runId}
-                  type="button"
-                  onClick={() => onSelectActiveRun?.(r.runId)}
-                  className={`flex items-center gap-2 px-3 py-2 rounded-lg font-bold text-xs transition shrink-0 cursor-pointer ${
-                    isSelected
-                      ? 'bg-blue-600 text-white shadow-xs'
-                      : 'bg-white text-slate-700 hover:bg-slate-200 border border-slate-200'
-                  }`}
-                >
-                  <span>{icon}</span>
-                  <span>{name}</span>
-                  <span
-                    className={`w-2 h-2 rounded-full ${
-                      isSelected ? 'bg-green-300' : 'bg-green-500'
-                    } animate-pulse`}
-                  />
-                </button>
-              );
-            })}
           </div>
-        )}
 
-        {PanelComponent ? (
-          <ErrorBoundary
-            fallback={(error) => (
-              <div className="p-8 bg-white rounded-2xl border border-rose-200 text-center space-y-4 shadow-sm max-w-xl mx-auto my-6">
-                <div className="text-4xl">⚠️</div>
-                <h3 className="text-lg font-bold text-slate-800">
-                  Không thể hiển thị bảng điều khiển hoạt động: {activeRun.activityId}
-                </h3>
-                <p className="text-xs text-rose-600 bg-rose-50 p-3 rounded-lg font-mono text-left max-h-24 overflow-y-auto">
-                  {error?.message || String(error)}
-                </p>
-                <div className="flex justify-center gap-3 pt-2">
-                  <button
-                    type="button"
-                    onClick={() => window.location.reload()}
-                    className="min-h-[44px] px-5 py-2 bg-blue-600 text-white rounded-xl font-bold text-xs hover:bg-blue-700 transition cursor-pointer"
-                  >
-                    🔄 Tải lại trang
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => onEndActivity(activeRun.runId)}
-                    className="min-h-[44px] px-5 py-2 bg-rose-600 text-white rounded-xl font-bold text-xs hover:bg-rose-700 transition cursor-pointer"
-                  >
-                    ⏹️ Kết thúc hoạt động
-                  </button>
-                </div>
+          {/* Thanh chuyển đổi Tab khi có nhiều hoạt động song song */}
+          {activeRuns && activeRuns.length > 1 && (
+            <div className="flex items-center gap-2 p-1.5 bg-slate-100 border border-slate-200 rounded-xl overflow-x-auto shadow-2xs">
+              <div className="text-xs font-extrabold text-slate-500 uppercase px-2 shrink-0">
+                Hoạt động song song:
               </div>
-            )}
-          >
-            <PanelComponent
-              runId={activeRun.runId}
-              state={activeRun.state}
-              onSendIntent={onSendTeacherIntent}
-              onEndActivity={() => onEndActivity(activeRun.runId)}
-            />
-          </ErrorBoundary>
-        ) : (
-          <div className="p-6 bg-white rounded-xl border border-gray-200 text-center space-y-3">
-            <h3 className="text-lg font-bold text-gray-800">
-              Đang chạy hoạt động: {activeRun.activityId}
-            </h3>
-            <p className="text-sm text-gray-500">
-              Hoạt động này chưa có bảng điều khiển tùy biến trên giao diện này.
-            </p>
-            <button
-              type="button"
-              onClick={() => onEndActivity(activeRun.runId)}
-              className="min-h-[48px] px-6 py-2 bg-red-600 text-white rounded-lg font-medium hover:bg-red-700"
-            >
-              ⏹️ Kết thúc hoạt động
-            </button>
-          </div>
-        )}
-      </div>
-    ) : (
-      <div className="space-y-6" data-testid="activity-panel-lobby">
-      <div>
-        <h2 className="text-xl font-bold text-gray-800">Hoạt động & Trò chơi tương tác</h2>
-        <p className="text-sm text-gray-500">
-          Chọn một hoạt động để bắt đầu tương tác thời gian thực với học sinh trong lớp.
-        </p>
-      </div>
+              {activeRuns.map(r => {
+                const isSelected = r.runId === activeRun.runId;
+                const meta = activities.find(a => a.id === r.activityId);
+                const icon =
+                  meta?.icon ||
+                  (r.activityId === 'exam'
+                    ? '📝'
+                    : r.activityId === 'assignment-hub'
+                      ? '📁'
+                      : '⚡');
+                const name = meta?.name || r.activityId;
+                return (
+                  <button
+                    key={r.runId}
+                    type="button"
+                    onClick={() => onSelectActiveRun?.(r.runId)}
+                    className={`flex items-center gap-2 px-3 py-2 rounded-lg font-bold text-xs transition shrink-0 cursor-pointer ${
+                      isSelected
+                        ? 'bg-blue-600 text-white shadow-xs'
+                        : 'bg-white text-slate-700 hover:bg-slate-200 border border-slate-200'
+                    }`}
+                  >
+                    <span>{icon}</span>
+                    <span>{name}</span>
+                    <span
+                      className={`w-2 h-2 rounded-full ${
+                        isSelected ? 'bg-green-300' : 'bg-green-500'
+                      } animate-pulse`}
+                    />
+                  </button>
+                );
+              })}
+            </div>
+          )}
 
-      {activities.length === 0 ? (
-        <div className="py-12 text-center border-2 border-dashed border-gray-200 rounded-xl">
-          <span className="text-4xl block mb-2">📦</span>
-          <p className="text-gray-500 font-medium">Chưa có hoạt động nào được cài đặt.</p>
-        </div>
-      ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-          {activities
-            .filter(act => act.id !== 'swiss-duel' && act.id !== 'territory-war' && act.id !== 'arcade-duel' && act.id !== 'exam')
-            .map(act => {
-              const isQuizLive = act.id === 'quiz-live';
-              const displayName = act.name === 'Quiz Live' ? 'Quizz Live' : act.name;
-              const displayIcon = isQuizLive ? '⚡🎮' : act.icon;
-              const displayDescription = isQuizLive
-                ? 'Bộ 5 chế độ trắc nghiệm đỉnh cao: Kahoot nhịp GV, Quizizz tự do, Đấu Cờ Thụy Sỹ, Đại Chiến Lãnh Thổ và Đối Kháng 1vs1.'
-                : act.description;
-
-              return (
-                <div
-                  key={act.id}
-                  data-testid={`activity-card-${act.id}`}
-                  className="p-5 bg-white border border-gray-200 rounded-xl shadow-sm hover:shadow-md transition-shadow flex flex-col justify-between"
-                >
-                  <div className="space-y-2">
-                    <div className="flex items-center gap-2">
-                      <span className="text-3xl">{displayIcon}</span>
-                      <div>
-                        <div className="flex items-center gap-2">
-                          <h3 className="text-lg font-bold text-gray-800">{displayName}</h3>
-                          {isQuizLive && (
-                            <span className="px-2 py-0.5 rounded-full text-[10px] font-extrabold bg-gradient-to-r from-purple-500 to-indigo-600 text-white shadow-xs">
-                              4 CHẾ ĐỘ
-                            </span>
-                          )}
-                        </div>
-                        <span className="text-xs text-gray-400">Phiên bản v{act.version}</span>
-                      </div>
-                    </div>
-
-                    {displayDescription && (
-                      <p className="text-sm text-gray-600 line-clamp-2">{displayDescription}</p>
-                    )}
-
-                    {isQuizLive && (
-                      <div className="pt-1 flex flex-wrap gap-1">
-                        <span className="px-1.5 py-0.5 rounded text-[11px] bg-red-50 text-red-700 border border-red-200 font-semibold">
-                          🔴▲ Kahoot
-                        </span>
-                        <span className="px-1.5 py-0.5 rounded text-[11px] bg-purple-50 text-purple-700 border border-purple-200 font-semibold">
-                          ⚡ Quizizz
-                        </span>
-                        <span className="px-1.5 py-0.5 rounded text-[11px] bg-amber-50 text-amber-800 border border-amber-200 font-semibold">
-                          ♟️ Đấu Cờ Thụy Sỹ
-                        </span>
-                        <span className="px-1.5 py-0.5 rounded text-[11px] bg-blue-50 text-blue-700 border border-blue-200 font-semibold">
-                          ⚔️ Đại Chiến Lãnh Thổ
-                        </span>
-                      </div>
-                    )}
-
-                    {!isQuizLive && act.rewardTriggers.length > 0 && (
-                      <div className="pt-1 flex flex-wrap gap-1">
-                        {act.rewardTriggers.map((t, idx) => (
-                          <span
-                            key={idx}
-                            className="px-2 py-0.5 rounded text-xs bg-amber-50 text-amber-800 border border-amber-200"
-                          >
-                            ⭐ {t}
-                          </span>
-                        ))}
-                      </div>
-                    )}
-                  </div>
-
-                  <div className="pt-4 mt-2 border-t border-gray-100 flex justify-end">
+          {PanelComponent ? (
+            <ErrorBoundary
+              fallback={error => (
+                <div className="p-8 bg-white rounded-2xl border border-rose-200 text-center space-y-4 shadow-sm max-w-xl mx-auto my-6">
+                  <div className="text-4xl">⚠️</div>
+                  <h3 className="text-lg font-bold text-slate-800">
+                    Không thể hiển thị bảng điều khiển hoạt động: {activeRun.activityId}
+                  </h3>
+                  <p className="text-xs text-rose-600 bg-rose-50 p-3 rounded-lg font-mono text-left max-h-24 overflow-y-auto">
+                    {error?.message || String(error)}
+                  </p>
+                  <div className="flex justify-center gap-3 pt-2">
                     <button
                       type="button"
-                      data-testid={`btn-start-${act.id}`}
-                      onClick={() => handleOpenConfig(act)}
-                      className="min-h-[48px] px-5 py-2 bg-blue-600 text-white rounded-lg text-sm font-semibold hover:bg-blue-700 shadow-sm flex items-center gap-1.5 cursor-pointer"
+                      onClick={() => window.location.reload()}
+                      className="min-h-[44px] px-5 py-2 bg-blue-600 text-white rounded-xl font-bold text-xs hover:bg-blue-700 transition cursor-pointer"
                     >
-                      🚀 Bắt đầu
+                      🔄 Tải lại trang
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => onEndActivity(activeRun.runId)}
+                      className="min-h-[44px] px-5 py-2 bg-rose-600 text-white rounded-xl font-bold text-xs hover:bg-rose-700 transition cursor-pointer"
+                    >
+                      ⏹️ Kết thúc hoạt động
                     </button>
                   </div>
                 </div>
-              );
-            })}
+              )}
+            >
+              <PanelComponent
+                runId={activeRun.runId}
+                state={activeRun.state}
+                onSendIntent={onSendTeacherIntent}
+                onEndActivity={() => onEndActivity(activeRun.runId)}
+              />
+            </ErrorBoundary>
+          ) : (
+            <div className="p-6 bg-white rounded-xl border border-gray-200 text-center space-y-3">
+              <h3 className="text-lg font-bold text-gray-800">
+                Đang chạy hoạt động: {activeRun.activityId}
+              </h3>
+              <p className="text-sm text-gray-500">
+                Hoạt động này chưa có bảng điều khiển tùy biến trên giao diện này.
+              </p>
+              <button
+                type="button"
+                onClick={() => onEndActivity(activeRun.runId)}
+                className="min-h-[48px] px-6 py-2 bg-red-600 text-white rounded-lg font-medium hover:bg-red-700"
+              >
+                ⏹️ Kết thúc hoạt động
+              </button>
+            </div>
+          )}
+        </div>
+      ) : (
+        <div className="space-y-6" data-testid="activity-panel-lobby">
+          <div>
+            <h2 className="text-xl font-bold text-gray-800">Hoạt động & Trò chơi tương tác</h2>
+            <p className="text-sm text-gray-500">
+              Chọn một hoạt động để bắt đầu tương tác thời gian thực với học sinh trong lớp.
+            </p>
+          </div>
+
+          {activities.length === 0 ? (
+            <div className="py-12 text-center border-2 border-dashed border-gray-200 rounded-xl">
+              <span className="text-4xl block mb-2">📦</span>
+              <p className="text-gray-500 font-medium">Chưa có hoạt động nào được cài đặt.</p>
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+              {activities
+                .filter(
+                  act =>
+                    act.id !== 'swiss-duel' &&
+                    act.id !== 'territory-war' &&
+                    act.id !== 'arcade-duel' &&
+                    act.id !== 'exam'
+                )
+                .map(act => {
+                  const isQuizLive = act.id === 'quiz-live';
+                  const displayName = act.name === 'Quiz Live' ? 'Quizz Live' : act.name;
+                  const displayIcon = isQuizLive ? '⚡🎮' : act.icon;
+                  const displayDescription = isQuizLive
+                    ? 'Bộ 5 chế độ trắc nghiệm đỉnh cao: Kahoot nhịp GV, Quizizz tự do, Đấu Cờ Thụy Sỹ, Đại Chiến Lãnh Thổ và Đối Kháng 1vs1.'
+                    : act.description;
+
+                  return (
+                    <div
+                      key={act.id}
+                      data-testid={`activity-card-${act.id}`}
+                      className="p-5 bg-white border border-gray-200 rounded-xl shadow-sm hover:shadow-md transition-shadow flex flex-col justify-between"
+                    >
+                      <div className="space-y-2">
+                        <div className="flex items-center gap-2">
+                          <span className="text-3xl">{displayIcon}</span>
+                          <div>
+                            <div className="flex items-center gap-2">
+                              <h3 className="text-lg font-bold text-gray-800">{displayName}</h3>
+                              {isQuizLive && (
+                                <span className="px-2 py-0.5 rounded-full text-[10px] font-extrabold bg-gradient-to-r from-purple-500 to-indigo-600 text-white shadow-xs">
+                                  4 CHẾ ĐỘ
+                                </span>
+                              )}
+                            </div>
+                            <span className="text-xs text-gray-400">Phiên bản v{act.version}</span>
+                          </div>
+                        </div>
+
+                        {displayDescription && (
+                          <p className="text-sm text-gray-600 line-clamp-2">{displayDescription}</p>
+                        )}
+
+                        {isQuizLive && (
+                          <div className="pt-1 flex flex-wrap gap-1">
+                            <span className="px-1.5 py-0.5 rounded text-[11px] bg-red-50 text-red-700 border border-red-200 font-semibold">
+                              🔴▲ Kahoot
+                            </span>
+                            <span className="px-1.5 py-0.5 rounded text-[11px] bg-purple-50 text-purple-700 border border-purple-200 font-semibold">
+                              ⚡ Quizizz
+                            </span>
+                            <span className="px-1.5 py-0.5 rounded text-[11px] bg-amber-50 text-amber-800 border border-amber-200 font-semibold">
+                              ♟️ Đấu Cờ Thụy Sỹ
+                            </span>
+                            <span className="px-1.5 py-0.5 rounded text-[11px] bg-blue-50 text-blue-700 border border-blue-200 font-semibold">
+                              ⚔️ Đại Chiến Lãnh Thổ
+                            </span>
+                          </div>
+                        )}
+
+                        {!isQuizLive && act.rewardTriggers.length > 0 && (
+                          <div className="pt-1 flex flex-wrap gap-1">
+                            {act.rewardTriggers.map((t, idx) => (
+                              <span
+                                key={idx}
+                                className="px-2 py-0.5 rounded text-xs bg-amber-50 text-amber-800 border border-amber-200"
+                              >
+                                ⭐ {t}
+                              </span>
+                            ))}
+                          </div>
+                        )}
+                      </div>
+
+                      <div className="pt-4 mt-2 border-t border-gray-100 flex justify-end">
+                        <button
+                          type="button"
+                          data-testid={`btn-start-${act.id}`}
+                          onClick={() => handleOpenConfig(act)}
+                          className="min-h-[48px] px-5 py-2 bg-blue-600 text-white rounded-lg text-sm font-semibold hover:bg-blue-700 shadow-sm flex items-center gap-1.5 cursor-pointer"
+                        >
+                          🚀 Bắt đầu
+                        </button>
+                      </div>
+                    </div>
+                  );
+                })}
+            </div>
+          )}
         </div>
       )}
-    </div>
-  )}
 
-  {/* Modal cấu hình khi bắt đầu Activity (dùng chung cho cả mở mới và chạy song song) */}
-  {isConfigModalOpen && selectedActivity && (
+      {/* Modal cấu hình khi bắt đầu Activity (dùng chung cho cả mở mới và chạy song song) */}
+      {isConfigModalOpen && selectedActivity && (
         <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
           <div className="bg-white rounded-xl shadow-xl max-w-xl w-full max-h-[90vh] flex flex-col p-6 overflow-hidden">
             <div className="flex items-center justify-between border-b pb-3 shrink-0">
@@ -2408,7 +2540,10 @@ export const ActivityPanel: React.FC<ActivityPanelProps> = ({
               </div>
             )}
 
-            <form onSubmit={handleSubmitStart} className="flex-1 overflow-y-auto space-y-4 pr-1.5 my-1">
+            <form
+              onSubmit={handleSubmitStart}
+              className="flex-1 overflow-y-auto space-y-4 pr-1.5 my-1"
+            >
               {selectedActivity.id === 'quick-poll' ? (
                 <>
                   <div>
@@ -2618,7 +2753,8 @@ export const ActivityPanel: React.FC<ActivityPanelProps> = ({
                             <p className="font-bold text-sm text-gray-900">Đối Kháng 1vs1</p>
                           </div>
                           <p className="text-xs text-gray-600 mt-0.5 leading-snug">
-                            Đấu 1-1 trên màn hình GV, bàn phím chia đôi, hệ thống vật phẩm & 2 chế độ
+                            Đấu 1-1 trên màn hình GV, bàn phím chia đôi, hệ thống vật phẩm & 2 chế
+                            độ
                           </p>
                         </div>
                       </label>
@@ -2649,11 +2785,13 @@ export const ActivityPanel: React.FC<ActivityPanelProps> = ({
                           <div className="flex items-center gap-1.5">
                             <span className="text-base">🏐🏆</span>
                             <p className="font-bold text-sm text-gray-900">
-                              Đấu Bóng Chuyền <span className="text-emerald-700 font-semibold">(thử nghiệm)</span>
+                              Đấu Bóng Chuyền{' '}
+                              <span className="text-emerald-700 font-semibold">(thử nghiệm)</span>
                             </p>
                           </div>
                           <p className="text-xs text-gray-600 mt-0.5 leading-snug">
-                            Thi đấu vòng bảng 3 lượt tính điểm sau đó bắt cặp xếp hạng 4 Cúp phân tầng
+                            Thi đấu vòng bảng 3 lượt tính điểm sau đó bắt cặp xếp hạng 4 Cúp phân
+                            tầng
                           </p>
                         </div>
                       </label>
@@ -2684,11 +2822,13 @@ export const ActivityPanel: React.FC<ActivityPanelProps> = ({
                           <div className="flex items-center gap-1.5">
                             <span className="text-base">⚔️🔵🔴</span>
                             <p className="font-bold text-sm text-gray-900">
-                              Đại Chiến Xanh Đỏ <span className="text-indigo-700 font-semibold">(thử nghiệm)</span>
+                              Đại Chiến Xanh Đỏ{' '}
+                              <span className="text-indigo-700 font-semibold">(thử nghiệm)</span>
                             </p>
                           </div>
                           <p className="text-xs text-gray-600 mt-0.5 leading-snug">
-                            Chia 2 phe cân bằng Elo, lượt sau phe thắng chọn đối thủ (15s), tính điểm trọng số lật kèo
+                            Chia 2 phe cân bằng Elo, lượt sau phe thắng chọn đối thủ (15s), tính
+                            điểm trọng số lật kèo
                           </p>
                         </div>
                       </label>
@@ -2743,10 +2883,12 @@ export const ActivityPanel: React.FC<ActivityPanelProps> = ({
                     >
                       <option value="">-- Dùng bộ câu hỏi mẫu mặc định --</option>
                       {questionSets?.map(s => {
-                        const isMatrix = s.tags?.some(t => t.toLowerCase().includes('ma trận')) || false;
+                        const isMatrix =
+                          s.tags?.some(t => t.toLowerCase().includes('ma trận')) || false;
                         return (
                           <option key={s.id} value={s.id}>
-                            {isMatrix ? '🎯 [Ma trận] ' : ''}{s.title} ({s.questionCount || 0} câu) - {s.subject || 'Chung'}
+                            {isMatrix ? '🎯 [Ma trận] ' : ''}
+                            {s.title} ({s.questionCount || 0} câu) - {s.subject || 'Chung'}
                           </option>
                         );
                       })}
@@ -2768,7 +2910,9 @@ export const ActivityPanel: React.FC<ActivityPanelProps> = ({
                               onChange={e => setQuizShuffleQuestions(e.target.checked)}
                               className="w-4 h-4 text-blue-600 rounded"
                             />
-                            <span>🔀 Đảo thứ tự câu hỏi (mỗi học sinh làm thứ tự khác nhau ở Quizizz)</span>
+                            <span>
+                              🔀 Đảo thứ tự câu hỏi (mỗi học sinh làm thứ tự khác nhau ở Quizizz)
+                            </span>
                           </label>
                           <label className="flex items-center gap-2 cursor-pointer text-sm font-medium text-gray-700">
                             <input
@@ -2806,7 +2950,10 @@ export const ActivityPanel: React.FC<ActivityPanelProps> = ({
                                   onChange={e => setQuizAllowReplay(e.target.checked)}
                                   className="w-4 h-4 text-emerald-600 rounded"
                                 />
-                                <span>🔄 Cho phép học sinh chơi lại (làm lại thêm nhiều lần khi hoàn thành)</span>
+                                <span>
+                                  🔄 Cho phép học sinh chơi lại (làm lại thêm nhiều lần khi hoàn
+                                  thành)
+                                </span>
                               </label>
                             </>
                           )}
@@ -2825,7 +2972,9 @@ export const ActivityPanel: React.FC<ActivityPanelProps> = ({
                           4. Cài đặt Đấu Cờ Thụy Sỹ
                         </label>
                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                          <label className={`p-3 border rounded-xl flex items-center gap-2 cursor-pointer transition ${swissMode === 'questions' ? 'bg-amber-50 border-amber-400 font-bold text-amber-900' : 'hover:bg-gray-50'}`}>
+                          <label
+                            className={`p-3 border rounded-xl flex items-center gap-2 cursor-pointer transition ${swissMode === 'questions' ? 'bg-amber-50 border-amber-400 font-bold text-amber-900' : 'hover:bg-gray-50'}`}
+                          >
                             <input
                               type="radio"
                               name="swissMode"
@@ -2835,10 +2984,14 @@ export const ActivityPanel: React.FC<ActivityPanelProps> = ({
                             />
                             <div>
                               <span className="block text-sm font-bold">♟️ Theo kho câu hỏi</span>
-                              <span className="block text-[11px] text-gray-500 font-normal">Thi hết câu hỏi trong đề thì dừng</span>
+                              <span className="block text-[11px] text-gray-500 font-normal">
+                                Thi hết câu hỏi trong đề thì dừng
+                              </span>
                             </div>
                           </label>
-                          <label className={`p-3 border rounded-xl flex items-center gap-2 cursor-pointer transition ${swissMode === 'time' ? 'bg-amber-50 border-amber-400 font-bold text-amber-900' : 'hover:bg-gray-50'}`}>
+                          <label
+                            className={`p-3 border rounded-xl flex items-center gap-2 cursor-pointer transition ${swissMode === 'time' ? 'bg-amber-50 border-amber-400 font-bold text-amber-900' : 'hover:bg-gray-50'}`}
+                          >
                             <input
                               type="radio"
                               name="swissMode"
@@ -2848,7 +3001,9 @@ export const ActivityPanel: React.FC<ActivityPanelProps> = ({
                             />
                             <div>
                               <span className="block text-sm font-bold">⏱️ Giới hạn thời gian</span>
-                              <span className="block text-[11px] text-gray-500 font-normal">Đếm ngược {swissTimeLimitMinutes} phút</span>
+                              <span className="block text-[11px] text-gray-500 font-normal">
+                                Đếm ngược {swissTimeLimitMinutes} phút
+                              </span>
                             </div>
                           </label>
                         </div>
@@ -2906,7 +3061,8 @@ export const ActivityPanel: React.FC<ActivityPanelProps> = ({
                           </label>
                         </div>
                         <p className="text-xs text-amber-800 bg-amber-50 p-2.5 rounded-lg border border-amber-200">
-                          💡 Hệ thống tự động ghép cặp học sinh 1-1 theo hệ Thụy Sỹ. Trả lời đúng sẽ ăn cờ đối thủ, tích điểm xếp hạng toàn lớp!
+                          💡 Hệ thống tự động ghép cặp học sinh 1-1 theo hệ Thụy Sỹ. Trả lời đúng sẽ
+                          ăn cờ đối thủ, tích điểm xếp hạng toàn lớp!
                         </p>
                       </div>
                     )}
@@ -2943,7 +3099,9 @@ export const ActivityPanel: React.FC<ActivityPanelProps> = ({
                               }`}
                             >
                               <span className="block text-sm font-bold">7x7 ⭐</span>
-                              <span className="text-[10px] text-gray-500 block">49 ô (Cân bằng)</span>
+                              <span className="text-[10px] text-gray-500 block">
+                                49 ô (Cân bằng)
+                              </span>
                             </button>
                             <button
                               type="button"
@@ -3005,7 +3163,9 @@ export const ActivityPanel: React.FC<ActivityPanelProps> = ({
                               }`}
                             >
                               <span className="block text-xs font-bold">⚖️ Cân bằng Elo</span>
-                              <span className="text-[10px] text-amber-700 block">(Khuyên dùng)</span>
+                              <span className="text-[10px] text-amber-700 block">
+                                (Khuyên dùng)
+                              </span>
                             </button>
                             <button
                               type="button"
@@ -3035,7 +3195,8 @@ export const ActivityPanel: React.FC<ActivityPanelProps> = ({
                         </div>
 
                         <p className="text-xs text-blue-800 bg-blue-50 p-2.5 rounded-lg border border-blue-200">
-                          💡 Hệ thống tự động chia học sinh / nhóm vào 2 phe Xanh và Đỏ. Trả lời đúng để chiếm cứ điểm bản đồ!
+                          💡 Hệ thống tự động chia học sinh / nhóm vào 2 phe Xanh và Đỏ. Trả lời
+                          đúng để chiếm cứ điểm bản đồ!
                         </p>
                       </div>
                     )}
@@ -3067,9 +3228,12 @@ export const ActivityPanel: React.FC<ActivityPanelProps> = ({
                                 className="mt-0.5 accent-indigo-600"
                               />
                               <div>
-                                <span className="block text-sm font-bold">🎯 Cùng trả lời (Chia 3)</span>
+                                <span className="block text-sm font-bold">
+                                  🎯 Cùng trả lời (Chia 3)
+                                </span>
                                 <span className="block text-[11px] text-gray-500 font-normal mt-0.5 leading-snug">
-                                  Trên là câu hỏi chung, dưới chia 2 bên chọn đáp án bí mật & lật bài cùng lúc
+                                  Trên là câu hỏi chung, dưới chia 2 bên chọn đáp án bí mật & lật
+                                  bài cùng lúc
                                 </span>
                               </div>
                             </label>
@@ -3089,9 +3253,12 @@ export const ActivityPanel: React.FC<ActivityPanelProps> = ({
                                 className="mt-0.5 accent-amber-600"
                               />
                               <div>
-                                <span className="block text-sm font-bold">🏎️ Đua tốc độ (Chia đôi 50/50)</span>
+                                <span className="block text-sm font-bold">
+                                  🏎️ Đua tốc độ (Chia đôi 50/50)
+                                </span>
                                 <span className="block text-[11px] text-gray-500 font-normal mt-0.5 leading-snug">
-                                  Tiến độ độc lập, ai nhanh và đúng thì qua câu. Chọn sai bị dừng 1.5s
+                                  Tiến độ độc lập, ai nhanh và đúng thì qua câu. Chọn sai bị dừng
+                                  1.5s
                                 </span>
                               </div>
                             </label>
@@ -3107,7 +3274,9 @@ export const ActivityPanel: React.FC<ActivityPanelProps> = ({
                               </label>
                               <select
                                 value={arcadeDuelTimeLimitPerQuestion}
-                                onChange={e => setArcadeDuelTimeLimitPerQuestion(Number(e.target.value))}
+                                onChange={e =>
+                                  setArcadeDuelTimeLimitPerQuestion(Number(e.target.value))
+                                }
                                 className="w-full min-h-[44px] px-3 py-2 border rounded-lg text-sm bg-white"
                               >
                                 <option value={10}>10 giây</option>
@@ -3167,7 +3336,9 @@ export const ActivityPanel: React.FC<ActivityPanelProps> = ({
                                 </label>
                                 <select
                                   value={arcadeDuelDropCondition}
-                                  onChange={e => setArcadeDuelDropCondition(Number(e.target.value) as 1 | 2)}
+                                  onChange={e =>
+                                    setArcadeDuelDropCondition(Number(e.target.value) as 1 | 2)
+                                  }
                                   className="w-full min-h-[40px] px-3 py-1.5 border rounded-lg text-sm bg-white"
                                 >
                                   <option value={1}>Đúng 1 câu nhận ngay</option>
@@ -3181,7 +3352,9 @@ export const ActivityPanel: React.FC<ActivityPanelProps> = ({
                                 </label>
                                 <select
                                   value={arcadeDuelInventoryCapacity}
-                                  onChange={e => setArcadeDuelInventoryCapacity(Number(e.target.value) as 2 | 3)}
+                                  onChange={e =>
+                                    setArcadeDuelInventoryCapacity(Number(e.target.value) as 2 | 3)
+                                  }
                                   className="w-full min-h-[40px] px-3 py-1.5 border rounded-lg text-sm bg-white"
                                 >
                                   <option value={2}>Tối đa 2 vật phẩm (Mặc định)</option>
@@ -3199,8 +3372,36 @@ export const ActivityPanel: React.FC<ActivityPanelProps> = ({
                         {/* Hướng dẫn phím bấm */}
                         <div className="p-3 bg-slate-900 text-slate-200 rounded-xl border border-slate-700 text-xs space-y-1.5 font-mono">
                           <p className="font-bold text-amber-300">⌨️ BỐ TRÍ PHÍM BÀN PHÍM GV:</p>
-                          <p>🔵 <span className="text-blue-300 font-bold">Đội Xanh:</span> Đáp án <span className="text-white font-bold bg-slate-800 px-1 rounded">A - S - D - F</span>{arcadeDuelEnablePowerUps ? <> | Dùng vật phẩm: <span className="text-amber-300 font-bold bg-slate-800 px-1 rounded">Q</span></> : null}</p>
-                          <p>🔴 <span className="text-red-300 font-bold">Đội Đỏ:</span> Đáp án <span className="text-white font-bold bg-slate-800 px-1 rounded">1 - 2 - 3 - 4</span>{arcadeDuelEnablePowerUps ? <> | Dùng vật phẩm: <span className="text-amber-300 font-bold bg-slate-800 px-1 rounded">5</span></> : null}</p>
+                          <p>
+                            🔵 <span className="text-blue-300 font-bold">Đội Xanh:</span> Đáp án{' '}
+                            <span className="text-white font-bold bg-slate-800 px-1 rounded">
+                              A - S - D - F
+                            </span>
+                            {arcadeDuelEnablePowerUps ? (
+                              <>
+                                {' '}
+                                | Dùng vật phẩm:{' '}
+                                <span className="text-amber-300 font-bold bg-slate-800 px-1 rounded">
+                                  Q
+                                </span>
+                              </>
+                            ) : null}
+                          </p>
+                          <p>
+                            🔴 <span className="text-red-300 font-bold">Đội Đỏ:</span> Đáp án{' '}
+                            <span className="text-white font-bold bg-slate-800 px-1 rounded">
+                              1 - 2 - 3 - 4
+                            </span>
+                            {arcadeDuelEnablePowerUps ? (
+                              <>
+                                {' '}
+                                | Dùng vật phẩm:{' '}
+                                <span className="text-amber-300 font-bold bg-slate-800 px-1 rounded">
+                                  5
+                                </span>
+                              </>
+                            ) : null}
+                          </p>
                         </div>
                       </div>
                     )}
@@ -3292,7 +3493,9 @@ export const ActivityPanel: React.FC<ActivityPanelProps> = ({
                           </label>
                           <select
                             value={volleyballTimeLimitPerQuestion}
-                            onChange={e => setVolleyballTimeLimitPerQuestion(Number(e.target.value))}
+                            onChange={e =>
+                              setVolleyballTimeLimitPerQuestion(Number(e.target.value))
+                            }
                             className="w-full min-h-[44px] px-3 py-2 border rounded-lg text-sm bg-white"
                           >
                             <option value={15}>15 giây (Nhanh)</option>
@@ -3343,10 +3546,16 @@ export const ActivityPanel: React.FC<ActivityPanelProps> = ({
                               min={1}
                               max={5}
                               value={factionQuestionsPerMatch}
-                              onChange={e => setFactionQuestionsPerMatch(Math.max(1, Math.min(5, Number(e.target.value) || 2)))}
+                              onChange={e =>
+                                setFactionQuestionsPerMatch(
+                                  Math.max(1, Math.min(5, Number(e.target.value) || 2))
+                                )
+                              }
                               className="w-full min-h-[44px] px-3 py-2 border rounded-xl text-sm bg-white"
                             />
-                            <p className="text-[11px] text-gray-500 mt-1">Mặc định: 2 câu hỏi/trận 1v1</p>
+                            <p className="text-[11px] text-gray-500 mt-1">
+                              Mặc định: 2 câu hỏi/trận 1v1
+                            </p>
                           </div>
 
                           <div>
@@ -3358,7 +3567,11 @@ export const ActivityPanel: React.FC<ActivityPanelProps> = ({
                               min={1}
                               max={20}
                               value={factionTotalRounds}
-                              onChange={e => setFactionTotalRounds(Math.max(1, Math.min(20, Number(e.target.value) || 5)))}
+                              onChange={e =>
+                                setFactionTotalRounds(
+                                  Math.max(1, Math.min(20, Number(e.target.value) || 5))
+                                )
+                              }
                               className="w-full min-h-[44px] px-3 py-2 border rounded-xl text-sm bg-white"
                             />
                             <p className="text-[11px] text-gray-500 mt-1">Mặc định: 5 vòng đấu</p>
@@ -3375,7 +3588,11 @@ export const ActivityPanel: React.FC<ActivityPanelProps> = ({
                               min={5}
                               max={120}
                               value={factionTimeLimitPerQuestion}
-                              onChange={e => setFactionTimeLimitPerQuestion(Math.max(5, Math.min(120, Number(e.target.value) || 20)))}
+                              onChange={e =>
+                                setFactionTimeLimitPerQuestion(
+                                  Math.max(5, Math.min(120, Number(e.target.value) || 20))
+                                )
+                              }
                               className="w-full min-h-[44px] px-3 py-2 border rounded-xl text-sm bg-white"
                             />
                           </div>
@@ -3389,10 +3606,16 @@ export const ActivityPanel: React.FC<ActivityPanelProps> = ({
                               min={5}
                               max={60}
                               value={factionPickPhaseSeconds}
-                              onChange={e => setFactionPickPhaseSeconds(Math.max(5, Math.min(60, Number(e.target.value) || 15)))}
+                              onChange={e =>
+                                setFactionPickPhaseSeconds(
+                                  Math.max(5, Math.min(60, Number(e.target.value) || 15))
+                                )
+                              }
                               className="w-full min-h-[44px] px-3 py-2 border rounded-xl text-sm bg-white"
                             />
-                            <p className="text-[11px] text-gray-500 mt-1">Mặc định: 15 giây đếm ngược</p>
+                            <p className="text-[11px] text-gray-500 mt-1">
+                              Mặc định: 15 giây đếm ngược
+                            </p>
                           </div>
                         </div>
 
@@ -3439,7 +3662,9 @@ export const ActivityPanel: React.FC<ActivityPanelProps> = ({
                       <div className="px-3 py-2.5 bg-blue-50 border border-blue-200 rounded-lg text-sm text-blue-900 font-bold flex items-center justify-between">
                         <div className="flex items-center gap-2">
                           <span>🏫</span>
-                          <span>Lớp: {classes.find(c => c.id === sessionClassId)?.name || 'Hiện tại'}</span>
+                          <span>
+                            Lớp: {classes.find(c => c.id === sessionClassId)?.name || 'Hiện tại'}
+                          </span>
                         </div>
                         <span className="text-xs font-normal text-blue-600 bg-white px-2 py-0.5 rounded border border-blue-100">
                           Tự động lưu vào Báo cáo theo ca
@@ -3460,7 +3685,9 @@ export const ActivityPanel: React.FC<ActivityPanelProps> = ({
                           ))}
                         </select>
                         <p className="text-xs text-amber-700 bg-amber-50 p-2 rounded-lg border border-amber-200 mt-1.5">
-                          💡 Phiên này đang là <strong>Phiên tự do</strong>. Chọn lớp để toàn bộ kết quả thí sinh được lưu chính xác vào <strong>Báo Cáo & Quản Lý Kỳ Thi Theo Ca</strong>.
+                          💡 Phiên này đang là <strong>Phiên tự do</strong>. Chọn lớp để toàn bộ kết
+                          quả thí sinh được lưu chính xác vào{' '}
+                          <strong>Báo Cáo & Quản Lý Kỳ Thi Theo Ca</strong>.
                         </p>
                       </div>
                     )}
@@ -3497,10 +3724,12 @@ export const ActivityPanel: React.FC<ActivityPanelProps> = ({
                     >
                       <option value="">-- Dùng bộ đề thi mẫu mặc định --</option>
                       {questionSets?.map(s => {
-                        const isMatrix = s.tags?.some(t => t.toLowerCase().includes('ma trận')) || false;
+                        const isMatrix =
+                          s.tags?.some(t => t.toLowerCase().includes('ma trận')) || false;
                         return (
                           <option key={s.id} value={s.id}>
-                            {isMatrix ? '🎯 [Ma trận] ' : ''}{s.title} ({s.questionCount || 0} câu) - {s.subject || 'Chung'}
+                            {isMatrix ? '🎯 [Ma trận] ' : ''}
+                            {s.title} ({s.questionCount || 0} câu) - {s.subject || 'Chung'}
                           </option>
                         );
                       })}
@@ -3553,7 +3782,8 @@ export const ActivityPanel: React.FC<ActivityPanelProps> = ({
                     </div>
 
                     <p className="text-xs text-slate-600">
-                      Bạn có thể chia đều điểm theo tổng điểm mong muốn (ví dụ đề 7 điểm), gán nhanh điểm cho tất cả câu, hoặc chỉnh sửa thủ công từng câu cụ thể.
+                      Bạn có thể chia đều điểm theo tổng điểm mong muốn (ví dụ đề 7 điểm), gán nhanh
+                      điểm cho tất cả câu, hoặc chỉnh sửa thủ công từng câu cụ thể.
                     </p>
 
                     {/* Bộ công cụ chia nhanh */}
@@ -3577,7 +3807,9 @@ export const ActivityPanel: React.FC<ActivityPanelProps> = ({
                             type="button"
                             onClick={() => {
                               if (examPreviewQuestions.length === 0) return;
-                              const pointPerQ = Math.round((targetTotalScore / examPreviewQuestions.length) * 100) / 100;
+                              const pointPerQ =
+                                Math.round((targetTotalScore / examPreviewQuestions.length) * 100) /
+                                100;
                               const updated: Record<string, number> = {};
                               examPreviewQuestions.forEach(q => {
                                 updated[q.id] = pointPerQ;
@@ -3586,7 +3818,12 @@ export const ActivityPanel: React.FC<ActivityPanelProps> = ({
                             }}
                             className="flex-1 px-2.5 py-1.5 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-xs font-bold transition cursor-pointer"
                           >
-                            Chia đều ({examPreviewQuestions.length > 0 ? (Math.round((targetTotalScore / examPreviewQuestions.length) * 100) / 100) : 0}đ/câu)
+                            Chia đều (
+                            {examPreviewQuestions.length > 0
+                              ? Math.round((targetTotalScore / examPreviewQuestions.length) * 100) /
+                                100
+                              : 0}
+                            đ/câu)
                           </button>
                         </div>
                       </div>
@@ -3644,7 +3881,10 @@ export const ActivityPanel: React.FC<ActivityPanelProps> = ({
                           </div>
                         ) : (
                           examPreviewQuestions.map((q, qIdx) => {
-                            const curPoint = examCustomPoints[q.id] !== undefined ? examCustomPoints[q.id] : q.points;
+                            const curPoint =
+                              examCustomPoints[q.id] !== undefined
+                                ? examCustomPoints[q.id]
+                                : q.points;
                             return (
                               <div
                                 key={q.id}
@@ -3726,7 +3966,8 @@ export const ActivityPanel: React.FC<ActivityPanelProps> = ({
                   </div>
 
                   <p className="text-xs text-gray-500 italic bg-gray-50 p-2.5 rounded-lg border">
-                    🔒 Khi bật mật khẩu, học sinh bắt buộc phải nhập đúng mật khẩu để mở khóa đề thi. Hệ thống tự động chấm điểm theo bản gốc đề thi.
+                    🔒 Khi bật mật khẩu, học sinh bắt buộc phải nhập đúng mật khẩu để mở khóa đề
+                    thi. Hệ thống tự động chấm điểm theo bản gốc đề thi.
                   </p>
                 </>
               ) : selectedActivity.id === 'swiss-duel' ? (
@@ -3773,7 +4014,9 @@ export const ActivityPanel: React.FC<ActivityPanelProps> = ({
                       Chế độ tổ chức vòng đấu
                     </label>
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                      <label className={`p-3 border rounded-xl flex items-center gap-2 cursor-pointer transition ${swissMode === 'questions' ? 'bg-amber-50 border-amber-400 font-bold text-amber-900' : 'hover:bg-gray-50'}`}>
+                      <label
+                        className={`p-3 border rounded-xl flex items-center gap-2 cursor-pointer transition ${swissMode === 'questions' ? 'bg-amber-50 border-amber-400 font-bold text-amber-900' : 'hover:bg-gray-50'}`}
+                      >
                         <input
                           type="radio"
                           name="swissMode"
@@ -3783,11 +4026,15 @@ export const ActivityPanel: React.FC<ActivityPanelProps> = ({
                         />
                         <div>
                           <span className="block text-sm font-bold">♟️ Theo kho câu hỏi</span>
-                          <span className="block text-[11px] text-gray-500 font-normal">Thi hết câu hỏi trong đề thì dừng (cấm gặp lại)</span>
+                          <span className="block text-[11px] text-gray-500 font-normal">
+                            Thi hết câu hỏi trong đề thì dừng (cấm gặp lại)
+                          </span>
                         </div>
                       </label>
 
-                      <label className={`p-3 border rounded-xl flex items-center gap-2 cursor-pointer transition ${swissMode === 'time' ? 'bg-amber-50 border-amber-400 font-bold text-amber-900' : 'hover:bg-gray-50'}`}>
+                      <label
+                        className={`p-3 border rounded-xl flex items-center gap-2 cursor-pointer transition ${swissMode === 'time' ? 'bg-amber-50 border-amber-400 font-bold text-amber-900' : 'hover:bg-gray-50'}`}
+                      >
                         <input
                           type="radio"
                           name="swissMode"
@@ -3797,7 +4044,9 @@ export const ActivityPanel: React.FC<ActivityPanelProps> = ({
                         />
                         <div>
                           <span className="block text-sm font-bold">⏱️ Theo thời gian</span>
-                          <span className="block text-[11px] text-gray-500 font-normal">Đấu trường liên tục (cho phép gặp lại & lặp câu hỏi)</span>
+                          <span className="block text-[11px] text-gray-500 font-normal">
+                            Đấu trường liên tục (cho phép gặp lại & lặp câu hỏi)
+                          </span>
                         </div>
                       </label>
                     </div>
@@ -3813,7 +4062,9 @@ export const ActivityPanel: React.FC<ActivityPanelProps> = ({
                         min={1}
                         max={60}
                         value={swissTimeLimitMinutes}
-                        onChange={e => setSwissTimeLimitMinutes(Math.max(1, parseInt(e.target.value, 10) || 10))}
+                        onChange={e =>
+                          setSwissTimeLimitMinutes(Math.max(1, parseInt(e.target.value, 10) || 10))
+                        }
                         className="w-full min-h-[48px] px-3 py-2 border rounded-lg text-sm"
                       />
                     </div>
@@ -3828,7 +4079,11 @@ export const ActivityPanel: React.FC<ActivityPanelProps> = ({
                       min={5}
                       max={120}
                       value={swissTimeLimitPerQuestion}
-                      onChange={e => setSwissTimeLimitPerQuestion(Math.max(5, parseInt(e.target.value, 10) || 30))}
+                      onChange={e =>
+                        setSwissTimeLimitPerQuestion(
+                          Math.max(5, parseInt(e.target.value, 10) || 30)
+                        )
+                      }
                       className="w-full min-h-[48px] px-3 py-2 border rounded-lg text-sm"
                     />
                   </div>
@@ -3856,10 +4111,19 @@ export const ActivityPanel: React.FC<ActivityPanelProps> = ({
 
                   <div className="p-3 bg-amber-50 border border-amber-200 rounded-xl text-xs text-amber-900 space-y-1">
                     <div className="font-bold">⚖️ Quy tắc tính điểm cờ & Nhịp đấu:</div>
-                    <div>• Thắng trận (2 câu): <b>+2 điểm</b> • Hòa trận: <b>+1 điểm</b> • Thua trận: <b>0 điểm</b></div>
+                    <div>
+                      • Thắng trận (2 câu): <b>+2 điểm</b> • Hòa trận: <b>+1 điểm</b> • Thua trận:{' '}
+                      <b>0 điểm</b>
+                    </div>
                     <div>• Bằng câu đúng là Hòa tuyệt đối.</div>
-                    <div>• Suất BYE (khi lẻ người): Tự động ưu tiên học sinh nhóm cuối cùng chưa từng nhận BYE (+2đ). Nếu nhóm cuối đều đã nhận thì reset để cho nhận lại.</div>
-                    <div>• Khi người cuối cùng nộp bài: Hệ thống tự động đếm ngược 10 giây để bốc thăm vòng kế tiếp.</div>
+                    <div>
+                      • Suất BYE (khi lẻ người): Tự động ưu tiên học sinh nhóm cuối cùng chưa từng
+                      nhận BYE (+2đ). Nếu nhóm cuối đều đã nhận thì reset để cho nhận lại.
+                    </div>
+                    <div>
+                      • Khi người cuối cùng nộp bài: Hệ thống tự động đếm ngược 10 giây để bốc thăm
+                      vòng kế tiếp.
+                    </div>
                   </div>
                 </>
               ) : selectedActivity.id === 'assignment-hub' ? (
@@ -3930,7 +4194,8 @@ export const ActivityPanel: React.FC<ActivityPanelProps> = ({
                     </div>
 
                     <p className="text-[11px] text-blue-800/80 leading-relaxed">
-                      💡 Bài nộp của học sinh (Word, Excel, ảnh, PDF...) sẽ được tự động lưu trực tiếp vào thư mục được chọn này trên máy tính của bạn.
+                      💡 Bài nộp của học sinh (Word, Excel, ảnh, PDF...) sẽ được tự động lưu trực
+                      tiếp vào thư mục được chọn này trên máy tính của bạn.
                     </p>
                   </div>
 
@@ -3942,7 +4207,8 @@ export const ActivityPanel: React.FC<ActivityPanelProps> = ({
                           <span>📢</span> Tài liệu phát xuống cho học sinh
                         </label>
                         <p className="text-[11px] text-blue-700/80">
-                          Đính kèm file đề bài, hình ảnh, tài liệu để tự động phát xuống ngay khi bắt đầu.
+                          Đính kèm file đề bài, hình ảnh, tài liệu để tự động phát xuống ngay khi
+                          bắt đầu.
                         </p>
                       </div>
                       <label className="min-h-[36px] px-3 py-1.5 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-lg text-xs flex items-center gap-1.5 cursor-pointer shadow-xs transition shrink-0">
@@ -3964,7 +4230,8 @@ export const ActivityPanel: React.FC<ActivityPanelProps> = ({
 
                     {assignmentInitialFiles.length === 0 ? (
                       <p className="text-xs text-blue-600/70 italic bg-white/70 p-2.5 rounded-lg border border-dashed border-blue-200 text-center">
-                        Chưa chọn tệp đính kèm nào. (Thầy/Cô cũng có thể phát thêm tài liệu bất cứ lúc nào trong bảng điều khiển).
+                        Chưa chọn tệp đính kèm nào. (Thầy/Cô cũng có thể phát thêm tài liệu bất cứ
+                        lúc nào trong bảng điều khiển).
                       </p>
                     ) : (
                       <div className="space-y-1.5 pt-1">
@@ -3973,12 +4240,17 @@ export const ActivityPanel: React.FC<ActivityPanelProps> = ({
                             key={idx}
                             className="flex items-center justify-between p-2 bg-white rounded-lg border border-blue-200 text-xs shadow-2xs"
                           >
-                            <span className="font-semibold text-gray-800 truncate" title={file.name}>
+                            <span
+                              className="font-semibold text-gray-800 truncate"
+                              title={file.name}
+                            >
                               📄 {file.name} ({Math.round(file.size / 1024)} KB)
                             </span>
                             <button
                               type="button"
-                              onClick={() => setAssignmentInitialFiles(prev => prev.filter((_, i) => i !== idx))}
+                              onClick={() =>
+                                setAssignmentInitialFiles(prev => prev.filter((_, i) => i !== idx))
+                              }
                               className="text-red-500 hover:text-red-700 font-bold px-2 py-0.5 cursor-pointer rounded hover:bg-red-50"
                               title="Bỏ tệp này"
                             >
@@ -4009,7 +4281,9 @@ export const ActivityPanel: React.FC<ActivityPanelProps> = ({
                         </button>
                         <button
                           type="button"
-                          onClick={() => setAssignmentAllowedExts(['.docx', '.xlsx', '.pptx', '.pdf'])}
+                          onClick={() =>
+                            setAssignmentAllowedExts(['.docx', '.xlsx', '.pptx', '.pdf'])
+                          }
                           className="text-xs px-2.5 py-1 rounded-md bg-gray-100 text-gray-600 hover:bg-gray-200 font-medium transition cursor-pointer"
                         >
                           Chỉ Office / PDF
@@ -4032,7 +4306,9 @@ export const ActivityPanel: React.FC<ActivityPanelProps> = ({
                           <label
                             key={item.ext}
                             className={`p-2 border rounded-lg text-xs flex items-center gap-1.5 cursor-pointer transition ${
-                              checked ? 'bg-blue-50 border-blue-300 font-semibold text-blue-800' : 'bg-white'
+                              checked
+                                ? 'bg-blue-50 border-blue-300 font-semibold text-blue-800'
+                                : 'bg-white'
                             }`}
                           >
                             <input
@@ -4042,7 +4318,9 @@ export const ActivityPanel: React.FC<ActivityPanelProps> = ({
                                 if (e.target.checked) {
                                   setAssignmentAllowedExts(prev => [...prev, item.ext]);
                                 } else {
-                                  setAssignmentAllowedExts(prev => prev.filter(x => x !== item.ext));
+                                  setAssignmentAllowedExts(prev =>
+                                    prev.filter(x => x !== item.ext)
+                                  );
                                 }
                               }}
                               className="w-3.5 h-3.5 text-blue-600 rounded"
@@ -4054,11 +4332,13 @@ export const ActivityPanel: React.FC<ActivityPanelProps> = ({
                     </div>
                     {assignmentAllowedExts.length === 0 ? (
                       <p className="text-[11px] text-green-700 font-medium mt-1.5 flex items-center gap-1">
-                        <span>✅</span> Mặc định: Cho phép học sinh nộp mọi loại tệp (Word, Excel, ảnh, code, file nén...).
+                        <span>✅</span> Mặc định: Cho phép học sinh nộp mọi loại tệp (Word, Excel,
+                        ảnh, code, file nén...).
                       </p>
                     ) : (
                       <p className="text-[11px] text-amber-700 mt-1.5 flex items-center gap-1">
-                        <span>ℹ️</span> Đang giới hạn chỉ nhận các định dạng: {assignmentAllowedExts.join(', ')}.
+                        <span>ℹ️</span> Đang giới hạn chỉ nhận các định dạng:{' '}
+                        {assignmentAllowedExts.join(', ')}.
                       </p>
                     )}
                   </div>
@@ -4073,7 +4353,11 @@ export const ActivityPanel: React.FC<ActivityPanelProps> = ({
                         min={1}
                         max={500}
                         value={assignmentMaxFileSizeMb}
-                        onChange={e => setAssignmentMaxFileSizeMb(Math.max(1, parseInt(e.target.value, 10) || 50))}
+                        onChange={e =>
+                          setAssignmentMaxFileSizeMb(
+                            Math.max(1, parseInt(e.target.value, 10) || 50)
+                          )
+                        }
                         className="w-full min-h-[44px] px-3 py-2 border rounded-lg text-sm"
                       />
                     </div>
@@ -4116,12 +4400,18 @@ export const ActivityPanel: React.FC<ActivityPanelProps> = ({
                       <span>📱</span> Biến điện thoại thành Camera vật thể thông minh
                     </div>
                     <p className="text-xs text-slate-300 leading-relaxed">
-                      Khi bấm bắt đầu, hệ thống sẽ mở bảng điều khiển và mã QR kết nối. Giáo viên dùng điện thoại quét mã để chụp bài làm của học sinh bắn ngay lên máy tính, xoay cắt phóng to, dùng bút đỏ sửa bài và phát sóng đồng bộ tức thời xuống cổng học sinh & máy chiếu!
+                      Khi bấm bắt đầu, hệ thống sẽ mở bảng điều khiển và mã QR kết nối. Giáo viên
+                      dùng điện thoại quét mã để chụp bài làm của học sinh bắn ngay lên máy tính,
+                      xoay cắt phóng to, dùng bút đỏ sửa bài và phát sóng đồng bộ tức thời xuống
+                      cổng học sinh & máy chiếu!
                     </p>
                   </div>
                   <div className="flex items-center gap-2 p-3 bg-blue-50 border border-blue-200 rounded-lg text-xs text-blue-800">
                     <span>🛡️</span>
-                    <span><strong>Bảo mật cao:</strong> Chỉ giáo viên quét mã trên máy tính mới có quyền chụp ảnh. Toàn bộ ảnh tạm sẽ tự động được dọn sạch khi đóng tiết học.</span>
+                    <span>
+                      <strong>Bảo mật cao:</strong> Chỉ giáo viên quét mã trên máy tính mới có quyền
+                      chụp ảnh. Toàn bộ ảnh tạm sẽ tự động được dọn sạch khi đóng tiết học.
+                    </span>
                   </div>
                 </div>
               ) : selectedActivity.id === 'territory-war' ? (
@@ -4157,10 +4447,12 @@ export const ActivityPanel: React.FC<ActivityPanelProps> = ({
                     >
                       <option value="">-- Sử dụng câu hỏi mẫu mặc định --</option>
                       {questionSets?.map(s => {
-                        const isMatrix = s.tags?.some(t => t.toLowerCase().includes('ma trận')) || false;
+                        const isMatrix =
+                          s.tags?.some(t => t.toLowerCase().includes('ma trận')) || false;
                         return (
                           <option key={s.id} value={s.id}>
-                            {isMatrix ? '🎯 [Ma trận] ' : ''}{s.title} ({s.questionCount || 0} câu)
+                            {isMatrix ? '🎯 [Ma trận] ' : ''}
+                            {s.title} ({s.questionCount || 0} câu)
                           </option>
                         );
                       })}
@@ -4222,7 +4514,9 @@ export const ActivityPanel: React.FC<ActivityPanelProps> = ({
                       min={1}
                       max={60}
                       value={territoryTimeLimitMinutes}
-                      onChange={e => setTerritoryTimeLimitMinutes(Math.max(1, parseInt(e.target.value, 10) || 5))}
+                      onChange={e =>
+                        setTerritoryTimeLimitMinutes(Math.max(1, parseInt(e.target.value, 10) || 5))
+                      }
                       className="w-full min-h-[48px] px-3 py-2 border rounded-lg text-sm"
                     />
                   </div>
@@ -4238,7 +4532,10 @@ export const ActivityPanel: React.FC<ActivityPanelProps> = ({
                       <span>👑 Bật luật Sudden Death (Thắng Ngay Lập Tức)</span>
                     </label>
                     <p className="text-xs text-amber-800/90 leading-relaxed pl-6">
-                      (Mặc định tắt) Nếu bật: Phe nào công phá được <strong>Lâu Đài Lớn (chính tâm)</strong> hoặc <strong>Cả 2 Lâu Đài Cánh</strong> sẽ giành chiến thắng chung cuộc ngay mà không cần chờ hết giờ!
+                      (Mặc định tắt) Nếu bật: Phe nào công phá được{' '}
+                      <strong>Lâu Đài Lớn (chính tâm)</strong> hoặc{' '}
+                      <strong>Cả 2 Lâu Đài Cánh</strong> sẽ giành chiến thắng chung cuộc ngay mà
+                      không cần chờ hết giờ!
                     </p>
                   </div>
 
@@ -4307,7 +4604,9 @@ export const ActivityPanel: React.FC<ActivityPanelProps> = ({
                     </div>
 
                     <p className="text-[11px] text-slate-500 italic">
-                      * Điểm Elo ẩn hoàn toàn với học sinh để tránh so sánh tiêu cực. Sau khi trận đấu bắt đầu, Thầy/Cô vẫn có thể đổi học sinh qua lại giữa hai phe bất cứ lúc nào!
+                      * Điểm Elo ẩn hoàn toàn với học sinh để tránh so sánh tiêu cực. Sau khi trận
+                      đấu bắt đầu, Thầy/Cô vẫn có thể đổi học sinh qua lại giữa hai phe bất cứ lúc
+                      nào!
                     </p>
                   </div>
                 </>
@@ -4321,7 +4620,7 @@ export const ActivityPanel: React.FC<ActivityPanelProps> = ({
                       <input
                         type="text"
                         value={projectGradingTitle}
-                        onChange={(e) => setProjectGradingTitle(e.target.value)}
+                        onChange={e => setProjectGradingTitle(e.target.value)}
                         placeholder="VD: Báo cáo Dự án STEM, Thuyết trình Lịch sử..."
                         className="w-full min-h-[48px] px-3 py-2 border rounded-lg text-sm"
                         data-testid="input-project-grading-title"
@@ -4336,7 +4635,7 @@ export const ActivityPanel: React.FC<ActivityPanelProps> = ({
                         min={1}
                         max={100}
                         value={projectGradingMaxScore}
-                        onChange={(e) => setProjectGradingMaxScore(Number(e.target.value) || 10)}
+                        onChange={e => setProjectGradingMaxScore(Number(e.target.value) || 10)}
                         className="w-full min-h-[48px] px-3 py-2 border rounded-lg text-sm text-center font-bold"
                         data-testid="input-project-grading-max-score"
                       />
@@ -4375,12 +4674,13 @@ export const ActivityPanel: React.FC<ActivityPanelProps> = ({
 
                     {projectGradingGroups.length > 0 && (
                       <div className="flex flex-wrap gap-2 pt-1">
-                        {projectGradingGroups.map((g) => (
+                        {projectGradingGroups.map(g => (
                           <span
                             key={g.id}
                             className="text-xs px-2.5 py-1 bg-white border border-blue-200 rounded-md font-medium text-slate-700"
                           >
-                            {g.name} ({g.memberParticipantIds.length} HS) {g.leaderDisplayName ? `⭐ ${g.leaderDisplayName}` : ''}
+                            {g.name} ({g.memberParticipantIds.length} HS){' '}
+                            {g.leaderDisplayName ? `⭐ ${g.leaderDisplayName}` : ''}
                           </span>
                         ))}
                       </div>
@@ -4391,7 +4691,12 @@ export const ActivityPanel: React.FC<ActivityPanelProps> = ({
                   <div className="bg-slate-50 p-4 rounded-xl border border-slate-200 space-y-3">
                     <div className="flex justify-between items-center">
                       <span className="text-sm font-bold text-slate-800">
-                        ⚖️ Cấu hình trọng số điểm (Tổng: {projectGradingWeightSelf + projectGradingWeightMember + projectGradingWeightCross + projectGradingWeightTeacher}%)
+                        ⚖️ Cấu hình trọng số điểm (Tổng:{' '}
+                        {projectGradingWeightSelf +
+                          projectGradingWeightMember +
+                          projectGradingWeightCross +
+                          projectGradingWeightTeacher}
+                        %)
                       </span>
                       <span className="text-xs text-slate-500 font-medium">Thang điểm 10</span>
                     </div>
@@ -4406,7 +4711,7 @@ export const ActivityPanel: React.FC<ActivityPanelProps> = ({
                           min={0}
                           max={100}
                           value={projectGradingWeightSelf}
-                          onChange={(e) => setProjectGradingWeightSelf(Number(e.target.value) || 0)}
+                          onChange={e => setProjectGradingWeightSelf(Number(e.target.value) || 0)}
                           className="w-full h-10 px-2.5 border rounded-lg text-center font-bold text-sm bg-white"
                           data-testid="input-weight-self"
                         />
@@ -4421,7 +4726,7 @@ export const ActivityPanel: React.FC<ActivityPanelProps> = ({
                           min={0}
                           max={100}
                           value={projectGradingWeightMember}
-                          onChange={(e) => setProjectGradingWeightMember(Number(e.target.value) || 0)}
+                          onChange={e => setProjectGradingWeightMember(Number(e.target.value) || 0)}
                           className="w-full h-10 px-2.5 border rounded-lg text-center font-bold text-sm bg-white"
                           data-testid="input-weight-member"
                         />
@@ -4436,7 +4741,7 @@ export const ActivityPanel: React.FC<ActivityPanelProps> = ({
                           min={0}
                           max={100}
                           value={projectGradingWeightCross}
-                          onChange={(e) => setProjectGradingWeightCross(Number(e.target.value) || 0)}
+                          onChange={e => setProjectGradingWeightCross(Number(e.target.value) || 0)}
                           className="w-full h-10 px-2.5 border rounded-lg text-center font-bold text-sm bg-white"
                           data-testid="input-weight-cross"
                         />
@@ -4451,7 +4756,9 @@ export const ActivityPanel: React.FC<ActivityPanelProps> = ({
                           min={0}
                           max={100}
                           value={projectGradingWeightTeacher}
-                          onChange={(e) => setProjectGradingWeightTeacher(Number(e.target.value) || 0)}
+                          onChange={e =>
+                            setProjectGradingWeightTeacher(Number(e.target.value) || 0)
+                          }
                           className="w-full h-10 px-2.5 border rounded-lg text-center font-bold text-sm bg-white"
                           data-testid="input-weight-teacher"
                         />
@@ -4469,7 +4776,7 @@ export const ActivityPanel: React.FC<ActivityPanelProps> = ({
                       <input
                         type="text"
                         value={boardTitle}
-                        onChange={(e) => setBoardTitle(e.target.value)}
+                        onChange={e => setBoardTitle(e.target.value)}
                         placeholder="VD: Triển lãm bài giải Toán, Brainstorm ý tưởng STEM..."
                         className="w-full min-h-[48px] px-3 py-2 border rounded-lg text-sm"
                       />
@@ -4483,7 +4790,7 @@ export const ActivityPanel: React.FC<ActivityPanelProps> = ({
                         min={1}
                         max={100}
                         value={boardMaxGrade}
-                        onChange={(e) => setBoardMaxGrade(Number(e.target.value) || 10)}
+                        onChange={e => setBoardMaxGrade(Number(e.target.value) || 10)}
                         className="w-full min-h-[48px] px-3 py-2 border rounded-lg text-sm text-center font-bold"
                       />
                     </div>
@@ -4495,7 +4802,7 @@ export const ActivityPanel: React.FC<ActivityPanelProps> = ({
                     </label>
                     <textarea
                       value={boardPrompt}
-                      onChange={(e) => setBoardPrompt(e.target.value)}
+                      onChange={e => setBoardPrompt(e.target.value)}
                       placeholder="VD: Hãy vẽ sơ đồ lực tác dụng hoặc chụp bài làm câu 3 trong vở nộp lên..."
                       rows={2}
                       className="w-full p-3 border rounded-lg text-sm resize-none"
@@ -4508,7 +4815,7 @@ export const ActivityPanel: React.FC<ActivityPanelProps> = ({
                       <input
                         type="checkbox"
                         checked={boardRequireApproval}
-                        onChange={(e) => setBoardRequireApproval(e.target.checked)}
+                        onChange={e => setBoardRequireApproval(e.target.checked)}
                         className="w-4 h-4 text-blue-600 rounded"
                       />
                       <span>Duyệt bài trước khi hiện</span>
@@ -4517,7 +4824,7 @@ export const ActivityPanel: React.FC<ActivityPanelProps> = ({
                       <input
                         type="checkbox"
                         checked={boardAllowPeerGrades}
-                        onChange={(e) => setBoardAllowPeerGrades(e.target.checked)}
+                        onChange={e => setBoardAllowPeerGrades(e.target.checked)}
                         className="w-4 h-4 text-blue-600 rounded"
                       />
                       <span>Cho phép chấm điểm chéo</span>
@@ -4526,7 +4833,7 @@ export const ActivityPanel: React.FC<ActivityPanelProps> = ({
                       <input
                         type="checkbox"
                         checked={boardAllowDraw}
-                        onChange={(e) => setBoardAllowDraw(e.target.checked)}
+                        onChange={e => setBoardAllowDraw(e.target.checked)}
                         className="w-4 h-4 text-blue-600 rounded"
                       />
                       <span>Cho phép vẽ tay</span>
@@ -4535,7 +4842,7 @@ export const ActivityPanel: React.FC<ActivityPanelProps> = ({
                       <input
                         type="checkbox"
                         checked={boardAllowImage}
-                        onChange={(e) => setBoardAllowImage(e.target.checked)}
+                        onChange={e => setBoardAllowImage(e.target.checked)}
                         className="w-4 h-4 text-blue-600 rounded"
                       />
                       <span>Cho phép chụp/tải ảnh</span>
@@ -4544,7 +4851,7 @@ export const ActivityPanel: React.FC<ActivityPanelProps> = ({
                       <input
                         type="checkbox"
                         checked={boardAllowComments}
-                        onChange={(e) => setBoardAllowComments(e.target.checked)}
+                        onChange={e => setBoardAllowComments(e.target.checked)}
                         className="w-4 h-4 text-blue-600 rounded"
                       />
                       <span>Cho phép bình luận</span>
@@ -4553,7 +4860,7 @@ export const ActivityPanel: React.FC<ActivityPanelProps> = ({
                       <input
                         type="checkbox"
                         checked={boardAllowReactions}
-                        onChange={(e) => setBoardAllowReactions(e.target.checked)}
+                        onChange={e => setBoardAllowReactions(e.target.checked)}
                         className="w-4 h-4 text-blue-600 rounded"
                       />
                       <span>Cho phép Like/Thả tim</span>
@@ -4567,7 +4874,7 @@ export const ActivityPanel: React.FC<ActivityPanelProps> = ({
                         <input
                           type="checkbox"
                           checked={boardWorksheetEnabled}
-                          onChange={(e) => setBoardWorksheetEnabled(e.target.checked)}
+                          onChange={e => setBoardWorksheetEnabled(e.target.checked)}
                           className="w-4 h-4 text-blue-600 rounded"
                         />
                         <span>📝 Giao Phiếu bài tập kèm theo</span>
@@ -4586,11 +4893,11 @@ export const ActivityPanel: React.FC<ActivityPanelProps> = ({
                         </label>
                         <select
                           value={boardQuestionSetId}
-                          onChange={(e) => setBoardQuestionSetId(e.target.value)}
+                          onChange={e => setBoardQuestionSetId(e.target.value)}
                           className="w-full min-h-[44px] px-3 py-2 border rounded-lg text-sm bg-white font-medium"
                         >
                           <option value="">-- Chọn một bộ câu hỏi --</option>
-                          {questionSets.map((qs) => (
+                          {questionSets.map(qs => (
                             <option key={qs.id} value={qs.id}>
                               {qs.title} ({qs.questionCount ?? 0} câu)
                             </option>
@@ -4598,7 +4905,8 @@ export const ActivityPanel: React.FC<ActivityPanelProps> = ({
                         </select>
                         {boardQuestionSetId && (
                           <p className="text-[11px] text-blue-700 mt-1.5 font-medium">
-                            💡 Học sinh sẽ làm trực tiếp các câu hỏi trắc nghiệm, ghép nối hoặc điền từ trong phiếu này trước khi nộp lên bảng lớp.
+                            💡 Học sinh sẽ làm trực tiếp các câu hỏi trắc nghiệm, ghép nối hoặc điền
+                            từ trong phiếu này trước khi nộp lên bảng lớp.
                           </p>
                         )}
                       </div>
@@ -4636,7 +4944,9 @@ export const ActivityPanel: React.FC<ActivityPanelProps> = ({
                       }}
                       className="w-full min-h-[48px] px-3 py-2 border rounded-lg text-sm bg-white"
                     >
-                      <option value="">-- Sử dụng câu hỏi mẫu mặc định (MCQ, Đúng/Sai, Chùm Đ/S, Trả lời ngắn) --</option>
+                      <option value="">
+                        -- Sử dụng câu hỏi mẫu mặc định (MCQ, Đúng/Sai, Chùm Đ/S, Trả lời ngắn) --
+                      </option>
                       {questionSets?.map(s => (
                         <option key={s.id} value={s.id}>
                           {s.title} ({s.questionCount ?? 0} câu)
@@ -4711,7 +5021,9 @@ export const ActivityPanel: React.FC<ActivityPanelProps> = ({
                         onChange={e => setCircuitShuffleOptions(e.target.checked)}
                         className="w-4 h-4 text-blue-600 rounded"
                       />
-                      <span className="text-sm font-medium text-gray-700">Đảo thứ tự đáp án (A, B, C, D)</span>
+                      <span className="text-sm font-medium text-gray-700">
+                        Đảo thứ tự đáp án (A, B, C, D)
+                      </span>
                     </label>
 
                     <label className="flex items-center gap-2 cursor-pointer">
@@ -4722,14 +5034,19 @@ export const ActivityPanel: React.FC<ActivityPanelProps> = ({
                         className="w-4 h-4 text-blue-600 rounded"
                       />
                       <span className="text-sm font-medium text-gray-700">
-                        Mỗi học sinh thứ tự câu khác nhau <span className="text-blue-600 font-semibold">(Chống nhìn bài)</span>
+                        Mỗi học sinh thứ tự câu khác nhau{' '}
+                        <span className="text-blue-600 font-semibold">(Chống nhìn bài)</span>
                       </span>
                     </label>
                   </div>
 
                   <div className="flex items-center gap-2 p-3 bg-amber-50 border border-amber-200 rounded-lg text-xs text-amber-800">
                     <span>💡</span>
-                    <span>Tự động hỗ trợ đầy đủ 4 dạng: Trắc nghiệm 4 lựa chọn, Đúng/Sai đơn, Chùm Đúng/Sai (chuẩn BGD) và Điền từ/số ngắn. Học sinh trả lời đúng sẽ gieo xúc xắc và nhận thẻ bổ trợ!</span>
+                    <span>
+                      Tự động hỗ trợ đầy đủ 4 dạng: Trắc nghiệm 4 lựa chọn, Đúng/Sai đơn, Chùm
+                      Đúng/Sai (chuẩn BGD) và Điền từ/số ngắn. Học sinh trả lời đúng sẽ gieo xúc xắc
+                      và nhận thẻ bổ trợ!
+                    </span>
                   </div>
                 </>
               ) : (

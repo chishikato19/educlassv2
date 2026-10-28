@@ -45,7 +45,8 @@ interface WorksheetQuestionViewItem {
 
 function getText(val: unknown): string {
   if (typeof val === 'string') return val;
-  if (val && typeof val === 'object' && 'text' in val) return String((val as { text: unknown }).text);
+  if (val && typeof val === 'object' && 'text' in val)
+    return String((val as { text: unknown }).text);
   return '';
 }
 
@@ -215,7 +216,8 @@ export const StudentPostEditor: React.FC<StudentPostEditorProps> = ({
                     {worksheet.questionSetTitle || 'Phiếu học tập tương tác'}
                   </h4>
                   <p className="text-xs text-blue-700 mt-0.5">
-                    Gồm {worksheet.questions.length} câu hỏi. Điểm số sẽ được tự động chấm khi nộp bài.
+                    Gồm {worksheet.questions.length} câu hỏi. Điểm số sẽ được tự động chấm khi nộp
+                    bài.
                   </p>
                 </div>
                 <span className="text-xs font-bold px-2 py-1 bg-white text-blue-700 rounded-xl shadow-xs">
@@ -257,7 +259,7 @@ export const StudentPostEditor: React.FC<StudentPostEditorProps> = ({
                                 key={optIdx}
                                 type="button"
                                 onClick={() => {
-                                  setWorksheetAnswers((prev) => ({
+                                  setWorksheetAnswers(prev => ({
                                     ...prev,
                                     [q.id]: { selected: optIdx },
                                   }));
@@ -298,7 +300,7 @@ export const StudentPostEditor: React.FC<StudentPostEditorProps> = ({
                               label: '❌ Sai',
                               bg: 'bg-rose-600 text-white border-rose-600',
                             },
-                          ].map((btn) => {
+                          ].map(btn => {
                             const currentSelected = (
                               worksheetAnswers[q.id] as { selected?: boolean } | undefined
                             )?.selected;
@@ -308,7 +310,7 @@ export const StudentPostEditor: React.FC<StudentPostEditorProps> = ({
                                 key={String(btn.val)}
                                 type="button"
                                 onClick={() => {
-                                  setWorksheetAnswers((prev) => ({
+                                  setWorksheetAnswers(prev => ({
                                     ...prev,
                                     [q.id]: { selected: btn.val },
                                   }));
@@ -339,8 +341,7 @@ export const StudentPostEditor: React.FC<StudentPostEditorProps> = ({
                                 const currentPairs =
                                   (
                                     worksheetAnswers[q.id] as
-                                      | { pairs?: Record<string, string | null> }
-                                      | undefined
+                                      { pairs?: Record<string, string | null> } | undefined
                                   )?.pairs || {};
                                 const currentRightId = currentPairs[left.id] || '';
 
@@ -354,9 +355,9 @@ export const StudentPostEditor: React.FC<StudentPostEditorProps> = ({
                                     </div>
                                     <select
                                       value={currentRightId}
-                                      onChange={(e) => {
+                                      onChange={e => {
                                         const newRightId = e.target.value || null;
-                                        setWorksheetAnswers((prev) => {
+                                        setWorksheetAnswers(prev => {
                                           const oldObj =
                                             (prev[q.id] as {
                                               pairs?: Record<string, string | null>;
@@ -415,53 +416,50 @@ export const StudentPostEditor: React.FC<StudentPostEditorProps> = ({
 
                             {/* Điền các ô trống */}
                             <div className="space-y-1.5">
-                              {q.blanks.map(
-                                (b: { id: string; hint?: string }, bIdx: number) => {
-                                  const currentFilled =
-                                    (
-                                      worksheetAnswers[q.id] as
-                                        | { filled?: Record<string, string | null> }
-                                        | undefined
-                                    )?.filled || {};
-                                  const currentVal = currentFilled[b.id] || '';
+                              {q.blanks.map((b: { id: string; hint?: string }, bIdx: number) => {
+                                const currentFilled =
+                                  (
+                                    worksheetAnswers[q.id] as
+                                      { filled?: Record<string, string | null> } | undefined
+                                  )?.filled || {};
+                                const currentVal = currentFilled[b.id] || '';
 
-                                  return (
-                                    <div
-                                      key={b.id || bIdx}
-                                      className="flex items-center gap-2 bg-white p-2 rounded-xl border border-slate-200"
+                                return (
+                                  <div
+                                    key={b.id || bIdx}
+                                    className="flex items-center gap-2 bg-white p-2 rounded-xl border border-slate-200"
+                                  >
+                                    <span className="text-xs font-bold text-slate-600 min-w-[70px]">
+                                      Ô [{b.id}]:
+                                    </span>
+                                    <select
+                                      value={currentVal}
+                                      onChange={e => {
+                                        const chosenWord = e.target.value || null;
+                                        setWorksheetAnswers(prev => {
+                                          const oldObj =
+                                            (prev[q.id] as {
+                                              filled?: Record<string, string | null>;
+                                            }) || {};
+                                          const updatedFilled = {
+                                            ...(oldObj.filled || {}),
+                                            [b.id]: chosenWord,
+                                          };
+                                          return { ...prev, [q.id]: { filled: updatedFilled } };
+                                        });
+                                      }}
+                                      className="flex-1 min-h-[40px] px-2.5 py-1.5 bg-slate-50 border border-slate-300 rounded-lg text-xs font-semibold text-slate-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
                                     >
-                                      <span className="text-xs font-bold text-slate-600 min-w-[70px]">
-                                        Ô [{b.id}]:
-                                      </span>
-                                      <select
-                                        value={currentVal}
-                                        onChange={(e) => {
-                                          const chosenWord = e.target.value || null;
-                                          setWorksheetAnswers((prev) => {
-                                            const oldObj =
-                                              (prev[q.id] as {
-                                                filled?: Record<string, string | null>;
-                                              }) || {};
-                                            const updatedFilled = {
-                                              ...(oldObj.filled || {}),
-                                              [b.id]: chosenWord,
-                                            };
-                                            return { ...prev, [q.id]: { filled: updatedFilled } };
-                                          });
-                                        }}
-                                        className="flex-1 min-h-[40px] px-2.5 py-1.5 bg-slate-50 border border-slate-300 rounded-lg text-xs font-semibold text-slate-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                                      >
-                                        <option value="">-- Chọn từ điền vào --</option>
-                                        {(q.wordBank ?? []).map((w: string, wIdx: number) => (
-                                          <option key={wIdx} value={w}>
-                                            {w}
-                                          </option>
-                                        ))}
-                                      </select>
-                                    </div>
-                                  );
-                                }
-                              )}
+                                      <option value="">-- Chọn từ điền vào --</option>
+                                      {(q.wordBank ?? []).map((w: string, wIdx: number) => (
+                                        <option key={wIdx} value={w}>
+                                          {w}
+                                        </option>
+                                      ))}
+                                    </select>
+                                  </div>
+                                );
+                              })}
                             </div>
                           </div>
                         )}
@@ -480,7 +478,7 @@ export const StudentPostEditor: React.FC<StudentPostEditorProps> = ({
                   MÀU GIẤY GHI CHÚ
                 </label>
                 <div className="flex items-center gap-2">
-                  {NOTE_COLORS.map((c) => (
+                  {NOTE_COLORS.map(c => (
                     <button
                       key={c.id}
                       type="button"
@@ -505,13 +503,14 @@ export const StudentPostEditor: React.FC<StudentPostEditorProps> = ({
                 </label>
                 <textarea
                   value={text}
-                  onChange={(e) => setText(e.target.value)}
+                  onChange={e => setText(e.target.value)}
                   placeholder="Nhập nội dung câu trả lời hoặc suy nghĩ của bạn... (Hỗ trợ công thức Toán dạng $x^2 + y^2 = r^2$)"
                   rows={6}
                   className="w-full p-3.5 rounded-2xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-blue-500 text-slate-800 text-base resize-none"
                 />
                 <p className="text-[11px] text-slate-400 mt-1">
-                  💡 Mẹo: Nhập công thức Toán học bằng cách kẹp giữa 2 dấu đô la, ví dụ: <code>$E = mc^2$</code>
+                  💡 Mẹo: Nhập công thức Toán học bằng cách kẹp giữa 2 dấu đô la, ví dụ:{' '}
+                  <code>$E = mc^2$</code>
                 </p>
               </div>
             </div>
@@ -520,13 +519,11 @@ export const StudentPostEditor: React.FC<StudentPostEditorProps> = ({
           {/* TAB 2: Nét vẽ tay */}
           {activeTab === 'draw' && (
             <div className="space-y-2">
-              <label className="text-xs font-bold text-slate-500 block">
-                BẢNG VẼ TAY CẢM ỨNG
-              </label>
+              <label className="text-xs font-bold text-slate-500 block">BẢNG VẼ TAY CẢM ỨNG</label>
               <div className="h-72 w-full">
                 <TouchDrawingCanvas
                   initialDataUrl={drawingDataUrl}
-                  onChange={(url) => setDrawingDataUrl(url)}
+                  onChange={url => setDrawingDataUrl(url)}
                 />
               </div>
             </div>
@@ -557,12 +554,16 @@ export const StudentPostEditor: React.FC<StudentPostEditorProps> = ({
               ) : (
                 <div className="border-2 border-dashed border-slate-300 rounded-3xl p-6 text-center bg-slate-50/50 hover:bg-slate-50 transition">
                   <div className="text-4xl mb-2">📸</div>
-                  <h4 className="font-bold text-slate-700 text-base">Chụp ảnh vở hoặc tải ảnh bài tập</h4>
+                  <h4 className="font-bold text-slate-700 text-base">
+                    Chụp ảnh vở hoặc tải ảnh bài tập
+                  </h4>
                   <p className="text-xs text-slate-400 mt-1 mb-4">
                     Hệ thống sẽ tự động tối ưu hóa và nén nhẹ ảnh trước khi nộp
                   </p>
                   <label className="inline-flex min-h-[48px] px-5 py-3 rounded-2xl bg-blue-600 text-white font-bold text-sm hover:bg-blue-700 cursor-pointer shadow-md shadow-blue-200 transition items-center gap-2">
-                    <span>{isCompressing ? '⏳ Đang nén ảnh...' : '📷 Chọn ảnh hoặc Chụp ngay'}</span>
+                    <span>
+                      {isCompressing ? '⏳ Đang nén ảnh...' : '📷 Chọn ảnh hoặc Chụp ngay'}
+                    </span>
                     <input
                       type="file"
                       accept="image/*"

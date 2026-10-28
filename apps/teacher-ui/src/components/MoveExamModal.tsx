@@ -96,7 +96,10 @@ export const MoveExamModal: React.FC<MoveExamModalProps> = ({
       }
       onClose={() => !isSubmitting && onClose()}
     >
-      <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '16px', padding: '4px 0' }}>
+      <form
+        onSubmit={handleSubmit}
+        style={{ display: 'flex', flexDirection: 'column', gap: '16px', padding: '4px 0' }}
+      >
         {/* Thông tin bài thi & thư mục hiện tại */}
         <div
           style={{
@@ -107,18 +110,31 @@ export const MoveExamModal: React.FC<MoveExamModalProps> = ({
             fontSize: '13px',
           }}
         >
-          <div style={{ color: UI_COLORS.textMuted, fontSize: '11.5px', fontWeight: 600 }}>KỲ THI ĐANG CHUYỂN:</div>
-          <div style={{ fontWeight: 700, color: UI_COLORS.text, fontSize: '14.5px', marginTop: '2px' }}>
+          <div style={{ color: UI_COLORS.textMuted, fontSize: '11.5px', fontWeight: 600 }}>
+            KỲ THI ĐANG CHUYỂN:
+          </div>
+          <div
+            style={{ fontWeight: 700, color: UI_COLORS.text, fontSize: '14.5px', marginTop: '2px' }}
+          >
             {exam.title}
           </div>
           <div style={{ marginTop: '6px', fontSize: '12.5px', color: '#475569' }}>
-            Vị trí hiện tại: <strong>{currentNorm ? `📁 ${currentNorm}` : '🏠 Thư mục gốc (Chưa phân loại)'}</strong>
+            Vị trí hiện tại:{' '}
+            <strong>{currentNorm ? `📁 ${currentNorm}` : '🏠 Thư mục gốc (Chưa phân loại)'}</strong>
           </div>
         </div>
 
         {/* Chọn thư mục đích */}
         <div>
-          <label style={{ display: 'block', fontSize: '13px', fontWeight: 700, color: UI_COLORS.text, marginBottom: '6px' }}>
+          <label
+            style={{
+              display: 'block',
+              fontSize: '13px',
+              fontWeight: 700,
+              color: UI_COLORS.text,
+              marginBottom: '6px',
+            }}
+          >
             Chọn thư mục đích <span style={{ color: '#DC2626' }}>*</span>
           </label>
           <div
@@ -155,7 +171,7 @@ export const MoveExamModal: React.FC<MoveExamModalProps> = ({
             </div>
 
             {/* Danh sách các thư mục hiện có (phân cấp thụt lề) */}
-            {allFolders.map((f) => {
+            {allFolders.map(f => {
               const depth = f.split('/').length - 1;
               const leafName = f.split('/').pop() || f;
               const isSelected = selectedFolder === f;
@@ -180,7 +196,9 @@ export const MoveExamModal: React.FC<MoveExamModalProps> = ({
                 >
                   <span>{depth > 0 ? '📂' : '📁'}</span>
                   <span>{leafName}</span>
-                  <span style={{ fontSize: '11px', color: UI_COLORS.textMuted, marginLeft: 'auto' }}>
+                  <span
+                    style={{ fontSize: '11px', color: UI_COLORS.textMuted, marginLeft: 'auto' }}
+                  >
                     {f}
                   </span>
                 </div>
@@ -198,11 +216,21 @@ export const MoveExamModal: React.FC<MoveExamModalProps> = ({
             padding: '10px 12px',
           }}
         >
-          <label style={{ display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer', fontSize: '13px', fontWeight: 600, color: UI_COLORS.text }}>
+          <label
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: '8px',
+              cursor: 'pointer',
+              fontSize: '13px',
+              fontWeight: 600,
+              color: UI_COLORS.text,
+            }}
+          >
             <input
               type="checkbox"
               checked={isCreatingNew}
-              onChange={(e) => setIsCreatingNew(e.target.checked)}
+              onChange={e => setIsCreatingNew(e.target.checked)}
               style={{ accentColor: UI_COLORS.primary }}
             />
             <span>➕ Tạo thư mục con mới bên trong vị trí đã chọn</span>
@@ -214,7 +242,7 @@ export const MoveExamModal: React.FC<MoveExamModalProps> = ({
                 type="text"
                 placeholder="Nhập tên thư mục con mới (VD: Giữa HK1)..."
                 value={newFolderName}
-                onChange={(e) => {
+                onChange={e => {
                   setNewFolderName(e.target.value);
                   if (error) setError('');
                 }}
@@ -228,17 +256,18 @@ export const MoveExamModal: React.FC<MoveExamModalProps> = ({
                 }}
               />
               <div style={{ fontSize: '11.5px', color: UI_COLORS.textMuted, marginTop: '4px' }}>
-                Đường dẫn sẽ tạo: <strong>{selectedFolder ? `${selectedFolder}/${newFolderName || '...'}` : newFolderName || '...'}</strong>
+                Đường dẫn sẽ tạo:{' '}
+                <strong>
+                  {selectedFolder
+                    ? `${selectedFolder}/${newFolderName || '...'}`
+                    : newFolderName || '...'}
+                </strong>
               </div>
             </div>
           )}
         </div>
 
-        {error && (
-          <div style={{ fontSize: '12px', color: '#DC2626' }}>
-            {error}
-          </div>
-        )}
+        {error && <div style={{ fontSize: '12px', color: '#DC2626' }}>{error}</div>}
 
         {/* Nút hành động */}
         <div

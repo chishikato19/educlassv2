@@ -14,10 +14,7 @@ export interface OwnableResource {
  * - Admin luôn có toàn quyền truy cập bất kỳ tài nguyên nào (theo D5 PLAN.md).
  * - Giáo viên (teacher) chỉ có quyền truy cập khi id của giáo viên trùng với ownerId của tài nguyên.
  */
-export function hasResourceAccess(
-  user: AuthUserContext,
-  resource: OwnableResource
-): boolean {
+export function hasResourceAccess(user: AuthUserContext, resource: OwnableResource): boolean {
   if (user.role === 'admin') {
     return true;
   }

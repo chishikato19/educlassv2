@@ -53,7 +53,7 @@ describe('TokenService', () => {
 
     // Tạo token có hạn 10ms
     const shortLivedToken = tokenService.createToken(user, 10);
-    await new Promise((resolve) => setTimeout(resolve, 30));
+    await new Promise(resolve => setTimeout(resolve, 30));
 
     expect(tokenService.verifyToken(shortLivedToken)).toBeNull();
   });

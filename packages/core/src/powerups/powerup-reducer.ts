@@ -64,9 +64,10 @@ export function grantPowerUp(
 /**
  * Lấy ra vật phẩm đầu tiên trong hàng đợi (FIFO) để kích hoạt
  */
-export function popNextPowerUp(
-  inventory: PowerUpInventory
-): { inventory: PowerUpInventory; nextItem?: PowerUpItem | undefined } {
+export function popNextPowerUp(inventory: PowerUpInventory): {
+  inventory: PowerUpInventory;
+  nextItem?: PowerUpItem | undefined;
+} {
   if (inventory.queue.length === 0) {
     return { inventory };
   }

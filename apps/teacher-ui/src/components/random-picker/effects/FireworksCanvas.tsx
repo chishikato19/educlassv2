@@ -87,7 +87,8 @@ export const FireworksCanvas: React.FC<FireworksCanvasProps> = ({
 
     const createBurst = (x: number, y: number, baseColor?: string) => {
       const count = 45 + Math.floor(Math.random() * 25);
-      const chosenColor = baseColor || PALETTE[Math.floor(Math.random() * PALETTE.length)] || '#F59E0B';
+      const chosenColor =
+        baseColor || PALETTE[Math.floor(Math.random() * PALETTE.length)] || '#F59E0B';
 
       for (let i = 0; i < count; i++) {
         const angle = Math.random() * Math.PI * 2;
@@ -145,7 +146,7 @@ export const FireworksCanvas: React.FC<FireworksCanvasProps> = ({
       }
 
       // Vẽ và cập nhật Rockets
-      rockets = rockets.filter((r) => {
+      rockets = rockets.filter(r => {
         r.y += r.vy;
 
         // Vẽ vệt rocket bay lên
@@ -166,7 +167,7 @@ export const FireworksCanvas: React.FC<FireworksCanvasProps> = ({
       });
 
       // Vẽ và cập nhật Particles nổ bung
-      particles = particles.filter((p) => {
+      particles = particles.filter(p => {
         p.x += p.vx;
         p.y += p.vy;
         p.vy += p.gravity;

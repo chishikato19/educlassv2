@@ -45,7 +45,9 @@ function freePortIfOccupied(port: number): void {
         if (pid && pid !== currentPid) {
           try {
             execSync(`taskkill /F /PID ${pid}`, { stdio: 'ignore' });
-            console.info(`[Auto-Recovery] Đã giải phóng cổng ${port} bị chiếm bởi tiến trình cũ PID ${pid}`);
+            console.info(
+              `[Auto-Recovery] Đã giải phóng cổng ${port} bị chiếm bởi tiến trình cũ PID ${pid}`
+            );
           } catch {
             // Bỏ qua nếu tiến trình đã tắt
           }
@@ -103,7 +105,9 @@ async function cleanupAndExit(): Promise<void> {
 function openTeacherWindow(targetUrl?: string) {
   const teacherUrl =
     targetUrl ||
-    (serverInstance ? `http://localhost:${serverInstance.port}/teacher` : 'http://localhost:3000/teacher');
+    (serverInstance
+      ? `http://localhost:${serverInstance.port}/teacher`
+      : 'http://localhost:3000/teacher');
 
   if (teacherWindow) {
     if (teacherWindow.isMinimized()) teacherWindow.restore();
@@ -133,14 +137,18 @@ function openTeacherWindow(targetUrl?: string) {
 
   // Cho phép mở cửa sổ trình chiếu hoạt động độc lập, video & quay số (Màn hình 2) bên trong Electron
   teacherWindow.webContents.setWindowOpenHandler(({ url }) => {
-    if (url.includes('window=activity') || url.includes('window=video') || url.includes('window=random-picker')) {
+    if (
+      url.includes('window=activity') ||
+      url.includes('window=video') ||
+      url.includes('window=random-picker')
+    ) {
       const isVideo = url.includes('window=video');
       const isRandomPicker = url.includes('window=random-picker');
       const windowTitle = isVideo
         ? 'EduClass v2 — Trình Chiếu Video Học Liệu'
         : isRandomPicker
-        ? 'EduClass v2 — Trình Chiếu Quay Số Ngẫu Nhiên'
-        : 'EduClass v2 — Trình Chiếu Hoạt Động';
+          ? 'EduClass v2 — Trình Chiếu Quay Số Ngẫu Nhiên'
+          : 'EduClass v2 — Trình Chiếu Hoạt Động';
 
       return {
         action: 'allow',
@@ -320,7 +328,9 @@ ipcMain.handle('copy-text', (_, text: string) => {
 ipcMain.on('open-external', (_, targetUrl?: string) => {
   const url =
     targetUrl ||
-    (serverInstance ? `http://localhost:${serverInstance.port}/teacher` : 'http://localhost:3000/teacher');
+    (serverInstance
+      ? `http://localhost:${serverInstance.port}/teacher`
+      : 'http://localhost:3000/teacher');
   void shell.openExternal(url);
 });
 
@@ -328,7 +338,9 @@ ipcMain.on('open-external', (_, targetUrl?: string) => {
 ipcMain.on('open-teacher-window', (_, targetUrl?: string) => {
   const url =
     targetUrl ||
-    (serverInstance ? `http://localhost:${serverInstance.port}/teacher` : 'http://localhost:3000/teacher');
+    (serverInstance
+      ? `http://localhost:${serverInstance.port}/teacher`
+      : 'http://localhost:3000/teacher');
   openTeacherWindow(url);
 });
 
@@ -357,9 +369,7 @@ ipcMain.handle('check-for-update', async () => {
       currentVersion: app.getVersion(),
       latestVersion,
       releaseNotes:
-        typeof result.updateInfo.releaseNotes === 'string'
-          ? result.updateInfo.releaseNotes
-          : null,
+        typeof result.updateInfo.releaseNotes === 'string' ? result.updateInfo.releaseNotes : null,
       releaseDate: result.updateInfo.releaseDate,
     };
   } catch (err: unknown) {
@@ -392,7 +402,7 @@ ipcMain.handle('quit-and-install', () => {
   autoUpdater.quitAndInstall(false, true);
 });
 
-autoUpdater.on('download-progress', (progressObj) => {
+autoUpdater.on('download-progress', progressObj => {
   const payload = {
     percent: Math.round(progressObj.percent),
     transferred: progressObj.transferred,
@@ -407,7 +417,7 @@ autoUpdater.on('download-progress', (progressObj) => {
   }
 });
 
-autoUpdater.on('update-downloaded', (info) => {
+autoUpdater.on('update-downloaded', info => {
   const payload = {
     version: info.version,
   };
@@ -433,70 +443,73 @@ app.on('second-instance', () => {
   }
 });
 
-app.whenReady().then(async () => {
-  // Tìm đường dẫn UI giáo viên tối ưu
-  const candidates = [
-    path.join(currentDir, '../../teacher-ui/dist'),
-    path.join(currentDir, '../public/teacher'),
-    path.join(currentDir, '../../server/public/teacher'),
-    process.resourcesPath ? path.join(process.resourcesPath, 'public/teacher') : '',
-    process.resourcesPath ? path.join(process.resourcesPath, 'teacher-ui') : '',
-  ];
-  const teacherUiDir = candidates.find(c => Boolean(c) && fs.existsSync(c));
+app
+  .whenReady()
+  .then(async () => {
+    // Tìm đường dẫn UI giáo viên tối ưu
+    const candidates = [
+      path.join(currentDir, '../../teacher-ui/dist'),
+      path.join(currentDir, '../public/teacher'),
+      path.join(currentDir, '../../server/public/teacher'),
+      process.resourcesPath ? path.join(process.resourcesPath, 'public/teacher') : '',
+      process.resourcesPath ? path.join(process.resourcesPath, 'teacher-ui') : '',
+    ];
+    const teacherUiDir = candidates.find(c => Boolean(c) && fs.existsSync(c));
 
-  // Tìm đường dẫn Cổng học sinh tối ưu
-  const studentCandidates = [
-    path.join(currentDir, '../../server/public/student'),
-    path.join(currentDir, '../public/student'),
-    path.join(currentDir, '../../packages/server/public/student'),
-    process.resourcesPath ? path.join(process.resourcesPath, 'public/student') : '',
-    process.resourcesPath ? path.join(process.resourcesPath, 'student-ui') : '',
-  ];
-  const studentUiDir = studentCandidates.find(c => Boolean(c) && fs.existsSync(c));
+    // Tìm đường dẫn Cổng học sinh tối ưu
+    const studentCandidates = [
+      path.join(currentDir, '../../server/public/student'),
+      path.join(currentDir, '../public/student'),
+      path.join(currentDir, '../../packages/server/public/student'),
+      process.resourcesPath ? path.join(process.resourcesPath, 'public/student') : '',
+      process.resourcesPath ? path.join(process.resourcesPath, 'student-ui') : '',
+    ];
+    const studentUiDir = studentCandidates.find(c => Boolean(c) && fs.existsSync(c));
 
-  // Đường dẫn CSDL và dữ liệu người dùng bền vững trên máy tính người dùng (%APPDATA%/EduClass v2/data)
-  const dataDir = path.join(app.getPath('userData'), 'data');
-  if (!fs.existsSync(dataDir)) {
-    fs.mkdirSync(dataDir, { recursive: true });
-  }
-  const dbPath = path.join(dataDir, 'educlass.sqlite');
-  const assetsDir = path.join(dataDir, 'assets');
-  if (!fs.existsSync(assetsDir)) {
-    fs.mkdirSync(assetsDir, { recursive: true });
-  }
+    // Đường dẫn CSDL và dữ liệu người dùng bền vững trên máy tính người dùng (%APPDATA%/EduClass v2/data)
+    const dataDir = path.join(app.getPath('userData'), 'data');
+    if (!fs.existsSync(dataDir)) {
+      fs.mkdirSync(dataDir, { recursive: true });
+    }
+    const dbPath = path.join(dataDir, 'educlass.sqlite');
+    const assetsDir = path.join(dataDir, 'assets');
+    if (!fs.existsSync(assetsDir)) {
+      fs.mkdirSync(assetsDir, { recursive: true });
+    }
 
-  // Tự động giải phóng cổng 3000 nếu có tiến trình zombie cũ đang chiếm giữ
-  freePortIfOccupied(3000);
+    // Tự động giải phóng cổng 3000 nếu có tiến trình zombie cũ đang chiếm giữ
+    freePortIfOccupied(3000);
 
-  // 1. Khởi động Fastify server nhúng
-  serverInstance = await startEmbeddedServer({
-    port: 3000,
-    host: '0.0.0.0',
-    teacherUiDir,
-    studentUiDir,
-    dbPath,
-    dataDir,
-    assetsDir,
+    // 1. Khởi động Fastify server nhúng
+    serverInstance = await startEmbeddedServer({
+      port: 3000,
+      host: '0.0.0.0',
+      teacherUiDir,
+      studentUiDir,
+      dbPath,
+      dataDir,
+      assetsDir,
+    });
+
+    // 2. Tạo cửa sổ chính và khay hệ thống
+    await createMainWindow(serverInstance);
+    try {
+      createTray(serverInstance);
+    } catch {
+      // Bỏ qua nếu môi trường headless hoặc thiếu icon file trong test
+    }
+  })
+  .catch((err: unknown) => {
+    const errorMsg = err instanceof Error ? err.message : String(err);
+    console.error('[Startup Error]', err);
+    dialog.showErrorBox(
+      'Lỗi khởi động EduClass v2',
+      `Máy chủ EduClass không thể khởi động:\n${errorMsg}\n\nVui lòng kiểm tra lại tiến trình hệ thống.`
+    );
+    void cleanupAndExit();
   });
 
-  // 2. Tạo cửa sổ chính và khay hệ thống
-  await createMainWindow(serverInstance);
-  try {
-    createTray(serverInstance);
-  } catch {
-    // Bỏ qua nếu môi trường headless hoặc thiếu icon file trong test
-  }
-}).catch((err: unknown) => {
-  const errorMsg = err instanceof Error ? err.message : String(err);
-  console.error('[Startup Error]', err);
-  dialog.showErrorBox(
-    'Lỗi khởi động EduClass v2',
-    `Máy chủ EduClass không thể khởi động:\n${errorMsg}\n\nVui lòng kiểm tra lại tiến trình hệ thống.`
-  );
-  void cleanupAndExit();
-});
-
-app.on('before-quit', (event) => {
+app.on('before-quit', event => {
   if (!isCleaningUp) {
     event.preventDefault();
     void cleanupAndExit();

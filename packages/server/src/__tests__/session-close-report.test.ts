@@ -170,8 +170,8 @@ describe('Session Closing, Report Snapshots & Participant Logout (Task 1.8)', ()
       expect(onlinePartsAfter).toHaveLength(0);
 
       const allPartsAfter = await participantRepo.listBySessionId(sessionId);
-      expect(allPartsAfter.every((p) => p.status === 'offline')).toBe(true);
-      expect(allPartsAfter.every((p) => p.leftAt !== null)).toBe(true);
+      expect(allPartsAfter.every(p => p.status === 'offline')).toBe(true);
+      expect(allPartsAfter.every(p => p.leftAt !== null)).toBe(true);
 
       // 7. Học sinh cố resume bằng participantToken sau khi phiên đóng -> 400 SESSION_CLOSED
       const resumeRes = await app.inject({

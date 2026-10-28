@@ -16,7 +16,7 @@ export async function compressImage(
       reject(new Error('Không thể đọc file ảnh từ thiết bị'));
     };
 
-    reader.onload = (event) => {
+    reader.onload = event => {
       const srcUrl = event.target?.result as string;
       if (!srcUrl) {
         reject(new Error('Dữ liệu ảnh rỗng'));

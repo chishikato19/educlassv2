@@ -7,17 +7,10 @@
   },
   "compression": "normal",
   "electronLanguages": ["vi", "en-US"],
-  "files": [
-    "dist/**/*",
-    "src/window.html",
-    "!dist/installer"
-  ],
+  "files": ["dist/**/*", "src/window.html", "!dist/installer"],
   "forceCodeSigning": false,
   "win": {
-    "target": [
-      "nsis",
-      "portable"
-    ],
+    "target": ["nsis", "portable"],
     "signAndEditExecutable": false
   },
   "portable": {

@@ -22,7 +22,8 @@ const DOC_RELS_XML = `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 
 // 1x1 Pixel PNG Base64
 function getPixelPng(): Uint8Array {
-  const base64 = 'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNk+A8AAQUBAScY42YAAAAASUVORK5CYII=';
+  const base64 =
+    'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNk+A8AAQUBAScY42YAAAAASUVORK5CYII=';
   if (typeof Buffer !== 'undefined') {
     return Buffer.from(base64, 'base64');
   }
@@ -43,41 +44,43 @@ export function createInlineDrawingXml(
   name: string,
   rId = 'rIdImg1',
   cx = 952500,
-  cy = 952500,
+  cy = 952500
 ): string {
-  return `<w:drawing>` +
+  return (
+    `<w:drawing>` +
     `<wp:inline distT="0" distB="0" distL="0" distR="0">` +
-      `<wp:extent cx="${cx}" cy="${cy}"/>` +
-      `<wp:effectExtent l="0" t="0" r="0" b="0"/>` +
-      `<wp:docPr id="${docPrId}" name="${name}"/>` +
-      `<wp:cNvGraphicFramePr>` +
-        `<a:graphicFrameLocks xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main" noChangeAspect="1"/>` +
-      `</wp:cNvGraphicFramePr>` +
-      `<a:graphic xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main">` +
-        `<a:graphicData uri="http://schemas.openxmlformats.org/drawingml/2006/picture">` +
-          `<pic:pic xmlns:pic="http://schemas.openxmlformats.org/drawingml/2006/picture">` +
-            `<pic:nvPicPr>` +
-              `<pic:cNvPr id="0" name="${name}"/>` +
-              `<pic:cNvPicPr>` +
-                `<a:picLocks noChangeAspect="1" noChangeArrowheads="1"/>` +
-              `</pic:cNvPicPr>` +
-            `</pic:nvPicPr>` +
-            `<pic:blipFill>` +
-              `<a:blip r:embed="${rId}"/>` +
-              `<a:srcRect/>` +
-              `<a:stretch><a:fillRect/></a:stretch>` +
-            `</pic:blipFill>` +
-            `<pic:spPr bwMode="auto">` +
-              `<a:xfrm><a:off x="0" y="0"/><a:ext cx="${cx}" cy="${cy}"/></a:xfrm>` +
-              `<a:prstGeom prst="rect"><a:avLst/></a:prstGeom>` +
-              `<a:noFill/>` +
-              `<a:ln><a:noFill/></a:ln>` +
-            `</pic:spPr>` +
-          `</pic:pic>` +
-        `</a:graphicData>` +
-      `</a:graphic>` +
+    `<wp:extent cx="${cx}" cy="${cy}"/>` +
+    `<wp:effectExtent l="0" t="0" r="0" b="0"/>` +
+    `<wp:docPr id="${docPrId}" name="${name}"/>` +
+    `<wp:cNvGraphicFramePr>` +
+    `<a:graphicFrameLocks xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main" noChangeAspect="1"/>` +
+    `</wp:cNvGraphicFramePr>` +
+    `<a:graphic xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main">` +
+    `<a:graphicData uri="http://schemas.openxmlformats.org/drawingml/2006/picture">` +
+    `<pic:pic xmlns:pic="http://schemas.openxmlformats.org/drawingml/2006/picture">` +
+    `<pic:nvPicPr>` +
+    `<pic:cNvPr id="0" name="${name}"/>` +
+    `<pic:cNvPicPr>` +
+    `<a:picLocks noChangeAspect="1" noChangeArrowheads="1"/>` +
+    `</pic:cNvPicPr>` +
+    `</pic:nvPicPr>` +
+    `<pic:blipFill>` +
+    `<a:blip r:embed="${rId}"/>` +
+    `<a:srcRect/>` +
+    `<a:stretch><a:fillRect/></a:stretch>` +
+    `</pic:blipFill>` +
+    `<pic:spPr bwMode="auto">` +
+    `<a:xfrm><a:off x="0" y="0"/><a:ext cx="${cx}" cy="${cy}"/></a:xfrm>` +
+    `<a:prstGeom prst="rect"><a:avLst/></a:prstGeom>` +
+    `<a:noFill/>` +
+    `<a:ln><a:noFill/></a:ln>` +
+    `</pic:spPr>` +
+    `</pic:pic>` +
+    `</a:graphicData>` +
+    `</a:graphic>` +
     `</wp:inline>` +
-  `</w:drawing>`;
+    `</w:drawing>`
+  );
 }
 
 export async function createDocxBuffer(bodyXml: string, includeImage = false): Promise<Buffer> {

@@ -49,12 +49,12 @@ export const BoardPostSchema = z.object({
   color: BoardColorSchema.default('yellow'),
   text: z.string().default(''),
   drawingDataUrl: z.string().optional(), // Chuỗi ảnh nét vẽ tay (PNG / Base64)
-  imageUrl: z.string().optional(),       // Đường dẫn ảnh chụp vở hoặc tài liệu tải lên
+  imageUrl: z.string().optional(), // Đường dẫn ảnh chụp vở hoặc tài liệu tải lên
   status: z.enum(['pending', 'approved', 'rejected']).default('pending'),
   rejectionReason: z.string().optional(),
 
   // Cảm xúc & Bình luận
-  likes: z.array(z.string()).default([]),  // Danh sách participantId đã bấm 👍
+  likes: z.array(z.string()).default([]), // Danh sách participantId đã bấm 👍
   hearts: z.array(z.string()).default([]), // Danh sách participantId đã bấm ❤️
   comments: z.array(BoardCommentSchema).default([]),
 
@@ -69,7 +69,7 @@ export const BoardPostSchema = z.object({
 
   // Điều phối & Trình chiếu
   isSpotlight: z.boolean().default(false), // Phóng to trung tâm trên màn chiếu
-  isPinned: z.boolean().default(false),    // Ghim đầu bảng
+  isPinned: z.boolean().default(false), // Ghim đầu bảng
 
   createdAt: z.number(),
   updatedAt: z.number().optional(),
@@ -108,13 +108,13 @@ export const BoardConfigSchema = z.object({
   title: z.string().min(1, 'Tiêu đề không được để trống').default('Bảng Tương Tác Lớp Học'),
   prompt: z.string().min(1, 'Chủ đề / Đề bài không được để trống'),
   maxGrade: z.number().min(1).max(100).default(10), // Thang điểm tối đa (10 hoặc 100)
-  allowDraw: z.boolean().default(true),             // Cho phép nét vẽ tay
-  allowImage: z.boolean().default(true),            // Cho phép chụp / tải ảnh
-  allowComments: z.boolean().default(true),         // Cho phép bình luận, nhận xét
-  allowReactions: z.boolean().default(true),        // Cho phép thả tim, thích
-  allowPeerGrades: z.boolean().default(true),       // Cho phép học sinh chấm điểm lẫn nhau
-  requireApproval: z.boolean().default(true),       // Duyệt bài trước khi hiển thị cho cả lớp
-  anonymousMode: z.boolean().default(false),        // Chế độ ẩn danh (nếu cần)
+  allowDraw: z.boolean().default(true), // Cho phép nét vẽ tay
+  allowImage: z.boolean().default(true), // Cho phép chụp / tải ảnh
+  allowComments: z.boolean().default(true), // Cho phép bình luận, nhận xét
+  allowReactions: z.boolean().default(true), // Cho phép thả tim, thích
+  allowPeerGrades: z.boolean().default(true), // Cho phép học sinh chấm điểm lẫn nhau
+  requireApproval: z.boolean().default(true), // Duyệt bài trước khi hiển thị cho cả lớp
+  anonymousMode: z.boolean().default(false), // Chế độ ẩn danh (nếu cần)
   worksheet: BoardWorksheetConfigSchema.optional(), // Phiếu bài tập kèm theo (nếu có)
 });
 export type BoardConfig = z.infer<typeof BoardConfigSchema>;
@@ -125,9 +125,9 @@ export type BoardConfig = z.infer<typeof BoardConfigSchema>;
 export const BoardStateSchema = z.object({
   config: BoardConfigSchema,
   status: z.enum(['accepting', 'discussion_only', 'ended']).default('accepting'),
-  isGlobalMuted: z.boolean().default(false),          // Cấm bình luận toàn lớp
+  isGlobalMuted: z.boolean().default(false), // Cấm bình luận toàn lớp
   mutedParticipants: z.array(z.string()).default([]), // Danh sách học sinh bị cấm bình luận
-  posts: z.record(BoardPostSchema).default({}),        // Key: postId (thường là participantId)
+  posts: z.record(BoardPostSchema).default({}), // Key: postId (thường là participantId)
   startedAt: z.number(),
 });
 export type BoardState = z.infer<typeof BoardStateSchema>;

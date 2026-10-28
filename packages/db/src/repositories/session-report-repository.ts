@@ -68,10 +68,7 @@ export class SessionReportRepository {
   /**
    * Lấy danh sách báo cáo các phiên của một giáo viên (sắp xếp theo thời gian mới nhất)
    */
-  async listByOwnerId(
-    ownerId: string,
-    limit = 50
-  ): Promise<SessionReportWithSession[]> {
+  async listByOwnerId(ownerId: string, limit = 50): Promise<SessionReportWithSession[]> {
     const results = await this.db
       .select({
         id: sessionReports.id,

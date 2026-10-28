@@ -71,12 +71,9 @@ export const ArcadeDuelTeacherPanel: React.FC<ArcadeDuelTeacherPanelProps> = ({
   });
 
   // Xử lý chọn phương án
-  const handleSelectOption = useCallback(
-    (teamId: 'blue' | 'red', optionIndex: number) => {
-      setGameState(prev => handleOptionSelection(prev, teamId, optionIndex));
-    },
-    []
-  );
+  const handleSelectOption = useCallback((teamId: 'blue' | 'red', optionIndex: number) => {
+    setGameState(prev => handleOptionSelection(prev, teamId, optionIndex));
+  }, []);
 
   // Xử lý dùng vật phẩm
   const handleActivatePowerUp = useCallback((teamId: 'blue' | 'red') => {
@@ -176,9 +173,7 @@ export const ArcadeDuelTeacherPanel: React.FC<ArcadeDuelTeacherPanelProps> = ({
                 KẾT QUẢ CHUNG CUỘC
               </p>
               {gameState.winnerTeamId === 'draw' ? (
-                <div className="text-2xl font-extrabold text-amber-300">
-                  🤝 KẾT QUẢ HÒA!
-                </div>
+                <div className="text-2xl font-extrabold text-amber-300">🤝 KẾT QUẢ HÒA!</div>
               ) : gameState.winnerTeamId === 'blue' ? (
                 <div className="text-2xl font-extrabold text-blue-400">
                   🎉 {gameState.bluePlayer.teamName} CHIẾN THẮNG!
@@ -191,20 +186,12 @@ export const ArcadeDuelTeacherPanel: React.FC<ArcadeDuelTeacherPanelProps> = ({
 
               <div className="grid grid-cols-2 gap-4 mt-4 pt-3 border-t border-slate-700/60 font-mono">
                 <div>
-                  <p className="text-xs text-blue-300 font-bold">
-                    {gameState.bluePlayer.teamName}
-                  </p>
-                  <p className="text-2xl font-black text-blue-400">
-                    {gameState.bluePlayer.score}đ
-                  </p>
+                  <p className="text-xs text-blue-300 font-bold">{gameState.bluePlayer.teamName}</p>
+                  <p className="text-2xl font-black text-blue-400">{gameState.bluePlayer.score}đ</p>
                 </div>
                 <div>
-                  <p className="text-xs text-red-300 font-bold">
-                    {gameState.redPlayer.teamName}
-                  </p>
-                  <p className="text-2xl font-black text-red-400">
-                    {gameState.redPlayer.score}đ
-                  </p>
+                  <p className="text-xs text-red-300 font-bold">{gameState.redPlayer.teamName}</p>
+                  <p className="text-2xl font-black text-red-400">{gameState.redPlayer.score}đ</p>
                 </div>
               </div>
             </div>

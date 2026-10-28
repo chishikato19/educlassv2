@@ -5,30 +5,65 @@ import { App } from '../App.js';
 // Mock API client
 vi.mock('../api/client.js', () => ({
   api: {
-    getTeachers: vi.fn().mockResolvedValue([
-      { id: 'u1', username: 'mai.toan', displayName: 'Cô Mai', role: 'teacher' },
-    ]),
+    getTeachers: vi
+      .fn()
+      .mockResolvedValue([
+        { id: 'u1', username: 'mai.toan', displayName: 'Cô Mai', role: 'teacher' },
+      ]),
     login: vi.fn().mockResolvedValue({
       token: 'fake-token',
-      user: { id: 'u1', username: 'mai.toan', displayName: 'Cô Mai', role: 'teacher', active: true, createdAt: Date.now() },
+      user: {
+        id: 'u1',
+        username: 'mai.toan',
+        displayName: 'Cô Mai',
+        role: 'teacher',
+        active: true,
+        createdAt: Date.now(),
+      },
     }),
     registerTeacher: vi.fn().mockResolvedValue({
-      id: 'u2', username: 'nam.ly', displayName: 'Thầy Nam', role: 'teacher', active: true, createdAt: Date.now()
+      id: 'u2',
+      username: 'nam.ly',
+      displayName: 'Thầy Nam',
+      role: 'teacher',
+      active: true,
+      createdAt: Date.now(),
     }),
     resetPin: vi.fn().mockResolvedValue(undefined),
     logout: vi.fn().mockResolvedValue(undefined),
-    getClasses: vi.fn().mockResolvedValue([
-      { id: 'c1', name: 'Lớp 10A1', year: 2026, ownerId: 'u1', createdAt: Date.now() },
-    ]),
+    getClasses: vi
+      .fn()
+      .mockResolvedValue([
+        { id: 'c1', name: 'Lớp 10A1', year: 2026, ownerId: 'u1', createdAt: Date.now() },
+      ]),
     getStudents: vi.fn().mockResolvedValue([
-      { id: 's1', classId: 'c1', fullName: 'Nguyễn Văn An', code: 'HS01', hasPin: false, exp: 50, createdAt: Date.now() },
+      {
+        id: 's1',
+        classId: 'c1',
+        fullName: 'Nguyễn Văn An',
+        code: 'HS01',
+        hasPin: false,
+        exp: 50,
+        createdAt: Date.now(),
+      },
     ]),
     getQuestionSets: vi.fn().mockResolvedValue([
-      { id: 'qs1', ownerId: 'u1', title: 'Đề Toán ôn tập', subject: 'Toán', grade: 10, tags: ['toan'], questionCount: 5, updatedAt: Date.now() },
+      {
+        id: 'qs1',
+        ownerId: 'u1',
+        title: 'Đề Toán ôn tập',
+        subject: 'Toán',
+        grade: 10,
+        tags: ['toan'],
+        questionCount: 5,
+        updatedAt: Date.now(),
+      },
     ]),
-    getActivities: vi.fn().mockResolvedValue([
-      { id: 'quiz-live', name: 'Quiz Live', version: '1.0.0', author: 'EduClass' },
-    ]),
+    getActivities: vi
+      .fn()
+      .mockResolvedValue([
+        { id: 'quiz-live', name: 'Quiz Live', version: '1.0.0', author: 'EduClass' },
+      ]),
     getRewardRules: vi.fn().mockResolvedValue({
       globalRules: [],
       teacherRules: [],

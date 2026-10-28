@@ -9,14 +9,11 @@ import type { ActivityHostPlugin, ActivityHostProps } from '../types.js';
 /**
  * Host Component cho Tiện ích Camera vật thể
  */
-const ObjectCameraHostComponent: React.FC<ActivityHostProps> = ({
-  state,
-  onSendIntent,
-}) => {
+const ObjectCameraHostComponent: React.FC<ActivityHostProps> = ({ state, onSendIntent }) => {
   return (
     <ObjectCameraTeacherPanel
       state={state as ObjectCameraState}
-      onSendIntent={(intent) => onSendIntent(intent as ObjectCameraTeacherIntent)}
+      onSendIntent={intent => onSendIntent(intent as ObjectCameraTeacherIntent)}
     />
   );
 };

@@ -209,7 +209,9 @@ describe('Assignments Server Routes & Hub (@educlass/activity-assignment-hub)', 
     expect(previewData.sheets[0].data[0]).toEqual(['Họ và Tên', 'Điểm Toán', 'Điểm Văn']);
 
     // 7. Thử nộp tệp văn bản text xem preview text
-    const textBase64 = Buffer.from('Day la doan ma nguon Python:\nprint("Hello EduClass")').toString('base64');
+    const textBase64 = Buffer.from(
+      'Day la doan ma nguon Python:\nprint("Hello EduClass")'
+    ).toString('base64');
     const submitTextRes = await app.inject({
       method: 'POST',
       url: `/api/sessions/${sessionId}/activities/${runId}/assignment/submit`,

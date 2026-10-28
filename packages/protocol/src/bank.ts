@@ -134,7 +134,7 @@ export const BankCurriculumTreeNodeSchema = z.object({
       lesson: z.string(),
       totalQuestions: z.number().int().nonnegative(),
       countsByDifficulty: MatrixCountsSchema,
-    }),
+    })
   ),
   totalQuestions: z.number().int().nonnegative(),
 });

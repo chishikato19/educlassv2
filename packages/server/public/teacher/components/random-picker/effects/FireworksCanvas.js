@@ -1,0 +1,165 @@
+import { jsx as _jsx } from "react/jsx-runtime";
+import { useEffect, useRef } from 'react';
+const PALETTE = [
+    '#F59E0B', // Amber
+    '#EF4444', // Red
+    '#10B981', // Emerald
+    '#06B6D4', // Cyan
+    '#8B5CF6', // Purple
+    '#EC4899', // Pink
+    '#F97316', // Orange
+    '#FDE047', // Yellow
+    '#FFFFFF', // White
+];
+export const FireworksCanvas = ({ active, durationMs = 3000, onFinish, className = '', }) => {
+    const canvasRef = useRef(null);
+    const animFrameRef = useRef(null);
+    useEffect(() => {
+        if (!active) {
+            if (animFrameRef.current) {
+                cancelAnimationFrame(animFrameRef.current);
+                animFrameRef.current = null;
+            }
+            const canvas = canvasRef.current;
+            if (canvas) {
+                const ctx = canvas.getContext('2d');
+                if (ctx)
+                    ctx.clearRect(0, 0, canvas.width, canvas.height);
+            }
+            return undefined;
+        }
+        const canvas = canvasRef.current;
+        if (!canvas)
+            return undefined;
+        const ctx = canvas.getContext('2d');
+        if (!ctx)
+            return undefined;
+        // Thiết lập kích thước canvas theo container
+        const updateSize = () => {
+            if (!canvas)
+                return;
+            const rect = canvas.getBoundingClientRect();
+            const dpr = window.devicePixelRatio || 1;
+            canvas.width = Math.max(1, rect.width * dpr);
+            canvas.height = Math.max(1, rect.height * dpr);
+            ctx.scale(dpr, dpr);
+        };
+        updateSize();
+        let particles = [];
+        let rockets = [];
+        const startTime = performance.now();
+        let lastLaunchTime = 0;
+        const createBurst = (x, y, baseColor) => {
+            const count = 45 + Math.floor(Math.random() * 25);
+            const chosenColor = baseColor || PALETTE[Math.floor(Math.random() * PALETTE.length)] || '#F59E0B';
+            for (let i = 0; i < count; i++) {
+                const angle = Math.random() * Math.PI * 2;
+                const speed = 2 + Math.random() * 6;
+                const color = Math.random() < 0.25 ? '#FFFFFF' : chosenColor;
+                particles.push({
+                    x,
+                    y,
+                    vx: Math.cos(angle) * speed,
+                    vy: Math.sin(angle) * speed,
+                    alpha: 1,
+                    decay: 0.015 + Math.random() * 0.02,
+                    color,
+                    size: 2 + Math.random() * 2.5,
+                    gravity: 0.08,
+                    flicker: Math.random() > 0.5,
+                });
+            }
+        };
+        const launchRocket = (w, h) => {
+            const x = w * (0.2 + Math.random() * 0.6);
+            const targetY = h * (0.15 + Math.random() * 0.35);
+            const color = PALETTE[Math.floor(Math.random() * PALETTE.length)] || '#F59E0B';
+            rockets.push({
+                x,
+                y: h,
+                targetY,
+                vy: -7 - Math.random() * 4,
+                color,
+            });
+        };
+        // Khởi tạo ngay 2-3 đợt pháo hoa ban đầu
+        const rect = canvas.getBoundingClientRect();
+        createBurst(rect.width * 0.3, rect.height * 0.35);
+        createBurst(rect.width * 0.7, rect.height * 0.3);
+        createBurst(rect.width * 0.5, rect.height * 0.25);
+        const render = (now) => {
+            const elapsed = now - startTime;
+            const isSpawning = elapsed < durationMs;
+            const w = canvas.getBoundingClientRect().width;
+            const h = canvas.getBoundingClientRect().height;
+            ctx.clearRect(0, 0, w, h);
+            // Bắn rocket định kỳ khi còn trong thời gian hiệu lực
+            if (isSpawning && now - lastLaunchTime > 350) {
+                launchRocket(w, h);
+                lastLaunchTime = now;
+            }
+            // Vẽ và cập nhật Rockets
+            rockets = rockets.filter(r => {
+                r.y += r.vy;
+                // Vẽ vệt rocket bay lên
+                ctx.save();
+                ctx.fillStyle = r.color;
+                ctx.shadowColor = r.color;
+                ctx.shadowBlur = 6;
+                ctx.beginPath();
+                ctx.arc(r.x, r.y, 2.5, 0, Math.PI * 2);
+                ctx.fill();
+                ctx.restore();
+                if (r.y <= r.targetY) {
+                    createBurst(r.x, r.y, r.color);
+                    return false;
+                }
+                return true;
+            });
+            // Vẽ và cập nhật Particles nổ bung
+            particles = particles.filter(p => {
+                p.x += p.vx;
+                p.y += p.vy;
+                p.vy += p.gravity;
+                p.vx *= 0.98; // Lực cản không khí
+                p.vy *= 0.98;
+                p.alpha -= p.decay;
+                if (p.alpha <= 0)
+                    return false;
+                const currentAlpha = p.flicker && Math.random() > 0.4 ? p.alpha * 0.5 : p.alpha;
+                ctx.save();
+                ctx.globalAlpha = Math.max(0, currentAlpha);
+                ctx.fillStyle = p.color;
+                ctx.shadowColor = p.color;
+                ctx.shadowBlur = 4;
+                ctx.beginPath();
+                ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+                ctx.fill();
+                ctx.restore();
+                return true;
+            });
+            if (isSpawning || particles.length > 0 || rockets.length > 0) {
+                animFrameRef.current = requestAnimationFrame(render);
+            }
+            else {
+                ctx.clearRect(0, 0, w, h);
+                if (onFinish)
+                    onFinish();
+            }
+        };
+        animFrameRef.current = requestAnimationFrame(render);
+        const handleResize = () => {
+            updateSize();
+        };
+        window.addEventListener('resize', handleResize);
+        return () => {
+            window.removeEventListener('resize', handleResize);
+            if (animFrameRef.current) {
+                cancelAnimationFrame(animFrameRef.current);
+                animFrameRef.current = null;
+            }
+        };
+    }, [active, durationMs, onFinish]);
+    return (_jsx("canvas", { ref: canvasRef, className: `absolute inset-0 w-full h-full pointer-events-none z-30 ${className}`, style: { pointerEvents: 'none' } }));
+};
+//# sourceMappingURL=FireworksCanvas.js.map

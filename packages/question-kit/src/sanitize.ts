@@ -67,7 +67,7 @@ export function stripAnswerKey(question: Question): QuestionPublic {
         type: 'cloze_drag',
         stem: question.stem,
         template: question.template,
-        blanks: question.blanks.map((b) => ({
+        blanks: question.blanks.map(b => ({
           id: b.id,
           ...(b.hint !== undefined ? { hint: b.hint } : {}),
         })),

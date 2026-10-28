@@ -269,9 +269,7 @@ export function handleSelectOpponent(
 
   // Kiểm tra luật không lặp lại đối thủ đã từng đấu
   const hasFoughtBefore = state.matchHistory.some(
-    h =>
-      (h.p1 === attackerId && h.p2 === targetId) ||
-      (h.p1 === targetId && h.p2 === attackerId)
+    h => (h.p1 === attackerId && h.p2 === targetId) || (h.p1 === targetId && h.p2 === attackerId)
   );
 
   if (hasFoughtBefore) {

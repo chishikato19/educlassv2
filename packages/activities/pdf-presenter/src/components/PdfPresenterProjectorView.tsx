@@ -114,9 +114,7 @@ const ProjectorSinglePage: React.FC<ProjectorSinglePageProps> = ({
   );
 };
 
-export const PdfPresenterProjectorView: React.FC<PdfPresenterProjectorViewProps> = ({
-  state,
-}) => {
+export const PdfPresenterProjectorView: React.FC<PdfPresenterProjectorViewProps> = ({ state }) => {
   const totalPages = state.document?.totalPages || 1;
   const pageImages = state.document?.pageImages || [];
 
@@ -146,9 +144,9 @@ export const PdfPresenterProjectorView: React.FC<PdfPresenterProjectorViewProps>
 
       {/* Vùng Cuộn Liên Tục Toàn Bộ Trang Trên Máy Chiếu */}
       <div className="flex-1 overflow-y-auto bg-slate-950 p-8 flex flex-col items-center">
-        {Array.from({ length: totalPages }, (_, i) => i + 1).map((pNum) => {
-          const pageGaps = state.gaps.filter((g) => g.pageNumber === pNum);
-          const pageStrokes = state.strokes.filter((s) => s.pageNumber === pNum);
+        {Array.from({ length: totalPages }, (_, i) => i + 1).map(pNum => {
+          const pageGaps = state.gaps.filter(g => g.pageNumber === pNum);
+          const pageStrokes = state.strokes.filter(s => s.pageNumber === pNum);
           const pageImg = pageImages[pNum - 1];
 
           return (

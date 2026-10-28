@@ -1,8 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import type {
-  TerritoryStudentIntent,
-  TerritoryWarState,
-} from '../territory-schemas.js';
+import type { TerritoryStudentIntent, TerritoryWarState } from '../territory-schemas.js';
 import { TerritoryGrid } from './TerritoryGrid.js';
 import { territorySound } from './TerritorySound.js';
 import { getLeaderboardByTeam, getParticipantScore } from '../territory-logic.js';
@@ -93,9 +90,7 @@ export const TerritoryStudentView: React.FC<StudentViewProps> = ({
         className="min-h-screen bg-slate-900 text-white p-4 flex flex-col items-center justify-start text-center space-y-4 select-none"
         data-testid="territory-student-finished"
       >
-        <div className="text-5xl mt-2">
-          {isWinner ? '🏆' : isDraw ? '🤝' : '🛡️'}
-        </div>
+        <div className="text-5xl mt-2">{isWinner ? '🏆' : isDraw ? '🤝' : '🛡️'}</div>
         <div className="space-y-1">
           <span
             className={`px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider ${
@@ -108,8 +103,8 @@ export const TerritoryStudentView: React.FC<StudentViewProps> = ({
             {isWinner
               ? 'PHE BẠN ĐÃ CHIẾN THẮNG!'
               : isDraw
-              ? 'HAI PHE BẤT PHÂN THẮNG BẠI'
-              : 'PHE BẠN ĐÃ CHIẾN ĐẤU QUẢ CẢM!'}
+                ? 'HAI PHE BẤT PHÂN THẮNG BẠI'
+                : 'PHE BẠN ĐÃ CHIẾN ĐẤU QUẢ CẢM!'}
           </h1>
           <p className="text-xs text-slate-300 max-w-xs mx-auto">
             {state.winReason || 'Trận chiến đã khép lại với nhiều dấu ấn xuất sắc!'}
@@ -160,8 +155,8 @@ export const TerritoryStudentView: React.FC<StudentViewProps> = ({
                     isMe
                       ? 'bg-amber-500/20 border-amber-400/60 ring-1 ring-amber-400/40'
                       : isBlue
-                      ? 'bg-blue-950/40 border-blue-900/40'
-                      : 'bg-red-950/40 border-red-900/40'
+                        ? 'bg-blue-950/40 border-blue-900/40'
+                        : 'bg-red-950/40 border-red-900/40'
                   }`}
                 >
                   <div className="flex items-center gap-2 min-w-0">
@@ -169,7 +164,9 @@ export const TerritoryStudentView: React.FC<StudentViewProps> = ({
                       {idx + 1}
                     </span>
                     <span className="shrink-0">{isBlue ? '🔵' : '🔴'}</span>
-                    <span className={`font-bold truncate ${isMe ? 'text-amber-300' : 'text-white'}`}>
+                    <span
+                      className={`font-bold truncate ${isMe ? 'text-amber-300' : 'text-white'}`}
+                    >
                       {p.displayName} {isMe && '(Bạn)'}
                     </span>
                   </div>
@@ -177,9 +174,7 @@ export const TerritoryStudentView: React.FC<StudentViewProps> = ({
                     <span className="text-[10px] text-slate-400">
                       🏰{p.capturedCount} ✓{p.correctCount}
                     </span>
-                    <span className="font-mono font-bold text-amber-400 text-xs">
-                      +{pScore}đ
-                    </span>
+                    <span className="font-mono font-bold text-amber-400 text-xs">+{pScore}đ</span>
                   </div>
                 </div>
               );
@@ -279,7 +274,8 @@ export const TerritoryStudentView: React.FC<StudentViewProps> = ({
 
       {/* Footer gợi ý chiến thuật */}
       <div className="text-center text-[11px] text-slate-400 pb-1">
-        💡 <span className="text-amber-300 font-bold">Chạm ô nhấp nháy vàng</span> liền kề để công thành hoặc gia cố!
+        💡 <span className="text-amber-300 font-bold">Chạm ô nhấp nháy vàng</span> liền kề để công
+        thành hoặc gia cố!
       </div>
 
       {/* MODAL CÂU HỎI KHI ĐANG CÔNG THÀNH */}

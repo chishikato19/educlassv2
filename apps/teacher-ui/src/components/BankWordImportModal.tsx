@@ -1,9 +1,5 @@
 import React, { useId, useState } from 'react';
-import type {
-  CreateBankQuestionRequest,
-  DifficultyLevel,
-  QuestionType,
-} from '@educlass/protocol';
+import type { CreateBankQuestionRequest, DifficultyLevel, QuestionType } from '@educlass/protocol';
 import { renderLatexInText, type Question } from '@educlass/question-kit';
 import { api } from '../api/client.js';
 import { COMMON_SUBJECTS, GRADES } from './BankCurriculumTree.js';
@@ -17,7 +13,13 @@ export interface BankWordImportWarning {
 }
 
 export interface BankWordParsedData {
-  questions: Array<Question & { difficulty?: DifficultyLevel | undefined; chapter?: string | undefined; lesson?: string | undefined }>;
+  questions: Array<
+    Question & {
+      difficulty?: DifficultyLevel | undefined;
+      chapter?: string | undefined;
+      lesson?: string | undefined;
+    }
+  >;
   warnings: BankWordImportWarning[];
   totalDetected: number;
   successCount: number;
@@ -46,11 +48,9 @@ export const BankWordImportModal: React.FC<BankWordImportModalProps> = ({
   const [grade, setGrade] = useState<number>(currentGrade);
   const [subject, setSubject] = useState<string>(currentSubject);
   const [defaultChapter, setDefaultChapter] = useState<string>(
-    currentChapter || 'Chương 1: Kiến thức nền tảng',
+    currentChapter || 'Chương 1: Kiến thức nền tảng'
   );
-  const [defaultLesson, setDefaultLesson] = useState<string>(
-    currentLesson || 'Bài 1: Tổng quan',
-  );
+  const [defaultLesson, setDefaultLesson] = useState<string>(currentLesson || 'Bài 1: Tổng quan');
   const [defaultDifficulty, setDefaultDifficulty] = useState<DifficultyLevel>('nb');
 
   // Trạng thái xử lý file & xem trước
@@ -79,7 +79,7 @@ export const BankWordImportModal: React.FC<BankWordImportModalProps> = ({
       } else {
         file
           .arrayBuffer()
-          .then((buf) => {
+          .then(buf => {
             if (typeof Buffer !== 'undefined') {
               resolve(Buffer.from(buf).toString('base64'));
             } else {
@@ -171,7 +171,7 @@ export const BankWordImportModal: React.FC<BankWordImportModalProps> = ({
     setErrorMessage(null);
 
     try {
-      const bankItems: CreateBankQuestionRequest[] = parsedData.questions.map((q) => {
+      const bankItems: CreateBankQuestionRequest[] = parsedData.questions.map(q => {
         const itemChapter = q.chapter?.trim() || defaultChapter.trim() || 'Chương 1';
         const itemLesson = q.lesson?.trim() || defaultLesson.trim() || 'Bài 1';
         const itemDifficulty = (q.difficulty as DifficultyLevel) || defaultDifficulty;
@@ -204,7 +204,7 @@ export const BankWordImportModal: React.FC<BankWordImportModalProps> = ({
             items: q.items,
           });
           answerJson = JSON.stringify({
-            items: q.items.map((it) => it.correct),
+            items: q.items.map(it => it.correct),
             ...(q.explanation ? { explanation: q.explanation.text } : {}),
           });
         } else if (q.type === 'short') {
@@ -239,9 +239,7 @@ export const BankWordImportModal: React.FC<BankWordImportModalProps> = ({
       onSuccess(res.count);
       onClose();
     } catch (err: unknown) {
-      setErrorMessage(
-        err instanceof Error ? err.message : 'Lỗi khi lưu câu hỏi vào ngân hàng',
-      );
+      setErrorMessage(err instanceof Error ? err.message : 'Lỗi khi lưu câu hỏi vào ngân hàng');
     } finally {
       setIsSaving(false);
     }
@@ -294,10 +292,10 @@ export const BankWordImportModal: React.FC<BankWordImportModalProps> = ({
                 </label>
                 <select
                   value={grade}
-                  onChange={(e) => setGrade(Number(e.target.value))}
+                  onChange={e => setGrade(Number(e.target.value))}
                   className="w-full text-xs font-bold px-2.5 py-2 rounded-xl bg-white dark:bg-zinc-800 border border-zinc-300 dark:border-zinc-700 min-h-[40px] cursor-pointer"
                 >
-                  {GRADES.map((g) => (
+                  {GRADES.map(g => (
                     <option key={g} value={g}>
                       Khối {g}
                     </option>
@@ -311,10 +309,10 @@ export const BankWordImportModal: React.FC<BankWordImportModalProps> = ({
                 </label>
                 <select
                   value={subject}
-                  onChange={(e) => setSubject(e.target.value)}
+                  onChange={e => setSubject(e.target.value)}
                   className="w-full text-xs font-bold px-2.5 py-2 rounded-xl bg-white dark:bg-zinc-800 border border-zinc-300 dark:border-zinc-700 min-h-[40px] cursor-pointer"
                 >
-                  {COMMON_SUBJECTS.map((s) => (
+                  {COMMON_SUBJECTS.map(s => (
                     <option key={s} value={s}>
                       {s}
                     </option>
@@ -329,7 +327,7 @@ export const BankWordImportModal: React.FC<BankWordImportModalProps> = ({
                 <input
                   type="text"
                   value={defaultChapter}
-                  onChange={(e) => setDefaultChapter(e.target.value)}
+                  onChange={e => setDefaultChapter(e.target.value)}
                   placeholder="VD: Chương 1"
                   className="w-full text-xs font-semibold px-2.5 py-2 rounded-xl bg-white dark:bg-zinc-800 border border-zinc-300 dark:border-zinc-700 min-h-[40px]"
                 />
@@ -342,7 +340,7 @@ export const BankWordImportModal: React.FC<BankWordImportModalProps> = ({
                 <input
                   type="text"
                   value={defaultLesson}
-                  onChange={(e) => setDefaultLesson(e.target.value)}
+                  onChange={e => setDefaultLesson(e.target.value)}
                   placeholder="VD: Bài 1"
                   className="w-full text-xs font-semibold px-2.5 py-2 rounded-xl bg-white dark:bg-zinc-800 border border-zinc-300 dark:border-zinc-700 min-h-[40px]"
                 />
@@ -354,7 +352,7 @@ export const BankWordImportModal: React.FC<BankWordImportModalProps> = ({
                 Mức độ mặc định nếu câu không gắn nhãn:
               </span>
               <div className="flex items-center gap-2">
-                {(['nb', 'th', 'vd', 'vdc'] as const).map((diff) => {
+                {(['nb', 'th', 'vd', 'vdc'] as const).map(diff => {
                   const info = getDifficultyBadgeInfo(diff);
                   return (
                     <button
@@ -362,9 +360,7 @@ export const BankWordImportModal: React.FC<BankWordImportModalProps> = ({
                       type="button"
                       onClick={() => setDefaultDifficulty(diff)}
                       className={`px-2 py-1 rounded-lg border text-xs font-bold transition-all cursor-pointer ${
-                        defaultDifficulty === diff
-                          ? info.activeBtnClass
-                          : info.inactiveBtnClass
+                        defaultDifficulty === diff ? info.activeBtnClass : info.inactiveBtnClass
                       }`}
                     >
                       {info.shapeIcon} {info.shortLabel}
@@ -403,7 +399,8 @@ export const BankWordImportModal: React.FC<BankWordImportModalProps> = ({
                 Kéo thả file Microsoft Word (.docx) vào đây
               </h4>
               <p className="text-xs text-zinc-500 dark:text-zinc-400 max-w-md mx-auto mb-4">
-                Hệ thống tự động phát hiện các nhãn cú pháp [Chương: ...], [Bài: ...], [NB], [TH], [VD], [VDC] và hình ảnh đính kèm.
+                Hệ thống tự động phát hiện các nhãn cú pháp [Chương: ...], [Bài: ...], [NB], [TH],
+                [VD], [VDC] và hình ảnh đính kèm.
               </p>
 
               <div className="flex items-center justify-center gap-3">
@@ -419,9 +416,19 @@ export const BankWordImportModal: React.FC<BankWordImportModalProps> = ({
 
               {/* Hướng dẫn cú pháp nhanh */}
               <div className="mt-6 pt-4 border-t border-zinc-200/80 dark:border-zinc-800 text-left text-xs text-zinc-500 space-y-1 max-w-lg mx-auto">
-                <p className="font-bold text-zinc-700 dark:text-zinc-300">💡 Mẹo định dạng chuẩn:</p>
-                <p>• Phân chia bài học: Gõ <code className="text-blue-600 font-mono">[Chương: 1]</code> hoặc <code className="text-blue-600 font-mono">[Bài: Tính đơn điệu]</code>.</p>
-                <p>• Mức độ nhận thức: Gõ <code className="text-emerald-600 font-mono">[NB] Câu 1:</code> hoặc <code className="text-rose-600 font-mono">Câu 2 [VDC]:</code>.</p>
+                <p className="font-bold text-zinc-700 dark:text-zinc-300">
+                  💡 Mẹo định dạng chuẩn:
+                </p>
+                <p>
+                  • Phân chia bài học: Gõ{' '}
+                  <code className="text-blue-600 font-mono">[Chương: 1]</code> hoặc{' '}
+                  <code className="text-blue-600 font-mono">[Bài: Tính đơn điệu]</code>.
+                </p>
+                <p>
+                  • Mức độ nhận thức: Gõ{' '}
+                  <code className="text-emerald-600 font-mono">[NB] Câu 1:</code> hoặc{' '}
+                  <code className="text-rose-600 font-mono">Câu 2 [VDC]:</code>.
+                </p>
               </div>
             </div>
           ) : (
@@ -471,11 +478,8 @@ export const BankWordImportModal: React.FC<BankWordImportModalProps> = ({
                           {/* Chọn nhanh mức độ cho từng câu */}
                           <select
                             value={effectiveDiff}
-                            onChange={(e) =>
-                              handleUpdateItemDifficulty(
-                                idx,
-                                e.target.value as DifficultyLevel,
-                              )
+                            onChange={e =>
+                              handleUpdateItemDifficulty(idx, e.target.value as DifficultyLevel)
                             }
                             className={`text-xs font-bold px-2 py-1 rounded-lg border cursor-pointer ${diffInfo.badgeClass}`}
                           >
@@ -506,7 +510,7 @@ export const BankWordImportModal: React.FC<BankWordImportModalProps> = ({
                           <span>Đáp án đúng:</span>
                           <span className="font-bold text-emerald-600">
                             {typeof (q as { correct?: unknown }).correct === 'number'
-                              ? String.fromCharCode(65 + ((q as { correct: number }).correct))
+                              ? String.fromCharCode(65 + (q as { correct: number }).correct)
                               : String((q as { correct?: unknown }).correct ?? '')}
                           </span>
                         </div>

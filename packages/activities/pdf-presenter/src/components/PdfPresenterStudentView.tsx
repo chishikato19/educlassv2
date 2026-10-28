@@ -1,8 +1,6 @@
 import React, { useRef, useEffect, useState, useCallback } from 'react';
 import type { PdfPresenterState, PageGap, AnnotationStroke } from '../pdf-presenter-schemas.js';
-import {
-  renderCanvasWithGapsAndStrokes,
-} from '../converters/canvas-gap-engine.js';
+import { renderCanvasWithGapsAndStrokes } from '../converters/canvas-gap-engine.js';
 import { BASE_PAGE_WIDTH, BASE_PAGE_HEIGHT } from '../converters/document-loader.js';
 
 export interface PdfPresenterStudentViewProps {
@@ -106,18 +104,13 @@ const StudentSinglePage: React.FC<StudentSinglePageProps> = ({
         </span>
       </div>
       <div className="w-full overflow-hidden flex justify-center bg-white">
-        <canvas
-          ref={canvasRef}
-          style={{ width: '100%', height: 'auto', display: 'block' }}
-        />
+        <canvas ref={canvasRef} style={{ width: '100%', height: 'auto', display: 'block' }} />
       </div>
     </div>
   );
 };
 
-export const PdfPresenterStudentView: React.FC<PdfPresenterStudentViewProps> = ({
-  state,
-}) => {
+export const PdfPresenterStudentView: React.FC<PdfPresenterStudentViewProps> = ({ state }) => {
   const isBroadcastEnabled = state.isStudentBroadcastEnabled ?? true;
   const totalPages = state.document?.totalPages || 1;
   const pageImages = state.document?.pageImages || [];
@@ -147,9 +140,7 @@ export const PdfPresenterStudentView: React.FC<PdfPresenterStudentViewProps> = (
             <h1 className="text-xs font-bold text-white truncate">
               {state.document?.title || 'Tài liệu bài học'}
             </h1>
-            <p className="text-[10px] text-slate-400">
-              {totalPages} trang • Cuộn xem toàn bộ
-            </p>
+            <p className="text-[10px] text-slate-400">{totalPages} trang • Cuộn xem toàn bộ</p>
           </div>
         </div>
 
@@ -161,9 +152,9 @@ export const PdfPresenterStudentView: React.FC<PdfPresenterStudentViewProps> = (
 
       {/* Danh sách cuộn liên tục TẤT CẢ các trang */}
       <div className="flex-1 overflow-y-auto bg-slate-950 p-4 flex flex-col items-center">
-        {Array.from({ length: totalPages }, (_, i) => i + 1).map((pNum) => {
-          const pageGaps = state.gaps.filter((g) => g.pageNumber === pNum);
-          const pageStrokes = state.strokes.filter((s) => s.pageNumber === pNum);
+        {Array.from({ length: totalPages }, (_, i) => i + 1).map(pNum => {
+          const pageGaps = state.gaps.filter(g => g.pageNumber === pNum);
+          const pageStrokes = state.strokes.filter(s => s.pageNumber === pNum);
           const pageImg = pageImages[pNum - 1];
 
           return (

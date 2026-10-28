@@ -51,7 +51,7 @@
   - **Cúp Bạc (Silver Tier)**: Gồm các bạn HẠNG 3 của tất cả các bảng $\rightarrow$ Tranh phân hạng top 3.
   - **Cúp Đồng (Bronze Tier)**: Gồm các bạn HẠNG 4 (và Hạng 5 nếu có) $\rightarrow$ Tranh phân hạng khuyến khích.
 - **RQ-05.2 (Tiến trình Nhánh Đấu Playoff - 2 Lượt)**:
-  - **Lượt 1 (Bán kết phân nhánh)**: 
+  - **Lượt 1 (Bán kết phân nhánh)**:
     - Với 4 bảng: Nhất A gặp Nhất D; Nhất B gặp Nhất C (áp dụng tương tự cho các cúp khác).
   - **Lượt 2 (Chung kết & Tranh hạng ba)**:
     - 2 bạn thắng Bán kết gặp nhau tranh ngôi Quán quân của Cúp đó.
@@ -63,7 +63,7 @@
 
 ## 6. Giao Diện & Vinh Danh (UI/UX & Rewards)
 
-- **RQ-06.1 (Màn hình Học sinh)**: 
+- **RQ-06.1 (Màn hình Học sinh)**:
   - Hiển thị thông tin bảng đấu của mình, đối thủ hiện tại, 2 câu hỏi làm bài với nút bấm $\ge 48\times 48\text{px}$.
   - Giữa các lượt: Xem được bảng điểm của bảng mình và đối thủ trận kế tiếp.
   - Vòng xếp hạng: Hiển thị huy hiệu Cúp đang tranh tài.

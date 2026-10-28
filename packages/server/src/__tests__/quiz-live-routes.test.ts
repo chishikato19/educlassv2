@@ -1,9 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import {
-  createDatabaseConnection,
-  runMigrations,
-  UserRepository,
-} from '@educlass/db';
+import { createDatabaseConnection, runMigrations, UserRepository } from '@educlass/db';
 import { buildServer } from '../app.js';
 import { ScryptPasswordHasher } from '../auth/password-hasher.js';
 
@@ -179,7 +175,11 @@ describe('Quiz Live Server Integration & REST Routes (Task 3.3)', () => {
       expect(endData.results[0].accuracy).toBe(100);
 
       // 10. Xác nhận EXP đã được ghi nhận trong reward_logs
-      const expTotals = await app.rewardRepo.getParticipantExpTotals(sessionId, participantId, 'quiz-live');
+      const expTotals = await app.rewardRepo.getParticipantExpTotals(
+        sessionId,
+        participantId,
+        'quiz-live'
+      );
       expect(expTotals.activityExp).toBeGreaterThan(0);
       expect(expTotals.sessionExp).toBeGreaterThan(0);
     } finally {

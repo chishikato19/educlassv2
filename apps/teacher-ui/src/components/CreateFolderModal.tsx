@@ -71,15 +71,26 @@ export const CreateFolderModal: React.FC<CreateFolderModalProps> = ({
       }
       onClose={onClose}
     >
-      <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '16px', padding: '4px 0' }}>
+      <form
+        onSubmit={handleSubmit}
+        style={{ display: 'flex', flexDirection: 'column', gap: '16px', padding: '4px 0' }}
+      >
         {/* Vị trí thư mục cha */}
         <div>
-          <label style={{ display: 'block', fontSize: '13px', fontWeight: 700, color: UI_COLORS.text, marginBottom: '6px' }}>
+          <label
+            style={{
+              display: 'block',
+              fontSize: '13px',
+              fontWeight: 700,
+              color: UI_COLORS.text,
+              marginBottom: '6px',
+            }}
+          >
             Vị trí (Thư mục cha)
           </label>
           <select
             value={parentPath}
-            onChange={(e) => setParentPath(e.target.value)}
+            onChange={e => setParentPath(e.target.value)}
             style={{
               width: '100%',
               boxSizing: 'border-box',
@@ -94,7 +105,7 @@ export const CreateFolderModal: React.FC<CreateFolderModalProps> = ({
             }}
           >
             <option value="">🏠 [Thư mục gốc]</option>
-            {allFolders.map((f) => {
+            {allFolders.map(f => {
               const depth = f.split('/').length - 1;
               const leaf = f.split('/').pop() || f;
               return (
@@ -108,14 +119,22 @@ export const CreateFolderModal: React.FC<CreateFolderModalProps> = ({
 
         {/* Tên thư mục mới */}
         <div>
-          <label style={{ display: 'block', fontSize: '13px', fontWeight: 700, color: UI_COLORS.text, marginBottom: '6px' }}>
+          <label
+            style={{
+              display: 'block',
+              fontSize: '13px',
+              fontWeight: 700,
+              color: UI_COLORS.text,
+              marginBottom: '6px',
+            }}
+          >
             Tên thư mục mới <span style={{ color: '#DC2626' }}>*</span>
           </label>
           <input
             type="text"
             placeholder="VD: Giữa HK1, 15 Phút, Tin học 10..."
             value={folderName}
-            onChange={(e) => {
+            onChange={e => {
               setFolderName(e.target.value);
               if (error) setError('');
             }}
@@ -131,7 +150,9 @@ export const CreateFolderModal: React.FC<CreateFolderModalProps> = ({
             }}
           />
           {error && (
-            <span style={{ fontSize: '12px', color: '#DC2626', marginTop: '4px', display: 'block' }}>
+            <span
+              style={{ fontSize: '12px', color: '#DC2626', marginTop: '4px', display: 'block' }}
+            >
               {error}
             </span>
           )}
@@ -148,7 +169,8 @@ export const CreateFolderModal: React.FC<CreateFolderModalProps> = ({
             color: '#1E40AF',
           }}
         >
-          Đường dẫn thư mục sẽ tạo: <strong style={{ color: UI_COLORS.primary }}>📁 {previewPath}</strong>
+          Đường dẫn thư mục sẽ tạo:{' '}
+          <strong style={{ color: UI_COLORS.primary }}>📁 {previewPath}</strong>
         </div>
 
         {/* Nút hành động */}

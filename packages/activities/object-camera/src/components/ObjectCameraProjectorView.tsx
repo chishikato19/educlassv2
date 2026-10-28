@@ -5,21 +5,17 @@ export interface ObjectCameraProjectorViewProps {
   state: ObjectCameraState;
 }
 
-export const ObjectCameraProjectorView: React.FC<ObjectCameraProjectorViewProps> = ({
-  state,
-}) => {
+export const ObjectCameraProjectorView: React.FC<ObjectCameraProjectorViewProps> = ({ state }) => {
   const canvasRefPrimary = useRef<HTMLCanvasElement>(null);
   const canvasRefSecondary = useRef<HTMLCanvasElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
 
-  const activePhoto = state.photos.find((p) => p.id === state.activePhotoId) || null;
-  const comparePhoto = state.photos.find((p) => p.id === state.comparePhotoId) || null;
+  const activePhoto = state.photos.find(p => p.id === state.activePhotoId) || null;
+  const comparePhoto = state.photos.find(p => p.id === state.comparePhotoId) || null;
 
-  const annotationsPrimary = state.annotations.filter(
-    (a) => a.photoId === (activePhoto?.id || '')
-  );
+  const annotationsPrimary = state.annotations.filter(a => a.photoId === (activePhoto?.id || ''));
   const annotationsSecondary = state.annotations.filter(
-    (a) => a.photoId === (comparePhoto?.id || '')
+    a => a.photoId === (comparePhoto?.id || '')
   );
 
   // Render ảnh và nét bút giáo viên lên Máy chiếu
@@ -66,7 +62,10 @@ export const ObjectCameraProjectorView: React.FC<ObjectCameraProjectorViewProps>
       ctx.scale(viewport.zoom, viewport.zoom);
 
       // Kích thước vẽ lớn tối đa trên máy chiếu
-      const scale = Math.min((canvas.width * 0.96) / img.width, (canvas.height * 0.96) / img.height);
+      const scale = Math.min(
+        (canvas.width * 0.96) / img.width,
+        (canvas.height * 0.96) / img.height
+      );
       const drawWidth = img.width * scale;
       const drawHeight = img.height * scale;
       const drawX = -drawWidth / 2;
@@ -148,7 +147,12 @@ export const ObjectCameraProjectorView: React.FC<ObjectCameraProjectorViewProps>
   };
 
   useEffect(() => {
-    renderProjectorCanvas(canvasRefPrimary.current, activePhoto, annotationsPrimary, state.viewport);
+    renderProjectorCanvas(
+      canvasRefPrimary.current,
+      activePhoto,
+      annotationsPrimary,
+      state.viewport
+    );
   }, [activePhoto, annotationsPrimary, state.viewport]);
 
   useEffect(() => {
@@ -160,7 +164,13 @@ export const ObjectCameraProjectorView: React.FC<ObjectCameraProjectorViewProps>
         state.compareViewport || state.viewport
       );
     }
-  }, [comparePhoto, annotationsSecondary, state.compareViewport, state.viewport, state.displayMode]);
+  }, [
+    comparePhoto,
+    annotationsSecondary,
+    state.compareViewport,
+    state.viewport,
+    state.displayMode,
+  ]);
 
   return (
     <div
@@ -176,14 +186,18 @@ export const ObjectCameraProjectorView: React.FC<ObjectCameraProjectorViewProps>
               📷
             </div>
             <h2 className="text-3xl font-extrabold text-slate-100 mb-2">Camera Vật Thể</h2>
-            <p className="text-lg text-slate-400">Đang sẵn sàng kết nối và trình chiếu bài giảng...</p>
+            <p className="text-lg text-slate-400">
+              Đang sẵn sàng kết nối và trình chiếu bài giảng...
+            </p>
           </div>
         )
       ) : (
         // Chế độ so sánh 2 ảnh
         <div
           className={`w-full h-full flex ${
-            state.displayMode === 'compare_vertical' ? 'flex-row divide-x-2 divide-slate-800' : 'flex-col divide-y-2 divide-slate-800'
+            state.displayMode === 'compare_vertical'
+              ? 'flex-row divide-x-2 divide-slate-800'
+              : 'flex-col divide-y-2 divide-slate-800'
           }`}
         >
           {/* Ảnh 1 */}
@@ -210,7 +224,9 @@ export const ObjectCameraProjectorView: React.FC<ObjectCameraProjectorViewProps>
       {state.displayMode === 'single' && activePhoto?.studentName && (
         <div className="absolute top-6 left-6 bg-slate-900/90 backdrop-blur border border-slate-700/80 px-6 py-2.5 rounded-2xl text-lg font-bold shadow-2xl flex items-center gap-3">
           <span className="text-2xl">📖</span>
-          <span>Bài làm của em: <span className="text-blue-400">{activePhoto.studentName}</span></span>
+          <span>
+            Bài làm của em: <span className="text-blue-400">{activePhoto.studentName}</span>
+          </span>
         </div>
       )}
 
@@ -219,8 +235,8 @@ export const ObjectCameraProjectorView: React.FC<ObjectCameraProjectorViewProps>
         <div className="absolute bottom-8 left-1/2 -translate-x-1/2 bg-gradient-to-r from-amber-500 via-yellow-400 to-amber-500 text-slate-950 font-black text-2xl px-10 py-4 rounded-3xl shadow-2xl flex items-center gap-4 animate-bounce z-30">
           <span className="text-4xl">🌟</span>
           <span>
-            Chúc mừng em <span className="underline">{state.lastAwardedStudent.studentName}</span> được Thầy/Cô thưởng +
-            {state.lastAwardedStudent.exp} EXP!
+            Chúc mừng em <span className="underline">{state.lastAwardedStudent.studentName}</span>{' '}
+            được Thầy/Cô thưởng +{state.lastAwardedStudent.exp} EXP!
           </span>
           <span className="text-4xl">🌟</span>
         </div>

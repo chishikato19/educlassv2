@@ -64,7 +64,7 @@ describe('Assets REST Routes (Task 2.2)', () => {
 
     // Verify file exists on disk
     const onDiskFiles = fs.readdirSync(tempAssetsDir);
-    expect(onDiskFiles.some((f) => f.includes(expectedHash))).toBe(true);
+    expect(onDiskFiles.some(f => f.includes(expectedHash))).toBe(true);
 
     // 3. Duplicate upload returns the same asset without duplicating file
     const dupRes = await app.inject({

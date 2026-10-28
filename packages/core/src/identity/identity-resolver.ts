@@ -41,7 +41,7 @@ export function isNameTaken(
 ): boolean {
   const normalizedTarget = normalizeVietnameseString(name).toLowerCase();
   return activeParticipants.some(
-    (p) =>
+    p =>
       p.status === 'online' &&
       normalizeVietnameseString(p.displayName).toLowerCase() === normalizedTarget
   );

@@ -43,40 +43,40 @@ const SYMBOL_MAP: Record<string, string> = {
   '·': '\\cdot ',
   '•': '\\cdot ',
   '°': '^\\circ ',
-  'α': '\\alpha ',
-  'β': '\\beta ',
-  'γ': '\\gamma ',
-  'δ': '\\delta ',
-  'ε': '\\epsilon ',
-  'ζ': '\\zeta ',
-  'η': '\\eta ',
-  'θ': '\\theta ',
-  'ι': '\\iota ',
-  'κ': '\\kappa ',
-  'λ': '\\lambda ',
-  'μ': '\\mu ',
-  'ν': '\\nu ',
-  'ξ': '\\xi ',
-  'π': '\\pi ',
-  'ρ': '\\rho ',
-  'σ': '\\sigma ',
-  'τ': '\\tau ',
-  'υ': '\\upsilon ',
-  'φ': '\\phi ',
-  'χ': '\\chi ',
-  'ψ': '\\psi ',
-  'ω': '\\omega ',
-  'Γ': '\\Gamma ',
-  'Δ': '\\Delta ',
-  'Θ': '\\Theta ',
-  'Λ': '\\Lambda ',
-  'Ξ': '\\Xi ',
-  'Π': '\\Pi ',
-  'Σ': '\\Sigma ',
-  'Υ': '\\Upsilon ',
-  'Φ': '\\Phi ',
-  'Ψ': '\\Psi ',
-  'Ω': '\\Omega ',
+  α: '\\alpha ',
+  β: '\\beta ',
+  γ: '\\gamma ',
+  δ: '\\delta ',
+  ε: '\\epsilon ',
+  ζ: '\\zeta ',
+  η: '\\eta ',
+  θ: '\\theta ',
+  ι: '\\iota ',
+  κ: '\\kappa ',
+  λ: '\\lambda ',
+  μ: '\\mu ',
+  ν: '\\nu ',
+  ξ: '\\xi ',
+  π: '\\pi ',
+  ρ: '\\rho ',
+  σ: '\\sigma ',
+  τ: '\\tau ',
+  υ: '\\upsilon ',
+  φ: '\\phi ',
+  χ: '\\chi ',
+  ψ: '\\psi ',
+  ω: '\\omega ',
+  Γ: '\\Gamma ',
+  Δ: '\\Delta ',
+  Θ: '\\Theta ',
+  Λ: '\\Lambda ',
+  Ξ: '\\Xi ',
+  Π: '\\Pi ',
+  Σ: '\\Sigma ',
+  Υ: '\\Upsilon ',
+  Φ: '\\Phi ',
+  Ψ: '\\Psi ',
+  Ω: '\\Omega ',
 };
 
 interface SimpleNode {
@@ -175,7 +175,7 @@ function parseSimpleXml(xml: string): SimpleNode {
 
 function findChildrenByTag(node: SimpleNode, tag: string): SimpleNode[] {
   const normTag = tag.toLowerCase();
-  return node.children.filter((c) => c.tag === normTag || c.tag.endsWith(':' + normTag));
+  return node.children.filter(c => c.tag === normTag || c.tag.endsWith(':' + normTag));
 }
 
 function findFirstChildByTag(node: SimpleNode, tag: string): SimpleNode | undefined {
@@ -191,13 +191,38 @@ function nodeToLatex(node: SimpleNode): string {
 
   switch (tag) {
     case 'omath':
-    case 'omathpara':
     case 'e':
     case 'num':
     case 'den':
     case 'sub':
     case 'sup': {
       return node.children.map(nodeToLatex).join('');
+    }
+
+    case 'omathpara': {
+      const mathChildren = findChildrenByTag(node, 'omath');
+      if (mathChildren.length > 1) {
+        return `\\begin{aligned}${mathChildren.map(nodeToLatex).join(' \\\\ ')}\\end{aligned}`;
+      }
+      return node.children.map(nodeToLatex).join('');
+    }
+
+    case 'eqarr': {
+      // Mảng phương trình m:eqArr gồm các phần tử m:e (mỗi m:e là 1 dòng trong hệ/mảng phương trình)
+      const rows = findChildrenByTag(node, 'e').map(nodeToLatex);
+      return `\\begin{aligned}${rows.join(' \\\\ ')}\\end{aligned}`;
+    }
+
+    case 'm': {
+      // Ma trận m:m chứa các hàng m:mr, mỗi hàng chứa các ô m:e
+      const mrList = findChildrenByTag(node, 'mr');
+      const rows = mrList.map(mr => findChildrenByTag(mr, 'e').map(nodeToLatex).join(' & '));
+      return `\\begin{matrix}${rows.join(' \\\\ ')}\\end{matrix}`;
+    }
+
+    case 'aln': {
+      // Điểm căn lề trong hệ phương trình / mảng phương trình
+      return '& ';
     }
 
     case 'r': {
@@ -313,17 +338,83 @@ function nodeToLatex(node: SimpleNode): string {
     }
 
     case 'd': {
-      // Delimiters (dấu ngoặc)
+      // Delimiters (dấu ngoặc đơn, ngoặc vuông, ngoặc nhọn hệ phương trình)
       const dPr = findFirstChildByTag(node, 'dpr');
       const begChr = dPr && findFirstChildByTag(dPr, 'begchr');
       const endChr = dPr && findFirstChildByTag(dPr, 'endchr');
+      const sepChr = dPr && findFirstChildByTag(dPr, 'sepchr');
 
-      const beg = begChr?.attrs['m:val'] ?? begChr?.attrs['val'] ?? '(';
-      const end = endChr?.attrs['m:val'] ?? endChr?.attrs['val'] ?? ')';
+      const hasBegChr = Boolean(
+        begChr && (begChr.attrs['m:val'] !== undefined || begChr.attrs['val'] !== undefined)
+      );
+      const hasEndChr = Boolean(
+        endChr && (endChr.attrs['m:val'] !== undefined || endChr.attrs['val'] !== undefined)
+      );
 
-      const eNode = findFirstChildByTag(node, 'e');
-      const eStr = eNode ? nodeToLatex(eNode) : node.children.map(nodeToLatex).join('');
+      const beg = hasBegChr
+        ? (begChr?.attrs['m:val'] ?? begChr?.attrs['val'] ?? '')
+        : dPr
+          ? ''
+          : '(';
+      const end = hasEndChr
+        ? (endChr?.attrs['m:val'] ?? endChr?.attrs['val'] ?? '')
+        : dPr
+          ? ''
+          : ')';
+      const sep = sepChr?.attrs['m:val'] ?? sepChr?.attrs['val'] ?? '';
 
+      const eNodes = findChildrenByTag(node, 'e');
+
+      // Hàm trích xuất các dòng nếu m:e chứa m:eqArr hoặc m:m
+      const extractSubRows = (eNode: SimpleNode): string[] | null => {
+        const eqArr = findFirstChildByTag(eNode, 'eqarr');
+        if (eqArr) {
+          const rows = findChildrenByTag(eqArr, 'e').map(nodeToLatex);
+          return rows.length > 0 ? rows : null;
+        }
+        const mNode = findFirstChildByTag(eNode, 'm');
+        if (mNode) {
+          const mrList = findChildrenByTag(mNode, 'mr');
+          const rows = mrList.map(mr => findChildrenByTag(mr, 'e').map(nodeToLatex).join(' & '));
+          return rows.length > 0 ? rows : null;
+        }
+        return null;
+      };
+
+      // 1. Hệ phương trình có dấu ngoặc nhọn { ở đầu và không có dấu đóng ngoặc ở cuối (hoặc đóng ngoặc rỗng)
+      if (beg === '{' && (end === '' || end === '}')) {
+        // Nhiều thẻ m:e trực tiếp trong m:d
+        if (eNodes.length > 1) {
+          return `\\begin{cases}${eNodes.map(nodeToLatex).join(' \\\\ ')}\\end{cases}`;
+        }
+        // Một thẻ m:e nhưng bên trong chứa m:eqArr hoặc m:m
+        if (eNodes.length === 1) {
+          const subRows = extractSubRows(eNodes[0]!);
+          if (subRows && subRows.length > 1) {
+            return `\\begin{cases}${subRows.join(' \\\\ ')}\\end{cases}`;
+          }
+        }
+        // Trường hợp chỉ có 1 biểu thức bên trong ngoặc nhọn đơn
+        if (end === '') {
+          return `\\left\\{${eNodes[0] ? nodeToLatex(eNodes[0]) : ''}\\right.`;
+        }
+      }
+
+      // 2. Tuyển các nghiệm hoặc dấu ngoặc vuông [ không có đóng ngoặc
+      if (beg === '[' && end === '') {
+        if (eNodes.length > 1) {
+          return `\\left[\\begin{matrix}${eNodes.map(nodeToLatex).join(' \\\\ ')}\\end{matrix}\\right.`;
+        }
+        if (eNodes.length === 1) {
+          const subRows = extractSubRows(eNodes[0]!);
+          if (subRows && subRows.length > 1) {
+            return `\\left[\\begin{matrix}${subRows.join(' \\\\ ')}\\end{matrix}\\right.`;
+          }
+        }
+        return `\\left[${eNodes[0] ? nodeToLatex(eNodes[0]) : ''}\\right.`;
+      }
+
+      // 3. Dấu ngoặc thông thường
       let left = `\\left${beg}`;
       let right = `\\right${end}`;
 
@@ -332,7 +423,15 @@ function nodeToLatex(node: SimpleNode): string {
       if (beg === '') left = '\\left.';
       if (end === '') right = '\\right.';
 
-      return `${left}${eStr}${right}`;
+      const sepStr = sep ? (sep === ';' ? '; ' : `${sep} `) : ', ';
+      const content =
+        eNodes.length > 1
+          ? eNodes.map(nodeToLatex).join(sepStr)
+          : eNodes[0]
+            ? nodeToLatex(eNodes[0])
+            : node.children.map(nodeToLatex).join('');
+
+      return `${left}${content}${right}`;
     }
 
     case 'bar': {
@@ -371,14 +470,14 @@ export function convertOmmlToLatex(ommlXml: string): string {
  */
 export function replaceOmmlInXml(documentXml: string): string {
   // 1. Xử lý các khối hiển thị riêng m:oMathPara -> $$latex$$
-  let result = documentXml.replace(/<m:oMathPara[\s\S]*?<\/m:oMathPara>/gi, (match) => {
+  let result = documentXml.replace(/<m:oMathPara[\s\S]*?<\/m:oMathPara>/gi, match => {
     const latex = convertOmmlToLatex(match).trim();
     if (!latex) return '';
     return `<w:r><w:t>$$${latex}$$</w:t></w:r>`;
   });
 
   // 2. Xử lý các khối inline m:oMath -> $latex$
-  result = result.replace(/<m:oMath[\s\S]*?<\/m:oMath>/gi, (match) => {
+  result = result.replace(/<m:oMath[\s\S]*?<\/m:oMath>/gi, match => {
     const latex = convertOmmlToLatex(match).trim();
     if (!latex) return '';
     return `<w:r><w:t>$${latex}$</w:t></w:r>`;

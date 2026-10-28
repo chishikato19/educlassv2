@@ -1,9 +1,5 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import type {
-  ClassDto,
-  ParticipantDto,
-  StudentDto,
-} from '@educlass/protocol';
+import type { ClassDto, ParticipantDto, StudentDto } from '@educlass/protocol';
 import {
   pickStudentFromCandidates,
   type PickerQueueItem,
@@ -76,7 +72,9 @@ export const RandomPickerTab: React.FC<RandomPickerTabProps> = ({
 }) => {
   // 1. Nguồn danh sách học sinh: 'class' hoặc 'excel'
   const [sourceType, setSourceType] = useState<'class' | 'excel'>('class');
-  const [currentClassId, setCurrentClassId] = useState<string>(selectedClassId || classes[0]?.id || '');
+  const [currentClassId, setCurrentClassId] = useState<string>(
+    selectedClassId || classes[0]?.id || ''
+  );
   const [excelText, setExcelText] = useState<string>('');
 
   // 2. Cài đặt quay - Mặc định là Chế độ Ngẫu nhiên
@@ -185,7 +183,11 @@ export const RandomPickerTab: React.FC<RandomPickerTabProps> = ({
         if (msg.type === 'TRIGGER_PICK') {
           // Projector kích hoạt
         } else if (msg.type === 'CONFIRM_RESULT') {
-          handleConfirmStudentResult(msg.payload.studentId, msg.payload.action, msg.payload.expGained);
+          handleConfirmStudentResult(
+            msg.payload.studentId,
+            msg.payload.action,
+            msg.payload.expGained
+          );
         }
       };
 
@@ -226,7 +228,19 @@ export const RandomPickerTab: React.FC<RandomPickerTabProps> = ({
         },
       });
     }
-  }, [pickerStudents, queue, settings, selectedStudent, isPicking, cards, boxes, slotState, balloons, magicCards, showFireworks]);
+  }, [
+    pickerStudents,
+    queue,
+    settings,
+    selectedStudent,
+    isPicking,
+    cards,
+    boxes,
+    slotState,
+    balloons,
+    magicCards,
+    showFireworks,
+  ]);
 
   useEffect(() => {
     broadcastState();
@@ -235,7 +249,7 @@ export const RandomPickerTab: React.FC<RandomPickerTabProps> = ({
   // Cập nhật pool học sinh khi đổi nguồn từ Lớp học
   useEffect(() => {
     if (sourceType === 'class') {
-      const pool: PickerStudent[] = students.map((s) => ({
+      const pool: PickerStudent[] = students.map(s => ({
         id: s.id,
         name: s.fullName,
         code: s.code || undefined,
@@ -263,11 +277,17 @@ export const RandomPickerTab: React.FC<RandomPickerTabProps> = ({
       return;
     }
 
-    const lines = excelText.split('\n').map((l) => l.trim()).filter(Boolean);
+    const lines = excelText
+      .split('\n')
+      .map(l => l.trim())
+      .filter(Boolean);
     const parsed: PickerStudent[] = [];
 
     lines.forEach((line, index) => {
-      const parts = line.split('\t').map((p) => p.trim()).filter(Boolean);
+      const parts = line
+        .split('\t')
+        .map(p => p.trim())
+        .filter(Boolean);
 
       let name = '';
       let code = '';
@@ -279,7 +299,8 @@ export const RandomPickerTab: React.FC<RandomPickerTabProps> = ({
         const perfRaw = (parts[2] ?? '').toLowerCase();
         if (perfRaw.includes('tốt') || perfRaw === 'tot') academicPerformance = 'tot';
         else if (perfRaw.includes('khá') || perfRaw === 'kha') academicPerformance = 'kha';
-        else if (perfRaw.includes('chưa') || perfRaw === 'chua_dat') academicPerformance = 'chua_dat';
+        else if (perfRaw.includes('chưa') || perfRaw === 'chua_dat')
+          academicPerformance = 'chua_dat';
       } else if (parts.length === 2) {
         code = parts[0] ?? '';
         name = parts[1] ?? '';
@@ -415,24 +436,22 @@ export const RandomPickerTab: React.FC<RandomPickerTabProps> = ({
   // Tính toán số lượng còn lại
   const availableStudents = useMemo(() => {
     if (!settings.excludeCalled) return pickerStudents;
-    return pickerStudents.filter((s) => !s.alreadyCalled);
+    return pickerStudents.filter(s => !s.alreadyCalled);
   }, [pickerStudents, settings.excludeCalled]);
 
   const calledCount = useMemo(() => {
-    return pickerStudents.filter((s) => s.alreadyCalled).length;
+    return pickerStudents.filter(s => s.alreadyCalled).length;
   }, [pickerStudents]);
 
   // Thuật toán chọn trò chơi ngẫu nhiên cho từng lượt (đáp ứng luật không lặp lại trò của lượt trước và loại trừ Pinball/Bắn vịt khi chọn học sinh giỏi)
   const pickRandomSubMode = useCallback(
     (strategy: PickerSelectionStrategy): RandomPickerModeId => {
       const basePool =
-        strategy === 'bias_good'
-          ? BIAS_GOOD_COMPATIBLE_SUB_MODES
-          : ALL_RANDOM_SUB_MODES;
+        strategy === 'bias_good' ? BIAS_GOOD_COMPATIBLE_SUB_MODES : ALL_RANDOM_SUB_MODES;
 
       let candidatePool = basePool;
       if (lastPlayedMode && basePool.length > 1) {
-        const filtered = basePool.filter((m) => m !== lastPlayedMode);
+        const filtered = basePool.filter(m => m !== lastPlayedMode);
         if (filtered.length > 0) {
           candidatePool = filtered;
         }
@@ -508,7 +527,7 @@ export const RandomPickerTab: React.FC<RandomPickerTabProps> = ({
       return;
     }
 
-    const others = pickerStudents.filter((s) => s.id !== target.id);
+    const others = pickerStudents.filter(s => s.id !== target.id);
     const dummyStudents: PickerStudent[] = [];
     for (let i = 0; i < 4; i++) {
       if (others.length > 0) {
@@ -556,7 +575,7 @@ export const RandomPickerTab: React.FC<RandomPickerTabProps> = ({
         onShowToast('Đã gọi hết học sinh! Vui lòng bấm "Đặt lại danh sách quay".');
         return;
       }
-      const others = pickerStudents.filter((s) => s.id !== target.id);
+      const others = pickerStudents.filter(s => s.id !== target.id);
       const dummyStudents: PickerStudent[] = [];
       for (let i = 0; i < 4; i++) {
         if (others.length > 0) {
@@ -619,7 +638,7 @@ export const RandomPickerTab: React.FC<RandomPickerTabProps> = ({
       return;
     }
 
-    const others = pickerStudents.filter((s) => s.id !== target.id);
+    const others = pickerStudents.filter(s => s.id !== target.id);
     const dummyStudents: PickerStudent[] = [];
     for (let i = 0; i < 2; i++) {
       if (others.length > 0) {
@@ -655,7 +674,7 @@ export const RandomPickerTab: React.FC<RandomPickerTabProps> = ({
         onShowToast('Đã gọi hết học sinh! Vui lòng bấm "Đặt lại danh sách quay".');
         return;
       }
-      const others = pickerStudents.filter((s) => s.id !== target.id);
+      const others = pickerStudents.filter(s => s.id !== target.id);
       const dummyStudents: PickerStudent[] = [];
       for (let i = 0; i < 2; i++) {
         if (others.length > 0) {
@@ -675,7 +694,7 @@ export const RandomPickerTab: React.FC<RandomPickerTabProps> = ({
     }
 
     // Đánh dấu hộp giáo viên chọn
-    setBoxes((prev) =>
+    setBoxes(prev =>
       prev.map((b, i) =>
         i === boxIndex
           ? { ...b, status: 'selected', isTarget: true, student: pick.target }
@@ -693,7 +712,7 @@ export const RandomPickerTab: React.FC<RandomPickerTabProps> = ({
     // Nhịp 1: Sau 700ms, 2 hộp KHÔNG được chọn rung và mở trước
     window.setTimeout(() => {
       let dummyPtr = 0;
-      setBoxes((prev) =>
+      setBoxes(prev =>
         prev.map((b, i) => {
           if (i === boxIndex) return b;
           return {
@@ -710,7 +729,7 @@ export const RandomPickerTab: React.FC<RandomPickerTabProps> = ({
 
     // Nhịp 2: Sau 1800ms, hộp trúng thưởng BẬT TUNG NẮP và nổ pháo hoa!
     window.setTimeout(() => {
-      setBoxes((prev) =>
+      setBoxes(prev =>
         prev.map((b, i) => (i === boxIndex ? { ...b, status: 'opened_winner' } : b))
       );
       setSelectedStudent(pick.target);
@@ -747,7 +766,7 @@ export const RandomPickerTab: React.FC<RandomPickerTabProps> = ({
       return;
     }
 
-    const targetIdx = pickerStudents.findIndex((s) => s.id === target.id);
+    const targetIdx = pickerStudents.findIndex(s => s.id === target.id);
     const studentNum = targetIdx >= 0 ? targetIdx + 1 : Math.floor(Math.random() * 99) + 1;
     const numToDisplay = studentNum % 100;
     const targetTens = Math.floor(numToDisplay / 10);
@@ -784,7 +803,7 @@ export const RandomPickerTab: React.FC<RandomPickerTabProps> = ({
     // Nhịp 2: Sau 3800ms, Hàng đơn vị phanh lại theo GSAP -> Chốt số & nổ pháo hoa
     window.setTimeout(() => {
       if (tickTimer) clearInterval(tickTimer);
-      setSlotState((prev) => ({
+      setSlotState(prev => ({
         ...prev,
         isSpinningTens: false,
         isSpinningUnits: false,
@@ -905,11 +924,9 @@ export const RandomPickerTab: React.FC<RandomPickerTabProps> = ({
     }
 
     // Làm nổ quả bóng được chọn và gắn học sinh trúng
-    setBalloons((prev) =>
+    setBalloons(prev =>
       prev.map((b, i) =>
-        i === balloonIndex
-          ? { ...b, isPopped: true, isTarget: true, student: pick.target }
-          : b
+        i === balloonIndex ? { ...b, isPopped: true, isTarget: true, student: pick.target } : b
       )
     );
 
@@ -955,7 +972,7 @@ export const RandomPickerTab: React.FC<RandomPickerTabProps> = ({
       return;
     }
 
-    const others = pickerStudents.filter((s) => s.id !== target.id);
+    const others = pickerStudents.filter(s => s.id !== target.id);
     const dummyStudents: PickerStudent[] = [];
     for (let i = 0; i < 8; i++) {
       if (others.length > 0) {
@@ -998,7 +1015,7 @@ export const RandomPickerTab: React.FC<RandomPickerTabProps> = ({
         onShowToast('Đã gọi hết học sinh! Vui lòng bấm "Đặt lại danh sách quay".');
         return;
       }
-      const others = pickerStudents.filter((s) => s.id !== target.id);
+      const others = pickerStudents.filter(s => s.id !== target.id);
       const dummyStudents: PickerStudent[] = [];
       for (let i = 0; i < 8; i++) {
         if (others.length > 0) {
@@ -1018,7 +1035,7 @@ export const RandomPickerTab: React.FC<RandomPickerTabProps> = ({
     }
 
     let dummyPtr = 0;
-    setMagicCards((prev) =>
+    setMagicCards(prev =>
       prev.map((c, i) => {
         if (i === cardIndex) {
           return { ...c, isRevealed: true, isTarget: true, student: pick.target };
@@ -1109,22 +1126,25 @@ export const RandomPickerTab: React.FC<RandomPickerTabProps> = ({
   };
 
   // ==================== MODE 8: BẮN VỊT (DUCK HUNT) ====================
-  const handleDuckHuntComplete = useCallback((winnerStudent: PickerStudent) => {
-    setSelectedStudent(winnerStudent);
-    setShowFireworks(true);
-    if (settings.soundEnabled) {
-      soundManager.playWinner();
-      soundManager.playFireworkBurst();
-    }
-    if (channelRef.current) {
-      channelRef.current.postMessage({ type: 'TRIGGER_FIREWORKS' });
-    }
-    // Mở ResultModal để thầy cô chấm điểm EXP hoặc đưa vào hàng chờ
-    window.setTimeout(() => {
-      setIsPicking(false);
-      setIsResultModalOpen(true);
-    }, 1500);
-  }, [settings.soundEnabled]);
+  const handleDuckHuntComplete = useCallback(
+    (winnerStudent: PickerStudent) => {
+      setSelectedStudent(winnerStudent);
+      setShowFireworks(true);
+      if (settings.soundEnabled) {
+        soundManager.playWinner();
+        soundManager.playFireworkBurst();
+      }
+      if (channelRef.current) {
+        channelRef.current.postMessage({ type: 'TRIGGER_FIREWORKS' });
+      }
+      // Mở ResultModal để thầy cô chấm điểm EXP hoặc đưa vào hàng chờ
+      window.setTimeout(() => {
+        setIsPicking(false);
+        setIsResultModalOpen(true);
+      }, 1500);
+    },
+    [settings.soundEnabled]
+  );
 
   const handleTriggerPickDuckHunt = (strategy: PickerSelectionStrategy = 'normal') => {
     if (isPicking) return;
@@ -1280,7 +1300,7 @@ export const RandomPickerTab: React.FC<RandomPickerTabProps> = ({
     action: 'correct' | 'wrong' | 'queue' | 'skip',
     expGained?: number
   ) => {
-    const student = pickerStudents.find((s) => s.id === studentId);
+    const student = pickerStudents.find(s => s.id === studentId);
     if (!student) return;
 
     if (action === 'correct') {
@@ -1289,7 +1309,9 @@ export const RandomPickerTab: React.FC<RandomPickerTabProps> = ({
       // Cộng EXP trên máy chủ nếu đang có phiên học online
       if (activeSessionId) {
         const participant = participants.find(
-          (p) => p.studentId === student.id || p.displayName.trim().toLowerCase() === student.name.trim().toLowerCase()
+          p =>
+            p.studentId === student.id ||
+            p.displayName.trim().toLowerCase() === student.name.trim().toLowerCase()
         );
         if (participant) {
           try {
@@ -1311,16 +1333,14 @@ export const RandomPickerTab: React.FC<RandomPickerTabProps> = ({
       }
 
       // Đánh dấu đã gọi và cộng điểm
-      setPickerStudents((prev) =>
-        prev.map((s) =>
-          s.id === studentId
-            ? { ...s, alreadyCalled: true, score: (s.score || 0) + exp }
-            : s
+      setPickerStudents(prev =>
+        prev.map(s =>
+          s.id === studentId ? { ...s, alreadyCalled: true, score: (s.score || 0) + exp } : s
         )
       );
     } else if (action === 'wrong') {
-      setPickerStudents((prev) =>
-        prev.map((s) => (s.id === studentId ? { ...s, alreadyCalled: true } : s))
+      setPickerStudents(prev =>
+        prev.map(s => (s.id === studentId ? { ...s, alreadyCalled: true } : s))
       );
       onShowToast(`Đã ghi nhận câu trả lời của ${student.name}.`);
     } else if (action === 'queue') {
@@ -1330,9 +1350,9 @@ export const RandomPickerTab: React.FC<RandomPickerTabProps> = ({
         student,
         queuedAt: Date.now(),
       };
-      setQueue((prev) => [...prev, newItem]);
-      setPickerStudents((prev) =>
-        prev.map((s) => (s.id === studentId ? { ...s, alreadyCalled: true } : s))
+      setQueue(prev => [...prev, newItem]);
+      setPickerStudents(prev =>
+        prev.map(s => (s.id === studentId ? { ...s, alreadyCalled: true } : s))
       );
       onShowToast(`Đã đưa ${student.name} vào hàng chờ lên bảng!`);
     }
@@ -1342,7 +1362,7 @@ export const RandomPickerTab: React.FC<RandomPickerTabProps> = ({
 
   // Xử lý từ hàng chờ
   const handleGradeFromQueue = (item: PickerQueueItem, isCorrect: boolean) => {
-    setQueue((prev) => prev.filter((q) => q.id !== item.id));
+    setQueue(prev => prev.filter(q => q.id !== item.id));
     void handleConfirmStudentResult(
       item.student.id,
       isCorrect ? 'correct' : 'wrong',
@@ -1351,13 +1371,13 @@ export const RandomPickerTab: React.FC<RandomPickerTabProps> = ({
   };
 
   const handleRemoveFromQueue = (queueItemId: string) => {
-    setQueue((prev) => prev.filter((q) => q.id !== queueItemId));
+    setQueue(prev => prev.filter(q => q.id !== queueItemId));
     onShowToast('Đã xóa học sinh khỏi hàng chờ.');
   };
 
   // Đặt lại lượt quay
   const handleResetSession = () => {
-    setPickerStudents((prev) => prev.map((s) => ({ ...s, alreadyCalled: false })));
+    setPickerStudents(prev => prev.map(s => ({ ...s, alreadyCalled: false })));
     setHasCalledAny(false);
     setSelectedStudent(null);
     setIsWaitingForManualFlip(false);
@@ -1380,7 +1400,9 @@ export const RandomPickerTab: React.FC<RandomPickerTabProps> = ({
       'width=1280,height=720,menubar=no,toolbar=no,location=no,status=no'
     );
     if (!win) {
-      onShowToast('⚠️ Cửa sổ bị chặn popup bởi trình duyệt! Vui lòng cho phép popup để mở màn hình chiếu.');
+      onShowToast(
+        '⚠️ Cửa sổ bị chặn popup bởi trình duyệt! Vui lòng cho phép popup để mở màn hình chiếu.'
+      );
     } else {
       win.focus();
     }
@@ -1399,9 +1421,7 @@ export const RandomPickerTab: React.FC<RandomPickerTabProps> = ({
   };
 
   const effectiveMode: RandomPickerModeId =
-    settings.mode === 'random_mode'
-      ? (activeRandomSubMode ?? 'random_mode')
-      : settings.mode;
+    settings.mode === 'random_mode' ? (activeRandomSubMode ?? 'random_mode') : settings.mode;
 
   const CurrentModeComponent =
     PICKER_MODES[effectiveMode]?.component || PICKER_MODES.card_flip.component;
@@ -1418,7 +1438,8 @@ export const RandomPickerTab: React.FC<RandomPickerTabProps> = ({
             </h1>
           </div>
           <p className="text-sm text-slate-500 mt-1">
-            Lật thẻ bài thần bí, gọi học sinh ngẫu nhiên công bằng, hỗ trợ hàng chờ lên bảng & cộng điểm EXP.
+            Lật thẻ bài thần bí, gọi học sinh ngẫu nhiên công bằng, hỗ trợ hàng chờ lên bảng & cộng
+            điểm EXP.
           </p>
         </div>
 
@@ -1459,7 +1480,9 @@ export const RandomPickerTab: React.FC<RandomPickerTabProps> = ({
                 type="button"
                 onClick={() => setSourceType('class')}
                 className={`px-3 py-1 rounded-lg transition ${
-                  sourceType === 'class' ? 'bg-white text-indigo-600 shadow-sm font-bold' : 'text-slate-600'
+                  sourceType === 'class'
+                    ? 'bg-white text-indigo-600 shadow-sm font-bold'
+                    : 'text-slate-600'
                 }`}
               >
                 🏫 Từ Lớp Học
@@ -1468,7 +1491,9 @@ export const RandomPickerTab: React.FC<RandomPickerTabProps> = ({
                 type="button"
                 onClick={() => setSourceType('excel')}
                 className={`px-3 py-1 rounded-lg transition ${
-                  sourceType === 'excel' ? 'bg-white text-indigo-600 shadow-sm font-bold' : 'text-slate-600'
+                  sourceType === 'excel'
+                    ? 'bg-white text-indigo-600 shadow-sm font-bold'
+                    : 'text-slate-600'
                 }`}
               >
                 📋 Dán Từ Excel
@@ -1484,10 +1509,10 @@ export const RandomPickerTab: React.FC<RandomPickerTabProps> = ({
                 </label>
                 <select
                   value={currentClassId}
-                  onChange={(e) => setCurrentClassId(e.target.value)}
+                  onChange={e => setCurrentClassId(e.target.value)}
                   className="w-full bg-slate-50 border border-slate-300 rounded-xl px-3 py-2 text-sm font-medium text-slate-800 focus:outline-none focus:ring-2 focus:ring-indigo-500"
                 >
-                  {classes.map((c) => (
+                  {classes.map(c => (
                     <option key={c.id} value={c.id}>
                       {c.name} ({c.year ? `Năm học ${c.year}` : 'Chung'})
                     </option>
@@ -1508,7 +1533,7 @@ export const RandomPickerTab: React.FC<RandomPickerTabProps> = ({
               </label>
               <textarea
                 value={excelText}
-                onChange={(e) => setExcelText(e.target.value)}
+                onChange={e => setExcelText(e.target.value)}
                 placeholder="1. Nguyễn Văn An&#10;2. Trần Thị Bình&#10;3. Lê Văn Cường..."
                 rows={3}
                 className="w-full border border-slate-300 rounded-xl p-2.5 text-xs font-mono focus:ring-2 focus:ring-indigo-500 focus:outline-none"
@@ -1538,9 +1563,9 @@ export const RandomPickerTab: React.FC<RandomPickerTabProps> = ({
               <span className="font-semibold text-slate-800">Chế độ quay:</span>
               <select
                 value={settings.mode}
-                onChange={(e) => {
+                onChange={e => {
                   const newMode = e.target.value as RandomPickerModeId;
-                  setSettings((prev) => ({ ...prev, mode: newMode }));
+                  setSettings(prev => ({ ...prev, mode: newMode }));
                   setActiveRandomSubMode(null);
                   setLastPlayedMode(null);
                   resetAllModes();
@@ -1568,8 +1593,8 @@ export const RandomPickerTab: React.FC<RandomPickerTabProps> = ({
                 min={0}
                 max={500}
                 value={settings.correctExp}
-                onChange={(e) =>
-                  setSettings((prev) => ({
+                onChange={e =>
+                  setSettings(prev => ({
                     ...prev,
                     correctExp: Math.max(0, parseInt(e.target.value, 10) || 0),
                   }))
@@ -1583,9 +1608,7 @@ export const RandomPickerTab: React.FC<RandomPickerTabProps> = ({
               <input
                 type="checkbox"
                 checked={settings.excludeCalled}
-                onChange={(e) =>
-                  setSettings((prev) => ({ ...prev, excludeCalled: e.target.checked }))
-                }
+                onChange={e => setSettings(prev => ({ ...prev, excludeCalled: e.target.checked }))}
                 className="w-4 h-4 accent-indigo-600 rounded cursor-pointer"
               />
             </div>
@@ -1616,11 +1639,13 @@ export const RandomPickerTab: React.FC<RandomPickerTabProps> = ({
         className={`bg-gradient-to-b from-indigo-950 via-slate-900 to-indigo-950 shadow-2xl relative overflow-hidden flex flex-col items-center justify-center transition-all ${
           isFullscreen
             ? 'w-full h-screen p-2 rounded-none'
-            : effectiveMode === 'duck_race' || effectiveMode === 'marble_race' || effectiveMode === 'duck_hunt'
-            ? 'rounded-3xl p-2 sm:p-3 border-4 border-indigo-900/60 min-h-[580px] w-full'
-            : effectiveMode === 'elimination_grid'
-            ? 'rounded-3xl p-3 sm:p-4 border-4 border-indigo-900/60 min-h-[580px] w-full'
-            : 'rounded-3xl p-6 border-4 border-indigo-900/60 min-h-[440px]'
+            : effectiveMode === 'duck_race' ||
+                effectiveMode === 'marble_race' ||
+                effectiveMode === 'duck_hunt'
+              ? 'rounded-3xl p-2 sm:p-3 border-4 border-indigo-900/60 min-h-[580px] w-full'
+              : effectiveMode === 'elimination_grid'
+                ? 'rounded-3xl p-3 sm:p-4 border-4 border-indigo-900/60 min-h-[580px] w-full'
+                : 'rounded-3xl p-6 border-4 border-indigo-900/60 min-h-[440px]'
         }`}
       >
         {/* Nút bật / thoát Fullscreen trực tiếp trong khung trò chơi */}
@@ -1640,8 +1665,8 @@ export const RandomPickerTab: React.FC<RandomPickerTabProps> = ({
         <FireworksCanvas active={showFireworks} onFinish={() => setShowFireworks(false)} />
 
         {/* Tiêu đề chế độ hoặc Thông báo chờ lật (Ẩn khi Fullscreen ở chế độ bắn vịt để không chiếm diện tích trên) */}
-        {!(isFullscreen && effectiveMode === 'duck_hunt') && (
-          isWaitingForManualFlip && effectiveMode === 'card_flip' ? (
+        {!(isFullscreen && effectiveMode === 'duck_hunt') &&
+          (isWaitingForManualFlip && effectiveMode === 'card_flip' ? (
             <div className="z-10 text-center mb-2 animate-bounce">
               <span className="text-sm font-black text-amber-300 bg-amber-950/80 border-2 border-amber-400 px-4 py-1.5 rounded-full shadow-lg">
                 👉 Thầy/Cô hãy chọn và bấm vào 1 lá bài để lật mở!
@@ -1682,33 +1707,34 @@ export const RandomPickerTab: React.FC<RandomPickerTabProps> = ({
                 {effectiveMode === 'random_mode'
                   ? 'Mỗi lượt gọi sẽ bốc ngẫu nhiên 1 trong 10 trò chơi mini-game kịch tính'
                   : effectiveMode === 'card_flip'
-                  ? cards.some((c) => c.isRevealed)
-                    ? 'Bấm nút bên dưới để bắt đầu lượt gọi tiếp theo'
-                    : 'Bấm nút bên dưới để xốc bài, sau đó tự tay bấm vào lá bài để lật mở'
-                  : effectiveMode === 'mystery_box'
-                  ? 'Bấm quay rồi chọn 1 hộp quà: 2 hộp phụ sẽ mở trước, hộp trúng mở sau cùng'
-                  : effectiveMode === 'slot_machine'
-                  ? 'Bấm nút quay hoặc giật cần gạt để cuộn số hàng chục và hàng đơn vị'
-                  : effectiveMode === 'name_roller'
-                  ? 'Cuộn lướt qua các tên học sinh và dừng chậm dần ở người may mắn'
-                  : effectiveMode === 'balloon_pop'
-                  ? 'Bấm quay rồi chạm vào 1 quả bóng bay bồng bềnh để nổ tung'
-                  : effectiveMode === 'magic_deck'
-                  ? 'Bấm quay để bộ bài ma thuật xào xáo và chia ra lưới 3x3'
-                  : effectiveMode === 'elimination_grid'
-                  ? 'Tất cả học sinh xuất hiện trên các ô chữ nhật, các ô biến mất dần: còn 5 ô -> còn 3 ô -> còn 1 ô chiến thắng'
-                  : effectiveMode === 'ball_elimination'
-                  ? '1 dãy 10 quả bóng số 0-9 lộn xộn, nổ ngẫu nhiên từng quả và dừng lại ở 2 (hoặc 1) quả cuối cùng để ghép thành STT học sinh'
-                  : effectiveMode === 'duck_hunt'
-                  ? 'Trường bắn súng săn hội chợ, khóa mục tiêu và bắn hạ chú vịt may mắn'
-                  : 'Đàn vịt rẽ sóng bơi đua gay cấn, chú vịt chạm vạch đích sẽ được xướng tên'}
+                    ? cards.some(c => c.isRevealed)
+                      ? 'Bấm nút bên dưới để bắt đầu lượt gọi tiếp theo'
+                      : 'Bấm nút bên dưới để xốc bài, sau đó tự tay bấm vào lá bài để lật mở'
+                    : effectiveMode === 'mystery_box'
+                      ? 'Bấm quay rồi chọn 1 hộp quà: 2 hộp phụ sẽ mở trước, hộp trúng mở sau cùng'
+                      : effectiveMode === 'slot_machine'
+                        ? 'Bấm nút quay hoặc giật cần gạt để cuộn số hàng chục và hàng đơn vị'
+                        : effectiveMode === 'name_roller'
+                          ? 'Cuộn lướt qua các tên học sinh và dừng chậm dần ở người may mắn'
+                          : effectiveMode === 'balloon_pop'
+                            ? 'Bấm quay rồi chạm vào 1 quả bóng bay bồng bềnh để nổ tung'
+                            : effectiveMode === 'magic_deck'
+                              ? 'Bấm quay để bộ bài ma thuật xào xáo và chia ra lưới 3x3'
+                              : effectiveMode === 'elimination_grid'
+                                ? 'Tất cả học sinh xuất hiện trên các ô chữ nhật, các ô biến mất dần: còn 5 ô -> còn 3 ô -> còn 1 ô chiến thắng'
+                                : effectiveMode === 'ball_elimination'
+                                  ? '1 dãy 10 quả bóng số 0-9 lộn xộn, nổ ngẫu nhiên từng quả và dừng lại ở 2 (hoặc 1) quả cuối cùng để ghép thành STT học sinh'
+                                  : effectiveMode === 'duck_hunt'
+                                    ? 'Trường bắn súng săn hội chợ, khóa mục tiêu và bắn hạ chú vịt may mắn'
+                                    : 'Đàn vịt rẽ sóng bơi đua gay cấn, chú vịt chạm vạch đích sẽ được xướng tên'}
               </p>
             </div>
-          )
-        )}
+          ))}
 
         {/* Khu vực trò chơi tương ứng theo Mode */}
-        <div className={`w-full z-10 ${isFullscreen ? 'flex-1 flex flex-col items-center justify-center min-h-0' : 'my-2'}`}>
+        <div
+          className={`w-full z-10 ${isFullscreen ? 'flex-1 flex flex-col items-center justify-center min-h-0' : 'my-2'}`}
+        >
           <CurrentModeComponent
             isPicking={isPicking}
             selectedStudent={selectedStudent}
@@ -1780,7 +1806,7 @@ export const RandomPickerTab: React.FC<RandomPickerTabProps> = ({
                 </span>
               </div>
               <div className="flex items-center gap-3 overflow-x-auto pb-1 scrollbar-thin">
-                {queue.map((item) => (
+                {queue.map(item => (
                   <div
                     key={item.id}
                     className="flex items-center gap-2 bg-indigo-950/80 border border-indigo-400/40 rounded-xl px-3 py-1.5 shadow-md shrink-0"
@@ -1788,7 +1814,9 @@ export const RandomPickerTab: React.FC<RandomPickerTabProps> = ({
                     <div className="text-left">
                       <div className="font-black text-white text-xs">{item.student.name}</div>
                       {item.student.code && (
-                        <div className="text-[10px] text-indigo-300 font-mono">{item.student.code}</div>
+                        <div className="text-[10px] text-indigo-300 font-mono">
+                          {item.student.code}
+                        </div>
                       )}
                     </div>
                     <div className="flex items-center gap-1 ml-2">

@@ -64,11 +64,16 @@ export class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundarySt
             }}
           >
             <div style={{ fontSize: '48px', marginBottom: '16px' }}>⚠️</div>
-            <h1 style={{ fontSize: '20px', fontWeight: 700, margin: '0 0 8px 0', color: '#0F172A' }}>
+            <h1
+              style={{ fontSize: '20px', fontWeight: 700, margin: '0 0 8px 0', color: '#0F172A' }}
+            >
               Bàn làm việc gặp sự cố hiển thị
             </h1>
-            <p style={{ fontSize: '14px', color: '#64748B', margin: '0 0 24px 0', lineHeight: 1.5 }}>
-              Một lỗi giao diện bất ngờ đã xảy ra. Thầy/Cô có thể tải lại bàn làm việc để tiếp tục mà không làm ảnh hưởng đến dữ liệu phiên học.
+            <p
+              style={{ fontSize: '14px', color: '#64748B', margin: '0 0 24px 0', lineHeight: 1.5 }}
+            >
+              Một lỗi giao diện bất ngờ đã xảy ra. Thầy/Cô có thể tải lại bàn làm việc để tiếp tục
+              mà không làm ảnh hưởng đến dữ liệu phiên học.
             </p>
 
             {this.state.error && (

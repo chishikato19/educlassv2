@@ -36,38 +36,46 @@
 import { sqliteTable, text, integer, index } from 'drizzle-orm/sqlite-core';
 import { users } from './users.js';
 
-export const bankQuestions = sqliteTable('bank_questions', {
-  id: text('id').primaryKey(), // ULID
-  ownerId: text('owner_id')
-    .notNull()
-    .references(() => users.id, { onDelete: 'cascade' }),
-  
-  // Cây phân cấp cố định
-  grade: integer('grade').notNull(),        // 1..12
-  subject: text('subject').notNull(),       // 'Toán', 'Vật lí', 'Hóa học'...
-  chapter: text('chapter').notNull(),       // 'Chương 1: Khảo sát hàm số'
-  lesson: text('lesson').notNull(),         // 'Bài 1: Tính đơn điệu'
-  
-  // 4 mức độ nhận thức chuẩn Bộ GD&ĐT
-  difficulty: text('difficulty', { 
-    enum: ['nb', 'th', 'vd', 'vdc'] 
-  }).notNull(),
-  
-  // Dạng câu hỏi (chuẩn question-kit)
-  type: text('type', { 
-    enum: ['mcq4', 'tf', 'tf_group', 'short'] 
-  }).notNull(),
-  
-  contentJson: text('content_json').notNull(), // Nội dung câu hỏi + phương án (RichText + KaTeX)
-  answerJson: text('answer_json').notNull(),   // Đáp án đúng + lời giải chi tiết
-  points: integer('points').notNull().default(10),
-  
-  createdAt: integer('created_at').notNull(),
-  updatedAt: integer('updated_at').notNull(),
-}, (table) => ({
-  ownerGradeSubjectIdx: index('bank_q_owner_grade_sub_idx').on(table.ownerId, table.grade, table.subject),
-  lessonDiffIdx: index('bank_q_lesson_diff_idx').on(table.lesson, table.difficulty),
-}));
+export const bankQuestions = sqliteTable(
+  'bank_questions',
+  {
+    id: text('id').primaryKey(), // ULID
+    ownerId: text('owner_id')
+      .notNull()
+      .references(() => users.id, { onDelete: 'cascade' }),
+
+    // Cây phân cấp cố định
+    grade: integer('grade').notNull(), // 1..12
+    subject: text('subject').notNull(), // 'Toán', 'Vật lí', 'Hóa học'...
+    chapter: text('chapter').notNull(), // 'Chương 1: Khảo sát hàm số'
+    lesson: text('lesson').notNull(), // 'Bài 1: Tính đơn điệu'
+
+    // 4 mức độ nhận thức chuẩn Bộ GD&ĐT
+    difficulty: text('difficulty', {
+      enum: ['nb', 'th', 'vd', 'vdc'],
+    }).notNull(),
+
+    // Dạng câu hỏi (chuẩn question-kit)
+    type: text('type', {
+      enum: ['mcq4', 'tf', 'tf_group', 'short'],
+    }).notNull(),
+
+    contentJson: text('content_json').notNull(), // Nội dung câu hỏi + phương án (RichText + KaTeX)
+    answerJson: text('answer_json').notNull(), // Đáp án đúng + lời giải chi tiết
+    points: integer('points').notNull().default(10),
+
+    createdAt: integer('created_at').notNull(),
+    updatedAt: integer('updated_at').notNull(),
+  },
+  table => ({
+    ownerGradeSubjectIdx: index('bank_q_owner_grade_sub_idx').on(
+      table.ownerId,
+      table.grade,
+      table.subject
+    ),
+    lessonDiffIdx: index('bank_q_lesson_diff_idx').on(table.lesson, table.difficulty),
+  })
+);
 ```
 
 ---
@@ -75,6 +83,7 @@ export const bankQuestions = sqliteTable('bank_questions', {
 ## 3. Thiết kế Protocol & Giao thức (packages/protocol)
 
 ### 3.1 Schemas Zod:
+
 ```ts
 // packages/protocol/src/schemas/bank.ts
 import { z } from 'zod';
@@ -145,23 +154,24 @@ export type MatrixStatsResponse = z.infer<typeof MatrixStatsResponseSchema>;
 
 Cung cấp các API tại prefix `/api/bank`:
 
-| Method | Endpoint | Mô tả |
-|---|---|---|
-| `GET` | `/api/bank/tree?grade=12&subject=Toán` | Lấy cây phân cấp Chương - Bài kèm tổng số câu của từng bài |
-| `GET` | `/api/bank/questions?grade=12&subject=Toán&lesson=Bài 1&difficulty=nb` | Lọc danh sách câu hỏi trong ngân hàng |
-| `POST` | `/api/bank/questions` | Thêm mới 1 câu hỏi vào ngân hàng |
-| `PUT` | `/api/bank/questions/:id` | Cập nhật câu hỏi ngân hàng |
-| `DELETE` | `/api/bank/questions/:id` | Xóa câu hỏi khỏi ngân hàng |
-| `POST` | `/api/bank/matrix-stats` | Nhận danh sách `lessons[]`, trả về số lượng câu có sẵn theo 4 mức độ |
-| `POST` | `/api/bank/generate-set` | Thuật toán bốc ngẫu nhiên theo ma trận $\rightarrow$ Tự động tạo `question_sets` mới và trả về ID bộ đề |
+| Method   | Endpoint                                                               | Mô tả                                                                                                   |
+| -------- | ---------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------- |
+| `GET`    | `/api/bank/tree?grade=12&subject=Toán`                                 | Lấy cây phân cấp Chương - Bài kèm tổng số câu của từng bài                                              |
+| `GET`    | `/api/bank/questions?grade=12&subject=Toán&lesson=Bài 1&difficulty=nb` | Lọc danh sách câu hỏi trong ngân hàng                                                                   |
+| `POST`   | `/api/bank/questions`                                                  | Thêm mới 1 câu hỏi vào ngân hàng                                                                        |
+| `PUT`    | `/api/bank/questions/:id`                                              | Cập nhật câu hỏi ngân hàng                                                                              |
+| `DELETE` | `/api/bank/questions/:id`                                              | Xóa câu hỏi khỏi ngân hàng                                                                              |
+| `POST`   | `/api/bank/matrix-stats`                                               | Nhận danh sách `lessons[]`, trả về số lượng câu có sẵn theo 4 mức độ                                    |
+| `POST`   | `/api/bank/generate-set`                                               | Thuật toán bốc ngẫu nhiên theo ma trận $\rightarrow$ Tự động tạo `question_sets` mới và trả về ID bộ đề |
 
 ### Thuật toán Bốc ngẫu nhiên & Sinh đề (`/api/bank/generate-set`):
+
 1. Với mỗi `row` trong `matrix`:
    - Với mỗi mức độ $d \in \{\text{'nb'}, \text{'th'}, \text{'vd'}, \text{'vdc'}\}$:
      - Số lượng cần lấy: $k = \text{row.counts}[d]$.
      - Nếu $k > 0$: Truy vấn ngẫu nhiên từ kho:
        ```sql
-       SELECT * FROM bank_questions 
+       SELECT * FROM bank_questions
        WHERE owner_id = :ownerId AND lesson = :lesson AND difficulty = :d
        ORDER BY RANDOM() LIMIT :k;
        ```
@@ -177,6 +187,7 @@ Cung cấp các API tại prefix `/api/bank`:
 ## 5. Mở rộng Parser Word (packages/question-kit)
 
 Nâng cấp hàm `parseWordDocument` trong `word-parser.ts`:
+
 - **Nhận diện Chương & Bài**:
   - Regex: `/^\[(Chương|Chuong)\s*:\s*(.+?)\]/i`
   - Regex: `/^\[(Bài|Bai)\s*:\s*(.+?)\]/i`
@@ -194,6 +205,7 @@ Nâng cấp hàm `parseWordDocument` trong `word-parser.ts`:
 ## 6. Thiết kế Giao diện Teacher UI (apps/teacher-ui)
 
 ### 6.1 Giao diện Quản lý Ngân hàng câu hỏi (`QuestionBankTab`)
+
 - Tách làm 2 chế độ xem hoặc thêm tab phụ: **Ngân hàng câu hỏi** (kho gốc) & **Bộ đề thi** (danh sách đề thi đã tạo).
 - **Cột trái**: Bộ chọn Khối, Môn; Cây thư mục Chương - Bài dạng Accordion có badge đếm số lượng câu.
 - **Cột phải**:
@@ -202,6 +214,7 @@ Nâng cấp hàm `parseWordDocument` trong `word-parser.ts`:
   - Danh sách thẻ câu hỏi (card) hiển thị rõ đề bài (render KaTeX), các phương án lựa chọn, đáp án đúng (tô xanh) và lời giải chi tiết (nếu có).
 
 ### 6.2 Giao diện Modal Ma trận Đề thi (`MatrixImportModal`)
+
 - Nằm trong tab **Kho đề** (Question Sets).
 - **Bước 1**: Chọn Khối, Môn $\rightarrow$ Checkbox cây bài học cần ra đề.
 - **Bước 2**: Bảng lưới 2 chiều:

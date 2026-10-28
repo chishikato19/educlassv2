@@ -14,7 +14,9 @@ const InteractiveBoardHostComponent: React.FC<ActivityHostProps> = ({
     <InteractiveBoardProjectorView
       runId={runId}
       state={state as Parameters<typeof InteractiveBoardProjectorView>[0]['state']}
-      onSendIntent={onSendIntent as Parameters<typeof InteractiveBoardProjectorView>[0]['onSendIntent']}
+      onSendIntent={
+        onSendIntent as Parameters<typeof InteractiveBoardProjectorView>[0]['onSendIntent']
+      }
     />
   );
 };
@@ -27,4 +29,3 @@ export const interactiveBoardPlugin: ActivityHostPlugin = {
     'Màn chiếu cộng tác và triển lãm sản phẩm học tập: chữ, nét vẽ tay, hình ảnh, chấm điểm chéo và tiêu điểm chữa bài',
   component: InteractiveBoardHostComponent,
 };
-

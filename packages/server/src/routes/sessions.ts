@@ -219,11 +219,12 @@ export function buildQuizSummaryFromRun(
 
       const sCount = Number(item.totalQuestions || totalQuestions);
       const cCount = Number(item.correctCount || 0);
-      const acc = typeof item.accuracy === 'number'
-        ? item.accuracy
-        : sCount > 0
-        ? Math.round((cCount / sCount) * 100)
-        : 0;
+      const acc =
+        typeof item.accuracy === 'number'
+          ? item.accuracy
+          : sCount > 0
+            ? Math.round((cCount / sCount) * 100)
+            : 0;
 
       scoreboard.push({
         participantId: res.participantId,
@@ -242,18 +243,20 @@ export function buildQuizSummaryFromRun(
     }
   }
 
-  scoreboard.sort((a, b) => (b.score - a.score) || (b.correctCount - a.correctCount));
+  scoreboard.sort((a, b) => b.score - a.score || b.correctCount - a.correctCount);
   scoreboard.forEach((item, idx) => {
     item.rank = idx + 1;
   });
 
   const totalParticipants = scoreboard.length;
-  const averageScore = totalParticipants > 0
-    ? Math.round(scoreboard.reduce((acc, s) => acc + s.score, 0) / totalParticipants)
-    : 0;
-  const averageAccuracy = totalParticipants > 0
-    ? Math.round(scoreboard.reduce((acc, s) => acc + s.accuracy, 0) / totalParticipants)
-    : 0;
+  const averageScore =
+    totalParticipants > 0
+      ? Math.round(scoreboard.reduce((acc, s) => acc + s.score, 0) / totalParticipants)
+      : 0;
+  const averageAccuracy =
+    totalParticipants > 0
+      ? Math.round(scoreboard.reduce((acc, s) => acc + s.accuracy, 0) / totalParticipants)
+      : 0;
 
   return {
     sessionId: run.sessionId,
@@ -336,7 +339,7 @@ export const sessionsRoutes: FastifyPluginAsync<SessionsRoutesOptions> = async (
     }
 
     const wifiOrLan = candidates.find(
-      (ip) => ip.startsWith('192.168.') || ip.startsWith('10.') || ip.startsWith('172.')
+      ip => ip.startsWith('192.168.') || ip.startsWith('10.') || ip.startsWith('172.')
     );
 
     return wifiOrLan ?? candidates[0] ?? '127.0.0.1';
@@ -434,7 +437,12 @@ export const sessionsRoutes: FastifyPluginAsync<SessionsRoutesOptions> = async (
       if (selectedClass.ownerId !== user.id && user.role !== 'admin') {
         return reply
           .status(403)
-          .send(formatProtocolError('FORBIDDEN', 'Bạn không có quyền mở phiên cho lớp của giáo viên khác.'));
+          .send(
+            formatProtocolError(
+              'FORBIDDEN',
+              'Bạn không có quyền mở phiên cho lớp của giáo viên khác.'
+            )
+          );
       }
     }
 
@@ -492,7 +500,9 @@ export const sessionsRoutes: FastifyPluginAsync<SessionsRoutesOptions> = async (
     if (!activeSession) {
       return reply
         .status(404)
-        .send(formatProtocolError('SESSION_NOT_FOUND', 'Thầy/cô hiện không có phiên học nào đang mở.'));
+        .send(
+          formatProtocolError('SESSION_NOT_FOUND', 'Thầy/cô hiện không có phiên học nào đang mở.')
+        );
     }
 
     const hostHeader = request.headers.host;
@@ -528,24 +538,28 @@ export const sessionsRoutes: FastifyPluginAsync<SessionsRoutesOptions> = async (
    * POST /api/sessions/close-active
    * Đóng phiên active hiện tại của giáo viên (hữu ích khi cần giải phóng phiên cũ)
    */
-  fastify.post('/api/sessions/close-active', { preHandler: authenticate }, async (request, reply) => {
-    const user = request.user!;
-    const active = await sessionRepo.findActiveByOwnerId(user.id);
-    if (!active) {
-      return reply.send({ success: true, message: 'Không có phiên nào đang mở' });
+  fastify.post(
+    '/api/sessions/close-active',
+    { preHandler: authenticate },
+    async (request, reply) => {
+      const user = request.user!;
+      const active = await sessionRepo.findActiveByOwnerId(user.id);
+      if (!active) {
+        return reply.send({ success: true, message: 'Không có phiên nào đang mở' });
+      }
+      await sessionRepo.updateStatus(active.id, 'closed', Date.now());
+      if (beaconService) {
+        const details = await buildSessionDetails(active, request.headers.host);
+        const serverBaseUrl = new URL(details.joinUrl).origin;
+        beaconService.sendSessionClosed({
+          sessionId: active.id,
+          joinCode: active.joinCode,
+          serverUrl: serverBaseUrl,
+        });
+      }
+      return reply.send({ success: true, closedSessionId: active.id });
     }
-    await sessionRepo.updateStatus(active.id, 'closed', Date.now());
-    if (beaconService) {
-      const details = await buildSessionDetails(active, request.headers.host);
-      const serverBaseUrl = new URL(details.joinUrl).origin;
-      beaconService.sendSessionClosed({
-        sessionId: active.id,
-        joinCode: active.joinCode,
-        serverUrl: serverBaseUrl,
-      });
-    }
-    return reply.send({ success: true, closedSessionId: active.id });
-  });
+  );
 
   /**
    * GET /api/sessions/:id
@@ -568,7 +582,9 @@ export const sessionsRoutes: FastifyPluginAsync<SessionsRoutesOptions> = async (
       if (session.ownerId !== user.id && user.role !== 'admin') {
         return reply
           .status(403)
-          .send(formatProtocolError('FORBIDDEN', 'Bạn không có quyền xem thông tin phiên học này.'));
+          .send(
+            formatProtocolError('FORBIDDEN', 'Bạn không có quyền xem thông tin phiên học này.')
+          );
       }
 
       const hostHeader = request.headers.host;
@@ -614,7 +630,8 @@ export const sessionsRoutes: FastifyPluginAsync<SessionsRoutesOptions> = async (
 
       const now = Date.now();
       const bodyParsed = request.body ? CloseSessionRequestSchema.safeParse(request.body) : null;
-      const closeReason = (bodyParsed?.success ? bodyParsed.data.reason : undefined) ?? 'Tiết học kết thúc';
+      const closeReason =
+        (bodyParsed?.success ? bodyParsed.data.reason : undefined) ?? 'Tiết học kết thúc';
 
       // 1. Chuyển FSM sang closing (nếu đang open)
       const fsmInitial: SessionFsmState = {
@@ -664,7 +681,7 @@ export const sessionsRoutes: FastifyPluginAsync<SessionsRoutesOptions> = async (
       // 2. Thu thập dữ liệu và tạo Report Snapshot
       const participantsList = await participantRepo.listBySessionId(id);
       const teamsList = await teamRepo.listBySessionId(id);
-      const teamMap = new Map(teamsList.map((t) => [t.id, t.name]));
+      const teamMap = new Map(teamsList.map(t => [t.id, t.name]));
 
       let className: string | null = null;
       if (session.classId) {
@@ -672,8 +689,8 @@ export const sessionsRoutes: FastifyPluginAsync<SessionsRoutesOptions> = async (
         if (cls) className = cls.name;
       }
 
-      const onlineCount = participantsList.filter((p) => p.status === 'online').length;
-      const offlineCount = participantsList.filter((p) => p.status === 'offline').length;
+      const onlineCount = participantsList.filter(p => p.status === 'online').length;
+      const offlineCount = participantsList.filter(p => p.status === 'offline').length;
 
       // Lấy avatar học sinh và danh hiệu mới trao tặng trong phiên (Task 5.4)
       const studentAvatars = new Map<string, AvatarConfig>();
@@ -702,7 +719,7 @@ export const sessionsRoutes: FastifyPluginAsync<SessionsRoutesOptions> = async (
       if (titleRepo) {
         const sessionTitles = await titleRepo.getTitlesAwardedInSession(id);
         const studentNameMap = new Map(
-          participantsList.filter((p) => p.studentId).map((p) => [p.studentId!, p.displayName])
+          participantsList.filter(p => p.studentId).map(p => [p.studentId!, p.displayName])
         );
         for (const st of sessionTitles) {
           const studentName = studentNameMap.get(st.studentId) ?? 'Học sinh';
@@ -737,7 +754,7 @@ export const sessionsRoutes: FastifyPluginAsync<SessionsRoutesOptions> = async (
       });
 
       const quizRuns: QuizSummaryReport[] = [];
-      const quizLiveRuns = activityRuns.filter((r) => r.activityId === 'quiz-live');
+      const quizLiveRuns = activityRuns.filter(r => r.activityId === 'quiz-live');
       quizLiveRuns.forEach((r, idx) => {
         const runResults = resultsByRun.get(r.id) ?? [];
         quizRuns.push(buildQuizSummaryFromRun(r, runResults, session.joinCode, className, idx + 1));
@@ -754,20 +771,20 @@ export const sessionsRoutes: FastifyPluginAsync<SessionsRoutesOptions> = async (
         totalParticipants: participantsList.length,
         onlineParticipants: onlineCount,
         offlineParticipants: offlineCount,
-        participants: participantsList.map((p) => ({
+        participants: participantsList.map(p => ({
           id: p.id,
           studentId: p.studentId ?? null,
           displayName: p.displayName,
           identityLevel: p.identityLevel as 'account' | 'roster' | 'guest',
           teamName: (p.teamId ? teamMap.get(p.teamId) : null) ?? null,
           joinedAt: p.joinedAt,
-          leftAt: p.status === 'online' ? now : p.leftAt ?? now,
+          leftAt: p.status === 'online' ? now : (p.leftAt ?? now),
           avatar: p.studentId ? studentAvatars.get(p.studentId) : undefined,
         })),
-        teams: teamsList.map((t) => ({
+        teams: teamsList.map(t => ({
           id: t.id,
           name: t.name,
-          memberCount: participantsList.filter((p) => p.teamId === t.id).length,
+          memberCount: participantsList.filter(p => p.teamId === t.id).length,
         })),
         scoreboard: analytics.scoreboard,
         difficultQuestions: analytics.difficultQuestions,
@@ -870,10 +887,7 @@ export const sessionsRoutes: FastifyPluginAsync<SessionsRoutesOptions> = async (
         return reply
           .status(403)
           .send(
-            formatProtocolError(
-              'FORBIDDEN',
-              'Bạn không có quyền xem báo cáo của phiên học này.'
-            )
+            formatProtocolError('FORBIDDEN', 'Bạn không có quyền xem báo cáo của phiên học này.')
           );
       }
 
@@ -929,10 +943,7 @@ export const sessionsRoutes: FastifyPluginAsync<SessionsRoutesOptions> = async (
         return reply
           .status(403)
           .send(
-            formatProtocolError(
-              'FORBIDDEN',
-              'Bạn không có quyền tải báo cáo của phiên học này.'
-            )
+            formatProtocolError('FORBIDDEN', 'Bạn không có quyền tải báo cáo của phiên học này.')
           );
       }
 
@@ -960,10 +971,7 @@ export const sessionsRoutes: FastifyPluginAsync<SessionsRoutesOptions> = async (
 
       const filename = `bao-cao-phien-${session.joinCode}.xlsx`;
       return reply
-        .header(
-          'Content-Type',
-          'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
-        )
+        .header('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
         .header('Content-Disposition', `attachment; filename="${filename}"`)
         .send(buffer);
     }
@@ -982,18 +990,33 @@ export const sessionsRoutes: FastifyPluginAsync<SessionsRoutesOptions> = async (
 
       const session = await sessionRepo.findById(id);
       if (!session) {
-        return reply.status(404).send(formatProtocolError('SESSION_NOT_FOUND', 'Không tìm thấy phiên học tương ứng.'));
+        return reply
+          .status(404)
+          .send(formatProtocolError('SESSION_NOT_FOUND', 'Không tìm thấy phiên học tương ứng.'));
       }
       if (session.ownerId !== user.id && user.role !== 'admin') {
-        return reply.status(403).send(formatProtocolError('FORBIDDEN', 'Bạn không có quyền tải báo cáo của phiên học này.'));
+        return reply
+          .status(403)
+          .send(
+            formatProtocolError('FORBIDDEN', 'Bạn không có quyền tải báo cáo của phiên học này.')
+          );
       }
       if (!sessionReportRepo) {
-        return reply.status(404).send(formatProtocolError('INTERNAL_ERROR', 'Hệ thống báo cáo chưa được cấu hình.'));
+        return reply
+          .status(404)
+          .send(formatProtocolError('INTERNAL_ERROR', 'Hệ thống báo cáo chưa được cấu hình.'));
       }
 
       const report = await sessionReportRepo.findBySessionId(id);
       if (!report) {
-        return reply.status(404).send(formatProtocolError('SESSION_NOT_FOUND', 'Phiên học chưa kết thúc hoặc chưa có báo cáo tổng kết.'));
+        return reply
+          .status(404)
+          .send(
+            formatProtocolError(
+              'SESSION_NOT_FOUND',
+              'Phiên học chưa kết thúc hoặc chưa có báo cáo tổng kết.'
+            )
+          );
       }
 
       const snapshot = JSON.parse(report.snapshotJson) as SessionReportSnapshot;
@@ -1011,68 +1034,67 @@ export const sessionsRoutes: FastifyPluginAsync<SessionsRoutesOptions> = async (
    * GET /api/sessions/reports
    * Danh sách lịch sử báo cáo các phiên học đã đóng của giáo viên
    */
-  fastify.get(
-    '/api/sessions/reports',
-    { preHandler: authenticate },
-    async (request, reply) => {
-      const user = request.user!;
-      if (!sessionReportRepo) {
-        return reply.send({ reports: [] });
-      }
+  fastify.get('/api/sessions/reports', { preHandler: authenticate }, async (request, reply) => {
+    const user = request.user!;
+    if (!sessionReportRepo) {
+      return reply.send({ reports: [] });
+    }
 
-      const rawReports = user.role === 'admin'
+    const rawReports =
+      user.role === 'admin'
         ? await sessionReportRepo.listAll(100)
         : await sessionReportRepo.listByOwnerId(user.id, 100);
 
-      const items: SessionReportListItem[] = [];
+    const items: SessionReportListItem[] = [];
 
-      for (const r of rawReports) {
-        try {
-          const snapshot = JSON.parse(r.snapshotJson) as SessionReportSnapshot;
-          
-          let quizTitle = 'Quizizz Live';
-          if (snapshot.difficultQuestions && snapshot.difficultQuestions.length > 0) {
-            const firstDiff = snapshot.difficultQuestions[0];
-            if (firstDiff && firstDiff.activityName) {
-              quizTitle = firstDiff.activityName;
-            }
+    for (const r of rawReports) {
+      try {
+        const snapshot = JSON.parse(r.snapshotJson) as SessionReportSnapshot;
+
+        let quizTitle = 'Quizizz Live';
+        if (snapshot.difficultQuestions && snapshot.difficultQuestions.length > 0) {
+          const firstDiff = snapshot.difficultQuestions[0];
+          if (firstDiff && firstDiff.activityName) {
+            quizTitle = firstDiff.activityName;
           }
-
-          let quizRuns = snapshot.quizRuns;
-          if ((!quizRuns || quizRuns.length === 0) && activityRunRepo) {
-            const rawRuns = await activityRunRepo.listRunsBySessionId(r.sessionId);
-            const rawQuizRuns = rawRuns.filter((ar) => ar.activityId === 'quiz-live');
-            quizRuns = [];
-            for (let i = 0; i < rawQuizRuns.length; i++) {
-              const ar = rawQuizRuns[i]!;
-              const results = await activityRunRepo.findResultsByRunId(ar.id);
-              quizRuns.push(buildQuizSummaryFromRun(ar, results, r.sessionJoinCode, snapshot.className, i + 1));
-            }
-          }
-
-          items.push({
-            id: r.id,
-            sessionId: r.sessionId,
-            sessionCode: r.sessionJoinCode || snapshot.sessionCode,
-            className: snapshot.className ?? null,
-            createdAt: r.createdAt,
-            openedAt: r.sessionOpenedAt ?? snapshot.openedAt,
-            closedAt: r.sessionClosedAt ?? snapshot.closedAt ?? r.createdAt,
-            totalParticipants: snapshot.totalParticipants ?? snapshot.participants.length,
-            quizTitle,
-            summary: snapshot.summary,
-            scoreboard: snapshot.scoreboard ?? [],
-            snapshot,
-            quizRuns: quizRuns || [],
-          });
-        } catch {
-          // Bỏ qua bản ghi JSON hỏng
         }
-      }
 
-      return reply.send(SessionReportsListResponseSchema.parse({ reports: items }));
+        let quizRuns = snapshot.quizRuns;
+        if ((!quizRuns || quizRuns.length === 0) && activityRunRepo) {
+          const rawRuns = await activityRunRepo.listRunsBySessionId(r.sessionId);
+          const rawQuizRuns = rawRuns.filter(ar => ar.activityId === 'quiz-live');
+          quizRuns = [];
+          for (let i = 0; i < rawQuizRuns.length; i++) {
+            const ar = rawQuizRuns[i]!;
+            const results = await activityRunRepo.findResultsByRunId(ar.id);
+            quizRuns.push(
+              buildQuizSummaryFromRun(ar, results, r.sessionJoinCode, snapshot.className, i + 1)
+            );
+          }
+        }
+
+        items.push({
+          id: r.id,
+          sessionId: r.sessionId,
+          sessionCode: r.sessionJoinCode || snapshot.sessionCode,
+          className: snapshot.className ?? null,
+          createdAt: r.createdAt,
+          openedAt: r.sessionOpenedAt ?? snapshot.openedAt,
+          closedAt: r.sessionClosedAt ?? snapshot.closedAt ?? r.createdAt,
+          totalParticipants: snapshot.totalParticipants ?? snapshot.participants.length,
+          quizTitle,
+          summary: snapshot.summary,
+          scoreboard: snapshot.scoreboard ?? [],
+          snapshot,
+          quizRuns: quizRuns || [],
+        });
+      } catch {
+        // Bỏ qua bản ghi JSON hỏng
+      }
     }
-  );
+
+    return reply.send(SessionReportsListResponseSchema.parse({ reports: items }));
+  });
 
   /**
    * GET /api/sessions/:id/quiz-summary
@@ -1087,10 +1109,16 @@ export const sessionsRoutes: FastifyPluginAsync<SessionsRoutesOptions> = async (
 
       const session = await sessionRepo.findById(id);
       if (!session) {
-        return reply.status(404).send(formatProtocolError('SESSION_NOT_FOUND', 'Không tìm thấy phiên học tương ứng.'));
+        return reply
+          .status(404)
+          .send(formatProtocolError('SESSION_NOT_FOUND', 'Không tìm thấy phiên học tương ứng.'));
       }
       if (session.ownerId !== user.id && user.role !== 'admin') {
-        return reply.status(403).send(formatProtocolError('FORBIDDEN', 'Bạn không có quyền xem kết quả của phiên học này.'));
+        return reply
+          .status(403)
+          .send(
+            formatProtocolError('FORBIDDEN', 'Bạn không có quyền xem kết quả của phiên học này.')
+          );
       }
 
       if (!activityRunRepo) {
@@ -1098,7 +1126,7 @@ export const sessionsRoutes: FastifyPluginAsync<SessionsRoutesOptions> = async (
       }
 
       const runs = await activityRunRepo.listRunsBySessionId(id);
-      const quizRuns = runs.filter((r) => r.activityId === 'quiz-live').reverse();
+      const quizRuns = runs.filter(r => r.activityId === 'quiz-live').reverse();
       const latestQuizRun = quizRuns[0];
 
       if (!latestQuizRun) {
@@ -1108,7 +1136,10 @@ export const sessionsRoutes: FastifyPluginAsync<SessionsRoutesOptions> = async (
       let quizTitle = 'Quizizz Live';
       let totalQuestions = 0;
       try {
-        const cfg = JSON.parse(latestQuizRun.configJson) as { title?: string; questions?: unknown[] };
+        const cfg = JSON.parse(latestQuizRun.configJson) as {
+          title?: string;
+          questions?: unknown[];
+        };
         if (cfg.title) quizTitle = cfg.title;
         if (Array.isArray(cfg.questions)) totalQuestions = cfg.questions.length;
       } catch {
@@ -1142,11 +1173,12 @@ export const sessionsRoutes: FastifyPluginAsync<SessionsRoutesOptions> = async (
 
           const sCount = Number(item.totalQuestions || totalQuestions);
           const cCount = Number(item.correctCount || 0);
-          const acc = typeof item.accuracy === 'number'
-            ? item.accuracy
-            : sCount > 0
-            ? Math.round((cCount / sCount) * 100)
-            : 0;
+          const acc =
+            typeof item.accuracy === 'number'
+              ? item.accuracy
+              : sCount > 0
+                ? Math.round((cCount / sCount) * 100)
+                : 0;
 
           scoreboard.push({
             participantId: res.participantId,
@@ -1164,18 +1196,20 @@ export const sessionsRoutes: FastifyPluginAsync<SessionsRoutesOptions> = async (
         }
       }
 
-      scoreboard.sort((a, b) => (a.rank - b.rank) || (b.score - a.score));
+      scoreboard.sort((a, b) => a.rank - b.rank || b.score - a.score);
       scoreboard.forEach((item, idx) => {
         item.rank = idx + 1;
       });
 
       const totalParticipants = scoreboard.length;
-      const averageScore = totalParticipants > 0
-        ? Math.round(scoreboard.reduce((acc, s) => acc + s.score, 0) / totalParticipants)
-        : 0;
-      const averageAccuracy = totalParticipants > 0
-        ? Math.round(scoreboard.reduce((acc, s) => acc + s.accuracy, 0) / totalParticipants)
-        : 0;
+      const averageScore =
+        totalParticipants > 0
+          ? Math.round(scoreboard.reduce((acc, s) => acc + s.score, 0) / totalParticipants)
+          : 0;
+      const averageAccuracy =
+        totalParticipants > 0
+          ? Math.round(scoreboard.reduce((acc, s) => acc + s.accuracy, 0) / totalParticipants)
+          : 0;
 
       const summaryPayload = {
         sessionId: id,
@@ -1206,10 +1240,16 @@ export const sessionsRoutes: FastifyPluginAsync<SessionsRoutesOptions> = async (
 
       const session = await sessionRepo.findById(id);
       if (!session) {
-        return reply.status(404).send(formatProtocolError('SESSION_NOT_FOUND', 'Không tìm thấy phiên học tương ứng.'));
+        return reply
+          .status(404)
+          .send(formatProtocolError('SESSION_NOT_FOUND', 'Không tìm thấy phiên học tương ứng.'));
       }
       if (session.ownerId !== user.id && user.role !== 'admin') {
-        return reply.status(403).send(formatProtocolError('FORBIDDEN', 'Bạn không có quyền xem kết quả của phiên học này.'));
+        return reply
+          .status(403)
+          .send(
+            formatProtocolError('FORBIDDEN', 'Bạn không có quyền xem kết quả của phiên học này.')
+          );
       }
 
       if (!activityRunRepo) {
@@ -1223,7 +1263,7 @@ export const sessionsRoutes: FastifyPluginAsync<SessionsRoutesOptions> = async (
       }
 
       const runs = await activityRunRepo.listRunsBySessionId(id);
-      const quizRuns = runs.filter((r) => r.activityId === 'quiz-live');
+      const quizRuns = runs.filter(r => r.activityId === 'quiz-live');
       const items: QuizSummaryReport[] = [];
 
       for (let i = 0; i < quizRuns.length; i++) {
@@ -1249,19 +1289,31 @@ export const sessionsRoutes: FastifyPluginAsync<SessionsRoutesOptions> = async (
 
       const session = await sessionRepo.findById(id);
       if (!session) {
-        return reply.status(404).send(formatProtocolError('SESSION_NOT_FOUND', 'Không tìm thấy phiên học tương ứng.'));
+        return reply
+          .status(404)
+          .send(formatProtocolError('SESSION_NOT_FOUND', 'Không tìm thấy phiên học tương ứng.'));
       }
       if (session.ownerId !== user.id && user.role !== 'admin') {
-        return reply.status(403).send(formatProtocolError('FORBIDDEN', 'Bạn không có quyền tải báo cáo của phiên học này.'));
+        return reply
+          .status(403)
+          .send(
+            formatProtocolError('FORBIDDEN', 'Bạn không có quyền tải báo cáo của phiên học này.')
+          );
       }
 
       if (!activityRunRepo) {
-        return reply.status(404).send(formatProtocolError('INTERNAL_ERROR', 'Hệ thống báo cáo chưa được cấu hình.'));
+        return reply
+          .status(404)
+          .send(formatProtocolError('INTERNAL_ERROR', 'Hệ thống báo cáo chưa được cấu hình.'));
       }
 
       const run = await activityRunRepo.findRunById(runId);
       if (!run || run.sessionId !== id) {
-        return reply.status(404).send(formatProtocolError('SESSION_NOT_FOUND', 'Không tìm thấy lần thi Quizizz tương ứng.'));
+        return reply
+          .status(404)
+          .send(
+            formatProtocolError('SESSION_NOT_FOUND', 'Không tìm thấy lần thi Quizizz tương ứng.')
+          );
       }
 
       let className: string | null = null;
@@ -1284,7 +1336,7 @@ export const sessionsRoutes: FastifyPluginAsync<SessionsRoutesOptions> = async (
         totalParticipants: quizSummary.totalParticipants,
         onlineParticipants: quizSummary.totalParticipants,
         offlineParticipants: 0,
-        participants: quizSummary.scoreboard.map((s) => ({
+        participants: quizSummary.scoreboard.map(s => ({
           id: s.participantId,
           displayName: s.displayName,
           identityLevel: s.identityLevel,
@@ -1305,7 +1357,10 @@ export const sessionsRoutes: FastifyPluginAsync<SessionsRoutesOptions> = async (
 
       const excelSvc = excelService ?? new ExcelService();
       const buffer = excelSvc.exportSessionReportBuffer(fakeSnapshot);
-      const safeTitle = (quizSummary.title || 'quizizz').replace(/[^a-zA-Z0-9\u00C0-\u024F\u1EA0-\u1EF9]/g, '-');
+      const safeTitle = (quizSummary.title || 'quizizz').replace(
+        /[^a-zA-Z0-9\u00C0-\u024F\u1EA0-\u1EF9]/g,
+        '-'
+      );
       const filename = `bang-diem-${safeTitle}-${session.joinCode}.xlsx`;
 
       return reply
@@ -1329,10 +1384,7 @@ export const sessionsRoutes: FastifyPluginAsync<SessionsRoutesOptions> = async (
         return reply
           .status(404)
           .send(
-            formatProtocolError(
-              'BAD_CODE',
-              'Mã vào lớp không đúng hoặc phiên học đã kết thúc.'
-            )
+            formatProtocolError('BAD_CODE', 'Mã vào lớp không đúng hoặc phiên học đã kết thúc.')
           );
       }
 
@@ -1355,7 +1407,8 @@ export const sessionsRoutes: FastifyPluginAsync<SessionsRoutesOptions> = async (
         sessionId: activeSession.id,
         joinCode: activeSession.joinCode,
         status: activeSession.status as 'open' | 'closing' | 'closed',
-        identityMode: activeSession.identityMode as 'roster_only' | 'roster_or_guest' | 'guest_only',
+        identityMode: activeSession.identityMode as
+          'roster_only' | 'roster_or_guest' | 'guest_only',
         allowTeams: activeSession.allowTeams,
         allowPairing: lookupSettings?.allowPairing ?? false,
         maxStudentsPerDevice: lookupSettings?.maxStudentsPerDevice ?? 2,
@@ -1375,7 +1428,7 @@ export const sessionsRoutes: FastifyPluginAsync<SessionsRoutesOptions> = async (
     const activeSessions = await sessionRepo.listActiveSessions();
 
     const items = await Promise.all(
-      activeSessions.map(async (s) => {
+      activeSessions.map(async s => {
         let teacherName = 'Giáo viên';
         const owner = await userRepo.findById(s.ownerId);
         if (owner) teacherName = owner.displayName;
@@ -1426,10 +1479,7 @@ export const sessionsRoutes: FastifyPluginAsync<SessionsRoutesOptions> = async (
         return reply
           .status(404)
           .send(
-            formatProtocolError(
-              'BAD_CODE',
-              'Mã vào lớp không đúng hoặc phiên học đã kết thúc.'
-            )
+            formatProtocolError('BAD_CODE', 'Mã vào lớp không đúng hoặc phiên học đã kết thúc.')
           );
       }
 
@@ -1469,7 +1519,7 @@ export const sessionsRoutes: FastifyPluginAsync<SessionsRoutesOptions> = async (
           }
         }
 
-        studentItems = students.map((s) => ({
+        studentItems = students.map(s => ({
           id: s.id,
           fullName: s.fullName,
           hasPin: Boolean(s.passwordHash),
@@ -1490,7 +1540,8 @@ export const sessionsRoutes: FastifyPluginAsync<SessionsRoutesOptions> = async (
       const responsePayload = {
         sessionId: activeSession.id,
         className,
-        identityMode: activeSession.identityMode as 'roster_only' | 'roster_or_guest' | 'guest_only',
+        identityMode: activeSession.identityMode as
+          'roster_only' | 'roster_or_guest' | 'guest_only',
         allowTeams: activeSession.allowTeams,
         allowPairing: rosterSettings?.allowPairing ?? false,
         maxStudentsPerDevice: rosterSettings?.maxStudentsPerDevice ?? 2,
@@ -1526,19 +1577,17 @@ export const sessionsRoutes: FastifyPluginAsync<SessionsRoutesOptions> = async (
       return reply
         .status(404)
         .send(
-          formatProtocolError(
-            'BAD_CODE',
-            'Mã vào lớp không đúng hoặc phiên học không còn mở.'
-          )
+          formatProtocolError('BAD_CODE', 'Mã vào lớp không đúng hoặc phiên học không còn mở.')
         );
     }
 
     // Chuẩn hóa danh sách ID học sinh (hỗ trợ cả chọn đơn và chọn ghép 2-3 bạn)
-    const targetStudentIds: string[] = studentIds && studentIds.length > 0
-      ? Array.from(new Set(studentIds))
-      : studentId
-      ? [studentId]
-      : [];
+    const targetStudentIds: string[] =
+      studentIds && studentIds.length > 0
+        ? Array.from(new Set(studentIds))
+        : studentId
+          ? [studentId]
+          : [];
 
     let sessionSettings: SessionSettings | undefined;
     if (session.settingsJson) {
@@ -1609,12 +1658,22 @@ export const sessionsRoutes: FastifyPluginAsync<SessionsRoutesOptions> = async (
         if (!student) {
           return reply
             .status(404)
-            .send(formatProtocolError('STUDENT_NOT_FOUND', `Không tìm thấy học sinh trong hệ thống (ID: ${sId}).`));
+            .send(
+              formatProtocolError(
+                'STUDENT_NOT_FOUND',
+                `Không tìm thấy học sinh trong hệ thống (ID: ${sId}).`
+              )
+            );
         }
         if (session.classId && student.classId !== session.classId) {
           return reply
             .status(400)
-            .send(formatProtocolError('INVALID_PAYLOAD', `Học sinh ${student.fullName} không thuộc lớp của phiên này.`));
+            .send(
+              formatProtocolError(
+                'INVALID_PAYLOAD',
+                `Học sinh ${student.fullName} không thuộc lớp của phiên này.`
+              )
+            );
         }
         loadedStudents.push(student);
       }
@@ -1667,7 +1726,8 @@ export const sessionsRoutes: FastifyPluginAsync<SessionsRoutesOptions> = async (
         const hasPassword = Boolean(student.passwordHash);
         if (hasPassword) {
           anyHasPin = true;
-          const studentPin = pins?.[student.id] || (targetStudentIds.length === 1 ? pin : undefined);
+          const studentPin =
+            pins?.[student.id] || (targetStudentIds.length === 1 ? pin : undefined);
           if (!studentPin) {
             return reply
               .status(401)
@@ -1682,14 +1742,19 @@ export const sessionsRoutes: FastifyPluginAsync<SessionsRoutesOptions> = async (
           if (!isValidPin) {
             return reply
               .status(401)
-              .send(formatProtocolError('INVALID_PIN', `Mã PIN của học sinh ${student.fullName} không chính xác.`));
+              .send(
+                formatProtocolError(
+                  'INVALID_PIN',
+                  `Mã PIN của học sinh ${student.fullName} không chính xác.`
+                )
+              );
           }
         }
       }
 
-      finalDisplayName = loadedStudents.map((s) => s.fullName).join(' & ');
+      finalDisplayName = loadedStudents.map(s => s.fullName).join(' & ');
       finalStudentId = loadedStudents[0]!.id;
-      finalStudentIds = loadedStudents.map((s) => s.id);
+      finalStudentIds = loadedStudents.map(s => s.id);
       identityLevel = resolveIdentityLevel({
         hasStudentAccount: true,
         hasPin: anyHasPin,
@@ -1862,10 +1927,7 @@ export const sessionsRoutes: FastifyPluginAsync<SessionsRoutesOptions> = async (
       return reply
         .status(401)
         .send(
-          formatProtocolError(
-            'UNAUTHORIZED',
-            'Mã phiên học sinh không hợp lệ hoặc đã hết hạn.'
-          )
+          formatProtocolError('UNAUTHORIZED', 'Mã phiên học sinh không hợp lệ hoặc đã hết hạn.')
         );
     }
 
@@ -1873,12 +1935,7 @@ export const sessionsRoutes: FastifyPluginAsync<SessionsRoutesOptions> = async (
     if (!session || session.status === 'closed') {
       return reply
         .status(400)
-        .send(
-          formatProtocolError(
-            'SESSION_CLOSED',
-            'Phiên học đã kết thúc.'
-          )
-        );
+        .send(formatProtocolError('SESSION_CLOSED', 'Phiên học đã kết thúc.'));
     }
 
     let participant = await participantRepo.findById(tokenPayload.participantId);
@@ -1972,28 +2029,28 @@ export const sessionsRoutes: FastifyPluginAsync<SessionsRoutesOptions> = async (
 
       const participantsList = await participantRepo.listBySessionId(session.id);
       const teamsList = await teamRepo.listBySessionId(session.id);
-      const teamMap = new Map(teamsList.map((t) => [t.id, t.name]));
+      const teamMap = new Map(teamsList.map(t => [t.id, t.name]));
 
-      const onlineCount = participantsList.filter((p) => p.status === 'online').length;
-      const offlineCount = participantsList.filter((p) => p.status === 'offline').length;
+      const onlineCount = participantsList.filter(p => p.status === 'online').length;
+      const offlineCount = participantsList.filter(p => p.status === 'offline').length;
       const totalCount = participantsList.length;
 
       let eloMap = new Map<string, number>();
       if (session.classId && studentRepo) {
         try {
           const classStudents = await studentRepo.listByClassId(session.classId);
-          eloMap = new Map(classStudents.map((s) => [s.id, (s as { elo?: number }).elo ?? 1000]));
+          eloMap = new Map(classStudents.map(s => [s.id, (s as { elo?: number }).elo ?? 1000]));
         } catch {
           // ignore
         }
       }
 
-      const participantDtos = participantsList.map((p) => {
+      const participantDtos = participantsList.map(p => {
         let elo: number | undefined;
         if (p.studentId && eloMap.has(p.studentId)) {
           elo = eloMap.get(p.studentId);
         }
-        return toParticipantDto(p, p.teamId ? teamMap.get(p.teamId) ?? null : null, elo);
+        return toParticipantDto(p, p.teamId ? (teamMap.get(p.teamId) ?? null) : null, elo);
       });
 
       return reply.send(
@@ -2408,7 +2465,7 @@ export const sessionsRoutes: FastifyPluginAsync<SessionsRoutesOptions> = async (
       const expBreakdown: { reason: string; exp: number; ts: number }[] = [];
       if (rewardRepo) {
         const logs = await rewardRepo.listBySessionId(session.id);
-        const participantLogs = logs.filter((l) => l.participantId === participantId);
+        const participantLogs = logs.filter(l => l.participantId === participantId);
         for (const log of participantLogs) {
           totalExpEarned += log.exp;
           expBreakdown.push({
@@ -2442,7 +2499,7 @@ export const sessionsRoutes: FastifyPluginAsync<SessionsRoutesOptions> = async (
         if (titleRepo) {
           const studentTitles = await titleRepo.getStudentTitles(participant.studentId);
           // Lọc những danh hiệu được cấp trong chính phiên học này (sessionId)
-          const sessionTitles = studentTitles.filter((t) => t.sessionId === session.id);
+          const sessionTitles = studentTitles.filter(t => t.sessionId === session.id);
           for (const st of sessionTitles) {
             newTitlesAwarded.push({
               key: st.key,
@@ -2481,5 +2538,3 @@ export const sessionsRoutes: FastifyPluginAsync<SessionsRoutesOptions> = async (
     }
   );
 };
-
-

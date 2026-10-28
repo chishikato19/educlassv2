@@ -23,7 +23,11 @@ describe('Reward Rules & Priority & Caps (Task 3.2 Core)', () => {
     const quizRank1 = findEffectiveRule(DEFAULT_GLOBAL_REWARD_RULES, 'quiz_live', 'rank_1');
     expect(quizRank1?.exp).toBe(50);
 
-    const pollParticipate = findEffectiveRule(DEFAULT_GLOBAL_REWARD_RULES, 'quick_poll', 'participate');
+    const pollParticipate = findEffectiveRule(
+      DEFAULT_GLOBAL_REWARD_RULES,
+      'quick_poll',
+      'participate'
+    );
     expect(pollParticipate?.exp).toBe(10);
 
     const examScoreHigh = findEffectiveRule(DEFAULT_GLOBAL_REWARD_RULES, 'exam', 'score_high');

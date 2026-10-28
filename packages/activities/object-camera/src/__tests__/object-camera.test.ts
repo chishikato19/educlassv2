@@ -116,7 +116,10 @@ describe('ObjectCameraActivity', () => {
         color: '#EF4444',
         size: 4,
         opacity: 1,
-        points: [{ x: 0.1, y: 0.1 }, { x: 0.2, y: 0.2 }],
+        points: [
+          { x: 0.1, y: 0.1 },
+          { x: 0.2, y: 0.2 },
+        ],
         createdAt: 1000,
       },
     });

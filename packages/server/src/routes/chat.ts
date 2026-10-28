@@ -1,9 +1,5 @@
 import type { FastifyPluginAsync } from 'fastify';
-import type {
-  ChatRepository,
-  ParticipantRepository,
-  SessionRepository,
-} from '@educlass/db';
+import type { ChatRepository, ParticipantRepository, SessionRepository } from '@educlass/db';
 import {
   createEnvelope,
   formatProtocolError,
@@ -26,23 +22,15 @@ export interface ChatRoutesOptions {
   wsManager: WsGatewayManager;
 }
 
-export const chatRoutes: FastifyPluginAsync<ChatRoutesOptions> = async (
-  fastify,
-  options
-) => {
-  const {
-    chatRepo,
-    sessionRepo,
-    participantRepo,
-    authService,
-    tokenService,
-    wsManager,
-  } = options;
+export const chatRoutes: FastifyPluginAsync<ChatRoutesOptions> = async (fastify, options) => {
+  const { chatRepo, sessionRepo, participantRepo, authService, tokenService, wsManager } = options;
 
   /**
    * Helper kiểm tra xem request có phải do Giáo viên sở hữu phiên gửi hay không
    */
-  async function resolveTeacher(request: { headers: { authorization?: string | undefined } }): Promise<{ isTeacher: boolean; teacherId?: string }> {
+  async function resolveTeacher(request: {
+    headers: { authorization?: string | undefined };
+  }): Promise<{ isTeacher: boolean; teacherId?: string }> {
     const authHeader = request.headers.authorization;
     if (!authHeader || !authHeader.startsWith('Bearer ')) {
       return { isTeacher: false };
@@ -123,8 +111,7 @@ export const chatRoutes: FastifyPluginAsync<ChatRoutesOptions> = async (
     }
 
     const { isTeacher } = await resolveTeacher(request);
-    const participantId =
-      request.query.participantId || resolveParticipantId(request);
+    const participantId = request.query.participantId || resolveParticipantId(request);
 
     const messages = await chatRepo.listMessages(sessionId, {
       isTeacher,

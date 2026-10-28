@@ -28,9 +28,7 @@ function getActiveAssignmentRun(
       sessionId: string,
       runIdOrActivityId?: string
     ) => { run: ActivityRunDto; state: unknown } | null;
-    getActiveRuns: (
-      sessionId: string
-    ) => Array<{ run: ActivityRunDto; state: unknown }>;
+    getActiveRuns: (sessionId: string) => Array<{ run: ActivityRunDto; state: unknown }>;
   },
   sessionId: string,
   runId?: string
@@ -58,7 +56,7 @@ function getActiveAssignmentRun(
   // 3. Quét danh sách các lượt chạy trong session cụ thể
   if (sessionId && sessionId !== 'active' && sessionId !== 'current') {
     const sessionRuns = activityEngine.getActiveRuns(sessionId) || [];
-    const foundInSession = sessionRuns.find((r) => r.run.activityId === 'assignment-hub');
+    const foundInSession = sessionRuns.find(r => r.run.activityId === 'assignment-hub');
     if (foundInSession) {
       return foundInSession;
     }
@@ -71,7 +69,7 @@ function getActiveAssignmentRun(
   }
 
   const globalRuns = activityEngine.getActiveRuns('active') || [];
-  const foundGlobal = globalRuns.find((r) => r.run.activityId === 'assignment-hub');
+  const foundGlobal = globalRuns.find(r => r.run.activityId === 'assignment-hub');
   if (foundGlobal) {
     return foundGlobal;
   }
@@ -108,17 +106,20 @@ export const assignmentsRoutes: FastifyPluginAsync<AssignmentsRoutesOptions> = a
    * POST /api/system/resolve-target-dir
    * Chuẩn hóa đường dẫn thư mục lưu bài
    */
-  fastify.post<{ Body: { path?: string } }>('/api/system/resolve-target-dir', async (request, reply) => {
-    const inputPath = request.body?.path;
-    const base =
-      inputPath && inputPath.trim()
-        ? inputPath.trim()
-        : path.join(os.homedir(), 'Desktop', 'EduClass_BaiNop');
-    return reply.send({
-      finalDir: path.resolve(base),
-      originalDir: base,
-    });
-  });
+  fastify.post<{ Body: { path?: string } }>(
+    '/api/system/resolve-target-dir',
+    async (request, reply) => {
+      const inputPath = request.body?.path;
+      const base =
+        inputPath && inputPath.trim()
+          ? inputPath.trim()
+          : path.join(os.homedir(), 'Desktop', 'EduClass_BaiNop');
+      return reply.send({
+        finalDir: path.resolve(base),
+        originalDir: base,
+      });
+    }
+  );
 
   /**
    * POST /api/system/select-folder
@@ -141,17 +142,13 @@ export const assignmentsRoutes: FastifyPluginAsync<AssignmentsRoutesOptions> = a
           `$f.ShowNewFolderButton = $true; ` +
           `if ($f.ShowDialog() -eq 'OK') { Write-Output $f.SelectedPath }`;
 
-        exec(
-          `powershell -NoProfile -Command "${psCmd}"`,
-          { windowsHide: false },
-          (err, stdout) => {
-            if (err) {
-              return reject(err);
-            }
-            const trimmed = stdout.trim();
-            resolve(trimmed);
+        exec(`powershell -NoProfile -Command "${psCmd}"`, { windowsHide: false }, (err, stdout) => {
+          if (err) {
+            return reject(err);
           }
-        );
+          const trimmed = stdout.trim();
+          resolve(trimmed);
+        });
       });
 
       if (selectedPath && fs.existsSync(selectedPath)) {
@@ -287,7 +284,8 @@ export const assignmentsRoutes: FastifyPluginAsync<AssignmentsRoutesOptions> = a
 
       fs.writeFileSync(finalFilePath, buffer);
 
-      const displayFileName = attempt > 1 ? `${origBaseName} (Lần ${attempt})${origExt}` : safeOrigName;
+      const displayFileName =
+        attempt > 1 ? `${origBaseName} (Lần ${attempt})${origExt}` : safeOrigName;
 
       // 4. Tạo thông tin bài nộp
       const downloadUrl = `/api/sessions/${sessionId}/activities/${runId}/assignment/submissions/${participantId}/download`;
@@ -439,7 +437,10 @@ export const assignmentsRoutes: FastifyPluginAsync<AssignmentsRoutesOptions> = a
       const originalName = targetFile.replace(`${materialId}_`, '');
       const stream = fs.createReadStream(filePath);
 
-      reply.header('Content-Disposition', `attachment; filename="${encodeURIComponent(originalName)}"`);
+      reply.header(
+        'Content-Disposition',
+        `attachment; filename="${encodeURIComponent(originalName)}"`
+      );
       reply.header('Content-Type', 'application/octet-stream');
       return reply.send(stream);
     }
@@ -467,7 +468,9 @@ export const assignmentsRoutes: FastifyPluginAsync<AssignmentsRoutesOptions> = a
       sessionId = activeState.run.sessionId;
       runId = activeState.run.id;
 
-      const state = activeState.state as { submissions?: Record<string, { storedPath?: string; fileName?: string }> };
+      const state = activeState.state as {
+        submissions?: Record<string, { storedPath?: string; fileName?: string }>;
+      };
       const sub = state.submissions?.[participantId];
 
       if (!sub?.storedPath || !fs.existsSync(sub.storedPath)) {
@@ -485,7 +488,9 @@ export const assignmentsRoutes: FastifyPluginAsync<AssignmentsRoutesOptions> = a
       else if (ext === '.gif') mimeType = 'image/gif';
       else if (ext === '.webp') mimeType = 'image/webp';
       else if (ext === '.svg') mimeType = 'image/svg+xml';
-      else if (['.txt', '.md', '.json', '.c', '.cpp', '.py', '.pas', '.java', '.js', '.ts'].includes(ext)) {
+      else if (
+        ['.txt', '.md', '.json', '.c', '.cpp', '.py', '.pas', '.java', '.js', '.ts'].includes(ext)
+      ) {
         mimeType = 'text/plain; charset=utf-8';
       }
 
@@ -493,7 +498,10 @@ export const assignmentsRoutes: FastifyPluginAsync<AssignmentsRoutesOptions> = a
         reply.header('Content-Disposition', `inline; filename="${encodeURIComponent(fileName)}"`);
         reply.header('Content-Type', mimeType);
       } else {
-        reply.header('Content-Disposition', `attachment; filename="${encodeURIComponent(fileName)}"`);
+        reply.header(
+          'Content-Disposition',
+          `attachment; filename="${encodeURIComponent(fileName)}"`
+        );
         reply.header('Content-Type', 'application/octet-stream');
       }
       return reply.send(stream);
@@ -520,7 +528,9 @@ export const assignmentsRoutes: FastifyPluginAsync<AssignmentsRoutesOptions> = a
       sessionId = activeState.run.sessionId;
       runId = activeState.run.id;
 
-      const state = activeState.state as { submissions?: Record<string, { storedPath?: string; fileName?: string }> };
+      const state = activeState.state as {
+        submissions?: Record<string, { storedPath?: string; fileName?: string }>;
+      };
       const sub = state.submissions?.[participantId];
 
       if (!sub?.storedPath || !fs.existsSync(sub.storedPath)) {
@@ -590,7 +600,22 @@ export const assignmentsRoutes: FastifyPluginAsync<AssignmentsRoutesOptions> = a
         }
 
         // 6. Tệp văn bản / Code
-        if (['.txt', '.md', '.json', '.c', '.cpp', '.py', '.pas', '.java', '.js', '.ts', '.html', '.css'].includes(ext)) {
+        if (
+          [
+            '.txt',
+            '.md',
+            '.json',
+            '.c',
+            '.cpp',
+            '.py',
+            '.pas',
+            '.java',
+            '.js',
+            '.ts',
+            '.html',
+            '.css',
+          ].includes(ext)
+        ) {
           const content = fs.readFileSync(filePath, 'utf-8');
           return reply.send({
             type: 'text',

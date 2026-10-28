@@ -95,7 +95,7 @@ const SinglePageCanvas: React.FC<SinglePageCanvasProps> = ({
   const [collapsedGapIds, setCollapsedGapIds] = useState<Record<string, boolean>>({});
 
   const toggleCollapseGap = (gapId: string) => {
-    setCollapsedGapIds((prev) => ({
+    setCollapsedGapIds(prev => ({
       ...prev,
       [gapId]: !prev[gapId],
     }));
@@ -135,7 +135,8 @@ const SinglePageCanvas: React.FC<SinglePageCanvasProps> = ({
       liveStrokes.push({
         id: 'preview',
         pageNumber,
-        tool: activeTool === 'highlighter' ? 'highlighter' : activeTool === 'eraser' ? 'eraser' : 'pen',
+        tool:
+          activeTool === 'highlighter' ? 'highlighter' : activeTool === 'eraser' ? 'eraser' : 'pen',
         color: activeTool === 'highlighter' ? highlighterColor : penColor,
         size: activeTool === 'highlighter' ? 18 : penSize,
         opacity: activeTool === 'highlighter' ? 0.4 : 1,
@@ -250,7 +251,7 @@ const SinglePageCanvas: React.FC<SinglePageCanvasProps> = ({
 
     if (activeTool === 'eraser') {
       if (eraseBox) {
-        setEraseBox((prev) => (prev ? { ...prev, currentX: x, currentY: rawY } : null));
+        setEraseBox(prev => (prev ? { ...prev, currentX: x, currentY: rawY } : null));
       }
       return;
     }
@@ -290,13 +291,13 @@ const SinglePageCanvas: React.FC<SinglePageCanvasProps> = ({
 
         // Lọc các nét vẽ (chữ viết & dạ quang) có điểm chạm vào vùng chọn
         const idsToDelete = strokes
-          .filter((s) =>
-            s.points.some((p) => {
+          .filter(s =>
+            s.points.some(p => {
               const ptY = p.y <= 1.0001 ? p.y * canvasHeight : p.y;
               return p.x >= boxMinX && p.x <= boxMaxX && ptY >= boxMinY && ptY <= boxMaxY;
             })
           )
-          .map((s) => s.id);
+          .map(s => s.id);
 
         if (idsToDelete.length > 0) {
           onRemoveStrokes(idsToDelete, pageNumber);
@@ -379,7 +380,7 @@ const SinglePageCanvas: React.FC<SinglePageCanvasProps> = ({
         {gaps.map((gap, gIdx) => {
           // Tính vị trí hiển thị pixel của khoảng trống trên canvas
           const prevGapsHeight = gaps
-            .filter((g) => g.splitYRatio < gap.splitYRatio)
+            .filter(g => g.splitYRatio < gap.splitYRatio)
             .reduce((sum, g) => sum + g.gapHeightPx, 0);
           const gapTopPx = gap.splitYRatio * BASE_PAGE_HEIGHT + prevGapsHeight;
           const isCollapsed = Boolean(collapsedGapIds[gap.id]);
@@ -395,8 +396,12 @@ const SinglePageCanvas: React.FC<SinglePageCanvasProps> = ({
                 title="Bấm để mở rộng bảng công cụ điều chỉnh chỗ sửa bài này"
               >
                 <span>✂️ Chỗ #{gIdx + 1}</span>
-                <span className="text-[11px] font-mono text-slate-400 font-normal">({gap.gapHeightPx}px)</span>
-                <span className="text-[10px] text-slate-400 group-hover:text-blue-600 transition">▾</span>
+                <span className="text-[11px] font-mono text-slate-400 font-normal">
+                  ({gap.gapHeightPx}px)
+                </span>
+                <span className="text-[10px] text-slate-400 group-hover:text-blue-600 transition">
+                  ▾
+                </span>
               </button>
             );
           }
@@ -438,7 +443,7 @@ const SinglePageCanvas: React.FC<SinglePageCanvasProps> = ({
               {/* Đổi kiểu hoa văn nền */}
               <select
                 value={gap.pattern}
-                onChange={(e) => onUpdateGapPattern(gap.id, e.target.value as GapPattern)}
+                onChange={e => onUpdateGapPattern(gap.id, e.target.value as GapPattern)}
                 className="text-[11px] bg-slate-50 border border-slate-300 rounded px-1 py-0.5 text-slate-700 cursor-pointer outline-none"
               >
                 <option value="grid">Ô ly</option>
@@ -478,7 +483,9 @@ export const PdfPresenterTeacherPanel: React.FC<PdfPresenterTeacherPanelProps> =
   onSendIntent,
 }) => {
   // Bộ công cụ vẽ & thao tác
-  const [activeTool, setActiveTool] = useState<'pen' | 'highlighter' | 'eraser' | 'gap' | 'laser'>('pen');
+  const [activeTool, setActiveTool] = useState<'pen' | 'highlighter' | 'eraser' | 'gap' | 'laser'>(
+    'pen'
+  );
   const [penColor, setPenColor] = useState('#DC2626'); // Đỏ mặc định để chữa bài
   const [penSize, setPenSize] = useState(3);
   const [highlighterColor, setHighlighterColor] = useState('#FDE047'); // Vàng dạ quang
@@ -492,7 +499,9 @@ export const PdfPresenterTeacherPanel: React.FC<PdfPresenterTeacherPanelProps> =
   // Trạng thái vẽ thời gian thực
   const [isDrawing, setIsDrawing] = useState(false);
   const [drawingPage, setDrawingPage] = useState<number | null>(null);
-  const [currentStrokePoints, setCurrentStrokePoints] = useState<Array<{ x: number; y: number }>>([]);
+  const [currentStrokePoints, setCurrentStrokePoints] = useState<Array<{ x: number; y: number }>>(
+    []
+  );
   const [hoverGap, setHoverGap] = useState<{ pageNumber: number; yRatio: number } | null>(null);
 
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -608,7 +617,7 @@ export const PdfPresenterTeacherPanel: React.FC<PdfPresenterTeacherPanelProps> =
 
   const handleMoveDrawing = (pageNumber: number, pt: { x: number; y: number }) => {
     if (!isDrawing || drawingPage !== pageNumber) return;
-    setCurrentStrokePoints((prev) => [...prev, pt]);
+    setCurrentStrokePoints(prev => [...prev, pt]);
   };
 
   const handleEndDrawing = () => {
@@ -622,7 +631,8 @@ export const PdfPresenterTeacherPanel: React.FC<PdfPresenterTeacherPanelProps> =
     const newStroke: AnnotationStroke = {
       id: `stroke-${Date.now()}`,
       pageNumber: drawingPage,
-      tool: activeTool === 'highlighter' ? 'highlighter' : activeTool === 'eraser' ? 'eraser' : 'pen',
+      tool:
+        activeTool === 'highlighter' ? 'highlighter' : activeTool === 'eraser' ? 'eraser' : 'pen',
       color: activeTool === 'highlighter' ? highlighterColor : penColor,
       size: activeTool === 'highlighter' ? 18 : penSize,
       opacity: activeTool === 'highlighter' ? 0.4 : 1,
@@ -733,7 +743,9 @@ export const PdfPresenterTeacherPanel: React.FC<PdfPresenterTeacherPanelProps> =
             type="button"
             onClick={() => setActiveTool('pen')}
             className={`px-3 py-1.5 rounded-lg text-xs font-bold flex items-center gap-1.5 cursor-pointer transition ${
-              activeTool === 'pen' ? 'bg-red-600 text-white shadow' : 'text-slate-300 hover:bg-slate-800'
+              activeTool === 'pen'
+                ? 'bg-red-600 text-white shadow'
+                : 'text-slate-300 hover:bg-slate-800'
             }`}
           >
             <span>✏️</span>
@@ -744,7 +756,9 @@ export const PdfPresenterTeacherPanel: React.FC<PdfPresenterTeacherPanelProps> =
             type="button"
             onClick={() => setActiveTool('highlighter')}
             className={`px-3 py-1.5 rounded-lg text-xs font-bold flex items-center gap-1.5 cursor-pointer transition ${
-              activeTool === 'highlighter' ? 'bg-amber-500 text-slate-950 shadow' : 'text-slate-300 hover:bg-slate-800'
+              activeTool === 'highlighter'
+                ? 'bg-amber-500 text-slate-950 shadow'
+                : 'text-slate-300 hover:bg-slate-800'
             }`}
           >
             <span>🖍️</span>
@@ -755,7 +769,9 @@ export const PdfPresenterTeacherPanel: React.FC<PdfPresenterTeacherPanelProps> =
             type="button"
             onClick={() => setActiveTool('gap')}
             className={`px-3 py-1.5 rounded-lg text-xs font-bold flex items-center gap-1.5 cursor-pointer transition ${
-              activeTool === 'gap' ? 'bg-emerald-600 text-white shadow animate-pulse' : 'text-emerald-300 hover:bg-slate-800'
+              activeTool === 'gap'
+                ? 'bg-emerald-600 text-white shadow animate-pulse'
+                : 'text-emerald-300 hover:bg-slate-800'
             }`}
             title="Bấm vào trang để chèn khoảng trống sửa bài, đề dưới sẽ dạt xuống"
           >
@@ -767,7 +783,9 @@ export const PdfPresenterTeacherPanel: React.FC<PdfPresenterTeacherPanelProps> =
             type="button"
             onClick={() => setActiveTool('eraser')}
             className={`px-3 py-1.5 rounded-lg text-xs font-bold flex items-center gap-1.5 cursor-pointer transition ${
-              activeTool === 'eraser' ? 'bg-rose-700 text-white shadow' : 'text-slate-300 hover:bg-slate-800'
+              activeTool === 'eraser'
+                ? 'bg-rose-700 text-white shadow'
+                : 'text-slate-300 hover:bg-slate-800'
             }`}
             title="Kéo chuột quét chọn vùng để xóa chữ viết & vệt dạ quang trong vùng đó"
           >
@@ -779,7 +797,9 @@ export const PdfPresenterTeacherPanel: React.FC<PdfPresenterTeacherPanelProps> =
             type="button"
             onClick={() => setActiveTool('laser')}
             className={`px-2.5 py-1.5 rounded-lg text-xs font-bold flex items-center gap-1 cursor-pointer transition ${
-              activeTool === 'laser' ? 'bg-rose-700 text-white shadow' : 'text-slate-300 hover:bg-slate-800'
+              activeTool === 'laser'
+                ? 'bg-rose-700 text-white shadow'
+                : 'text-slate-300 hover:bg-slate-800'
             }`}
           >
             <span>🔴</span>
@@ -817,23 +837,27 @@ export const PdfPresenterTeacherPanel: React.FC<PdfPresenterTeacherPanelProps> =
             }
           >
             <span className="w-2 h-2 rounded-full animate-pulse bg-white"></span>
-            <span>{state.isStudentBroadcastEnabled ? '📡 Chiếu HS: BẬT' : '⏸️ Tạm dừng chiếu HS'}</span>
+            <span>
+              {state.isStudentBroadcastEnabled ? '📡 Chiếu HS: BẬT' : '⏸️ Tạm dừng chiếu HS'}
+            </span>
           </button>
 
           {/* Phóng to / Thu nhỏ */}
           <div className="flex items-center gap-1 bg-slate-900 px-2 py-1 rounded-lg border border-slate-700 text-xs">
             <button
               type="button"
-              onClick={() => setZoom((z) => Math.max(0.6, Number((z - 0.1).toFixed(1))))}
+              onClick={() => setZoom(z => Math.max(0.6, Number((z - 0.1).toFixed(1))))}
               className="px-1 text-slate-300 hover:text-white cursor-pointer"
               title="Thu nhỏ"
             >
               -
             </button>
-            <span className="w-10 text-center font-bold text-slate-200">{Math.round(zoom * 100)}%</span>
+            <span className="w-10 text-center font-bold text-slate-200">
+              {Math.round(zoom * 100)}%
+            </span>
             <button
               type="button"
-              onClick={() => setZoom((z) => Math.min(1.8, Number((z + 0.1).toFixed(1))))}
+              onClick={() => setZoom(z => Math.min(1.8, Number((z + 0.1).toFixed(1))))}
               className="px-1 text-slate-300 hover:text-white cursor-pointer"
               title="Phóng to"
             >
@@ -855,13 +879,15 @@ export const PdfPresenterTeacherPanel: React.FC<PdfPresenterTeacherPanelProps> =
                 { label: 'Xanh lá', hex: '#16A34A' },
                 { label: 'Đen', hex: '#0F172A' },
                 { label: 'Tím', hex: '#9333EA' },
-              ].map((c) => (
+              ].map(c => (
                 <button
                   key={c.hex}
                   type="button"
                   onClick={() => setPenColor(c.hex)}
                   className={`w-5 h-5 rounded-full border-2 transition-transform cursor-pointer ${
-                    penColor === c.hex ? 'border-white scale-125 shadow-md' : 'border-transparent hover:scale-110'
+                    penColor === c.hex
+                      ? 'border-white scale-125 shadow-md'
+                      : 'border-transparent hover:scale-110'
                   }`}
                   style={{ backgroundColor: c.hex }}
                   title={c.label}
@@ -869,13 +895,15 @@ export const PdfPresenterTeacherPanel: React.FC<PdfPresenterTeacherPanelProps> =
               ))}
 
               <span className="text-slate-400 ml-3">Cỡ nét:</span>
-              {[2, 3, 5].map((sz) => (
+              {[2, 3, 5].map(sz => (
                 <button
                   key={sz}
                   type="button"
                   onClick={() => setPenSize(sz)}
                   className={`px-2 py-0.5 rounded cursor-pointer ${
-                    penSize === sz ? 'bg-slate-600 text-white font-bold' : 'text-slate-400 hover:text-white'
+                    penSize === sz
+                      ? 'bg-slate-600 text-white font-bold'
+                      : 'text-slate-400 hover:text-white'
                   }`}
                 >
                   {sz}px
@@ -892,13 +920,15 @@ export const PdfPresenterTeacherPanel: React.FC<PdfPresenterTeacherPanelProps> =
                 { label: 'Xanh neon', hex: '#86EFAC' },
                 { label: 'Hồng neon', hex: '#F472B6' },
                 { label: 'Cam neon', hex: '#FDBA74' },
-              ].map((c) => (
+              ].map(c => (
                 <button
                   key={c.hex}
                   type="button"
                   onClick={() => setHighlighterColor(c.hex)}
                   className={`w-5 h-5 rounded-full border-2 transition-transform cursor-pointer ${
-                    highlighterColor === c.hex ? 'border-white scale-125 shadow-md' : 'border-transparent'
+                    highlighterColor === c.hex
+                      ? 'border-white scale-125 shadow-md'
+                      : 'border-transparent'
                   }`}
                   style={{ backgroundColor: c.hex }}
                   title={c.label}
@@ -927,7 +957,9 @@ export const PdfPresenterTeacherPanel: React.FC<PdfPresenterTeacherPanelProps> =
                   type="button"
                   onClick={() => setGapPattern('lines')}
                   className={`px-2 py-0.5 rounded cursor-pointer ${
-                    gapPattern === 'lines' ? 'bg-emerald-600 text-white font-bold' : 'text-slate-300'
+                    gapPattern === 'lines'
+                      ? 'bg-emerald-600 text-white font-bold'
+                      : 'text-slate-300'
                   }`}
                 >
                   📝 Dòng kẻ
@@ -936,7 +968,9 @@ export const PdfPresenterTeacherPanel: React.FC<PdfPresenterTeacherPanelProps> =
                   type="button"
                   onClick={() => setGapPattern('blank')}
                   className={`px-2 py-0.5 rounded cursor-pointer ${
-                    gapPattern === 'blank' ? 'bg-emerald-600 text-white font-bold' : 'text-slate-300'
+                    gapPattern === 'blank'
+                      ? 'bg-emerald-600 text-white font-bold'
+                      : 'text-slate-300'
                   }`}
                 >
                   ⬜ Trắng
@@ -948,7 +982,8 @@ export const PdfPresenterTeacherPanel: React.FC<PdfPresenterTeacherPanelProps> =
           {activeTool === 'eraser' && (
             <div className="flex items-center gap-2 bg-rose-950/70 px-3 py-1 rounded-lg border border-rose-800 text-rose-300">
               <span className="font-semibold">
-                🧹 Kéo chuột quét một vùng hình chữ nhật để xóa toàn bộ chữ viết & dạ quang trong vùng đó (hoặc click vào nét cần xóa)
+                🧹 Kéo chuột quét một vùng hình chữ nhật để xóa toàn bộ chữ viết & dạ quang trong
+                vùng đó (hoặc click vào nét cần xóa)
               </span>
             </div>
           )}
@@ -957,7 +992,7 @@ export const PdfPresenterTeacherPanel: React.FC<PdfPresenterTeacherPanelProps> =
         {/* Thanh Nhảy Trang Nhanh (Yêu cầu 3) */}
         <div className="flex items-center gap-1 text-slate-300 font-semibold">
           <span className="text-slate-400 mr-1">Nhảy nhanh:</span>
-          {Array.from({ length: totalPages }, (_, i) => i + 1).map((pNum) => (
+          {Array.from({ length: totalPages }, (_, i) => i + 1).map(pNum => (
             <button
               key={pNum}
               type="button"
@@ -984,9 +1019,9 @@ export const PdfPresenterTeacherPanel: React.FC<PdfPresenterTeacherPanelProps> =
         ref={scrollContainerRef}
         className="flex-1 overflow-y-auto overflow-x-hidden bg-slate-950 py-8 px-4 flex flex-col items-center relative"
       >
-        {Array.from({ length: totalPages }, (_, i) => i + 1).map((pNum) => {
-          const pageGaps = state.gaps.filter((g) => g.pageNumber === pNum);
-          const pageStrokes = state.strokes.filter((s) => s.pageNumber === pNum);
+        {Array.from({ length: totalPages }, (_, i) => i + 1).map(pNum => {
+          const pageGaps = state.gaps.filter(g => g.pageNumber === pNum);
+          const pageStrokes = state.strokes.filter(s => s.pageNumber === pNum);
           const pageImg = pageImages[pNum - 1];
 
           return (
@@ -1018,8 +1053,8 @@ export const PdfPresenterTeacherPanel: React.FC<PdfPresenterTeacherPanelProps> =
               onUpdateGapPattern={(gapId, p) =>
                 onSendIntent({ type: 'update_gap', gapId, gapHeightPx: 260, pattern: p })
               }
-              onRemoveGap={(gapId) => onSendIntent({ type: 'remove_gap', gapId })}
-              onClearStrokes={(p) => onSendIntent({ type: 'clear_page_strokes', pageNumber: p })}
+              onRemoveGap={gapId => onSendIntent({ type: 'remove_gap', gapId })}
+              onClearStrokes={p => onSendIntent({ type: 'clear_page_strokes', pageNumber: p })}
               onRemoveStrokes={handleRemoveStrokes}
               onLaserPointer={handleLaserPointer}
             />

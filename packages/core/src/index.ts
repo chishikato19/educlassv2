@@ -19,4 +19,3 @@ export function checkCoreProtocolCompatibility(version: unknown): boolean {
   const result = ProtocolVersionSchema.safeParse(version);
   return result.success;
 }
-

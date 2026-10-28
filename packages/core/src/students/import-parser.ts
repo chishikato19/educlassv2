@@ -32,8 +32,8 @@ function isHeaderRow(tokens: string[]): boolean {
     'name',
   ];
 
-  const lower = tokens.map((t) => t.toLowerCase().trim());
-  return lower.some((token) => headerKeywords.includes(token));
+  const lower = tokens.map(t => t.toLowerCase().trim());
+  return lower.some(token => headerKeywords.includes(token));
 }
 
 /**
@@ -43,8 +43,8 @@ export function parseClipboardText(rawText: string): StudentImportRow[] {
   const cleanText = rawText.replace(/^\uFEFF/, '');
   const lines = cleanText
     .split(/\r?\n/)
-    .map((l) => l.trim())
-    .filter((l) => l.length > 0);
+    .map(l => l.trim())
+    .filter(l => l.length > 0);
 
   if (lines.length === 0) {
     return [];
@@ -59,18 +59,27 @@ export function parseClipboardText(rawText: string): StudentImportRow[] {
   let colTenIdx = -1;
 
   // 1. Kiểm tra dòng đầu tiên xem có phải là header không
-  const firstLineTokens = lines[0]!.split(/\t|,|;/).map((t) => t.trim());
+  const firstLineTokens = lines[0]!.split(/\t|,|;/).map(t => t.trim());
   if (isHeaderRow(firstLineTokens)) {
     headerIndex = 0;
     firstLineTokens.forEach((token, idx) => {
       const lower = token.toLowerCase();
-      if (lower.includes('họ và tên') || lower.includes('họ tên') || lower === 'name' || lower === 'full name') {
+      if (
+        lower.includes('họ và tên') ||
+        lower.includes('họ tên') ||
+        lower === 'name' ||
+        lower === 'full name'
+      ) {
         colNameIdx = idx;
       } else if (lower === 'họ' || lower === 'họ đệm' || lower === 'họ lót') {
         colHoDemIdx = idx;
       } else if (lower === 'tên') {
         colTenIdx = idx;
-      } else if (lower.includes('pin') || lower.includes('mật khẩu') || lower.includes('password')) {
+      } else if (
+        lower.includes('pin') ||
+        lower.includes('mật khẩu') ||
+        lower.includes('password')
+      ) {
         colPinIdx = idx;
       } else if (lower.includes('mã') || lower.includes('code')) {
         colCodeIdx = idx;
@@ -84,9 +93,9 @@ export function parseClipboardText(rawText: string): StudentImportRow[] {
     const line = lines[i]!;
     // Tách cột bằng Tab (\t), Phẩy (,), hoặc Chấm phẩy (;)
     const delimiter = line.includes('\t') ? '\t' : line.includes(';') ? ';' : ',';
-    const tokens = line.split(delimiter).map((t) => t.trim());
+    const tokens = line.split(delimiter).map(t => t.trim());
 
-    if (tokens.every((t) => t.length === 0)) {
+    if (tokens.every(t => t.length === 0)) {
       continue;
     }
 
@@ -173,13 +182,9 @@ export function validateAndPreviewStudents(
   rows: StudentImportRow[],
   existingStudents: Array<{ fullName: string; code?: string | null }>
 ): StudentImportPreviewResponse {
-  const existingNamesSet = new Set(
-    existingStudents.map((s) => s.fullName.toLowerCase().trim())
-  );
+  const existingNamesSet = new Set(existingStudents.map(s => s.fullName.toLowerCase().trim()));
   const existingCodesSet = new Set(
-    existingStudents
-      .map((s) => s.code?.toLowerCase().trim())
-      .filter((c): c is string => Boolean(c))
+    existingStudents.map(s => s.code?.toLowerCase().trim()).filter((c): c is string => Boolean(c))
   );
 
   const seenImportNames = new Map<string, number>();

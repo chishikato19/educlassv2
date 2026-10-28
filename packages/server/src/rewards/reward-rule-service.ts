@@ -126,7 +126,7 @@ export class RewardRuleService {
       };
     }
 
-    const baseExp = matchedRule ? matchedRule.exp : params.defaultExp ?? 10;
+    const baseExp = matchedRule ? matchedRule.exp : (params.defaultExp ?? 10);
     if (baseExp <= 0) {
       return {
         expGranted: 0,

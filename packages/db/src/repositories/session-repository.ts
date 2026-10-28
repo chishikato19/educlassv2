@@ -77,7 +77,7 @@ export class SessionRepository {
    */
   async listActiveJoinCodes(): Promise<Set<string>> {
     const active = await this.listActiveSessions();
-    return new Set(active.map((s) => s.joinCode));
+    return new Set(active.map(s => s.joinCode));
   }
 
   /**

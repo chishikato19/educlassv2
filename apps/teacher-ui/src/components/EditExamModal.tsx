@@ -51,7 +51,7 @@ export const EditExamModal: React.FC<EditExamModalProps> = ({
 
     api
       .getExamDetail(exam.id)
-      .then((detail) => {
+      .then(detail => {
         if (!isMounted) return;
         const cfg = detail.config || {};
         if (cfg.folder !== undefined && cfg.folder !== null) {
@@ -136,22 +136,41 @@ export const EditExamModal: React.FC<EditExamModalProps> = ({
       }
       onClose={() => !isSubmitting && onClose()}
     >
-      <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '16px', padding: '4px 0' }}>
+      <form
+        onSubmit={handleSubmit}
+        style={{ display: 'flex', flexDirection: 'column', gap: '16px', padding: '4px 0' }}
+      >
         {isLoadingDetail && (
-          <div style={{ padding: '8px 12px', backgroundColor: '#EFF6FF', borderRadius: '6px', fontSize: '12.5px', color: '#1E40AF' }}>
+          <div
+            style={{
+              padding: '8px 12px',
+              backgroundColor: '#EFF6FF',
+              borderRadius: '6px',
+              fontSize: '12.5px',
+              color: '#1E40AF',
+            }}
+          >
             ⏳ Đang nạp thiết lập chi tiết của kỳ thi...
           </div>
         )}
 
         {/* 1. Tiêu đề kỳ thi */}
         <div>
-          <label style={{ display: 'block', fontSize: '13px', fontWeight: 700, color: UI_COLORS.text, marginBottom: '6px' }}>
+          <label
+            style={{
+              display: 'block',
+              fontSize: '13px',
+              fontWeight: 700,
+              color: UI_COLORS.text,
+              marginBottom: '6px',
+            }}
+          >
             Tiêu đề kỳ thi <span style={{ color: '#DC2626' }}>*</span>
           </label>
           <input
             type="text"
             value={title}
-            onChange={(e) => {
+            onChange={e => {
               setTitle(e.target.value);
               if (error) setError('');
             }}
@@ -168,7 +187,9 @@ export const EditExamModal: React.FC<EditExamModalProps> = ({
             }}
           />
           {error && (
-            <span style={{ fontSize: '12px', color: '#DC2626', marginTop: '4px', display: 'block' }}>
+            <span
+              style={{ fontSize: '12px', color: '#DC2626', marginTop: '4px', display: 'block' }}
+            >
               {error}
             </span>
           )}
@@ -177,13 +198,21 @@ export const EditExamModal: React.FC<EditExamModalProps> = ({
         {/* 2. Môn học & Thư mục */}
         <div style={{ display: 'flex', gap: '12px', flexWrap: 'wrap' }}>
           <div style={{ flex: '1 1 180px' }}>
-            <label style={{ display: 'block', fontSize: '13px', fontWeight: 700, color: UI_COLORS.text, marginBottom: '6px' }}>
+            <label
+              style={{
+                display: 'block',
+                fontSize: '13px',
+                fontWeight: 700,
+                color: UI_COLORS.text,
+                marginBottom: '6px',
+              }}
+            >
               Môn học
             </label>
             <input
               type="text"
               value={subject}
-              onChange={(e) => setSubject(e.target.value)}
+              onChange={e => setSubject(e.target.value)}
               placeholder="VD: Tin học, Toán..."
               disabled={isSubmitting}
               style={{
@@ -199,14 +228,22 @@ export const EditExamModal: React.FC<EditExamModalProps> = ({
           </div>
 
           <div style={{ flex: '1 1 200px' }}>
-            <label style={{ display: 'block', fontSize: '13px', fontWeight: 700, color: UI_COLORS.text, marginBottom: '6px' }}>
+            <label
+              style={{
+                display: 'block',
+                fontSize: '13px',
+                fontWeight: 700,
+                color: UI_COLORS.text,
+                marginBottom: '6px',
+              }}
+            >
               📁 Thư mục lưu trữ
             </label>
             <input
               type="text"
               list="edit-exam-folder-datalist"
               value={folder}
-              onChange={(e) => setFolder(e.target.value)}
+              onChange={e => setFolder(e.target.value)}
               placeholder="VD: Giữa HK1, 15 Phút..."
               disabled={isSubmitting}
               style={{
@@ -220,7 +257,7 @@ export const EditExamModal: React.FC<EditExamModalProps> = ({
               }}
             />
             <datalist id="edit-exam-folder-datalist">
-              {existingFolders.map((f) => (
+              {existingFolders.map(f => (
                 <option key={f} value={f} />
               ))}
             </datalist>
@@ -229,7 +266,15 @@ export const EditExamModal: React.FC<EditExamModalProps> = ({
 
         {/* 3. Thời gian làm bài */}
         <div>
-          <label style={{ display: 'block', fontSize: '13px', fontWeight: 700, color: UI_COLORS.text, marginBottom: '6px' }}>
+          <label
+            style={{
+              display: 'block',
+              fontSize: '13px',
+              fontWeight: 700,
+              color: UI_COLORS.text,
+              marginBottom: '6px',
+            }}
+          >
             Thời lượng làm bài (phút) <span style={{ color: '#DC2626' }}>*</span>
           </label>
           <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
@@ -238,7 +283,7 @@ export const EditExamModal: React.FC<EditExamModalProps> = ({
               min={1}
               max={180}
               value={durationMinutes}
-              onChange={(e) => {
+              onChange={e => {
                 const val = parseInt(e.target.value, 10);
                 setDurationMinutes(isNaN(val) ? 0 : val);
               }}
@@ -253,7 +298,7 @@ export const EditExamModal: React.FC<EditExamModalProps> = ({
                 minHeight: '40px',
               }}
             />
-            {[15, 30, 45, 60, 90].map((mins) => (
+            {[15, 30, 45, 60, 90].map(mins => (
               <button
                 key={mins}
                 type="button"
@@ -288,48 +333,91 @@ export const EditExamModal: React.FC<EditExamModalProps> = ({
             gap: '10px',
           }}
         >
-          <div style={{ fontSize: '13px', fontWeight: 700, color: UI_COLORS.text, marginBottom: '2px' }}>
+          <div
+            style={{
+              fontSize: '13px',
+              fontWeight: 700,
+              color: UI_COLORS.text,
+              marginBottom: '2px',
+            }}
+          >
             ⚙️ Tùy chọn thi & Trả kết quả
           </div>
 
-          <label style={{ display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer', fontSize: '13.5px', color: UI_COLORS.text }}>
+          <label
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: '8px',
+              cursor: 'pointer',
+              fontSize: '13.5px',
+              color: UI_COLORS.text,
+            }}
+          >
             <input
               type="checkbox"
               checked={shuffleQuestions}
-              onChange={(e) => setShuffleQuestions(e.target.checked)}
+              onChange={e => setShuffleQuestions(e.target.checked)}
               disabled={isSubmitting}
               style={{ accentColor: UI_COLORS.primary }}
             />
             <span>Xáo trộn thứ tự câu hỏi</span>
           </label>
 
-          <label style={{ display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer', fontSize: '13.5px', color: UI_COLORS.text }}>
+          <label
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: '8px',
+              cursor: 'pointer',
+              fontSize: '13.5px',
+              color: UI_COLORS.text,
+            }}
+          >
             <input
               type="checkbox"
               checked={shuffleOptions}
-              onChange={(e) => setShuffleOptions(e.target.checked)}
+              onChange={e => setShuffleOptions(e.target.checked)}
               disabled={isSubmitting}
               style={{ accentColor: UI_COLORS.primary }}
             />
             <span>Xáo trộn thứ tự các lựa chọn đáp án (A, B, C, D)</span>
           </label>
 
-          <label style={{ display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer', fontSize: '13.5px', color: UI_COLORS.text }}>
+          <label
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: '8px',
+              cursor: 'pointer',
+              fontSize: '13.5px',
+              color: UI_COLORS.text,
+            }}
+          >
             <input
               type="checkbox"
               checked={allowViewScore}
-              onChange={(e) => setAllowViewScore(e.target.checked)}
+              onChange={e => setAllowViewScore(e.target.checked)}
               disabled={isSubmitting}
               style={{ accentColor: UI_COLORS.primary }}
             />
             <span>Cho học sinh xem điểm số sau khi nộp bài</span>
           </label>
 
-          <label style={{ display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer', fontSize: '13.5px', color: UI_COLORS.text }}>
+          <label
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: '8px',
+              cursor: 'pointer',
+              fontSize: '13.5px',
+              color: UI_COLORS.text,
+            }}
+          >
             <input
               type="checkbox"
               checked={allowViewReview}
-              onChange={(e) => setAllowViewReview(e.target.checked)}
+              onChange={e => setAllowViewReview(e.target.checked)}
               disabled={isSubmitting}
               style={{ accentColor: UI_COLORS.primary }}
             />
@@ -337,13 +425,21 @@ export const EditExamModal: React.FC<EditExamModalProps> = ({
           </label>
 
           <div style={{ marginTop: '2px', paddingTop: '8px', borderTop: '1px solid #E2E8F0' }}>
-            <label style={{ display: 'block', fontSize: '12.5px', fontWeight: 600, color: UI_COLORS.text, marginBottom: '4px' }}>
+            <label
+              style={{
+                display: 'block',
+                fontSize: '12.5px',
+                fontWeight: 600,
+                color: UI_COLORS.text,
+                marginBottom: '4px',
+              }}
+            >
               🔒 Mật khẩu vào thi (Để trống nếu không yêu cầu):
             </label>
             <input
               type="text"
               value={password}
-              onChange={(e) => setPassword(e.target.value)}
+              onChange={e => setPassword(e.target.value)}
               placeholder="VD: 123456"
               disabled={isSubmitting}
               style={{

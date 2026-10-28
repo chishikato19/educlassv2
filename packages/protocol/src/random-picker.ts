@@ -76,7 +76,7 @@ export function pickStudentFromCandidates(
   if (!students || students.length === 0) return null;
 
   // Lọc theo trạng thái đã gọi nếu bật loại trừ
-  let pool = excludeCalled ? students.filter((s) => !s.alreadyCalled) : [...students];
+  let pool = excludeCalled ? students.filter(s => !s.alreadyCalled) : [...students];
 
   // Nếu tất cả đã được gọi nhưng vẫn cần quay, tái lập pool từ danh sách ban đầu
   if (pool.length === 0) {
@@ -85,13 +85,13 @@ export function pickStudentFromCandidates(
 
   // Nếu là chế độ ẩn: ưu tiên chọn học sinh có học lực tốt
   if (strategy === 'bias_good') {
-    const goodStudents = pool.filter((s) => s.academicPerformance === 'tot');
+    const goodStudents = pool.filter(s => s.academicPerformance === 'tot');
     if (goodStudents.length > 0) {
       const randomIndex = Math.floor(Math.random() * goodStudents.length);
       return goodStudents[randomIndex] ?? null;
     }
     // Nếu trong pool hiện tại không còn 'tot', thử tìm 'kha'
-    const fairStudents = pool.filter((s) => s.academicPerformance === 'kha');
+    const fairStudents = pool.filter(s => s.academicPerformance === 'kha');
     if (fairStudents.length > 0) {
       const randomIndex = Math.floor(Math.random() * fairStudents.length);
       return fairStudents[randomIndex] ?? null;

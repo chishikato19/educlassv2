@@ -4,10 +4,7 @@ import type { GradeResult } from './types.js';
 /**
  * Chấm điểm câu hỏi MCQ4 (Trắc nghiệm 4 lựa chọn, chọn 1)
  */
-export function gradeMcq4(
-  question: Mcq4Question,
-  answer?: Mcq4Answer | null
-): GradeResult {
+export function gradeMcq4(question: Mcq4Question, answer?: Mcq4Answer | null): GradeResult {
   const selected = answer?.selected ?? null;
   const isCorrect = selected !== null && selected === question.correct;
   const ratio = isCorrect ? 1.0 : 0.0;

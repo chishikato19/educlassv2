@@ -28,7 +28,9 @@ export const TerritoryProjectorView: React.FC<ProjectorViewProps> = ({ state }) 
   }, [state.status, state.endTime]);
 
   const { blueCommanders, redCommanders, allRanked } = getLeaderboardByTeam(state.participants);
-  const [leaderboardTab, setLeaderboardTab] = useState<'two_teams' | 'all' | 'blue' | 'red'>('two_teams');
+  const [leaderboardTab, setLeaderboardTab] = useState<'two_teams' | 'all' | 'blue' | 'red'>(
+    'two_teams'
+  );
 
   const totalLand = state.totalCells || 49;
   const bluePercent = Math.round((state.blueCellCount / totalLand) * 100);
@@ -58,8 +60,8 @@ export const TerritoryProjectorView: React.FC<ProjectorViewProps> = ({ state }) 
             {isBlueWin
               ? '👑 PHE XANH ĐÃ TOÀN THẮNG!'
               : isRedWin
-              ? '👑 PHE ĐỎ ĐÃ TOÀN THẮNG!'
-              : '🤝 HAI PHE HÒA ĐIỂM!'}
+                ? '👑 PHE ĐỎ ĐÃ TOÀN THẮNG!'
+                : '🤝 HAI PHE HÒA ĐIỂM!'}
           </h1>
           <p className="text-sm text-slate-300 max-w-xl mx-auto">
             {state.winReason || 'Hai phe đã cống hiến một trận đại chiến vô cùng kịch tính!'}
@@ -68,24 +70,44 @@ export const TerritoryProjectorView: React.FC<ProjectorViewProps> = ({ state }) 
 
         {/* Điểm số chung cuộc 2 phe */}
         <div className="flex items-center justify-center gap-6 w-full max-w-3xl bg-slate-900/90 border-2 border-slate-700 p-4 md:p-5 rounded-3xl shadow-2xl">
-          <div className={`text-center flex-1 p-3 rounded-2xl ${isBlueWin ? 'bg-blue-950/60 border border-blue-500/50' : ''}`}>
+          <div
+            className={`text-center flex-1 p-3 rounded-2xl ${isBlueWin ? 'bg-blue-950/60 border border-blue-500/50' : ''}`}
+          >
             <div className="flex items-center justify-center gap-1.5">
               <span className="text-sm font-black text-blue-400">🔵 PHE XANH</span>
-              {isBlueWin && <span className="text-xs bg-amber-400 text-black px-1.5 py-0.5 rounded font-black">THẮNG</span>}
+              {isBlueWin && (
+                <span className="text-xs bg-amber-400 text-black px-1.5 py-0.5 rounded font-black">
+                  THẮNG
+                </span>
+              )}
             </div>
-            <span className="text-4xl md:text-5xl font-black text-white font-mono block my-1">{state.blueScore}</span>
-            <span className="text-xs text-slate-400 block">{state.blueCellCount} ô đất ({bluePercent}%) • {blueCommanders.length} quân</span>
+            <span className="text-4xl md:text-5xl font-black text-white font-mono block my-1">
+              {state.blueScore}
+            </span>
+            <span className="text-xs text-slate-400 block">
+              {state.blueCellCount} ô đất ({bluePercent}%) • {blueCommanders.length} quân
+            </span>
           </div>
 
           <div className="text-2xl font-black text-slate-500">VS</div>
 
-          <div className={`text-center flex-1 p-3 rounded-2xl ${isRedWin ? 'bg-red-950/60 border border-red-500/50' : ''}`}>
+          <div
+            className={`text-center flex-1 p-3 rounded-2xl ${isRedWin ? 'bg-red-950/60 border border-red-500/50' : ''}`}
+          >
             <div className="flex items-center justify-center gap-1.5">
               <span className="text-sm font-black text-red-400">🔴 PHE ĐỎ</span>
-              {isRedWin && <span className="text-xs bg-amber-400 text-black px-1.5 py-0.5 rounded font-black">THẮNG</span>}
+              {isRedWin && (
+                <span className="text-xs bg-amber-400 text-black px-1.5 py-0.5 rounded font-black">
+                  THẮNG
+                </span>
+              )}
             </div>
-            <span className="text-4xl md:text-5xl font-black text-white font-mono block my-1">{state.redScore}</span>
-            <span className="text-xs text-slate-400 block">{state.redCellCount} ô đất ({redPercent}%) • {redCommanders.length} quân</span>
+            <span className="text-4xl md:text-5xl font-black text-white font-mono block my-1">
+              {state.redScore}
+            </span>
+            <span className="text-xs text-slate-400 block">
+              {state.redCellCount} ô đất ({redPercent}%) • {redCommanders.length} quân
+            </span>
           </div>
         </div>
 
@@ -173,30 +195,37 @@ export const TerritoryProjectorView: React.FC<ProjectorViewProps> = ({ state }) 
                               idx === 0
                                 ? 'bg-amber-400 text-black shadow'
                                 : idx === 1
-                                ? 'bg-slate-300 text-black shadow'
-                                : idx === 2
-                                ? 'bg-amber-700 text-white'
-                                : 'bg-blue-500/30 text-blue-200'
+                                  ? 'bg-slate-300 text-black shadow'
+                                  : idx === 2
+                                    ? 'bg-amber-700 text-white'
+                                    : 'bg-blue-500/30 text-blue-200'
                             }`}
                           >
                             {idx === 0 ? '🥇' : idx === 1 ? '🥈' : idx === 2 ? '🥉' : idx + 1}
                           </span>
                           <div className="truncate">
-                            <span className="font-bold text-sm text-white block truncate">{cmd.displayName}</span>
+                            <span className="font-bold text-sm text-white block truncate">
+                              {cmd.displayName}
+                            </span>
                             <span className="text-[11px] text-blue-300 block">
-                              🏰 {cmd.capturedCount} • 🛡️ {cmd.fortifiedCount} • ✓ {cmd.correctCount}
+                              🏰 {cmd.capturedCount} • 🛡️ {cmd.fortifiedCount} • ✓{' '}
+                              {cmd.correctCount}
                             </span>
                           </div>
                         </div>
                         <div className="text-right shrink-0 ml-2">
-                          <span className="text-sm font-black text-amber-300 font-mono block">+{pScore} đ</span>
+                          <span className="text-sm font-black text-amber-300 font-mono block">
+                            +{pScore} đ
+                          </span>
                           <span className="text-[10px] text-slate-400">đóng góp</span>
                         </div>
                       </div>
                     );
                   })}
                   {blueCommanders.length === 0 && (
-                    <p className="text-xs text-slate-500 py-4 text-center italic">Chưa có thành viên nào ghi điểm</p>
+                    <p className="text-xs text-slate-500 py-4 text-center italic">
+                      Chưa có thành viên nào ghi điểm
+                    </p>
                   )}
                 </div>
               </div>
@@ -223,30 +252,37 @@ export const TerritoryProjectorView: React.FC<ProjectorViewProps> = ({ state }) 
                               idx === 0
                                 ? 'bg-amber-400 text-black shadow'
                                 : idx === 1
-                                ? 'bg-slate-300 text-black shadow'
-                                : idx === 2
-                                ? 'bg-amber-700 text-white'
-                                : 'bg-red-500/30 text-red-200'
+                                  ? 'bg-slate-300 text-black shadow'
+                                  : idx === 2
+                                    ? 'bg-amber-700 text-white'
+                                    : 'bg-red-500/30 text-red-200'
                             }`}
                           >
                             {idx === 0 ? '🥇' : idx === 1 ? '🥈' : idx === 2 ? '🥉' : idx + 1}
                           </span>
                           <div className="truncate">
-                            <span className="font-bold text-sm text-white block truncate">{cmd.displayName}</span>
+                            <span className="font-bold text-sm text-white block truncate">
+                              {cmd.displayName}
+                            </span>
                             <span className="text-[11px] text-red-300 block">
-                              🏰 {cmd.capturedCount} • 🛡️ {cmd.fortifiedCount} • ✓ {cmd.correctCount}
+                              🏰 {cmd.capturedCount} • 🛡️ {cmd.fortifiedCount} • ✓{' '}
+                              {cmd.correctCount}
                             </span>
                           </div>
                         </div>
                         <div className="text-right shrink-0 ml-2">
-                          <span className="text-sm font-black text-amber-300 font-mono block">+{pScore} đ</span>
+                          <span className="text-sm font-black text-amber-300 font-mono block">
+                            +{pScore} đ
+                          </span>
                           <span className="text-[10px] text-slate-400">đóng góp</span>
                         </div>
                       </div>
                     );
                   })}
                   {redCommanders.length === 0 && (
-                    <p className="text-xs text-slate-500 py-4 text-center italic">Chưa có thành viên nào ghi điểm</p>
+                    <p className="text-xs text-slate-500 py-4 text-center italic">
+                      Chưa có thành viên nào ghi điểm
+                    </p>
                   )}
                 </div>
               </div>
@@ -260,8 +296,8 @@ export const TerritoryProjectorView: React.FC<ProjectorViewProps> = ({ state }) 
                 {(leaderboardTab === 'all'
                   ? allRanked
                   : leaderboardTab === 'blue'
-                  ? blueCommanders
-                  : redCommanders
+                    ? blueCommanders
+                    : redCommanders
                 ).map((cmd, idx) => {
                   const pScore = getParticipantScore(cmd);
                   const isBlue = cmd.team === 'blue';
@@ -282,22 +318,22 @@ export const TerritoryProjectorView: React.FC<ProjectorViewProps> = ({ state }) 
                             idx === 0
                               ? 'bg-amber-400 text-black shadow-lg text-sm'
                               : idx === 1
-                              ? 'bg-slate-200 text-black shadow'
-                              : idx === 2
-                              ? 'bg-amber-700 text-white shadow'
-                              : 'bg-slate-800 text-slate-300 border border-slate-700'
+                                ? 'bg-slate-200 text-black shadow'
+                                : idx === 2
+                                  ? 'bg-amber-700 text-white shadow'
+                                  : 'bg-slate-800 text-slate-300 border border-slate-700'
                           }`}
                         >
                           {idx === 0 ? '🥇' : idx === 1 ? '🥈' : idx === 2 ? '🥉' : idx + 1}
                         </span>
 
-                        <span className="text-lg shrink-0">
-                          {isBlue ? '🔵' : '🔴'}
-                        </span>
+                        <span className="text-lg shrink-0">{isBlue ? '🔵' : '🔴'}</span>
 
                         <div className="truncate">
                           <div className="flex items-center gap-2">
-                            <span className="font-bold text-sm text-white truncate">{cmd.displayName}</span>
+                            <span className="font-bold text-sm text-white truncate">
+                              {cmd.displayName}
+                            </span>
                             {cmd.groupName && (
                               <span className="text-[10px] bg-slate-800 text-slate-300 px-2 py-0.5 rounded-full border border-slate-700">
                                 {cmd.groupName}
@@ -310,13 +346,18 @@ export const TerritoryProjectorView: React.FC<ProjectorViewProps> = ({ state }) 
                             )}
                           </div>
                           <div className="text-xs text-slate-400 mt-0.5">
-                            Chiếm: <b className="text-white">{cmd.capturedCount} ô</b> • Gia cố: <b className="text-white">{cmd.fortifiedCount}</b> • Trả lời đúng: <b className="text-emerald-400">{cmd.correctCount}</b>/{cmd.totalQuestions}
+                            Chiếm: <b className="text-white">{cmd.capturedCount} ô</b> • Gia cố:{' '}
+                            <b className="text-white">{cmd.fortifiedCount}</b> • Trả lời đúng:{' '}
+                            <b className="text-emerald-400">{cmd.correctCount}</b>/
+                            {cmd.totalQuestions}
                           </div>
                         </div>
                       </div>
 
                       <div className="text-right shrink-0 ml-3">
-                        <span className="text-base font-black text-amber-300 font-mono block">+{pScore} điểm</span>
+                        <span className="text-base font-black text-amber-300 font-mono block">
+                          +{pScore} điểm
+                        </span>
                         <span className="text-[11px] text-slate-400">cá nhân</span>
                       </div>
                     </div>
@@ -347,7 +388,9 @@ export const TerritoryProjectorView: React.FC<ProjectorViewProps> = ({ state }) 
             <div>
               <span className="text-xs uppercase font-bold text-blue-400">PHE XANH</span>
               <div className="flex items-baseline gap-2">
-                <span className="text-3xl font-black font-mono text-blue-300">{state.blueScore}</span>
+                <span className="text-3xl font-black font-mono text-blue-300">
+                  {state.blueScore}
+                </span>
                 <span className="text-xs text-slate-400">điểm ({bluePercent}%)</span>
               </div>
             </div>
@@ -491,7 +534,10 @@ export const TerritoryProjectorView: React.FC<ProjectorViewProps> = ({ state }) 
 
           {/* Hướng dẫn hiển thị */}
           <div className="p-3 bg-slate-950/60 rounded-2xl border border-slate-800 text-[11px] text-slate-400 leading-relaxed">
-            ⚡ <span className="text-amber-400 font-bold">Sudden Death:</span> Chiếm được <span className="text-white font-bold">Lâu Đài Lớn (🏰)</span> hoặc <span className="text-white font-bold">Cả 2 Lâu Đài Cánh (🏯)</span> sẽ phân định thắng ngay lập tức!
+            ⚡ <span className="text-amber-400 font-bold">Sudden Death:</span> Chiếm được{' '}
+            <span className="text-white font-bold">Lâu Đài Lớn (🏰)</span> hoặc{' '}
+            <span className="text-white font-bold">Cả 2 Lâu Đài Cánh (🏯)</span> sẽ phân định thắng
+            ngay lập tức!
           </div>
         </div>
       </div>

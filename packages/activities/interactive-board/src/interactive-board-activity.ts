@@ -127,13 +127,13 @@ export const InteractiveBoardActivity: ActivityDefinition<
                 const selected =
                   typeof ansData === 'number'
                     ? ansData
-                    : (ansData as { selected?: number | null }).selected ?? null;
+                    : ((ansData as { selected?: number | null }).selected ?? null);
                 answerPayload = { type: 'mcq4', questionId: q.id, selected };
               } else if (q.type === 'tf') {
                 const selected =
                   typeof ansData === 'boolean'
                     ? ansData
-                    : (ansData as { selected?: boolean | null }).selected ?? null;
+                    : ((ansData as { selected?: boolean | null }).selected ?? null);
                 answerPayload = { type: 'tf', questionId: q.id, selected };
               } else if (q.type === 'matching') {
                 const pairs =
@@ -164,9 +164,7 @@ export const InteractiveBoardActivity: ActivityDefinition<
 
           const maxGrade = st.config.maxGrade || 10;
           const scaledScore =
-            totalPossible > 0
-              ? Number(((totalEarned / totalPossible) * maxGrade).toFixed(1))
-              : 0;
+            totalPossible > 0 ? Number(((totalEarned / totalPossible) * maxGrade).toFixed(1)) : 0;
 
           worksheetResult = {
             autoScore: scaledScore,
@@ -215,7 +213,11 @@ export const InteractiveBoardActivity: ActivityDefinition<
       // [B] Thả cảm xúc (Thích 👍 hoặc Thả tim ❤️)
       if (intentData.type === 'react_post') {
         if (!st.config.allowReactions) {
-          return { ok: false, reason: 'Tính năng thả cảm xúc đang bị tắt', code: 'FEATURE_DISABLED' };
+          return {
+            ok: false,
+            reason: 'Tính năng thả cảm xúc đang bị tắt',
+            code: 'FEATURE_DISABLED',
+          };
         }
 
         const post = st.posts[intentData.postId];
@@ -250,7 +252,11 @@ export const InteractiveBoardActivity: ActivityDefinition<
       if (intentData.type === 'add_comment') {
         const check = canStudentComment(st, participantId);
         if (!check.ok) {
-          return { ok: false, reason: check.reason || 'Không thể bình luận', code: 'COMMENT_MUTED' };
+          return {
+            ok: false,
+            reason: check.reason || 'Không thể bình luận',
+            code: 'COMMENT_MUTED',
+          };
         }
 
         const post = st.posts[intentData.postId];
@@ -283,12 +289,20 @@ export const InteractiveBoardActivity: ActivityDefinition<
       if (intentData.type === 'grade_peer_post') {
         const post = st.posts[intentData.postId];
         if (!post) {
-          return { ok: false, reason: 'Không tìm thấy bài viết để chấm điểm', code: 'POST_NOT_FOUND' };
+          return {
+            ok: false,
+            reason: 'Không tìm thấy bài viết để chấm điểm',
+            code: 'POST_NOT_FOUND',
+          };
         }
 
         const check = canStudentGrade(st, participantId, post, intentData.score);
         if (!check.ok) {
-          return { ok: false, reason: check.reason || 'Không thể chấm điểm', code: 'INVALID_GRADE' };
+          return {
+            ok: false,
+            reason: check.reason || 'Không thể chấm điểm',
+            code: 'INVALID_GRADE',
+          };
         }
 
         const updatedPeerGrades = {

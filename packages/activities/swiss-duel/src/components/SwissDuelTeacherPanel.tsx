@@ -55,7 +55,9 @@ export const SwissDuelTeacherPanel: React.FC<TeacherPanelProps> = ({
           const totalSec = Math.floor(diffMs / 1000);
           const mins = Math.floor(totalSec / 60);
           const secs = totalSec % 60;
-          setTournamentTimeLeft(`${String(mins).padStart(2, '0')}:${String(secs).padStart(2, '0')}`);
+          setTournamentTimeLeft(
+            `${String(mins).padStart(2, '0')}:${String(secs).padStart(2, '0')}`
+          );
         }
       };
       updateTournamentTimer();
@@ -67,21 +69,23 @@ export const SwissDuelTeacherPanel: React.FC<TeacherPanelProps> = ({
     return undefined;
   }, [state.mode, state.endTime, state.status]);
 
-  const completedTables = state.matchups.filter(
-    m => m.player1Answered && m.player2Answered
-  ).length;
+  const completedTables = state.matchups.filter(m => m.player1Answered && m.player2Answered).length;
   const totalTables = state.matchups.length;
 
   const byeStudent = state.byePlayerId ? state.participants[state.byePlayerId] : null;
 
   const unpairedStudents = Object.values(state.participants).filter(
     p =>
-      !state.matchups.some(m => m.player1Id === p.participantId || m.player2Id === p.participantId) &&
-      state.byePlayerId !== p.participantId
+      !state.matchups.some(
+        m => m.player1Id === p.participantId || m.player2Id === p.participantId
+      ) && state.byePlayerId !== p.participantId
   );
 
   const containerRef = useRef<HTMLDivElement>(null);
-  const [dimensions, setDimensions] = useState<{ width: number; height: number }>({ width: 0, height: 0 });
+  const [dimensions, setDimensions] = useState<{ width: number; height: number }>({
+    width: 0,
+    height: 0,
+  });
 
   useEffect(() => {
     const el = containerRef.current;
@@ -114,11 +118,7 @@ export const SwissDuelTeacherPanel: React.FC<TeacherPanelProps> = ({
   }, [activeTab]);
 
   const gridLayout = useMemo(() => {
-    return calculateOptimalBoardGrid(
-      state.matchups.length,
-      dimensions.width,
-      dimensions.height
-    );
+    return calculateOptimalBoardGrid(state.matchups.length, dimensions.width, dimensions.height);
   }, [state.matchups.length, dimensions.width, dimensions.height]);
 
   return (
@@ -142,7 +142,9 @@ export const SwissDuelTeacherPanel: React.FC<TeacherPanelProps> = ({
               </span>
               {state.mode === 'time' && (
                 <div className="flex items-center gap-1 shrink-0">
-                  <span className={`px-2 py-0.5 rounded-full text-[11px] font-mono font-bold border ${isTimeExpired ? 'bg-rose-950 border-rose-500 text-rose-300 animate-pulse' : 'bg-amber-950 border-amber-400 text-amber-300'}`}>
+                  <span
+                    className={`px-2 py-0.5 rounded-full text-[11px] font-mono font-bold border ${isTimeExpired ? 'bg-rose-950 border-rose-500 text-rose-300 animate-pulse' : 'bg-amber-950 border-amber-400 text-amber-300'}`}
+                  >
                     ⏱️ {tournamentTimeLeft || '00:00'}
                   </span>
                   <button
@@ -251,10 +253,16 @@ export const SwissDuelTeacherPanel: React.FC<TeacherPanelProps> = ({
       <div className="flex flex-wrap items-center justify-between gap-2 border-b border-[#442512] py-1.5 px-1 text-xs md:text-sm shrink-0">
         <div className="flex items-center gap-3">
           <div className="text-amber-300 font-bold">
-            Vòng hiện tại: <span className="text-base text-white font-black">{state.currentRound} / {state.totalRounds}</span>
+            Vòng hiện tại:{' '}
+            <span className="text-base text-white font-black">
+              {state.currentRound} / {state.totalRounds}
+            </span>
           </div>
           <div className="text-amber-200/80">
-            Tiến độ: <span className="font-bold text-white">{completedTables} / {totalTables} bàn đã xong</span>
+            Tiến độ:{' '}
+            <span className="font-bold text-white">
+              {completedTables} / {totalTables} bàn đã xong
+            </span>
           </div>
         </div>
 
@@ -308,8 +316,10 @@ export const SwissDuelTeacherPanel: React.FC<TeacherPanelProps> = ({
             <span className="text-base">⏳</span>
             <span>
               Có <b>{unpairedStudents.length} học sinh</b> vừa vào phòng đấu:{' '}
-              <b className="text-blue-300 font-bold">{unpairedStudents.map(p => p.displayName).join(', ')}</b>.
-              Sẽ tự động được xếp bàn ở <b>Vòng {state.currentRound + 1}</b>!
+              <b className="text-blue-300 font-bold">
+                {unpairedStudents.map(p => p.displayName).join(', ')}
+              </b>
+              . Sẽ tự động được xếp bàn ở <b>Vòng {state.currentRound + 1}</b>!
             </span>
           </div>
           {completedTables === 0 && (
@@ -330,9 +340,12 @@ export const SwissDuelTeacherPanel: React.FC<TeacherPanelProps> = ({
           {state.matchups.length === 0 ? (
             <div className="h-full flex flex-col items-center justify-center text-center p-6 text-amber-200/60 space-y-2">
               <span className="text-5xl opacity-40">♟️</span>
-              <p className="text-sm font-semibold text-amber-300/80">Chưa có bàn đấu nào được khởi tạo</p>
+              <p className="text-sm font-semibold text-amber-300/80">
+                Chưa có bàn đấu nào được khởi tạo
+              </p>
               <p className="text-xs text-amber-200/50 max-w-md">
-                Khi có học sinh tham gia và bốc thăm vòng đấu, các bàn cờ sẽ được tự động chia tỉ lệ hiển thị vừa vặn trên toàn màn hình.
+                Khi có học sinh tham gia và bốc thăm vòng đấu, các bàn cờ sẽ được tự động chia tỉ lệ
+                hiển thị vừa vặn trên toàn màn hình.
               </p>
             </div>
           ) : (
@@ -384,16 +397,24 @@ export const SwissDuelTeacherPanel: React.FC<TeacherPanelProps> = ({
                       {/* Player 1 (Quân Trắng) */}
                       <div className="flex items-center justify-between gap-1 min-w-0">
                         <div className="flex items-center gap-1.5 min-w-0 flex-1 truncate">
-                          <span className={`shrink-0 ${st.pieceText}`}>{CHESS_PIECES.whiteKing}</span>
+                          <span className={`shrink-0 ${st.pieceText}`}>
+                            {CHESS_PIECES.whiteKing}
+                          </span>
                           <span
                             className={`truncate ${st.nameText} ${p1Win ? 'text-amber-300 font-bold' : 'text-white'}`}
                             title={p1?.displayName || 'P1'}
                           >
                             {p1?.displayName || 'P1'}
                           </span>
-                          {p1Win && <span className="text-[10px] shrink-0" title="Chiến thắng">👑</span>}
+                          {p1Win && (
+                            <span className="text-[10px] shrink-0" title="Chiến thắng">
+                              👑
+                            </span>
+                          )}
                         </div>
-                        <span className={`font-mono font-bold shrink-0 ${st.scoreText} ${p1Win ? 'text-amber-300' : 'text-amber-200/90'}`}>
+                        <span
+                          className={`font-mono font-bold shrink-0 ${st.scoreText} ${p1Win ? 'text-amber-300' : 'text-amber-200/90'}`}
+                        >
                           {m.player1Score}/2
                         </span>
                       </div>
@@ -401,25 +422,35 @@ export const SwissDuelTeacherPanel: React.FC<TeacherPanelProps> = ({
                       {/* Player 2 (Quân Đen) */}
                       <div className="flex items-center justify-between gap-1 min-w-0">
                         <div className="flex items-center gap-1.5 min-w-0 flex-1 truncate">
-                          <span className={`shrink-0 ${st.pieceText}`}>{CHESS_PIECES.blackKing}</span>
+                          <span className={`shrink-0 ${st.pieceText}`}>
+                            {CHESS_PIECES.blackKing}
+                          </span>
                           <span
                             className={`truncate ${st.nameText} ${p2Win ? 'text-amber-300 font-bold' : 'text-slate-300'}`}
                             title={p2?.displayName || 'P2'}
                           >
                             {p2?.displayName || 'P2'}
                           </span>
-                          {p2Win && <span className="text-[10px] shrink-0" title="Chiến thắng">👑</span>}
+                          {p2Win && (
+                            <span className="text-[10px] shrink-0" title="Chiến thắng">
+                              👑
+                            </span>
+                          )}
                         </div>
-                        <span className={`font-mono font-bold shrink-0 ${st.scoreText} ${p2Win ? 'text-amber-300' : 'text-amber-200/90'}`}>
+                        <span
+                          className={`font-mono font-bold shrink-0 ${st.scoreText} ${p2Win ? 'text-amber-300' : 'text-amber-200/90'}`}
+                        >
                           {m.player2Score}/2
                         </span>
                       </div>
                     </div>
 
                     {/* Footer kết quả */}
-                    {isCompleted && (
-                      st.showFooter ? (
-                        <div className={`mt-1 pt-0.5 border-t border-white/10 text-center font-bold text-emerald-300 truncate shrink-0 ${st.footerText}`}>
+                    {isCompleted &&
+                      (st.showFooter ? (
+                        <div
+                          className={`mt-1 pt-0.5 border-t border-white/10 text-center font-bold text-emerald-300 truncate shrink-0 ${st.footerText}`}
+                        >
                           {p1Win && `🏆 ${p1?.displayName || 'P1'} Thắng (+2đ)`}
                           {p2Win && `🏆 ${p2?.displayName || 'P2'} Thắng (+2đ)`}
                           {isDraw && '🤝 Hai bên Hòa nhau (+1đ)'}
@@ -430,8 +461,7 @@ export const SwissDuelTeacherPanel: React.FC<TeacherPanelProps> = ({
                           {p2Win && `${p2?.displayName || 'P2'} Thắng`}
                           {isDraw && 'Hòa trận'}
                         </div>
-                      )
-                    )}
+                      ))}
                   </ChessWoodCard>
                 );
               })}
@@ -463,11 +493,11 @@ export const SwissDuelTeacherPanel: React.FC<TeacherPanelProps> = ({
                     <td className="py-2.5 px-3 text-center font-black text-amber-300">
                       #{entry.rank}
                     </td>
-                    <td className="py-2.5 px-3 font-bold text-white">
-                      {entry.displayName}
-                    </td>
+                    <td className="py-2.5 px-3 font-bold text-white">{entry.displayName}</td>
                     <td className="py-2.5 px-3 text-center text-amber-200">
-                      <span>{badge.icon} {badge.title}</span>
+                      <span>
+                        {badge.icon} {badge.title}
+                      </span>
                     </td>
                     <td className="py-2.5 px-3 text-center font-mono font-black text-amber-400 text-sm">
                       {entry.tournamentPoints} đ
@@ -499,12 +529,15 @@ export const SwissDuelTeacherPanel: React.FC<TeacherPanelProps> = ({
                 Hết Giờ Thi Đấu Giải Đấu!
               </h3>
               <p className="text-xs text-amber-100/80 mt-1 leading-relaxed">
-                Thời gian thi đấu quy định đã kết thúc. Thầy/Cô muốn kết thúc giải đấu để xem tổng kết, hay muốn cộng thêm thời gian cho các kỳ thủ thi đấu tiếp?
+                Thời gian thi đấu quy định đã kết thúc. Thầy/Cô muốn kết thúc giải đấu để xem tổng
+                kết, hay muốn cộng thêm thời gian cho các kỳ thủ thi đấu tiếp?
               </p>
             </div>
 
             <div className="p-3.5 bg-amber-950/60 rounded-2xl border border-amber-500/40 space-y-2">
-              <span className="text-xs font-bold text-amber-300 block">➕ Cộng thêm thời gian thi đấu:</span>
+              <span className="text-xs font-bold text-amber-300 block">
+                ➕ Cộng thêm thời gian thi đấu:
+              </span>
               <div className="grid grid-cols-3 gap-2">
                 <button
                   type="button"

@@ -193,7 +193,7 @@ describe('Exam Activity Persistence & Multi-batch Integration (Task 3.1)', () =>
       expect(student1Updated?.exp).toBeGreaterThan(0);
       const rewardsList = await rewardRepo.listBySessionId(session1Id);
       expect(rewardsList.length).toBeGreaterThan(0);
-      expect(rewardsList.some((r) => r.studentId === stu1.id)).toBe(true);
+      expect(rewardsList.some(r => r.studentId === stu1.id)).toBe(true);
 
       // 10. Giáo viên tạm dừng Ca 1 (Hết tiết 1)
       const pauseRes = await app.inject({
@@ -306,7 +306,7 @@ describe('Exam Activity Persistence & Multi-batch Integration (Task 3.1)', () =>
       // 15. Kiểm tra exam_records: đã có đủ 2 học sinh từ 2 ca thi!
       const finalRecords = await examRecordRepo.listByExam(examId);
       expect(finalRecords).toHaveLength(2);
-      const stu2Record = finalRecords.find((r) => r.studentId === stu2.id);
+      const stu2Record = finalRecords.find(r => r.studentId === stu2.id);
       expect(stu2Record).toBeDefined();
       expect(stu2Record?.batchIndex).toBe(2);
       expect(stu2Record?.status).toBe('submitted');

@@ -17,7 +17,10 @@ import {
 } from './track-layout.js';
 import { soundManager } from '../../sound.js';
 
-export const SCENARIO_LABELS: Record<MarbleRaceScenario, { name: string; desc: string; icon: string }> = {
+export const SCENARIO_LABELS: Record<
+  MarbleRaceScenario,
+  { name: string; desc: string; icon: string }
+> = {
   wire_to_wire: {
     name: 'Kẻ Thống Trị',
     desc: 'Bứt tốc dẫn đầu từ đầu đến cuối',
@@ -81,7 +84,7 @@ export function initializeMarbles(
   const startY = 70;
 
   // Chọn đối thủ cho kịch bản 'duel'
-  const others = candidates.filter((s) => s.id !== targetStudent?.id);
+  const others = candidates.filter(s => s.id !== targetStudent?.id);
   const rivalId = others.length > 0 && scenario === 'duel' ? others[0]?.id : null;
 
   candidates.forEach((st, idx) => {
@@ -89,7 +92,10 @@ export function initializeMarbles(
     const col = idx % cols;
     const isTarget = targetStudent !== null && st.id === targetStudent.id;
     const isRival = st.id === rivalId;
-    const palette = MARBLE_PALETTES[idx % MARBLE_PALETTES.length] ?? { main: '#f43f5e', sec: '#9f1239' };
+    const palette = MARBLE_PALETTES[idx % MARBLE_PALETTES.length] ?? {
+      main: '#f43f5e',
+      sec: '#9f1239',
+    };
 
     const jitterX = (Math.random() - 0.5) * (cellWidth * 0.3);
     const jitterY = (Math.random() - 0.5) * 12;
@@ -233,7 +239,7 @@ function applySeeSawPhysics(m: MarbleEntity, ss: SeeSawObstacle): void {
 
   if (resolveMarbleVsWall(m, wall)) {
     // Bi đè lên một bên làm bập bênh chúi xuống
-    const armDistance = (m.x - ss.x);
+    const armDistance = m.x - ss.x;
     ss.angularVelocity += armDistance * 0.00015;
   }
 }
@@ -251,18 +257,18 @@ export function updateMarblePhysics(
 ): { winner: MarbleEntity | null } {
   let firstFinisher: MarbleEntity | null = null;
   // Tốc độ rơi êm ái, vừa mắt để quan sát tên học sinh (0.20 thay vì 0.38)
-  const baseGravity = isGateOpen ? 0.20 : 0.015;
+  const baseGravity = isGateOpen ? 0.2 : 0.015;
 
   // 1. Cập nhật góc quay các chướng ngại vật động
-  track.spinners.forEach((sp) => {
+  track.spinners.forEach(sp => {
     sp.angle += sp.angularVelocity;
   });
 
-  track.vortices.forEach((vt) => {
+  track.vortices.forEach(vt => {
     vt.angle += vt.rotationSpeed;
   });
 
-  track.seeSaws.forEach((ss) => {
+  track.seeSaws.forEach(ss => {
     ss.angle += ss.angularVelocity;
     ss.angularVelocity *= 0.94; // Giảm chấn
     // Chặn góc nghiêng tối đa
@@ -275,7 +281,7 @@ export function updateMarblePhysics(
     }
   });
 
-  track.bumpers.forEach((bp) => {
+  track.bumpers.forEach(bp => {
     if (bp.pulseScale > 1) {
       bp.pulseScale = Math.max(1, bp.pulseScale - 0.035);
     }
@@ -285,14 +291,14 @@ export function updateMarblePhysics(
   const currentLeadY = marbles.reduce((max, m) => (!m.hasFinished ? Math.max(max, m.y) : max), 0);
 
   // 2. Cập nhật từng viên bi
-  marbles.forEach((m) => {
+  marbles.forEach(m => {
     // Nếu chưa mở cổng xuất phát
     if (!isGateOpen) {
       m.vy += baseGravity;
       m.y += m.vy;
       m.x += m.vx;
-      m.vx *= 0.90;
-      m.vy *= 0.90;
+      m.vx *= 0.9;
+      m.vy *= 0.9;
 
       if (m.y + m.radius > START_GATE_Y) {
         m.y = START_GATE_Y - m.radius;
@@ -416,12 +422,12 @@ export function updateMarblePhysics(
     }
 
     // 1. Tương tác với Tường
-    track.walls.forEach((w) => {
+    track.walls.forEach(w => {
       resolveMarbleVsWall(m, w);
     });
 
     // 2. Tương tác với Đinh cản Pachinko
-    track.pegs.forEach((peg) => {
+    track.pegs.forEach(peg => {
       const dx = m.x - peg.x;
       const dy = m.y - peg.y;
       const distSq = dx * dx + dy * dy;
@@ -450,12 +456,12 @@ export function updateMarblePhysics(
     });
 
     // 3. Tương tác với Phễu lốc xoáy (Chặng 2 mới)
-    track.vortices.forEach((vt) => {
+    track.vortices.forEach(vt => {
       applyVortexPhysics(m, vt);
     });
 
     // 4. Tương tác với Nấm nảy Pinball (Bumpers)
-    track.bumpers.forEach((bp) => {
+    track.bumpers.forEach(bp => {
       const dx = m.x - bp.x;
       const dy = m.y - bp.y;
       const distSq = dx * dx + dy * dy;
@@ -483,7 +489,7 @@ export function updateMarblePhysics(
     });
 
     // 5. Tương tác với Cánh quạt xoay (Spinners)
-    track.spinners.forEach((sp) => {
+    track.spinners.forEach(sp => {
       const armCount = 4;
       for (let i = 0; i < armCount; i++) {
         const armAngle = sp.angle + (i * Math.PI) / 2;
@@ -509,13 +515,13 @@ export function updateMarblePhysics(
     });
 
     // 6. Tương tác với Cầu bập bênh (Chặng 4 mới)
-    track.seeSaws.forEach((ss) => {
+    track.seeSaws.forEach(ss => {
       applySeeSawPhysics(m, ss);
     });
 
     // 7. Tương tác với Vạch tăng tốc Turbo Neon (Turbo Boost Pads)
     if (track.turboPads) {
-      track.turboPads.forEach((pad) => {
+      track.turboPads.forEach(pad => {
         const dx = m.x - pad.x;
         const dy = m.y - pad.y;
         const distSq = dx * dx + dy * dy;
@@ -559,7 +565,7 @@ export function updateMarblePhysics(
       m.hasFinished = true;
       m.finishTime = now;
 
-      const alreadyFinishedCount = marbles.filter((item) => item.hasFinished).length;
+      const alreadyFinishedCount = marbles.filter(item => item.hasFinished).length;
       m.rank = alreadyFinishedCount;
 
       if (alreadyFinishedCount === 1) {

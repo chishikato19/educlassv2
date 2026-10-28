@@ -12,9 +12,7 @@ export class AssetRepository {
   /**
    * Tạo bản ghi asset mới
    */
-  async create(
-    data: Omit<AssetInsert, 'id'> & { id?: string | undefined },
-  ): Promise<AssetSelect> {
+  async create(data: Omit<AssetInsert, 'id'> & { id?: string | undefined }): Promise<AssetSelect> {
     const id = data.id ?? generateId();
     const insertPayload: AssetInsert = {
       ...data,
@@ -48,7 +46,7 @@ export class AssetRepository {
    * Tìm hoặc tạo asset mới (deduplication tự động theo hash)
    */
   async findOrCreate(
-    data: Omit<AssetInsert, 'id'> & { id?: string | undefined },
+    data: Omit<AssetInsert, 'id'> & { id?: string | undefined }
   ): Promise<{ asset: AssetSelect; isNew: boolean }> {
     const existing = await this.findBySha256(data.sha256);
     if (existing) {

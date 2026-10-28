@@ -1,8 +1,4 @@
-import type {
-  BoardPost,
-  BoardState,
-  PeerGrade,
-} from '@educlass/protocol';
+import type { BoardPost, BoardState, PeerGrade } from '@educlass/protocol';
 
 /**
  * Tính điểm trung bình cộng do học sinh khác chấm (Peer Average Score)
@@ -72,11 +68,7 @@ export function canStudentGrade(
 export function maskStateForStudent(fullState: BoardState, participantId: string): BoardState {
   const myPost = fullState.posts[participantId];
   const hasSubmitted = Boolean(
-    myPost &&
-      (myPost.text ||
-        myPost.imageUrl ||
-        myPost.drawingDataUrl ||
-        myPost.worksheetResult)
+    myPost && (myPost.text || myPost.imageUrl || myPost.drawingDataUrl || myPost.worksheetResult)
   );
 
   const filteredPosts: Record<string, BoardPost> = {};

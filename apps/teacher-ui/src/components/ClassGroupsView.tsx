@@ -133,7 +133,11 @@ export const ClassGroupsView: React.FC<ClassGroupsViewProps> = ({
 
   // Xử lý xóa nhóm
   const handleDeleteGroup = async (group: ClassGroupDto) => {
-    if (!window.confirm(`Bạn có chắc chắn muốn xóa "${group.name}"? Các bạn trong nhóm sẽ trở về trạng thái chưa phân nhóm.`)) {
+    if (
+      !window.confirm(
+        `Bạn có chắc chắn muốn xóa "${group.name}"? Các bạn trong nhóm sẽ trở về trạng thái chưa phân nhóm.`
+      )
+    ) {
       return;
     }
     try {
@@ -146,7 +150,11 @@ export const ClassGroupsView: React.FC<ClassGroupsViewProps> = ({
   };
 
   // Chỉ định nhóm trưởng
-  const handleSetLeader = async (groupId: string, studentId: string | null, currentLeaderId?: string | null) => {
+  const handleSetLeader = async (
+    groupId: string,
+    studentId: string | null,
+    currentLeaderId?: string | null
+  ) => {
     try {
       // Nếu click vào chính nhóm trưởng hiện tại -> Hủy nhóm trưởng
       const targetLeaderId = currentLeaderId === studentId ? null : studentId;
@@ -258,7 +266,7 @@ export const ClassGroupsView: React.FC<ClassGroupsViewProps> = ({
             ⚠️ Học sinh chưa phân nhóm ({unassignedCount} bạn):
           </div>
           <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px' }}>
-            {overview?.unassignedStudents.map((st) => (
+            {overview?.unassignedStudents.map(st => (
               <div
                 key={st.id}
                 style={{
@@ -283,7 +291,7 @@ export const ClassGroupsView: React.FC<ClassGroupsViewProps> = ({
                       cursor: 'pointer',
                     }}
                     value=""
-                    onChange={(e) => {
+                    onChange={e => {
                       if (e.target.value) {
                         void handleMoveStudent(st.id, e.target.value);
                       }
@@ -292,7 +300,7 @@ export const ClassGroupsView: React.FC<ClassGroupsViewProps> = ({
                     <option value="" disabled>
                       + Vào nhóm...
                     </option>
-                    {overview?.groups.map((g) => (
+                    {overview?.groups.map(g => (
                       <option key={g.id} value={g.id}>
                         {g.name}
                       </option>
@@ -326,8 +334,16 @@ export const ClassGroupsView: React.FC<ClassGroupsViewProps> = ({
         >
           <div style={{ fontSize: '40px', marginBottom: '12px' }}>👥</div>
           <h3 style={{ margin: 0, fontSize: '18px', fontWeight: 700 }}>Lớp chưa phân nhóm</h3>
-          <p style={{ color: UI_COLORS.textMuted, fontSize: '14px', maxWidth: '400px', margin: '8px auto 20px' }}>
-            Tạo các nhóm học tập để tổ chức dự án, thảo luận hoặc hoạt động nhóm. Bạn có thể chia đều ngẫu nhiên chỉ với 1 cú click!
+          <p
+            style={{
+              color: UI_COLORS.textMuted,
+              fontSize: '14px',
+              maxWidth: '400px',
+              margin: '8px auto 20px',
+            }}
+          >
+            Tạo các nhóm học tập để tổ chức dự án, thảo luận hoặc hoạt động nhóm. Bạn có thể chia
+            đều ngẫu nhiên chỉ với 1 cú click!
           </p>
           <Button
             variant="primary"
@@ -455,9 +471,24 @@ export const ClassGroupsView: React.FC<ClassGroupsViewProps> = ({
                 </div>
 
                 {/* Danh sách thành viên */}
-                <div style={{ padding: '12px', display: 'flex', flexDirection: 'column', gap: '8px', minHeight: '120px' }}>
+                <div
+                  style={{
+                    padding: '12px',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    gap: '8px',
+                    minHeight: '120px',
+                  }}
+                >
                   {members.length === 0 ? (
-                    <div style={{ padding: '24px 0', textAlign: 'center', color: UI_COLORS.textMuted, fontSize: '13px' }}>
+                    <div
+                      style={{
+                        padding: '24px 0',
+                        textAlign: 'center',
+                        color: UI_COLORS.textMuted,
+                        fontSize: '13px',
+                      }}
+                    >
                       Chưa có thành viên nào
                     </div>
                   ) : (
@@ -481,10 +512,18 @@ export const ClassGroupsView: React.FC<ClassGroupsViewProps> = ({
                           }}
                         >
                           <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                            <span style={{ fontSize: '11px', color: UI_COLORS.textMuted, minWidth: '16px' }}>
+                            <span
+                              style={{
+                                fontSize: '11px',
+                                color: UI_COLORS.textMuted,
+                                minWidth: '16px',
+                              }}
+                            >
                               {idx + 1}.
                             </span>
-                            <span style={{ fontWeight: isLeader ? 700 : 500, color: UI_COLORS.text }}>
+                            <span
+                              style={{ fontWeight: isLeader ? 700 : 500, color: UI_COLORS.text }}
+                            >
                               {st.fullName}
                             </span>
                           </div>
@@ -493,7 +532,9 @@ export const ClassGroupsView: React.FC<ClassGroupsViewProps> = ({
                             {/* Nút phong nhóm trưởng */}
                             <button
                               type="button"
-                              onClick={() => void handleSetLeader(group.id, st.id, group.leaderStudentId)}
+                              onClick={() =>
+                                void handleSetLeader(group.id, st.id, group.leaderStudentId)
+                              }
                               title={isLeader ? 'Hủy quyền Nhóm trưởng' : 'Đặt làm Nhóm trưởng ⭐'}
                               style={{
                                 border: 'none',
@@ -514,7 +555,9 @@ export const ClassGroupsView: React.FC<ClassGroupsViewProps> = ({
                               <button
                                 type="button"
                                 title="Chuyển sang nhóm khác"
-                                onClick={() => setActiveMoveMenuStudentId(isMenuOpen ? null : st.id)}
+                                onClick={() =>
+                                  setActiveMoveMenuStudentId(isMenuOpen ? null : st.id)
+                                }
                                 style={{
                                   border: `1px solid ${UI_COLORS.border}`,
                                   background: '#FFFFFF',
@@ -545,12 +588,18 @@ export const ClassGroupsView: React.FC<ClassGroupsViewProps> = ({
                                     padding: '4px',
                                   }}
                                 >
-                                  <div style={{ fontSize: '11px', color: UI_COLORS.textMuted, padding: '4px 8px' }}>
+                                  <div
+                                    style={{
+                                      fontSize: '11px',
+                                      color: UI_COLORS.textMuted,
+                                      padding: '4px 8px',
+                                    }}
+                                  >
                                     Chuyển {st.fullName} sang:
                                   </div>
                                   {overview.groups
-                                    .filter((g) => g.id !== group.id)
-                                    .map((targetG) => (
+                                    .filter(g => g.id !== group.id)
+                                    .map(targetG => (
                                       <button
                                         key={targetG.id}
                                         type="button"
@@ -567,13 +616,22 @@ export const ClassGroupsView: React.FC<ClassGroupsViewProps> = ({
                                           fontSize: '12px',
                                           fontWeight: 500,
                                         }}
-                                        onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = '#EFF6FF')}
-                                        onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = 'transparent')}
+                                        onMouseEnter={e =>
+                                          (e.currentTarget.style.backgroundColor = '#EFF6FF')
+                                        }
+                                        onMouseLeave={e =>
+                                          (e.currentTarget.style.backgroundColor = 'transparent')
+                                        }
                                       >
                                         👉 {targetG.name}
                                       </button>
                                     ))}
-                                  <div style={{ borderTop: `1px solid ${UI_COLORS.border}`, margin: '4px 0' }} />
+                                  <div
+                                    style={{
+                                      borderTop: `1px solid ${UI_COLORS.border}`,
+                                      margin: '4px 0',
+                                    }}
+                                  />
                                   <button
                                     type="button"
                                     onClick={() => void handleMoveStudent(st.id, null)}
@@ -589,8 +647,12 @@ export const ClassGroupsView: React.FC<ClassGroupsViewProps> = ({
                                       fontSize: '12px',
                                       color: '#DC2626',
                                     }}
-                                    onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = '#FEE2E2')}
-                                    onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = 'transparent')}
+                                    onMouseEnter={e =>
+                                      (e.currentTarget.style.backgroundColor = '#FEE2E2')
+                                    }
+                                    onMouseLeave={e =>
+                                      (e.currentTarget.style.backgroundColor = 'transparent')
+                                    }
                                   >
                                     ❌ Bỏ khỏi nhóm
                                   </button>
@@ -618,18 +680,21 @@ export const ClassGroupsView: React.FC<ClassGroupsViewProps> = ({
         >
           <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
             <p style={{ fontSize: '14px', color: UI_COLORS.textMuted, margin: 0 }}>
-              Hệ thống sẽ xáo trộn ngẫu nhiên toàn bộ <strong>{students.length} học sinh</strong> của lớp {className} và chia đều sĩ số vào số lượng nhóm bạn chọn.
+              Hệ thống sẽ xáo trộn ngẫu nhiên toàn bộ <strong>{students.length} học sinh</strong>{' '}
+              của lớp {className} và chia đều sĩ số vào số lượng nhóm bạn chọn.
             </p>
 
             {/* Bộ chọn số lượng nhóm (Customizable Group Count) */}
             <div>
-              <label style={{ display: 'block', fontSize: '14px', fontWeight: 600, marginBottom: '8px' }}>
+              <label
+                style={{ display: 'block', fontSize: '14px', fontWeight: 600, marginBottom: '8px' }}
+              >
                 Số nhóm / tổ cần chia:
               </label>
               <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
                 <button
                   type="button"
-                  onClick={() => setGroupCount((prev) => Math.max(2, prev - 1))}
+                  onClick={() => setGroupCount(prev => Math.max(2, prev - 1))}
                   style={{
                     width: '40px',
                     height: '40px',
@@ -643,12 +708,19 @@ export const ClassGroupsView: React.FC<ClassGroupsViewProps> = ({
                 >
                   -
                 </button>
-                <div style={{ fontSize: '22px', fontWeight: 800, minWidth: '40px', textAlign: 'center' }}>
+                <div
+                  style={{
+                    fontSize: '22px',
+                    fontWeight: 800,
+                    minWidth: '40px',
+                    textAlign: 'center',
+                  }}
+                >
                   {groupCount}
                 </div>
                 <button
                   type="button"
-                  onClick={() => setGroupCount((prev) => Math.min(20, prev + 1))}
+                  onClick={() => setGroupCount(prev => Math.min(20, prev + 1))}
                   style={{
                     width: '40px',
                     height: '40px',
@@ -681,16 +753,27 @@ export const ClassGroupsView: React.FC<ClassGroupsViewProps> = ({
             >
               💡 <strong>Dự tính phân bổ:</strong> Mỗi nhóm khoảng{' '}
               <strong>{Math.floor(students.length / Math.max(1, groupCount))}</strong> đến{' '}
-              <strong>{Math.ceil(students.length / Math.max(1, groupCount))}</strong> học sinh (chênh lệch tối đa 1 bạn).
+              <strong>{Math.ceil(students.length / Math.max(1, groupCount))}</strong> học sinh
+              (chênh lệch tối đa 1 bạn).
             </div>
 
             {/* Phong cách đặt tên */}
             <div>
-              <label style={{ display: 'block', fontSize: '14px', fontWeight: 600, marginBottom: '8px' }}>
+              <label
+                style={{ display: 'block', fontSize: '14px', fontWeight: 600, marginBottom: '8px' }}
+              >
                 Phong cách đặt tên nhóm:
               </label>
               <div style={{ display: 'flex', gap: '16px' }}>
-                <label style={{ display: 'flex', alignItems: 'center', gap: '6px', cursor: 'pointer', fontSize: '14px' }}>
+                <label
+                  style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '6px',
+                    cursor: 'pointer',
+                    fontSize: '14px',
+                  }}
+                >
                   <input
                     type="radio"
                     name="namingStyle"
@@ -699,7 +782,15 @@ export const ClassGroupsView: React.FC<ClassGroupsViewProps> = ({
                   />
                   Nhóm 1, Nhóm 2, Nhóm 3...
                 </label>
-                <label style={{ display: 'flex', alignItems: 'center', gap: '6px', cursor: 'pointer', fontSize: '14px' }}>
+                <label
+                  style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '6px',
+                    cursor: 'pointer',
+                    fontSize: '14px',
+                  }}
+                >
                   <input
                     type="radio"
                     name="namingStyle"
@@ -713,17 +804,34 @@ export const ClassGroupsView: React.FC<ClassGroupsViewProps> = ({
 
             {/* Tự động chỉ định nhóm trưởng */}
             <div>
-              <label style={{ display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer', fontSize: '14px' }}>
+              <label
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '8px',
+                  cursor: 'pointer',
+                  fontSize: '14px',
+                }}
+              >
                 <input
                   type="checkbox"
                   checked={autoAssignLeader}
-                  onChange={(e) => setAutoAssignLeader(e.target.checked)}
+                  onChange={e => setAutoAssignLeader(e.target.checked)}
                 />
-                <span style={{ fontWeight: 600 }}>Tự động chọn ngẫu nhiên 1 nhóm trưởng cho mỗi nhóm ⭐</span>
+                <span style={{ fontWeight: 600 }}>
+                  Tự động chọn ngẫu nhiên 1 nhóm trưởng cho mỗi nhóm ⭐
+                </span>
               </label>
             </div>
 
-            <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '12px', marginTop: '12px' }}>
+            <div
+              style={{
+                display: 'flex',
+                justifyContent: 'flex-end',
+                gap: '12px',
+                marginTop: '12px',
+              }}
+            >
               <Button variant="secondary" onClick={() => setIsRandomizeOpen(false)}>
                 Hủy
               </Button>
@@ -750,7 +858,7 @@ export const ClassGroupsView: React.FC<ClassGroupsViewProps> = ({
             <Input
               label="Tên nhóm mới:"
               value={newGroupName}
-              onChange={(e) => setNewGroupName(e.target.value)}
+              onChange={e => setNewGroupName(e.target.value)}
               placeholder="VD: Nhóm 5, Tổ 5, Nhóm Stem..."
               autoFocus
             />
@@ -781,7 +889,7 @@ export const ClassGroupsView: React.FC<ClassGroupsViewProps> = ({
             <Input
               label="Tên nhóm:"
               value={editGroupName}
-              onChange={(e) => setEditGroupName(e.target.value)}
+              onChange={e => setEditGroupName(e.target.value)}
               placeholder="Nhập tên nhóm..."
               autoFocus
             />

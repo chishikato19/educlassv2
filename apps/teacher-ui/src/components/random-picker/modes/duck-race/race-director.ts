@@ -51,14 +51,14 @@ export function initializeDuckFlock(
   if (students.length === 0) return [];
 
   // Đảm bảo targetStudent có trong danh sách
-  const pool = students.some((s) => s.id === targetStudent.id)
+  const pool = students.some(s => s.id === targetStudent.id)
     ? [...students]
     : [targetStudent, ...students];
 
   const nameMap = buildStudentDisplayNameMap(pool);
 
   // Chọn đối thủ cho kịch bản 'duel' và 'triple_threat'
-  const others = pool.filter((s) => s.id !== targetStudent.id);
+  const others = pool.filter(s => s.id !== targetStudent.id);
   const rivalId1 = others.length > 0 ? others[0]?.id : null;
   const rivalId2 = others.length > 1 ? others[1]?.id : null;
 
@@ -68,7 +68,8 @@ export function initializeDuckFlock(
 
   return pool.map((student, idx) => {
     const isTarget = student.id === targetStudent.id;
-    const isRival = student.id === rivalId1 && (scenario === 'duel' || scenario === 'triple_threat');
+    const isRival =
+      student.id === rivalId1 && (scenario === 'duel' || scenario === 'triple_threat');
     const isRival2 = student.id === rivalId2 && scenario === 'triple_threat';
 
     // Phân bố làn bơi đan xen tự nhiên, tận dụng toàn bộ chiều rộng mặt sông
@@ -103,7 +104,7 @@ export function initializeDuckFlock(
 /**
  * Tính toán vị trí X của chú vịt theo tiến trình thời gian cuộc đua (0.0 đến 1.0)
  * dựa trên 5 KỊCH BẢN kịch tính khác nhau
- * 
+ *
  * NGUYÊN TẮC VÀNG:
  * 1. Chuyển động tăng đơn điệu liên tục (vịt luôn bơi tiến lên, không bao giờ dừng khựng lại).
  * 2. Không có bất kỳ chú vịt nào tới vạch đích trước hoặc phải dừng lại đợi vịt nhất!
@@ -139,7 +140,7 @@ export function calculateDuckX(
           duckProgress = p * 0.78;
         } else if (p < 0.75) {
           // Giai đoạn 2: Tăng tốc rút ngắn khoảng cách với nhóm dẫn đầu
-          const midP = (p - 0.45) / 0.30;
+          const midP = (p - 0.45) / 0.3;
           duckProgress = 0.351 + midP * 0.36;
           isSpeeding = true;
         } else {
@@ -168,7 +169,7 @@ export function calculateDuckX(
         // So kè dao động liên tục từng centimet
         const duelSwing = Math.sin(p * 15) * 0.02;
 
-        if (p < 0.90) {
+        if (p < 0.9) {
           if (duck.isTarget) {
             duckProgress = leadBase + duelSwing;
           } else {
@@ -176,7 +177,7 @@ export function calculateDuckX(
           }
         } else {
           // Chặng 10% nước rút cuối cùng: cả 2 cùng lao về vạch đích, Target rướn mỏ thắng sát nút
-          const endP = (p - 0.90) / 0.10;
+          const endP = (p - 0.9) / 0.1;
           if (duck.isTarget) {
             duckProgress = 0.886 + endP * 0.129; // Cán đích ở 1.015
           } else {
@@ -257,24 +258,24 @@ export function calculateDuckX(
           trioWave = Math.sin(p * 13 + 4.188) * 0.025; // + 240 độ
         }
 
-        if (p < 0.90) {
+        if (p < 0.9) {
           duckProgress = trioBase + trioWave;
         } else {
           // 10% nước rút cuối cùng: cả 3 cùng lao về đích trong tích tắc sát nút
-          const endP = (p - 0.90) / 0.10;
+          const endP = (p - 0.9) / 0.1;
           if (duck.isTarget) {
             duckProgress = 0.886 + endP * 0.129; // Cán đích ở 1.015
           } else if (duck.isRival) {
             duckProgress = 0.886 + endP * 0.106; // Về nhì ở 0.992
           } else {
-            duckProgress = 0.886 + endP * 0.100; // Về ba ở 0.986
+            duckProgress = 0.886 + endP * 0.1; // Về ba ở 0.986
           }
         }
       } else {
         // Đàn vịt còn lại bơi phía sau trải dài tự nhiên
         const base = p * 0.87 + flockSpread * p;
         const wave = Math.sin(p * 8 + duck.bobPhase) * 0.012;
-        duckProgress = Math.min(Math.max(base + wave, p * 0.70), 0.91);
+        duckProgress = Math.min(Math.max(base + wave, p * 0.7), 0.91);
       }
       break;
     }

@@ -128,9 +128,7 @@ export const SyncTurnView: React.FC<SyncTurnViewProps> = ({
           <div className="flex items-center justify-between pb-3 border-b border-blue-900/40">
             <div className="flex items-center gap-2">
               <span className="w-3.5 h-3.5 rounded-full bg-blue-500 shadow-md shadow-blue-500/50" />
-              <h3 className="font-extrabold text-lg text-blue-300">
-                {state.bluePlayer.teamName}
-              </h3>
+              <h3 className="font-extrabold text-lg text-blue-300">{state.bluePlayer.teamName}</h3>
               {state.bluePlayer.streak > 1 && (
                 <span className="px-2 py-0.5 rounded-full bg-amber-500/20 text-amber-300 text-xs font-bold border border-amber-500/30">
                   🔥 x{state.bluePlayer.streak}
@@ -165,10 +163,12 @@ export const SyncTurnView: React.FC<SyncTurnViewProps> = ({
                 'border-slate-700 bg-slate-800/80 text-slate-200 hover:border-blue-500 hover:bg-blue-950/40';
 
               if (isEliminated) {
-                btnClass = 'opacity-30 line-through border-transparent bg-slate-900 text-slate-600 pointer-events-none';
+                btnClass =
+                  'opacity-30 line-through border-transparent bg-slate-900 text-slate-600 pointer-events-none';
               } else if (isReview) {
                 if (isCorrectOpt) {
-                  btnClass = 'border-emerald-500 bg-emerald-950/80 text-emerald-200 ring-2 ring-emerald-500/50';
+                  btnClass =
+                    'border-emerald-500 bg-emerald-950/80 text-emerald-200 ring-2 ring-emerald-500/50';
                 } else if (isSelected) {
                   btnClass = 'border-red-500 bg-red-950/80 text-red-200 line-through';
                 }
@@ -192,9 +192,7 @@ export const SyncTurnView: React.FC<SyncTurnViewProps> = ({
                       🔒 Đã chốt
                     </span>
                   )}
-                  {isReview && isCorrectOpt && (
-                    <span className="text-emerald-400 text-lg">✓</span>
-                  )}
+                  {isReview && isCorrectOpt && <span className="text-emerald-400 text-lg">✓</span>}
                 </button>
               );
             })}
@@ -229,9 +227,7 @@ export const SyncTurnView: React.FC<SyncTurnViewProps> = ({
           <div className="flex items-center justify-between pb-3 border-b border-red-900/40">
             <div className="flex items-center gap-2">
               <span className="w-3.5 h-3.5 rounded-full bg-red-500 shadow-md shadow-red-500/50" />
-              <h3 className="font-extrabold text-lg text-red-300">
-                {state.redPlayer.teamName}
-              </h3>
+              <h3 className="font-extrabold text-lg text-red-300">{state.redPlayer.teamName}</h3>
               {state.redPlayer.streak > 1 && (
                 <span className="px-2 py-0.5 rounded-full bg-amber-500/20 text-amber-300 text-xs font-bold border border-amber-500/30">
                   🔥 x{state.redPlayer.streak}
@@ -266,10 +262,12 @@ export const SyncTurnView: React.FC<SyncTurnViewProps> = ({
                 'border-slate-700 bg-slate-800/80 text-slate-200 hover:border-red-500 hover:bg-red-950/40';
 
               if (isEliminated) {
-                btnClass = 'opacity-30 line-through border-transparent bg-slate-900 text-slate-600 pointer-events-none';
+                btnClass =
+                  'opacity-30 line-through border-transparent bg-slate-900 text-slate-600 pointer-events-none';
               } else if (isReview) {
                 if (isCorrectOpt) {
-                  btnClass = 'border-emerald-500 bg-emerald-950/80 text-emerald-200 ring-2 ring-emerald-500/50';
+                  btnClass =
+                    'border-emerald-500 bg-emerald-950/80 text-emerald-200 ring-2 ring-emerald-500/50';
                 } else if (isSelected) {
                   btnClass = 'border-red-500 bg-red-950/80 text-red-200 line-through';
                 }
@@ -293,9 +291,7 @@ export const SyncTurnView: React.FC<SyncTurnViewProps> = ({
                       🔒 Đã chốt
                     </span>
                   )}
-                  {isReview && isCorrectOpt && (
-                    <span className="text-emerald-400 text-lg">✓</span>
-                  )}
+                  {isReview && isCorrectOpt && <span className="text-emerald-400 text-lg">✓</span>}
                 </button>
               );
             })}

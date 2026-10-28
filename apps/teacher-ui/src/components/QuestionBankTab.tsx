@@ -18,19 +18,20 @@ export interface QuestionBankTabProps {
   }) => Promise<void> | void;
   onUpdateQuestionSet?: (
     id: string,
-    data: { title?: string; subject?: string; grade?: number; tags?: string[] },
+    data: { title?: string; subject?: string; grade?: number; tags?: string[] }
   ) => Promise<void> | void;
   onDeleteQuestionSet: (id: string) => Promise<void> | void;
   onCloneQuestionSet: (id: string, newTitle?: string) => Promise<void> | void;
   onExportQuestionSet: (id: string) => Promise<void> | void;
   onImportQuestionSet: (pkg: EduclassPackage) => Promise<void> | void;
   onOpenQuestionEditor?: ((questionSet: QuestionSetItem) => void) | undefined;
-  onImportWordQuestions?: ((data: {
-    setInfo: { title: string; subject: string; grade: number; tags: string[] };
-    questions: Question[];
-  }) => Promise<void> | void) | undefined;
+  onImportWordQuestions?:
+    | ((data: {
+        setInfo: { title: string; subject: string; grade: number; tags: string[] };
+        questions: Question[];
+      }) => Promise<void> | void)
+    | undefined;
 }
-
 
 export const QuestionBankTab: React.FC<QuestionBankTabProps> = ({
   questionSets,
@@ -74,7 +75,7 @@ export const QuestionBankTab: React.FC<QuestionBankTabProps> = ({
 
   // Bộ lọc
   const filteredSets = useMemo(() => {
-    return questionSets.filter((qs) => {
+    return questionSets.filter(qs => {
       // Tìm kiếm theo từ khóa
       if (searchTerm.trim()) {
         const term = searchTerm.trim().toLowerCase();
@@ -113,8 +114,8 @@ export const QuestionBankTab: React.FC<QuestionBankTabProps> = ({
 
     const tagsArray = formTags
       .split(',')
-      .map((t) => t.trim())
-      .filter((t) => t.length > 0);
+      .map(t => t.trim())
+      .filter(t => t.length > 0);
 
     try {
       await onCreateQuestionSet({
@@ -140,7 +141,7 @@ export const QuestionBankTab: React.FC<QuestionBankTabProps> = ({
     } catch (err: unknown) {
       alert(
         'Không thể nhập file .educlass: ' +
-          (err instanceof Error ? err.message : 'Định dạng file không đúng'),
+          (err instanceof Error ? err.message : 'Định dạng file không đúng')
       );
     } finally {
       if (fileInputRef.current) {
@@ -252,7 +253,7 @@ export const QuestionBankTab: React.FC<QuestionBankTabProps> = ({
               type="text"
               placeholder="Tìm kiếm bộ đề, môn học..."
               value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
+              onChange={e => setSearchTerm(e.target.value)}
               data-testid="input-search-question-sets"
               className="w-full min-h-[48px] px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
@@ -286,7 +287,7 @@ export const QuestionBankTab: React.FC<QuestionBankTabProps> = ({
             >
               Tất cả
             </button>
-            {allTags.map((tag) => (
+            {allTags.map(tag => (
               <button
                 key={tag}
                 type="button"
@@ -351,7 +352,7 @@ export const QuestionBankTab: React.FC<QuestionBankTabProps> = ({
       {/* Lưới danh sách các bộ đề */}
       {!isLoading && filteredSets.length > 0 && (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-          {filteredSets.map((qs) => (
+          {filteredSets.map(qs => (
             <div
               key={qs.id}
               className="border border-gray-200 rounded-lg p-5 bg-white shadow-sm hover:shadow transition-shadow flex flex-col justify-between"
@@ -362,7 +363,7 @@ export const QuestionBankTab: React.FC<QuestionBankTabProps> = ({
                     <span className="inline-block px-2.5 py-0.5 rounded text-xs font-medium bg-blue-100 text-blue-800">
                       {qs.subject} • Lớp {qs.grade}
                     </span>
-                    {qs.tags.some((t) => t.toLowerCase().includes('ma trận')) && (
+                    {qs.tags.some(t => t.toLowerCase().includes('ma trận')) && (
                       <span
                         data-testid={`badge-matrix-${qs.id}`}
                         className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-bold bg-purple-100 text-purple-800 border border-purple-200"
@@ -437,7 +438,7 @@ export const QuestionBankTab: React.FC<QuestionBankTabProps> = ({
                     onClick={() => {
                       if (
                         window.confirm(
-                          `Bạn có chắc chắn muốn xóa bộ đề "${qs.title}" không?\nTất cả câu hỏi và hình ảnh trong bộ đề này sẽ bị xóa khỏi hệ thống.`,
+                          `Bạn có chắc chắn muốn xóa bộ đề "${qs.title}" không?\nTất cả câu hỏi và hình ảnh trong bộ đề này sẽ bị xóa khỏi hệ thống.`
                         )
                       ) {
                         onDeleteQuestionSet(qs.id);
@@ -470,7 +471,7 @@ export const QuestionBankTab: React.FC<QuestionBankTabProps> = ({
             padding: '16px',
             boxSizing: 'border-box',
           }}
-          onClick={(e) => {
+          onClick={e => {
             if (e.target === e.currentTarget) handleCloseCreateModal();
           }}
         >
@@ -512,7 +513,7 @@ export const QuestionBankTab: React.FC<QuestionBankTabProps> = ({
                   required
                   placeholder="Ví dụ: Kiểm tra 1 tiết Học kỳ 1"
                   value={formTitle}
-                  onChange={(e) => setFormTitle(e.target.value)}
+                  onChange={e => setFormTitle(e.target.value)}
                   data-testid="input-set-title"
                   className="w-full min-h-[48px] px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                 />
@@ -526,7 +527,7 @@ export const QuestionBankTab: React.FC<QuestionBankTabProps> = ({
                     required
                     placeholder="Toán, Vật lý..."
                     value={formSubject}
-                    onChange={(e) => setFormSubject(e.target.value)}
+                    onChange={e => setFormSubject(e.target.value)}
                     data-testid="input-set-subject"
                     className="w-full min-h-[48px] px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                   />
@@ -536,11 +537,11 @@ export const QuestionBankTab: React.FC<QuestionBankTabProps> = ({
                   <label className="block text-sm font-medium text-gray-700 mb-1">Khối lớp</label>
                   <select
                     value={formGrade}
-                    onChange={(e) => setFormGrade(Number(e.target.value))}
+                    onChange={e => setFormGrade(Number(e.target.value))}
                     data-testid="select-set-grade"
                     className="w-full min-h-[48px] px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white"
                   >
-                    {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12].map((g) => (
+                    {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12].map(g => (
                       <option key={g} value={g}>
                         Lớp {g}
                       </option>
@@ -557,7 +558,7 @@ export const QuestionBankTab: React.FC<QuestionBankTabProps> = ({
                   type="text"
                   placeholder="Giải tích, Chương 1, Khảo sát hàm số"
                   value={formTags}
-                  onChange={(e) => setFormTags(e.target.value)}
+                  onChange={e => setFormTags(e.target.value)}
                   data-testid="input-set-tags"
                   className="w-full min-h-[48px] px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                 />

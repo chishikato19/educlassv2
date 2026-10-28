@@ -8,7 +8,8 @@ export const CORE_POWER_UPS: Record<PowerUpType, Omit<PowerUpItem, 'id'>> = {
     type: 'shield',
     name: 'Khiên Hộ Thể',
     icon: '🛡️',
-    description: 'Bảo vệ bản thân, chặn đứng 1 đòn tấn công bất kỳ từ đối thủ (45 giây hoặc 1 lần bị tấn công)',
+    description:
+      'Bảo vệ bản thân, chặn đứng 1 đòn tấn công bất kỳ từ đối thủ (45 giây hoặc 1 lần bị tấn công)',
     targetScope: 'self',
     durationMs: 45000, // 45 giây
   },
@@ -16,7 +17,8 @@ export const CORE_POWER_UPS: Record<PowerUpType, Omit<PowerUpItem, 'id'>> = {
     type: 'reflect_shield',
     name: 'Khiên Phản Đòn',
     icon: '🪞',
-    description: 'Bảo vệ bản thân, chặn đứng và dội ngược đòn tấn công về kẻ xuất chiêu (45 giây hoặc 1 lần bị tấn công)',
+    description:
+      'Bảo vệ bản thân, chặn đứng và dội ngược đòn tấn công về kẻ xuất chiêu (45 giây hoặc 1 lần bị tấn công)',
     targetScope: 'self',
     durationMs: 45000, // 45 giây
   },

@@ -1,10 +1,5 @@
 import React, { useState } from 'react';
-import type {
-  BoardColor,
-  BoardPost,
-  BoardReactionType,
-  BoardState,
-} from '@educlass/protocol';
+import type { BoardColor, BoardPost, BoardReactionType, BoardState } from '@educlass/protocol';
 import { StudentPostEditor } from './StudentPostEditor.js';
 import { PeerGradingModal } from './PeerGradingModal.js';
 import { PeerGradesDetailModal } from './PeerGradesDetailModal.js';
@@ -55,7 +50,9 @@ export const InteractiveBoardStudentView: React.FC<InteractiveBoardStudentViewPr
   );
 
   const postsList = Object.values(postsObj);
-  const approvedPosts = postsList.filter((p) => p.status === 'approved' || (participantId && p.participantId === participantId));
+  const approvedPosts = postsList.filter(
+    p => p.status === 'approved' || (participantId && p.participantId === participantId)
+  );
 
   // Gửi bài nộp lên Thầy/Cô
   const handleSubmitPost = (data: {
@@ -153,8 +150,8 @@ export const InteractiveBoardStudentView: React.FC<InteractiveBoardStudentViewPr
               myPost.status === 'approved'
                 ? 'bg-emerald-50 border-emerald-200'
                 : myPost.status === 'rejected'
-                ? 'bg-rose-50 border-rose-200'
-                : 'bg-amber-50 border-amber-200'
+                  ? 'bg-rose-50 border-rose-200'
+                  : 'bg-amber-50 border-amber-200'
             }`}
           >
             <div className="flex items-center justify-between">
@@ -168,8 +165,8 @@ export const InteractiveBoardStudentView: React.FC<InteractiveBoardStudentViewPr
                     {myPost.status === 'approved'
                       ? 'Bài của bạn đã được Thầy/Cô duyệt và hiển thị cho cả lớp!'
                       : myPost.status === 'rejected'
-                      ? `Thầy/Cô yêu cầu chỉnh sửa: ${myPost.rejectionReason || 'Chưa đạt yêu cầu'}`
-                      : 'Bài đang chờ Thầy/Cô duyệt trước khi hiển thị cho các bạn.'}
+                        ? `Thầy/Cô yêu cầu chỉnh sửa: ${myPost.rejectionReason || 'Chưa đạt yêu cầu'}`
+                        : 'Bài đang chờ Thầy/Cô duyệt trước khi hiển thị cho các bạn.'}
                   </p>
                 </div>
               </div>
@@ -207,7 +204,8 @@ export const InteractiveBoardStudentView: React.FC<InteractiveBoardStudentViewPr
               Nội dung bài làm của cả lớp đang tạm ẩn
             </h3>
             <p className="text-sm text-amber-800 max-w-md mx-auto leading-relaxed">
-              Bạn cần <strong>hoàn thành nộp bài làm của mình</strong> trước thì mới mở khóa xem sản phẩm của các bạn khác và cùng tham gia thả tim, góp ý, chấm điểm!
+              Bạn cần <strong>hoàn thành nộp bài làm của mình</strong> trước thì mới mở khóa xem sản
+              phẩm của các bạn khác và cùng tham gia thả tim, góp ý, chấm điểm!
             </p>
             <button
               type="button"
@@ -220,7 +218,7 @@ export const InteractiveBoardStudentView: React.FC<InteractiveBoardStudentViewPr
         ) : (
           /* 3. Lưới các bài đăng (Classroom Grid) khi đã nộp bài */
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3.5">
-            {approvedPosts.map((post) => {
+            {approvedPosts.map(post => {
               const isMyOwn = post.participantId === participantId;
               const isLocked = Boolean(post.isLocked);
               const colorStyle = COLOR_CLASSES[post.color] || COLOR_CLASSES.yellow;
@@ -229,269 +227,277 @@ export const InteractiveBoardStudentView: React.FC<InteractiveBoardStudentViewPr
               const hasLike = (post.likes || []).includes(participantId);
               const peerReviewCount = Object.keys(post.peerGrades || {}).length;
 
-            return (
-              <div
-                key={post.id}
-                className={`rounded-3xl border p-4 shadow-sm transition flex flex-col justify-between ${
-                  post.isSpotlight ? 'ring-4 ring-amber-400 shadow-md' : ''
-                } ${isLocked ? 'bg-slate-100 border-dashed border-slate-300' : colorStyle.card}`}
-              >
-                <div>
-                  {/* Tiêu đề thẻ bài: Tên tác giả + Huy hiệu */}
-                  <div className="flex items-center justify-between pb-2 border-b border-black/5 mb-3">
-                    <div className="flex items-center gap-2">
-                      <div className="w-8 h-8 rounded-full bg-white font-black text-xs text-slate-700 flex items-center justify-center shadow-xs">
-                        {post.authorName.charAt(0).toUpperCase()}
+              return (
+                <div
+                  key={post.id}
+                  className={`rounded-3xl border p-4 shadow-sm transition flex flex-col justify-between ${
+                    post.isSpotlight ? 'ring-4 ring-amber-400 shadow-md' : ''
+                  } ${isLocked ? 'bg-slate-100 border-dashed border-slate-300' : colorStyle.card}`}
+                >
+                  <div>
+                    {/* Tiêu đề thẻ bài: Tên tác giả + Huy hiệu */}
+                    <div className="flex items-center justify-between pb-2 border-b border-black/5 mb-3">
+                      <div className="flex items-center gap-2">
+                        <div className="w-8 h-8 rounded-full bg-white font-black text-xs text-slate-700 flex items-center justify-center shadow-xs">
+                          {post.authorName.charAt(0).toUpperCase()}
+                        </div>
+                        <div>
+                          <span className="font-extrabold text-slate-800 text-sm">
+                            {isMyOwn ? `${post.authorName} (Bạn)` : post.authorName}
+                          </span>
+                          {isLocked && (
+                            <span className="text-[10px] text-slate-400 block">
+                              Bài nộp đang bị khóa
+                            </span>
+                          )}
+                        </div>
                       </div>
-                      <div>
-                        <span className="font-extrabold text-slate-800 text-sm">
-                          {isMyOwn ? `${post.authorName} (Bạn)` : post.authorName}
-                        </span>
-                        {isLocked && (
-                          <span className="text-[10px] text-slate-400 block">Bài nộp đang bị khóa</span>
+
+                      {/* Huy hiệu xếp hạng hoặc Spotlight */}
+                      <div className="flex items-center gap-1">
+                        {post.isSpotlight && (
+                          <span className="text-[10px] font-black bg-amber-400 text-amber-950 px-2 py-0.5 rounded-full flex items-center gap-0.5">
+                            🌟 Tiêu điểm
+                          </span>
+                        )}
+                        {post.rankAward && (
+                          <span className="text-[10px] font-black bg-indigo-100 text-indigo-700 px-2 py-0.5 rounded-full">
+                            {post.rankAward === 'top1'
+                              ? '🏆 Quán quân'
+                              : post.rankAward === 'top2'
+                                ? '🥈 Á quân'
+                                : post.rankAward === 'top3'
+                                  ? '🥉 Quý quân'
+                                  : '💡 Sáng tạo'}
+                          </span>
                         )}
                       </div>
                     </div>
 
-                    {/* Huy hiệu xếp hạng hoặc Spotlight */}
-                    <div className="flex items-center gap-1">
-                      {post.isSpotlight && (
-                        <span className="text-[10px] font-black bg-amber-400 text-amber-950 px-2 py-0.5 rounded-full flex items-center gap-0.5">
-                          🌟 Tiêu điểm
-                        </span>
-                      )}
-                      {post.rankAward && (
-                        <span className="text-[10px] font-black bg-indigo-100 text-indigo-700 px-2 py-0.5 rounded-full">
-                          {post.rankAward === 'top1'
-                            ? '🏆 Quán quân'
-                            : post.rankAward === 'top2'
-                            ? '🥈 Á quân'
-                            : post.rankAward === 'top3'
-                            ? '🥉 Quý quân'
-                            : '💡 Sáng tạo'}
-                        </span>
-                      )}
-                    </div>
+                    {/* Nội dung bài nộp */}
+                    {isLocked ? (
+                      <div className="py-8 flex flex-col items-center justify-center text-slate-400 text-center">
+                        <span className="text-3xl mb-1">🔒</span>
+                        <span className="text-xs font-semibold">Nộp bài của bạn để mở khóa</span>
+                      </div>
+                    ) : (
+                      <div className="space-y-2.5">
+                        {/* Kết quả Phiếu bài tập (nếu có) */}
+                        {post.worksheetResult && (
+                          <div className="bg-blue-50 border border-blue-200 rounded-2xl px-3 py-2 flex items-center justify-between text-xs text-blue-900 font-bold shadow-xs">
+                            <span className="flex items-center gap-1.5">
+                              <span>📋</span> Phiếu bài tập:
+                            </span>
+                            <span className="bg-blue-600 text-white px-2 py-0.5 rounded-lg text-[11px] font-black">
+                              Đúng {post.worksheetResult.correctCount}/
+                              {post.worksheetResult.totalCount} (
+                              {post.worksheetResult.autoScore.toFixed(1)}/
+                              {post.worksheetResult.maxScore}đ)
+                            </span>
+                          </div>
+                        )}
+
+                        {/* Văn bản bài làm */}
+                        {post.text && (
+                          <p className="text-slate-800 text-sm whitespace-pre-wrap break-words leading-relaxed">
+                            {post.text}
+                          </p>
+                        )}
+
+                        {/* Nét vẽ tay */}
+                        {post.drawingDataUrl && (
+                          <div className="rounded-2xl overflow-hidden border border-black/10 bg-white p-1">
+                            <img
+                              src={post.drawingDataUrl}
+                              alt="Nét vẽ tay"
+                              className="w-full max-h-48 object-contain rounded-xl"
+                            />
+                          </div>
+                        )}
+
+                        {/* Ảnh chụp vở / tài liệu */}
+                        {post.imageUrl && (
+                          <div
+                            onClick={() => setZoomImageUrl(post.imageUrl || null)}
+                            className="rounded-2xl overflow-hidden border border-black/10 bg-white p-1 cursor-pointer group relative"
+                          >
+                            <img
+                              src={post.imageUrl}
+                              alt="Ảnh chụp bài làm"
+                              className="w-full max-h-48 object-cover rounded-xl group-hover:scale-102 transition duration-200"
+                            />
+                            <div className="absolute inset-0 bg-black/20 opacity-0 group-hover:opacity-100 transition rounded-xl flex items-center justify-center text-white text-xs font-bold">
+                              🔍 Nhấn để phóng to
+                            </div>
+                          </div>
+                        )}
+                      </div>
+                    )}
                   </div>
 
-                  {/* Nội dung bài nộp */}
-                  {isLocked ? (
-                    <div className="py-8 flex flex-col items-center justify-center text-slate-400 text-center">
-                      <span className="text-3xl mb-1">🔒</span>
-                      <span className="text-xs font-semibold">Nộp bài của bạn để mở khóa</span>
-                    </div>
-                  ) : (
-                    <div className="space-y-2.5">
-                      {/* Kết quả Phiếu bài tập (nếu có) */}
-                      {post.worksheetResult && (
-                        <div className="bg-blue-50 border border-blue-200 rounded-2xl px-3 py-2 flex items-center justify-between text-xs text-blue-900 font-bold shadow-xs">
-                          <span className="flex items-center gap-1.5">
-                            <span>📋</span> Phiếu bài tập:
+                  {/* Phần chân thẻ: Điểm số, Cảm xúc & Bình luận */}
+                  {!isLocked && (
+                    <div className="pt-3 mt-3 border-t border-black/5 space-y-2">
+                      {/* Hàng 1: Điểm số (Điểm TB bạn học chấm + Điểm GV) */}
+                      <div className="flex items-center justify-between text-xs">
+                        {/* Nút bấm xem chi tiết ai chấm mấy điểm */}
+                        {state.config.allowPeerGrades && (
+                          <button
+                            type="button"
+                            onClick={() => setViewingGradesPost(post)}
+                            className="font-bold text-blue-700 bg-blue-100/80 hover:bg-blue-200 px-2 py-1 rounded-xl transition flex items-center gap-1"
+                            title="Bấm để xem danh sách bạn bè chấm điểm"
+                          >
+                            <span>📊</span>
+                            <span>
+                              TB:{' '}
+                              {post.peerAverageScore !== null
+                                ? `${post.peerAverageScore}★`
+                                : 'Chưa có'}
+                            </span>
+                            <span className="text-[10px] text-blue-500 font-normal">
+                              ({peerReviewCount})
+                            </span>
+                          </button>
+                        )}
+
+                        {post.teacherGrade !== null && (
+                          <span className="font-extrabold text-emerald-700 bg-emerald-100 px-2 py-1 rounded-xl">
+                            GV: {post.teacherGrade} đ
                           </span>
-                          <span className="bg-blue-600 text-white px-2 py-0.5 rounded-lg text-[11px] font-black">
-                            Đúng {post.worksheetResult.correctCount}/{post.worksheetResult.totalCount} ({post.worksheetResult.autoScore.toFixed(1)}/{post.worksheetResult.maxScore}đ)
-                          </span>
+                        )}
+                      </div>
+
+                      {/* Hàng 2: Nút tương tác Thả tim, Like, Chấm điểm & Bình luận */}
+                      <div className="flex items-center justify-between pt-1">
+                        {/* Thả tim ❤️ & Like 👍 */}
+                        {state.config.allowReactions && (
+                          <div className="flex items-center gap-1">
+                            <button
+                              type="button"
+                              onClick={() => handleReact(post.id, 'heart')}
+                              className={`min-h-[40px] px-2.5 py-1 rounded-xl font-bold text-xs transition flex items-center gap-1 ${
+                                hasHeart
+                                  ? 'bg-rose-500 text-white shadow-xs'
+                                  : 'bg-white/80 hover:bg-white text-slate-600'
+                              }`}
+                            >
+                              <span>❤️</span>
+                              <span>{(post.hearts || []).length}</span>
+                            </button>
+                            <button
+                              type="button"
+                              onClick={() => handleReact(post.id, 'like')}
+                              className={`min-h-[40px] px-2.5 py-1 rounded-xl font-bold text-xs transition flex items-center gap-1 ${
+                                hasLike
+                                  ? 'bg-blue-500 text-white shadow-xs'
+                                  : 'bg-white/80 hover:bg-white text-slate-600'
+                              }`}
+                            >
+                              <span>👍</span>
+                              <span>{(post.likes || []).length}</span>
+                            </button>
+                          </div>
+                        )}
+
+                        <div className="flex items-center gap-1">
+                          {/* Nút Chấm điểm bạn học (Không hiện trên bài của chính mình) */}
+                          {state.config.allowPeerGrades && !isMyOwn && (
+                            <button
+                              type="button"
+                              onClick={() => setGradingPost(post)}
+                              className="min-h-[40px] px-2.5 py-1 bg-amber-500 hover:bg-amber-600 text-white font-bold text-xs rounded-xl shadow-xs transition flex items-center gap-1"
+                            >
+                              <span>⭐</span> Chấm điểm
+                            </button>
+                          )}
+
+                          {/* Nút mở danh sách bình luận */}
+                          {state.config.allowComments && (
+                            <button
+                              type="button"
+                              onClick={() =>
+                                setExpandedCommentsPostId(
+                                  expandedCommentsPostId === post.id ? null : post.id
+                                )
+                              }
+                              className="min-h-[40px] px-2.5 py-1 bg-white/80 hover:bg-white text-slate-700 font-bold text-xs rounded-xl transition flex items-center gap-1"
+                            >
+                              <span>💬</span>
+                              <span>{(post.comments || []).length}</span>
+                            </button>
+                          )}
                         </div>
-                      )}
+                      </div>
 
-                      {/* Văn bản bài làm */}
-                      {post.text && (
-                        <p className="text-slate-800 text-sm whitespace-pre-wrap break-words leading-relaxed">
-                          {post.text}
-                        </p>
-                      )}
+                      {/* Vùng bình luận mở rộng (Accordion) */}
+                      {expandedCommentsPostId === post.id && (
+                        <div className="pt-2 border-t border-black/5 space-y-2">
+                          {/* Danh sách bình luận */}
+                          <div className="max-h-36 overflow-y-auto space-y-1.5 pr-1">
+                            {(post.comments || []).length === 0 ? (
+                              <p className="text-[11px] text-slate-400 text-center py-2">
+                                Chưa có bình luận nào
+                              </p>
+                            ) : (
+                              (post.comments || []).map(cm => (
+                                <div
+                                  key={cm.id}
+                                  className={`p-2 rounded-xl text-xs ${
+                                    cm.isTeacher
+                                      ? 'bg-amber-100/90 border border-amber-300 text-amber-900 font-medium'
+                                      : 'bg-white/80 text-slate-700'
+                                  }`}
+                                >
+                                  <div className="flex items-center justify-between font-bold mb-0.5">
+                                    <span>{cm.isTeacher ? '⭐ Giáo viên' : cm.authorName}</span>
+                                    <span className="text-[10px] text-slate-400 font-normal">
+                                      {new Date(cm.createdAt).toLocaleTimeString([], {
+                                        hour: '2-digit',
+                                        minute: '2-digit',
+                                      })}
+                                    </span>
+                                  </div>
+                                  <p className="break-words">{cm.content}</p>
+                                </div>
+                              ))
+                            )}
+                          </div>
 
-                      {/* Nét vẽ tay */}
-                      {post.drawingDataUrl && (
-                        <div className="rounded-2xl overflow-hidden border border-black/10 bg-white p-1">
-                          <img
-                            src={post.drawingDataUrl}
-                            alt="Nét vẽ tay"
-                            className="w-full max-h-48 object-contain rounded-xl"
-                          />
-                        </div>
-                      )}
-
-                      {/* Ảnh chụp vở / tài liệu */}
-                      {post.imageUrl && (
-                        <div
-                          onClick={() => setZoomImageUrl(post.imageUrl || null)}
-                          className="rounded-2xl overflow-hidden border border-black/10 bg-white p-1 cursor-pointer group relative"
-                        >
-                          <img
-                            src={post.imageUrl}
-                            alt="Ảnh chụp bài làm"
-                            className="w-full max-h-48 object-cover rounded-xl group-hover:scale-102 transition duration-200"
-                          />
-                          <div className="absolute inset-0 bg-black/20 opacity-0 group-hover:opacity-100 transition rounded-xl flex items-center justify-center text-white text-xs font-bold">
-                            🔍 Nhấn để phóng to
+                          {/* Form gửi bình luận */}
+                          <div className="flex items-center gap-1.5 pt-1">
+                            <input
+                              type="text"
+                              value={commentInput}
+                              onChange={e => setCommentInput(e.target.value)}
+                              onKeyDown={e => {
+                                if (e.key === 'Enter') handleAddComment(post.id);
+                              }}
+                              placeholder={
+                                state.isGlobalMuted
+                                  ? 'Thầy/Cô đã khóa bình luận'
+                                  : 'Nhận xét góp ý cho bạn...'
+                              }
+                              disabled={state.isGlobalMuted}
+                              className="flex-1 min-h-[40px] px-3 py-1.5 rounded-xl bg-white border border-slate-300 text-xs text-slate-800 focus:outline-none focus:ring-2 focus:ring-blue-400 disabled:bg-slate-100"
+                            />
+                            <button
+                              type="button"
+                              onClick={() => handleAddComment(post.id)}
+                              disabled={state.isGlobalMuted || !commentInput.trim()}
+                              className="min-h-[40px] px-3 py-1.5 bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs rounded-xl disabled:opacity-40 transition"
+                            >
+                              Gửi
+                            </button>
                           </div>
                         </div>
                       )}
                     </div>
                   )}
                 </div>
-
-                {/* Phần chân thẻ: Điểm số, Cảm xúc & Bình luận */}
-                {!isLocked && (
-                  <div className="pt-3 mt-3 border-t border-black/5 space-y-2">
-                    {/* Hàng 1: Điểm số (Điểm TB bạn học chấm + Điểm GV) */}
-                    <div className="flex items-center justify-between text-xs">
-                      {/* Nút bấm xem chi tiết ai chấm mấy điểm */}
-                      {state.config.allowPeerGrades && (
-                        <button
-                          type="button"
-                          onClick={() => setViewingGradesPost(post)}
-                          className="font-bold text-blue-700 bg-blue-100/80 hover:bg-blue-200 px-2 py-1 rounded-xl transition flex items-center gap-1"
-                          title="Bấm để xem danh sách bạn bè chấm điểm"
-                        >
-                          <span>📊</span>
-                          <span>
-                            TB: {post.peerAverageScore !== null ? `${post.peerAverageScore}★` : 'Chưa có'}
-                          </span>
-                          <span className="text-[10px] text-blue-500 font-normal">
-                            ({peerReviewCount})
-                          </span>
-                        </button>
-                      )}
-
-                      {post.teacherGrade !== null && (
-                        <span className="font-extrabold text-emerald-700 bg-emerald-100 px-2 py-1 rounded-xl">
-                          GV: {post.teacherGrade} đ
-                        </span>
-                      )}
-                    </div>
-
-                    {/* Hàng 2: Nút tương tác Thả tim, Like, Chấm điểm & Bình luận */}
-                    <div className="flex items-center justify-between pt-1">
-                      {/* Thả tim ❤️ & Like 👍 */}
-                      {state.config.allowReactions && (
-                        <div className="flex items-center gap-1">
-                          <button
-                            type="button"
-                            onClick={() => handleReact(post.id, 'heart')}
-                            className={`min-h-[40px] px-2.5 py-1 rounded-xl font-bold text-xs transition flex items-center gap-1 ${
-                              hasHeart
-                                ? 'bg-rose-500 text-white shadow-xs'
-                                : 'bg-white/80 hover:bg-white text-slate-600'
-                            }`}
-                          >
-                            <span>❤️</span>
-                            <span>{(post.hearts || []).length}</span>
-                          </button>
-                          <button
-                            type="button"
-                            onClick={() => handleReact(post.id, 'like')}
-                            className={`min-h-[40px] px-2.5 py-1 rounded-xl font-bold text-xs transition flex items-center gap-1 ${
-                              hasLike
-                                ? 'bg-blue-500 text-white shadow-xs'
-                                : 'bg-white/80 hover:bg-white text-slate-600'
-                            }`}
-                          >
-                            <span>👍</span>
-                            <span>{(post.likes || []).length}</span>
-                          </button>
-                        </div>
-                      )}
-
-                      <div className="flex items-center gap-1">
-                        {/* Nút Chấm điểm bạn học (Không hiện trên bài của chính mình) */}
-                        {state.config.allowPeerGrades && !isMyOwn && (
-                          <button
-                            type="button"
-                            onClick={() => setGradingPost(post)}
-                            className="min-h-[40px] px-2.5 py-1 bg-amber-500 hover:bg-amber-600 text-white font-bold text-xs rounded-xl shadow-xs transition flex items-center gap-1"
-                          >
-                            <span>⭐</span> Chấm điểm
-                          </button>
-                        )}
-
-                        {/* Nút mở danh sách bình luận */}
-                        {state.config.allowComments && (
-                          <button
-                            type="button"
-                            onClick={() =>
-                              setExpandedCommentsPostId(
-                                expandedCommentsPostId === post.id ? null : post.id
-                              )
-                            }
-                            className="min-h-[40px] px-2.5 py-1 bg-white/80 hover:bg-white text-slate-700 font-bold text-xs rounded-xl transition flex items-center gap-1"
-                          >
-                            <span>💬</span>
-                            <span>{(post.comments || []).length}</span>
-                          </button>
-                        )}
-                      </div>
-                    </div>
-
-                    {/* Vùng bình luận mở rộng (Accordion) */}
-                    {expandedCommentsPostId === post.id && (
-                      <div className="pt-2 border-t border-black/5 space-y-2">
-                        {/* Danh sách bình luận */}
-                        <div className="max-h-36 overflow-y-auto space-y-1.5 pr-1">
-                          {(post.comments || []).length === 0 ? (
-                            <p className="text-[11px] text-slate-400 text-center py-2">
-                              Chưa có bình luận nào
-                            </p>
-                          ) : (
-                            (post.comments || []).map((cm) => (
-                              <div
-                                key={cm.id}
-                                className={`p-2 rounded-xl text-xs ${
-                                  cm.isTeacher
-                                    ? 'bg-amber-100/90 border border-amber-300 text-amber-900 font-medium'
-                                    : 'bg-white/80 text-slate-700'
-                                }`}
-                              >
-                                <div className="flex items-center justify-between font-bold mb-0.5">
-                                  <span>{cm.isTeacher ? '⭐ Giáo viên' : cm.authorName}</span>
-                                  <span className="text-[10px] text-slate-400 font-normal">
-                                    {new Date(cm.createdAt).toLocaleTimeString([], {
-                                      hour: '2-digit',
-                                      minute: '2-digit',
-                                    })}
-                                  </span>
-                                </div>
-                                <p className="break-words">{cm.content}</p>
-                              </div>
-                            ))
-                          )}
-                        </div>
-
-                        {/* Form gửi bình luận */}
-                        <div className="flex items-center gap-1.5 pt-1">
-                          <input
-                            type="text"
-                            value={commentInput}
-                            onChange={(e) => setCommentInput(e.target.value)}
-                            onKeyDown={(e) => {
-                              if (e.key === 'Enter') handleAddComment(post.id);
-                            }}
-                            placeholder={
-                              state.isGlobalMuted
-                                ? 'Thầy/Cô đã khóa bình luận'
-                                : 'Nhận xét góp ý cho bạn...'
-                            }
-                            disabled={state.isGlobalMuted}
-                            className="flex-1 min-h-[40px] px-3 py-1.5 rounded-xl bg-white border border-slate-300 text-xs text-slate-800 focus:outline-none focus:ring-2 focus:ring-blue-400 disabled:bg-slate-100"
-                          />
-                          <button
-                            type="button"
-                            onClick={() => handleAddComment(post.id)}
-                            disabled={state.isGlobalMuted || !commentInput.trim()}
-                            className="min-h-[40px] px-3 py-1.5 bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs rounded-xl disabled:opacity-40 transition"
-                          >
-                            Gửi
-                          </button>
-                        </div>
-                      </div>
-                    )}
-                  </div>
-                )}
-              </div>
-            );
-          })}
-        </div>
+              );
+            })}
+          </div>
         )}
       </div>
 
@@ -514,7 +520,7 @@ export const InteractiveBoardStudentView: React.FC<InteractiveBoardStudentViewPr
           post={gradingPost}
           currentParticipantId={participantId}
           maxGrade={state.config.maxGrade}
-          onGrade={(score) => handleGradePeer(gradingPost.id, score)}
+          onGrade={score => handleGradePeer(gradingPost.id, score)}
           onClose={() => setGradingPost(null)}
         />
       )}

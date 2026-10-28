@@ -37,7 +37,7 @@ describe('RewardRules Repository (Task 3.2 DB)', () => {
 
     const globals = await rewardRepo.getGlobalRules();
     expect(globals).toHaveLength(3);
-    expect(globals.every((r) => r.scope === 'global')).toBe(true);
+    expect(globals.every(r => r.scope === 'global')).toBe(true);
   });
 
   it('manages teacher rules (set, get, reset) with atomic transactions', async () => {
@@ -57,15 +57,13 @@ describe('RewardRules Repository (Task 3.2 DB)', () => {
 
     const saved = await rewardRepo.setTeacherRules(teacher.id, teacherCustomRules);
     expect(saved).toHaveLength(3);
-    expect(saved.every((r) => r.ownerId === teacher.id && r.scope === 'teacher')).toBe(true);
+    expect(saved.every(r => r.ownerId === teacher.id && r.scope === 'teacher')).toBe(true);
 
-    const quizRule = saved.find((r) => r.activityId === 'quiz_live' && r.trigger === 'correct');
+    const quizRule = saved.find(r => r.activityId === 'quiz_live' && r.trigger === 'correct');
     expect(quizRule?.exp).toBe(25);
 
     // 2. Giáo viên cập nhật lại bộ quy tắc (thay thế)
-    const updatedRules = [
-      { activityId: 'quiz_live', trigger: 'correct', exp: 30, enabled: true },
-    ];
+    const updatedRules = [{ activityId: 'quiz_live', trigger: 'correct', exp: 30, enabled: true }];
     const updated = await rewardRepo.setTeacherRules(teacher.id, updatedRules);
     expect(updated).toHaveLength(1);
     expect(updated[0]?.exp).toBe(30);
@@ -128,11 +126,19 @@ describe('RewardRules Repository (Task 3.2 DB)', () => {
     });
 
     // Kiểm tra tổng EXP
-    const totalsQuiz = await rewardRepo.getParticipantExpTotals(session.id, participant.id, 'quiz_live');
+    const totalsQuiz = await rewardRepo.getParticipantExpTotals(
+      session.id,
+      participant.id,
+      'quiz_live'
+    );
     expect(totalsQuiz.sessionExp).toBe(35); // 10 + 20 + 5
     expect(totalsQuiz.activityExp).toBe(30); // 10 + 20
 
-    const totalsPoll = await rewardRepo.getParticipantExpTotals(session.id, participant.id, 'quick_poll');
+    const totalsPoll = await rewardRepo.getParticipantExpTotals(
+      session.id,
+      participant.id,
+      'quick_poll'
+    );
     expect(totalsPoll.sessionExp).toBe(35);
     expect(totalsPoll.activityExp).toBe(5);
   });

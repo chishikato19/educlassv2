@@ -30,7 +30,7 @@ export const classGroupsRoutes: FastifyPluginAsync<ClassGroupsRoutesOptions> = a
   const authenticate = createAuthenticateHook(authService);
 
   // Guard bảo vệ theo lớp học: Chỉ giáo viên sở hữu lớp (hoặc Admin) mới được thao tác nhóm của lớp đó
-  const classOwnerGuard = createOwnerGuard(authService, async (request) => {
+  const classOwnerGuard = createOwnerGuard(authService, async request => {
     const { classId } = request.params as { classId: string };
     return classRepo.findById(classId);
   });
@@ -46,7 +46,7 @@ export const classGroupsRoutes: FastifyPluginAsync<ClassGroupsRoutesOptions> = a
       const { classId } = request.params;
       const overview = await classGroupRepo.getGroupsOverview(classId);
 
-      const groups: ClassGroupWithMembersDto[] = overview.groups.map((g) => ({
+      const groups: ClassGroupWithMembersDto[] = overview.groups.map(g => ({
         id: g.group.id,
         classId: g.group.classId,
         name: g.group.name,
@@ -59,7 +59,8 @@ export const classGroupsRoutes: FastifyPluginAsync<ClassGroupsRoutesOptions> = a
       }));
 
       const unassignedStudents = overview.unassignedStudents.map(toStudentDto);
-      const totalStudents = groups.reduce((acc, g) => acc + g.members.length, 0) + unassignedStudents.length;
+      const totalStudents =
+        groups.reduce((acc, g) => acc + g.members.length, 0) + unassignedStudents.length;
 
       return reply.status(200).send({
         groups,
@@ -139,7 +140,7 @@ export const classGroupsRoutes: FastifyPluginAsync<ClassGroupsRoutesOptions> = a
         autoAssignLeader: parseResult.data.autoAssignLeader,
       });
 
-      const groups: ClassGroupWithMembersDto[] = overview.groups.map((g) => ({
+      const groups: ClassGroupWithMembersDto[] = overview.groups.map(g => ({
         id: g.group.id,
         classId: g.group.classId,
         name: g.group.name,
@@ -152,7 +153,8 @@ export const classGroupsRoutes: FastifyPluginAsync<ClassGroupsRoutesOptions> = a
       }));
 
       const unassignedStudents = overview.unassignedStudents.map(toStudentDto);
-      const totalStudents = groups.reduce((acc, g) => acc + g.members.length, 0) + unassignedStudents.length;
+      const totalStudents =
+        groups.reduce((acc, g) => acc + g.members.length, 0) + unassignedStudents.length;
 
       return reply.status(200).send({
         groups,
@@ -173,13 +175,17 @@ export const classGroupsRoutes: FastifyPluginAsync<ClassGroupsRoutesOptions> = a
       const { studentId } = request.params;
       const student = await studentRepo.findById(studentId);
       if (!student) {
-        return reply.status(404).send({ error: formatProtocolError('STUDENT_NOT_FOUND', 'Không tìm thấy học sinh') });
+        return reply
+          .status(404)
+          .send({ error: formatProtocolError('STUDENT_NOT_FOUND', 'Không tìm thấy học sinh') });
       }
 
       // Kiểm tra quyền giáo viên với lớp học
       const cls = await classRepo.findById(student.classId);
       if (!cls || (request.user!.role !== 'admin' && cls.ownerId !== request.user!.id)) {
-        return reply.status(403).send({ error: formatProtocolError('FORBIDDEN', 'Bạn không có quyền thao tác học sinh lớp này') });
+        return reply.status(403).send({
+          error: formatProtocolError('FORBIDDEN', 'Bạn không có quyền thao tác học sinh lớp này'),
+        });
       }
 
       const parseResult = AssignStudentGroupRequestSchema.safeParse(request.body);
@@ -197,7 +203,10 @@ export const classGroupsRoutes: FastifyPluginAsync<ClassGroupsRoutesOptions> = a
         const targetGroup = await classGroupRepo.findById(targetGroupId);
         if (!targetGroup || targetGroup.classId !== student.classId) {
           return reply.status(400).send({
-            error: formatProtocolError('GROUP_NOT_FOUND', 'Nhóm đích không hợp lệ hoặc không thuộc lớp học này'),
+            error: formatProtocolError(
+              'GROUP_NOT_FOUND',
+              'Nhóm đích không hợp lệ hoặc không thuộc lớp học này'
+            ),
           });
         }
       }
@@ -223,12 +232,16 @@ export const classGroupsRoutes: FastifyPluginAsync<ClassGroupsRoutesOptions> = a
       const { groupId } = request.params;
       const group = await classGroupRepo.findById(groupId);
       if (!group) {
-        return reply.status(404).send({ error: formatProtocolError('GROUP_NOT_FOUND', 'Không tìm thấy nhóm') });
+        return reply
+          .status(404)
+          .send({ error: formatProtocolError('GROUP_NOT_FOUND', 'Không tìm thấy nhóm') });
       }
 
       const cls = await classRepo.findById(group.classId);
       if (!cls || (request.user!.role !== 'admin' && cls.ownerId !== request.user!.id)) {
-        return reply.status(403).send({ error: formatProtocolError('FORBIDDEN', 'Bạn không có quyền quản lý nhóm lớp này') });
+        return reply.status(403).send({
+          error: formatProtocolError('FORBIDDEN', 'Bạn không có quyền quản lý nhóm lớp này'),
+        });
       }
 
       const parseResult = AssignGroupLeaderRequestSchema.safeParse(request.body);
@@ -246,7 +259,10 @@ export const classGroupsRoutes: FastifyPluginAsync<ClassGroupsRoutesOptions> = a
         const student = await studentRepo.findById(studentId);
         if (!student || student.classId !== group.classId) {
           return reply.status(400).send({
-            error: formatProtocolError('STUDENT_NOT_FOUND', 'Học sinh không tồn tại hoặc không thuộc lớp học này'),
+            error: formatProtocolError(
+              'STUDENT_NOT_FOUND',
+              'Học sinh không tồn tại hoặc không thuộc lớp học này'
+            ),
           });
         }
       }
@@ -270,12 +286,16 @@ export const classGroupsRoutes: FastifyPluginAsync<ClassGroupsRoutesOptions> = a
       const { groupId } = request.params;
       const group = await classGroupRepo.findById(groupId);
       if (!group) {
-        return reply.status(404).send({ error: formatProtocolError('GROUP_NOT_FOUND', 'Không tìm thấy nhóm') });
+        return reply
+          .status(404)
+          .send({ error: formatProtocolError('GROUP_NOT_FOUND', 'Không tìm thấy nhóm') });
       }
 
       const cls = await classRepo.findById(group.classId);
       if (!cls || (request.user!.role !== 'admin' && cls.ownerId !== request.user!.id)) {
-        return reply.status(403).send({ error: formatProtocolError('FORBIDDEN', 'Bạn không có quyền sửa nhóm lớp này') });
+        return reply
+          .status(403)
+          .send({ error: formatProtocolError('FORBIDDEN', 'Bạn không có quyền sửa nhóm lớp này') });
       }
 
       const parseResult = UpdateClassGroupRequestSchema.safeParse(request.body);
@@ -307,12 +327,16 @@ export const classGroupsRoutes: FastifyPluginAsync<ClassGroupsRoutesOptions> = a
       const { groupId } = request.params;
       const group = await classGroupRepo.findById(groupId);
       if (!group) {
-        return reply.status(404).send({ error: formatProtocolError('GROUP_NOT_FOUND', 'Không tìm thấy nhóm') });
+        return reply
+          .status(404)
+          .send({ error: formatProtocolError('GROUP_NOT_FOUND', 'Không tìm thấy nhóm') });
       }
 
       const cls = await classRepo.findById(group.classId);
       if (!cls || (request.user!.role !== 'admin' && cls.ownerId !== request.user!.id)) {
-        return reply.status(403).send({ error: formatProtocolError('FORBIDDEN', 'Bạn không có quyền xóa nhóm lớp này') });
+        return reply
+          .status(403)
+          .send({ error: formatProtocolError('FORBIDDEN', 'Bạn không có quyền xóa nhóm lớp này') });
       }
 
       await classGroupRepo.deleteById(groupId);

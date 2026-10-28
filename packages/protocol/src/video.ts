@@ -22,25 +22,33 @@ export function extractYouTubeId(input: string): string | null {
   }
 
   // youtube.com/watch?v=<id> hoặc m.youtube.com/watch?v=<id>
-  const watchMatch = trimmed.match(/(?:https?:\/\/)?(?:[a-zA-Z0-9-]+\.)?youtube\.com\/watch\?(?:.*&)?v=([a-zA-Z0-9_-]{11})/i);
+  const watchMatch = trimmed.match(
+    /(?:https?:\/\/)?(?:[a-zA-Z0-9-]+\.)?youtube\.com\/watch\?(?:.*&)?v=([a-zA-Z0-9_-]{11})/i
+  );
   if (watchMatch && watchMatch[1]) {
     return watchMatch[1];
   }
 
   // youtube.com/shorts/<id>
-  const shortsMatch = trimmed.match(/(?:https?:\/\/)?(?:[a-zA-Z0-9-]+\.)?youtube\.com\/shorts\/([a-zA-Z0-9_-]{11})/i);
+  const shortsMatch = trimmed.match(
+    /(?:https?:\/\/)?(?:[a-zA-Z0-9-]+\.)?youtube\.com\/shorts\/([a-zA-Z0-9_-]{11})/i
+  );
   if (shortsMatch && shortsMatch[1]) {
     return shortsMatch[1];
   }
 
   // youtube.com/embed/<id> hoặc youtube-nocookie.com/embed/<id>
-  const embedMatch = trimmed.match(/(?:https?:\/\/)?(?:[a-zA-Z0-9-]+\.)?youtube(?:-nocookie)?\.com\/embed\/([a-zA-Z0-9_-]{11})/i);
+  const embedMatch = trimmed.match(
+    /(?:https?:\/\/)?(?:[a-zA-Z0-9-]+\.)?youtube(?:-nocookie)?\.com\/embed\/([a-zA-Z0-9_-]{11})/i
+  );
   if (embedMatch && embedMatch[1]) {
     return embedMatch[1];
   }
 
   // youtube.com/live/<id>
-  const liveMatch = trimmed.match(/(?:https?:\/\/)?(?:[a-zA-Z0-9-]+\.)?youtube\.com\/live\/([a-zA-Z0-9_-]{11})/i);
+  const liveMatch = trimmed.match(
+    /(?:https?:\/\/)?(?:[a-zA-Z0-9-]+\.)?youtube\.com\/live\/([a-zA-Z0-9_-]{11})/i
+  );
   if (liveMatch && liveMatch[1]) {
     return liveMatch[1];
   }

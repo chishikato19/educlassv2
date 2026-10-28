@@ -122,6 +122,90 @@ describe('OMML to LaTeX Converter (Task 2.4)', () => {
     expect(latex).toContain('\\alpha');
   });
 
+  it('converts system of equations with m:d and m:eqArr to \\begin{cases}', () => {
+    const omml = `
+      <m:oMath xmlns:m="http://schemas.openxmlformats.org/officeDocument/2006/math">
+        <m:d>
+          <m:dPr>
+            <m:begChr m:val="{"/>
+            <m:endChr m:val=""/>
+          </m:dPr>
+          <m:e>
+            <m:eqArr>
+              <m:e>
+                <m:r><m:t>ax+y=5</m:t></m:r>
+              </m:e>
+              <m:e>
+                <m:r><m:t>3x+by=0</m:t></m:r>
+              </m:e>
+            </m:eqArr>
+          </m:e>
+        </m:d>
+      </m:oMath>
+    `;
+    const latex = convertOmmlToLatex(omml);
+    expect(latex.trim()).toBe('\\begin{cases}ax+y=5 \\\\ 3x+by=0\\end{cases}');
+  });
+
+  it('converts system of equations with m:d and multiple m:e children to \\begin{cases}', () => {
+    const omml = `
+      <m:oMath xmlns:m="http://schemas.openxmlformats.org/officeDocument/2006/math">
+        <m:d>
+          <m:dPr>
+            <m:begChr m:val="{"/>
+            <m:endChr m:val=""/>
+          </m:dPr>
+          <m:e>
+            <m:r><m:t>2x-y=-1</m:t></m:r>
+          </m:e>
+          <m:e>
+            <m:r><m:t>x-3y=7</m:t></m:r>
+          </m:e>
+        </m:d>
+      </m:oMath>
+    `;
+    const latex = convertOmmlToLatex(omml);
+    expect(latex.trim()).toBe('\\begin{cases}2x-y=-1 \\\\ x-3y=7\\end{cases}');
+  });
+
+  it('converts system of equations with m:d and matrix m:m to \\begin{cases}', () => {
+    const omml = `
+      <m:oMath xmlns:m="http://schemas.openxmlformats.org/officeDocument/2006/math">
+        <m:d>
+          <m:dPr>
+            <m:begChr m:val="{"/>
+            <m:endChr m:val=""/>
+          </m:dPr>
+          <m:e>
+            <m:m>
+              <m:mr>
+                <m:e><m:r><m:t>6x-3y=-12</m:t></m:r></m:e>
+              </m:mr>
+              <m:mr>
+                <m:e><m:r><m:t>-2x+y=4</m:t></m:r></m:e>
+              </m:mr>
+            </m:m>
+          </m:e>
+        </m:d>
+      </m:oMath>
+    `;
+    const latex = convertOmmlToLatex(omml);
+    expect(latex.trim()).toBe('\\begin{cases}6x-3y=-12 \\\\ -2x+y=4\\end{cases}');
+  });
+
+  it('converts standalone m:eqArr to \\begin{aligned}', () => {
+    const omml = `
+      <m:oMath xmlns:m="http://schemas.openxmlformats.org/officeDocument/2006/math">
+        <m:eqArr>
+          <m:e><m:r><m:t>ax+6y=2</m:t></m:r></m:e>
+          <m:e><m:r><m:t>5x+by=4</m:t></m:r></m:e>
+        </m:eqArr>
+      </m:oMath>
+    `;
+    const latex = convertOmmlToLatex(omml);
+    expect(latex.trim()).toBe('\\begin{aligned}ax+6y=2 \\\\ 5x+by=4\\end{aligned}');
+  });
+
   it('replaces all oMath blocks in document.xml with $latex$', () => {
     const xml = `
       <w:p xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main" xmlns:m="http://schemas.openxmlformats.org/officeDocument/2006/math">

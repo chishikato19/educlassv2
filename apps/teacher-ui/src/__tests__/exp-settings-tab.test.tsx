@@ -64,10 +64,14 @@ describe('ExpSettingsTab UI Component (apps/teacher-ui)', () => {
     expect(screen.getAllByText(/Bình chọn nhanh/i).length).toBeGreaterThan(0);
 
     // Kiểm tra hiển thị mức EXP hiện tại
-    const sessionCapInput = screen.getByLabelText(/Số EXP cho Trần EXP toàn phiên/i) as HTMLInputElement;
+    const sessionCapInput = screen.getByLabelText(
+      /Số EXP cho Trần EXP toàn phiên/i
+    ) as HTMLInputElement;
     expect(sessionCapInput.value).toBe('200');
 
-    const quizCorrectInput = screen.getByLabelText(/Số EXP cho Trả lời đúng 1 câu/i) as HTMLInputElement;
+    const quizCorrectInput = screen.getByLabelText(
+      /Số EXP cho Trả lời đúng 1 câu/i
+    ) as HTMLInputElement;
     expect(quizCorrectInput.value).toBe('10');
   });
 
@@ -81,11 +85,15 @@ describe('ExpSettingsTab UI Component (apps/teacher-ui)', () => {
       />
     );
 
-    const quizCorrectInput = screen.getByLabelText(/Số EXP cho Trả lời đúng 1 câu/i) as HTMLInputElement;
+    const quizCorrectInput = screen.getByLabelText(
+      /Số EXP cho Trả lời đúng 1 câu/i
+    ) as HTMLInputElement;
     fireEvent.change(quizCorrectInput, { target: { value: '25' } });
     expect(quizCorrectInput.value).toBe('25');
 
-    const toggleCheckbox = screen.getByLabelText(/Bật\/tắt Trả lời đúng 1 câu/i) as HTMLInputElement;
+    const toggleCheckbox = screen.getByLabelText(
+      /Bật\/tắt Trả lời đúng 1 câu/i
+    ) as HTMLInputElement;
     expect(toggleCheckbox.checked).toBe(true);
 
     fireEvent.click(toggleCheckbox);
@@ -155,13 +163,7 @@ describe('ExpSettingsTab UI Component (apps/teacher-ui)', () => {
   });
 
   it('renders loading state when isLoading is true', () => {
-    render(
-      <ExpSettingsTab
-        isLoading={true}
-        onSaveRules={vi.fn()}
-        onResetRules={vi.fn()}
-      />
-    );
+    render(<ExpSettingsTab isLoading={true} onSaveRules={vi.fn()} onResetRules={vi.fn()} />);
 
     expect(screen.getByText(/Đang tải dữ liệu cấu hình EXP/i)).toBeDefined();
   });

@@ -20,7 +20,14 @@ export interface ClassTabProps {
   onUpdateClass?: ((classId: string, name: string) => Promise<void>) | undefined;
   onDeleteClass?: ((classId: string) => Promise<void>) | undefined;
   onCreateStudent: (classId: string, data: CreateStudentRequest) => Promise<void>;
-  onUpdateStudent?: ((studentId: string, fullName: string, code?: string, academicPerformance?: AcademicPerformance) => Promise<void>) | undefined;
+  onUpdateStudent?:
+    | ((
+        studentId: string,
+        fullName: string,
+        code?: string,
+        academicPerformance?: AcademicPerformance
+      ) => Promise<void>)
+    | undefined;
   onSetStudentPin: (studentId: string, pin: string | null) => Promise<void>;
   onDeleteStudent: (studentId: string) => Promise<void>;
   onImportStudents: (
@@ -93,7 +100,7 @@ export const ClassTab: React.FC<ClassTabProps> = ({
   const [toastMessage, setToastMessage] = useState<string | null>(null);
   const [subTab, setSubTab] = useState<'students' | 'groups'>('students');
 
-  const selectedClass = classes.find((c) => c.id === selectedClassId);
+  const selectedClass = classes.find(c => c.id === selectedClassId);
 
   // Xử lý tạo lớp học
   const handleCreateClass = async () => {
@@ -166,7 +173,7 @@ export const ClassTab: React.FC<ClassTabProps> = ({
   const handlePreviewPaste = () => {
     if (!pasteText.trim()) return;
     const rows = parseClipboardText(pasteText);
-    const existing = students.map((s) => ({ fullName: s.fullName, code: s.code ?? null }));
+    const existing = students.map(s => ({ fullName: s.fullName, code: s.code ?? null }));
     const preview = validateAndPreviewStudents(rows, existing);
     setPreviewResult(preview);
   };
@@ -179,13 +186,13 @@ export const ClassTab: React.FC<ClassTabProps> = ({
     }
     if (!previewResult) return;
 
-    const importableItems = previewResult.items.filter((item) => item.status !== 'error');
+    const importableItems = previewResult.items.filter(item => item.status !== 'error');
     if (importableItems.length === 0) {
       setToastMessage('Không có dòng dữ liệu hợp lệ nào để nhập.');
       return;
     }
 
-    const validRowsToImport: CreateStudentRequest[] = importableItems.map((item) => {
+    const validRowsToImport: CreateStudentRequest[] = importableItems.map(item => {
       const req: CreateStudentRequest = { fullName: item.fullName };
       if (item.code) req.code = item.code;
       // Chỉ gửi PIN nếu >= 4 ký tự để tránh lỗi validation Zod schema
@@ -212,21 +219,13 @@ export const ClassTab: React.FC<ClassTabProps> = ({
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '20px', padding: '24px' }}>
       {toastMessage && (
-        <Toast
-          message={toastMessage}
-          type="success"
-          onClose={() => setToastMessage(null)}
-        />
+        <Toast message={toastMessage} type="success" onClose={() => setToastMessage(null)} />
       )}
 
       {/* Thanh tiêu đề và danh sách lớp học */}
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
         <h2 style={{ margin: 0, fontSize: '24px', fontWeight: 700 }}>Danh sách Lớp học</h2>
-        <Button
-          variant="primary"
-          onClick={handleOpenCreateClassModal}
-          data-testid="btn-add-class"
-        >
+        <Button variant="primary" onClick={handleOpenCreateClassModal} data-testid="btn-add-class">
           + Thêm lớp học
         </Button>
       </div>
@@ -247,15 +246,12 @@ export const ClassTab: React.FC<ClassTabProps> = ({
             <p style={{ color: UI_COLORS.textMuted, margin: '0 0 16px 0', fontSize: '15px' }}>
               Chưa có lớp học nào. Hãy bấm &quot;Thêm lớp học&quot; để bắt đầu tạo danh sách lớp.
             </p>
-            <Button
-              variant="primary"
-              onClick={handleOpenCreateClassModal}
-            >
+            <Button variant="primary" onClick={handleOpenCreateClassModal}>
               + Thêm lớp học ngay
             </Button>
           </div>
         ) : (
-          classes.map((cls) => {
+          classes.map(cls => {
             const isSelected = cls.id === selectedClassId;
             return (
               <button
@@ -384,11 +380,12 @@ export const ClassTab: React.FC<ClassTabProps> = ({
               classId={selectedClass.id}
               className={selectedClass.name}
               students={students}
-              onShowToast={(msg) => setToastMessage(msg)}
+              onShowToast={msg => setToastMessage(msg)}
             />
           ) : students.length === 0 ? (
             <div style={{ padding: '32px', textAlign: 'center', color: UI_COLORS.textMuted }}>
-              Lớp học chưa có học sinh. Bấm &quot;Thêm học sinh&quot; hoặc &quot;Nhập từ Excel / Dán&quot; để thêm.
+              Lớp học chưa có học sinh. Bấm &quot;Thêm học sinh&quot; hoặc &quot;Nhập từ Excel /
+              Dán&quot; để thêm.
             </div>
           ) : (
             <div style={{ overflowX: 'auto' }}>
@@ -416,10 +413,15 @@ export const ClassTab: React.FC<ClassTabProps> = ({
                       <td style={{ padding: '12px' }}>
                         <select
                           value={student.academicPerformance || 'dat'}
-                          onChange={(e) => {
+                          onChange={e => {
                             const val = e.target.value as AcademicPerformance;
                             if (onUpdateStudent) {
-                              void onUpdateStudent(student.id, student.fullName, student.code ?? undefined, val);
+                              void onUpdateStudent(
+                                student.id,
+                                student.fullName,
+                                student.code ?? undefined,
+                                val
+                              );
                             }
                           }}
                           style={{
@@ -432,18 +434,18 @@ export const ClassTab: React.FC<ClassTabProps> = ({
                               student.academicPerformance === 'tot'
                                 ? '#DCFCE7'
                                 : student.academicPerformance === 'kha'
-                                ? '#DBEAFE'
-                                : student.academicPerformance === 'chua_dat'
-                                ? '#FEE2E2'
-                                : '#FEF3C7',
+                                  ? '#DBEAFE'
+                                  : student.academicPerformance === 'chua_dat'
+                                    ? '#FEE2E2'
+                                    : '#FEF3C7',
                             color:
                               student.academicPerformance === 'tot'
                                 ? '#15803D'
                                 : student.academicPerformance === 'kha'
-                                ? '#1D4ED8'
-                                : student.academicPerformance === 'chua_dat'
-                                ? '#B91C1C'
-                                : '#B45309',
+                                  ? '#1D4ED8'
+                                  : student.academicPerformance === 'chua_dat'
+                                    ? '#B91C1C'
+                                    : '#B45309',
                             cursor: 'pointer',
                           }}
                         >
@@ -522,7 +524,7 @@ export const ClassTab: React.FC<ClassTabProps> = ({
         }
       >
         <form
-          onSubmit={(e) => {
+          onSubmit={e => {
             e.preventDefault();
             void handleCreateClass();
           }}
@@ -533,7 +535,7 @@ export const ClassTab: React.FC<ClassTabProps> = ({
             id="new-class-name-input"
             label="Tên lớp học (ví dụ: 12A1)"
             value={newClassName}
-            onChange={(e) => setNewClassName(e.target.value)}
+            onChange={e => setNewClassName(e.target.value)}
             placeholder="Nhập tên lớp..."
             autoFocus
             required
@@ -545,7 +547,7 @@ export const ClassTab: React.FC<ClassTabProps> = ({
             label="Năm học"
             type="number"
             value={newClassYear.toString()}
-            onChange={(e) => setNewClassYear(Number(e.target.value) || new Date().getFullYear())}
+            onChange={e => setNewClassYear(Number(e.target.value) || new Date().getFullYear())}
             data-testid="input-class-year"
           />
         </form>
@@ -577,29 +579,27 @@ export const ClassTab: React.FC<ClassTabProps> = ({
           <Input
             label="Họ và tên học sinh *"
             value={newStudentName}
-            onChange={(e) => setNewStudentName(e.target.value)}
+            onChange={e => setNewStudentName(e.target.value)}
             placeholder="Ví dụ: Nguyễn Văn An"
             autoFocus
           />
           <Input
             label="Mã học sinh (tùy chọn)"
             value={newStudentCode}
-            onChange={(e) => setNewStudentCode(e.target.value)}
+            onChange={e => setNewStudentCode(e.target.value)}
             placeholder="Ví dụ: HS001"
           />
           <Input
             label="Mã PIN đăng nhập (tùy chọn, tối thiểu 4 số)"
             value={newStudentPin}
-            onChange={(e) => setNewStudentPin(e.target.value)}
+            onChange={e => setNewStudentPin(e.target.value)}
             placeholder="Ví dụ: 1234"
           />
           <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
-            <label style={{ fontSize: '14px', fontWeight: 600, color: '#334155' }}>
-              Học lực
-            </label>
+            <label style={{ fontSize: '14px', fontWeight: 600, color: '#334155' }}>Học lực</label>
             <select
               value={newStudentAcademic}
-              onChange={(e) => setNewStudentAcademic(e.target.value as AcademicPerformance)}
+              onChange={e => setNewStudentAcademic(e.target.value as AcademicPerformance)}
               style={{
                 padding: '10px 12px',
                 borderRadius: '12px',
@@ -635,7 +635,9 @@ export const ClassTab: React.FC<ClassTabProps> = ({
               >
                 Xóa mã PIN
               </Button>
-            ) : <span />}
+            ) : (
+              <span />
+            )}
             <div style={{ display: 'flex', gap: '8px' }}>
               <Button variant="ghost" onClick={() => setIsPinModalOpen(false)}>
                 Hủy
@@ -649,12 +651,13 @@ export const ClassTab: React.FC<ClassTabProps> = ({
       >
         <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
           <p style={{ margin: 0, fontSize: '14px', color: UI_COLORS.textMuted }}>
-            Mã PIN dùng để học sinh đăng nhập vào lớp và bảo lưu vĩnh viễn điểm EXP, danh hiệu (cấp account theo D6).
+            Mã PIN dùng để học sinh đăng nhập vào lớp và bảo lưu vĩnh viễn điểm EXP, danh hiệu (cấp
+            account theo D6).
           </p>
           <Input
             label="Mã PIN mới (tối thiểu 4 số)"
             value={pinInput}
-            onChange={(e) => setPinInput(e.target.value)}
+            onChange={e => setPinInput(e.target.value)}
             placeholder="Nhập PIN mới..."
             autoFocus
           />
@@ -667,12 +670,27 @@ export const ClassTab: React.FC<ClassTabProps> = ({
         onClose={() => setIsImportModalOpen(false)}
         title="Nhập danh sách học sinh từ Excel"
         footer={
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', width: '100%' }}>
-            <label style={{ display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer', fontSize: '14px' }}>
+          <div
+            style={{
+              display: 'flex',
+              justifyContent: 'space-between',
+              alignItems: 'center',
+              width: '100%',
+            }}
+          >
+            <label
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: '8px',
+                cursor: 'pointer',
+                fontSize: '14px',
+              }}
+            >
               <input
                 type="checkbox"
                 checked={skipDuplicates}
-                onChange={(e) => setSkipDuplicates(e.target.checked)}
+                onChange={e => setSkipDuplicates(e.target.checked)}
               />
               Tự động bỏ qua học sinh bị trùng lặp
             </label>
@@ -681,7 +699,8 @@ export const ClassTab: React.FC<ClassTabProps> = ({
                 Hủy
               </Button>
               {(() => {
-                const importableCount = previewResult?.items.filter((item) => item.status !== 'error').length ?? 0;
+                const importableCount =
+                  previewResult?.items.filter(item => item.status !== 'error').length ?? 0;
                 return (
                   <Button
                     variant="primary"
@@ -700,12 +719,13 @@ export const ClassTab: React.FC<ClassTabProps> = ({
       >
         <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
           <p style={{ margin: 0, fontSize: '14px', color: UI_COLORS.textMuted }}>
-            Sao chép các cột từ Excel (STT, Mã HS, Họ và tên, Mã PIN) rồi dán trực tiếp vào ô bên dưới, sau đó bấm &quot;Xem trước&quot;:
+            Sao chép các cột từ Excel (STT, Mã HS, Họ và tên, Mã PIN) rồi dán trực tiếp vào ô bên
+            dưới, sau đó bấm &quot;Xem trước&quot;:
           </p>
           <textarea
             rows={5}
             value={pasteText}
-            onChange={(e) => setPasteText(e.target.value)}
+            onChange={e => setPasteText(e.target.value)}
             placeholder="Dán dữ liệu từ Excel vào đây (Ctrl+V)..."
             data-testid="textarea-paste-excel"
             style={{
@@ -725,14 +745,27 @@ export const ClassTab: React.FC<ClassTabProps> = ({
 
           {/* Bảng xem trước (Preview) */}
           {previewResult && (
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', marginTop: '12px' }}>
+            <div
+              style={{ display: 'flex', flexDirection: 'column', gap: '12px', marginTop: '12px' }}
+            >
               <div style={{ display: 'flex', gap: '16px', fontSize: '14px', fontWeight: 600 }}>
-                <span style={{ color: UI_COLORS.success }}>✓ Hợp lệ: {previewResult.validCount}</span>
-                <span style={{ color: UI_COLORS.warning }}>⚠ Cảnh báo/Trùng: {previewResult.warningCount}</span>
+                <span style={{ color: UI_COLORS.success }}>
+                  ✓ Hợp lệ: {previewResult.validCount}
+                </span>
+                <span style={{ color: UI_COLORS.warning }}>
+                  ⚠ Cảnh báo/Trùng: {previewResult.warningCount}
+                </span>
                 <span style={{ color: UI_COLORS.error }}>✕ Lỗi: {previewResult.errorCount}</span>
               </div>
 
-              <div style={{ maxHeight: '240px', overflowY: 'auto', border: `1px solid ${UI_COLORS.border}`, borderRadius: '12px' }}>
+              <div
+                style={{
+                  maxHeight: '240px',
+                  overflowY: 'auto',
+                  border: `1px solid ${UI_COLORS.border}`,
+                  borderRadius: '12px',
+                }}
+              >
                 <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '13px' }}>
                   <thead style={{ backgroundColor: '#F8FAFC', position: 'sticky', top: 0 }}>
                     <tr>
@@ -744,17 +777,29 @@ export const ClassTab: React.FC<ClassTabProps> = ({
                     </tr>
                   </thead>
                   <tbody>
-                    {previewResult.items.map((item) => {
+                    {previewResult.items.map(item => {
                       const isError = item.status === 'error';
                       const isWarning = item.status === 'warning';
                       const bgColor = isError ? '#FEF2F2' : isWarning ? '#FFFBEB' : '#F0FDF4';
-                      const textColor = isError ? UI_COLORS.error : isWarning ? '#B45309' : UI_COLORS.success;
+                      const textColor = isError
+                        ? UI_COLORS.error
+                        : isWarning
+                          ? '#B45309'
+                          : UI_COLORS.success;
 
                       return (
-                        <tr key={item.rowIndex} style={{ backgroundColor: bgColor, borderBottom: `1px solid ${UI_COLORS.border}` }}>
+                        <tr
+                          key={item.rowIndex}
+                          style={{
+                            backgroundColor: bgColor,
+                            borderBottom: `1px solid ${UI_COLORS.border}`,
+                          }}
+                        >
                           <td style={{ padding: '8px' }}>{item.rowIndex}</td>
                           <td style={{ padding: '8px' }}>{item.code ?? '—'}</td>
-                          <td style={{ padding: '8px', fontWeight: 600 }}>{item.fullName || '(Trống)'}</td>
+                          <td style={{ padding: '8px', fontWeight: 600 }}>
+                            {item.fullName || '(Trống)'}
+                          </td>
                           <td style={{ padding: '8px' }}>{item.pin ?? '—'}</td>
                           <td style={{ padding: '8px' }}>
                             <div style={{ display: 'flex', flexDirection: 'column', gap: '2px' }}>
@@ -762,10 +807,17 @@ export const ClassTab: React.FC<ClassTabProps> = ({
                                 {isError ? 'Lỗi' : isWarning ? 'Trùng lặp / Chú ý' : 'Hợp lệ'}
                               </span>
                               {item.errors.map((e, idx) => (
-                                <span key={idx} style={{ fontSize: '11px', color: UI_COLORS.error }}>{e}</span>
+                                <span
+                                  key={idx}
+                                  style={{ fontSize: '11px', color: UI_COLORS.error }}
+                                >
+                                  {e}
+                                </span>
                               ))}
                               {item.warnings.map((w, idx) => (
-                                <span key={idx} style={{ fontSize: '11px', color: '#B45309' }}>{w}</span>
+                                <span key={idx} style={{ fontSize: '11px', color: '#B45309' }}>
+                                  {w}
+                                </span>
                               ))}
                             </div>
                           </td>

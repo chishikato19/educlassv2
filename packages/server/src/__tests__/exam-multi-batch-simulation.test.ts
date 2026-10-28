@@ -268,12 +268,12 @@ describe('Multi-Batch Exam End-to-End Simulation (Task 5.2)', () => {
 
       // 20 học sinh Ca 1 PHẢI có isCompletedExam: true
       for (const stu of batch1Students) {
-        const found = rosterStudents.find((s) => s.id === stu.id);
+        const found = rosterStudents.find(s => s.id === stu.id);
         expect(found?.isCompletedExam).toBe(true);
       }
       // 20 học sinh Ca 2 PHẢI có isCompletedExam: false hoặc undefined
       for (const stu of batch2Students) {
-        const found = rosterStudents.find((s) => s.id === stu.id);
+        const found = rosterStudents.find(s => s.id === stu.id);
         expect(Boolean(found?.isCompletedExam)).toBe(false);
       }
 
@@ -367,8 +367,12 @@ describe('Multi-Batch Exam End-to-End Simulation (Task 5.2)', () => {
       expect(detail.records).toHaveLength(40);
 
       // Phân bổ đúng 20 em Ca 1 và 20 em Ca 2
-      const batch1Records = detail.records.filter((r: { batchIndex: number }) => r.batchIndex === 1);
-      const batch2Records = detail.records.filter((r: { batchIndex: number }) => r.batchIndex === 2);
+      const batch1Records = detail.records.filter(
+        (r: { batchIndex: number }) => r.batchIndex === 1
+      );
+      const batch2Records = detail.records.filter(
+        (r: { batchIndex: number }) => r.batchIndex === 2
+      );
       expect(batch1Records).toHaveLength(20);
       expect(batch2Records).toHaveLength(20);
 

@@ -42,7 +42,10 @@ describe('MatrixImportModal Component (Task 4.1 & 4.2)', () => {
       type: 'mcq4' as const,
       contentJson: JSON.stringify({
         stem: { text: 'Câu hỏi nhận biết 1: Hàm số đồng biến khi nào?' },
-        options: [{ id: 'opt_0', text: 'f\'(x) > 0' }, { id: 'opt_1', text: 'f\'(x) < 0' }],
+        options: [
+          { id: 'opt_0', text: "f'(x) > 0" },
+          { id: 'opt_1', text: "f'(x) < 0" },
+        ],
       }),
       answerJson: JSON.stringify({ correct: 0 }),
       points: 10,
@@ -62,7 +65,10 @@ describe('MatrixImportModal Component (Task 4.1 & 4.2)', () => {
     type: 'mcq4' as const,
     contentJson: JSON.stringify({
       stem: { text: 'Câu hỏi nhận biết 2 thay thế: Khẳng định nào đúng?' },
-      options: [{ id: 'opt_0', text: 'A' }, { id: 'opt_1', text: 'B' }],
+      options: [
+        { id: 'opt_0', text: 'A' },
+        { id: 'opt_1', text: 'B' },
+      ],
     }),
     answerJson: JSON.stringify({ correct: 1 }),
     points: 10,
@@ -77,9 +83,7 @@ describe('MatrixImportModal Component (Task 4.1 & 4.2)', () => {
       questions: mockPickedQuestions,
       totalQuestions: 1,
     });
-    vi.spyOn(api, 'getBankQuestions').mockResolvedValue([
-      mockReplacementQuestion,
-    ]);
+    vi.spyOn(api, 'getBankQuestions').mockResolvedValue([mockReplacementQuestion]);
     vi.spyOn(api, 'createQuestionSet').mockResolvedValue({
       id: 'set_created_matrix_123',
       ownerId: 'teacher_1',
@@ -102,7 +106,7 @@ describe('MatrixImportModal Component (Task 4.1 & 4.2)', () => {
           onSuccess={vi.fn()}
           initialGrade={12}
           initialSubject="Toán"
-        />,
+        />
       );
     });
 
@@ -122,7 +126,7 @@ describe('MatrixImportModal Component (Task 4.1 & 4.2)', () => {
           onSuccess={vi.fn()}
           initialGrade={12}
           initialSubject="Toán"
-        />,
+        />
       );
     });
 
@@ -152,7 +156,7 @@ describe('MatrixImportModal Component (Task 4.1 & 4.2)', () => {
           onSuccess={handleSuccess}
           initialGrade={12}
           initialSubject="Toán"
-        />,
+        />
       );
     });
 
@@ -207,7 +211,7 @@ describe('MatrixImportModal Component (Task 4.1 & 4.2)', () => {
             points: 10,
           }),
         ]),
-      }),
+      })
     );
     expect(handleSuccess).toHaveBeenCalledWith('set_created_matrix_123');
   });

@@ -74,8 +74,12 @@ export const SwissDuelProjectorView: React.FC<ProjectorViewProps> = ({ state }) 
           {/* Hạng 2 */}
           <div className="flex-1 flex flex-col items-center">
             <span className="text-4xl mb-2">🥈</span>
-            <p className="font-bold text-lg text-slate-200 truncate max-w-[180px]">{top2?.displayName ?? '—'}</p>
-            <p className="text-sm text-amber-300 font-black">{top2?.tournamentPoints ?? 0} điểm cờ</p>
+            <p className="font-bold text-lg text-slate-200 truncate max-w-[180px]">
+              {top2?.displayName ?? '—'}
+            </p>
+            <p className="text-sm text-amber-300 font-black">
+              {top2?.tournamentPoints ?? 0} điểm cờ
+            </p>
             <div className="w-full h-36 bg-gradient-to-t from-[#3d2716] to-[#5a381f] border-2 border-slate-400/60 rounded-t-2xl flex items-center justify-center text-3xl font-black text-slate-200 shadow-2xl mt-3">
               2
             </div>
@@ -84,8 +88,12 @@ export const SwissDuelProjectorView: React.FC<ProjectorViewProps> = ({ state }) 
           {/* Hạng 1 */}
           <div className="flex-1 flex flex-col items-center scale-105">
             <span className="text-5xl mb-2 animate-bounce">👑</span>
-            <p className="font-black text-2xl text-amber-300 truncate max-w-[200px]">{top1?.displayName ?? '—'}</p>
-            <p className="text-base text-amber-400 font-black">{top1?.tournamentPoints ?? 0} điểm cờ</p>
+            <p className="font-black text-2xl text-amber-300 truncate max-w-[200px]">
+              {top1?.displayName ?? '—'}
+            </p>
+            <p className="text-base text-amber-400 font-black">
+              {top1?.tournamentPoints ?? 0} điểm cờ
+            </p>
             <div className="w-full h-48 bg-gradient-to-t from-[#61410d] to-[#b37d1d] border-2 border-amber-300 rounded-t-2xl flex items-center justify-center text-4xl font-black text-amber-100 shadow-2xl mt-3">
               1
             </div>
@@ -94,8 +102,12 @@ export const SwissDuelProjectorView: React.FC<ProjectorViewProps> = ({ state }) 
           {/* Hạng 3 */}
           <div className="flex-1 flex flex-col items-center">
             <span className="text-4xl mb-2">🥉</span>
-            <p className="font-bold text-lg text-amber-200 truncate max-w-[180px]">{top3?.displayName ?? '—'}</p>
-            <p className="text-sm text-amber-300 font-black">{top3?.tournamentPoints ?? 0} điểm cờ</p>
+            <p className="font-bold text-lg text-amber-200 truncate max-w-[180px]">
+              {top3?.displayName ?? '—'}
+            </p>
+            <p className="text-sm text-amber-300 font-black">
+              {top3?.tournamentPoints ?? 0} điểm cờ
+            </p>
             <div className="w-full h-28 bg-gradient-to-t from-[#331c0d] to-[#4d2a13] border-2 border-amber-700/60 rounded-t-2xl flex items-center justify-center text-2xl font-black text-amber-300 shadow-xl mt-3">
               3
             </div>
@@ -124,7 +136,9 @@ export const SwissDuelProjectorView: React.FC<ProjectorViewProps> = ({ state }) 
           </div>
 
           <div className="flex items-center gap-3 bg-[#2b180c] border-2 border-amber-400 px-5 py-2.5 rounded-2xl shadow-xl">
-            <span className="text-xs text-amber-200 uppercase font-bold">Bốc thăm vòng mới sau:</span>
+            <span className="text-xs text-amber-200 uppercase font-bold">
+              Bốc thăm vòng mới sau:
+            </span>
             <span className="text-3xl font-black text-amber-300 font-mono animate-pulse">
               {remainingCountdown}s
             </span>
@@ -146,12 +160,18 @@ export const SwissDuelProjectorView: React.FC<ProjectorViewProps> = ({ state }) 
                       #{entry.rank}
                     </span>
                     <div>
-                      <span className="font-bold text-base text-white block">{entry.displayName}</span>
-                      <span className="text-xs text-amber-200/80">{badge.icon} {badge.title} • {entry.correctCount} câu đúng</span>
+                      <span className="font-bold text-base text-white block">
+                        {entry.displayName}
+                      </span>
+                      <span className="text-xs text-amber-200/80">
+                        {badge.icon} {badge.title} • {entry.correctCount} câu đúng
+                      </span>
                     </div>
                   </div>
                   <div className="text-right">
-                    <span className="text-lg font-black text-amber-400 font-mono">{entry.tournamentPoints} đ</span>
+                    <span className="text-lg font-black text-amber-400 font-mono">
+                      {entry.tournamentPoints} đ
+                    </span>
                     <span className="text-[10px] text-slate-400 block">BH: {entry.buchholz}</span>
                   </div>
                 </div>
@@ -167,7 +187,10 @@ export const SwissDuelProjectorView: React.FC<ProjectorViewProps> = ({ state }) 
   const byeStudent = state.byePlayerId ? state.participants[state.byePlayerId] : null;
 
   const containerRef = useRef<HTMLDivElement>(null);
-  const [dimensions, setDimensions] = useState<{ width: number; height: number }>({ width: 0, height: 0 });
+  const [dimensions, setDimensions] = useState<{ width: number; height: number }>({
+    width: 0,
+    height: 0,
+  });
 
   useEffect(() => {
     const el = containerRef.current;
@@ -200,11 +223,7 @@ export const SwissDuelProjectorView: React.FC<ProjectorViewProps> = ({ state }) 
   }, [state.status]);
 
   const gridLayout = useMemo(() => {
-    return calculateOptimalBoardGrid(
-      state.matchups.length,
-      dimensions.width,
-      dimensions.height
-    );
+    return calculateOptimalBoardGrid(state.matchups.length, dimensions.width, dimensions.height);
   }, [state.matchups.length, dimensions.width, dimensions.height]);
 
   return (
@@ -290,7 +309,9 @@ export const SwissDuelProjectorView: React.FC<ProjectorViewProps> = ({ state }) 
                     </span>
                   </div>
 
-                  <div className={`space-y-1 flex-1 flex flex-col justify-center min-h-0 ${st.rowGap}`}>
+                  <div
+                    className={`space-y-1 flex-1 flex flex-col justify-center min-h-0 ${st.rowGap}`}
+                  >
                     <div className="flex items-center justify-between gap-1 min-w-0">
                       <div className="flex items-center gap-1 min-w-0 flex-1 truncate">
                         <span className={`shrink-0 ${st.pieceText}`}>{CHESS_PIECES.whitePawn}</span>
@@ -300,9 +321,15 @@ export const SwissDuelProjectorView: React.FC<ProjectorViewProps> = ({ state }) 
                         >
                           {p1?.displayName || 'P1'}
                         </strong>
-                        {p1Win && <span className="text-[10px] shrink-0" title="Chiến thắng">👑</span>}
+                        {p1Win && (
+                          <span className="text-[10px] shrink-0" title="Chiến thắng">
+                            👑
+                          </span>
+                        )}
                       </div>
-                      <span className={`font-mono font-bold shrink-0 ${st.scoreText} ${p1Win ? 'text-amber-300' : 'text-amber-200/90'}`}>
+                      <span
+                        className={`font-mono font-bold shrink-0 ${st.scoreText} ${p1Win ? 'text-amber-300' : 'text-amber-200/90'}`}
+                      >
                         {m.player1Score}/2
                       </span>
                     </div>
@@ -316,17 +343,25 @@ export const SwissDuelProjectorView: React.FC<ProjectorViewProps> = ({ state }) 
                         >
                           {p2?.displayName || 'P2'}
                         </strong>
-                        {p2Win && <span className="text-[10px] shrink-0" title="Chiến thắng">👑</span>}
+                        {p2Win && (
+                          <span className="text-[10px] shrink-0" title="Chiến thắng">
+                            👑
+                          </span>
+                        )}
                       </div>
-                      <span className={`font-mono font-bold shrink-0 ${st.scoreText} ${p2Win ? 'text-amber-300' : 'text-amber-200/90'}`}>
+                      <span
+                        className={`font-mono font-bold shrink-0 ${st.scoreText} ${p2Win ? 'text-amber-300' : 'text-amber-200/90'}`}
+                      >
                         {m.player2Score}/2
                       </span>
                     </div>
                   </div>
 
-                  {isDone && (
-                    st.showFooter ? (
-                      <div className={`mt-1 pt-0.5 border-t border-white/10 text-center font-bold text-emerald-300 truncate shrink-0 ${st.footerText}`}>
+                  {isDone &&
+                    (st.showFooter ? (
+                      <div
+                        className={`mt-1 pt-0.5 border-t border-white/10 text-center font-bold text-emerald-300 truncate shrink-0 ${st.footerText}`}
+                      >
                         {p1Win && `${p1?.displayName} Thắng 🏆`}
                         {p2Win && `${p2?.displayName} Thắng 🏆`}
                         {isDraw && 'Hòa trận 🤝'}
@@ -337,8 +372,7 @@ export const SwissDuelProjectorView: React.FC<ProjectorViewProps> = ({ state }) 
                         {p2Win && `${p2?.displayName} Thắng`}
                         {isDraw && 'Hòa trận'}
                       </div>
-                    )
-                  )}
+                    ))}
                 </ChessWoodCard>
               );
             })}

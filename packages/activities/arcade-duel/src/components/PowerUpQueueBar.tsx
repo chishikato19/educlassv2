@@ -19,9 +19,7 @@ export const PowerUpQueueBar: React.FC<PowerUpQueueBarProps> = ({
 
   return (
     <div className="flex items-center gap-2">
-      <span className="text-xs font-bold text-slate-400 uppercase tracking-wider">
-        Túi đồ:
-      </span>
+      <span className="text-xs font-bold text-slate-400 uppercase tracking-wider">Túi đồ:</span>
       <div className="flex items-center gap-1.5">
         {Array.from({ length: max }).map((_, idx) => {
           const item = queue[idx];

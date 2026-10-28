@@ -106,10 +106,15 @@ export const FactionDuelStudentView: React.FC<StudentViewProps> = ({
           {isDraw ? '🤝' : isTeamWon ? '🏆' : '🎖️'}
         </div>
         <h1 className="text-2xl font-black mb-2">
-          {isDraw ? 'TRẬN ĐẤU BẤT PHÂN THẮNG BẠI!' : isTeamWon ? 'PHE BẠN ĐÃ CHIẾN THẮNG!' : 'PHE BẠN ĐÃ CHIẾN ĐẤU HẾT MÌNH!'}
+          {isDraw
+            ? 'TRẬN ĐẤU BẤT PHÂN THẮNG BẠI!'
+            : isTeamWon
+              ? 'PHE BẠN ĐÃ CHIẾN THẮNG!'
+              : 'PHE BẠN ĐÃ CHIẾN ĐẤU HẾT MÌNH!'}
         </h1>
         <p className="text-slate-300 text-sm mb-6">
-          Điểm số chung cuộc: <span className="text-blue-400 font-bold">Xanh {state.scoreBlue}</span> -{' '}
+          Điểm số chung cuộc:{' '}
+          <span className="text-blue-400 font-bold">Xanh {state.scoreBlue}</span> -{' '}
           <span className="text-red-400 font-bold">Đỏ {state.scoreRed}</span>
         </p>
         <div className="bg-slate-800 p-4 rounded-2xl w-full max-w-sm border border-slate-700">
@@ -165,10 +170,15 @@ export const FactionDuelStudentView: React.FC<StudentViewProps> = ({
                 <p className="text-xs text-slate-300 mt-1">
                   Bạn sẽ so tài cùng{' '}
                   <span className="font-bold text-white">
-                    {opposingTeamMembers.find(m => m.participantId === myPair.targetId)?.displayName}
+                    {
+                      opposingTeamMembers.find(m => m.participantId === myPair.targetId)
+                        ?.displayName
+                    }
                   </span>
                 </p>
-                <p className="text-[11px] text-slate-400 mt-2">Vòng đấu sẽ bắt đầu khi hết 15 giây...</p>
+                <p className="text-[11px] text-slate-400 mt-2">
+                  Vòng đấu sẽ bắt đầu khi hết 15 giây...
+                </p>
               </div>
             ) : (
               <div className="grid grid-cols-2 gap-2.5 max-h-[60vh] overflow-y-auto pr-1">
@@ -203,7 +213,9 @@ export const FactionDuelStudentView: React.FC<StudentViewProps> = ({
                           </span>
                           <span className="text-[10px] text-slate-400">Elo {opp.elo}</span>
                         </div>
-                        <span className={`text-[10px] px-1.5 py-0.5 rounded-md inline-block ${bonusColor}`}>
+                        <span
+                          className={`text-[10px] px-1.5 py-0.5 rounded-md inline-block ${bonusColor}`}
+                        >
                           {isClaimed ? 'Đã bị chọn' : bonusTag}
                         </span>
                       </div>
@@ -227,8 +239,8 @@ export const FactionDuelStudentView: React.FC<StudentViewProps> = ({
               </div>
               <p className="text-sm font-bold text-red-300">ĐANG ĐỢI BỊ THÁCH ĐẤU...</p>
               <p className="text-xs text-slate-400 max-w-xs mt-1">
-                Nếu thắng đối thủ kèo trên, bạn sẽ đem về tới <span className="text-amber-400 font-bold">+3 điểm</span>{' '}
-                cho phe nhà!
+                Nếu thắng đối thủ kèo trên, bạn sẽ đem về tới{' '}
+                <span className="text-amber-400 font-bold">+3 điểm</span> cho phe nhà!
               </p>
             </div>
           )}
@@ -255,7 +267,9 @@ export const FactionDuelStudentView: React.FC<StudentViewProps> = ({
           <div className="flex items-center gap-2">
             <span
               className={`w-3 h-3 rounded-full ${
-                isBlue ? 'bg-blue-500 shadow-[0_0_8px_#3b82f6]' : 'bg-red-500 shadow-[0_0_8px_#ef4444]'
+                isBlue
+                  ? 'bg-blue-500 shadow-[0_0_8px_#3b82f6]'
+                  : 'bg-red-500 shadow-[0_0_8px_#ef4444]'
               }`}
             />
             <span className="text-xs font-bold text-slate-200">
@@ -271,7 +285,9 @@ export const FactionDuelStudentView: React.FC<StudentViewProps> = ({
         {/* Cặp đấu 1v1 */}
         <div className="bg-slate-900 border border-slate-800 rounded-xl p-2.5 flex items-center justify-between mb-4">
           <div className="flex items-center gap-2 max-w-[40%]">
-            <div className={`w-7 h-7 rounded-lg flex items-center justify-center text-xs font-bold ${isBlue ? 'bg-blue-600' : 'bg-red-600'}`}>
+            <div
+              className={`w-7 h-7 rounded-lg flex items-center justify-center text-xs font-bold ${isBlue ? 'bg-blue-600' : 'bg-red-600'}`}
+            >
               {myMember?.displayName?.slice(0, 1) || 'B'}
             </div>
             <div className="truncate">
@@ -284,10 +300,14 @@ export const FactionDuelStudentView: React.FC<StudentViewProps> = ({
 
           <div className="flex items-center gap-2 max-w-[40%] text-right justify-end">
             <div className="truncate">
-              <p className="text-xs font-bold text-white truncate">{opponentMember?.displayName || 'Đối thủ'}</p>
+              <p className="text-xs font-bold text-white truncate">
+                {opponentMember?.displayName || 'Đối thủ'}
+              </p>
               <p className="text-[10px] text-slate-400">Elo {opponentMember?.elo ?? 1000}</p>
             </div>
-            <div className={`w-7 h-7 rounded-lg flex items-center justify-center text-xs font-bold ${!isBlue ? 'bg-blue-600' : 'bg-red-600'}`}>
+            <div
+              className={`w-7 h-7 rounded-lg flex items-center justify-center text-xs font-bold ${!isBlue ? 'bg-blue-600' : 'bg-red-600'}`}
+            >
               {opponentMember?.displayName?.slice(0, 1) || 'Đ'}
             </div>
           </div>
@@ -307,12 +327,16 @@ export const FactionDuelStudentView: React.FC<StudentViewProps> = ({
         ) : currentQ ? (
           <div>
             <div className="flex items-center justify-between text-xs text-slate-400 mb-2">
-              <span>Câu hỏi {activeQuestionIdx + 1}/{totalQ}</span>
+              <span>
+                Câu hỏi {activeQuestionIdx + 1}/{totalQ}
+              </span>
               {currentQ.timeLimitSeconds && <span>⏱️ {currentQ.timeLimitSeconds}s</span>}
             </div>
 
             <div className="bg-slate-900/90 border border-slate-800 p-4 rounded-2xl mb-4 shadow-inner">
-              <p className="text-sm font-semibold text-white leading-relaxed">{currentQ.stem.text}</p>
+              <p className="text-sm font-semibold text-white leading-relaxed">
+                {currentQ.stem.text}
+              </p>
             </div>
 
             {/* Các lựa chọn trả lời */}
@@ -337,7 +361,9 @@ export const FactionDuelStudentView: React.FC<StudentViewProps> = ({
                       <span className="w-7 h-7 rounded-lg bg-slate-700/80 flex items-center justify-center text-xs font-black shrink-0">
                         {letter}
                       </span>
-                      <span className="text-xs sm:text-sm font-medium leading-tight">{opt.text}</span>
+                      <span className="text-xs sm:text-sm font-medium leading-tight">
+                        {opt.text}
+                      </span>
                     </button>
                   );
                 })}

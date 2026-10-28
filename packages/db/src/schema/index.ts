@@ -36,7 +36,9 @@ export const students = sqliteTable('students', {
   classId: text('class_id')
     .notNull()
     .references(() => classes.id, { onDelete: 'cascade' }),
-  groupId: text('group_id').references((): AnySQLiteColumn => classGroups.id, { onDelete: 'set null' }),
+  groupId: text('group_id').references((): AnySQLiteColumn => classGroups.id, {
+    onDelete: 'set null',
+  }),
   fullName: text('full_name').notNull(),
   code: text('code'),
   passwordHash: text('password_hash'),
@@ -62,7 +64,9 @@ export const classGroups = sqliteTable('class_groups', {
     .references(() => classes.id, { onDelete: 'cascade' }),
   name: text('name').notNull(),
   orderIndex: integer('order_index').notNull().default(0),
-  leaderStudentId: text('leader_student_id').references((): AnySQLiteColumn => students.id, { onDelete: 'set null' }),
+  leaderStudentId: text('leader_student_id').references((): AnySQLiteColumn => students.id, {
+    onDelete: 'set null',
+  }),
   createdAt: integer('created_at').notNull(),
 });
 
@@ -271,7 +275,6 @@ export const rewardRules = sqliteTable('reward_rules', {
 export type RewardRuleSelect = typeof rewardRules.$inferSelect;
 export type RewardRuleInsert = typeof rewardRules.$inferInsert;
 
-
 /**
  * 16. Bảng reward_log: Nhật ký thưởng EXP
  */
@@ -455,4 +458,3 @@ export const bankQuestions = sqliteTable('bank_questions', {
 
 export type BankQuestionSelect = typeof bankQuestions.$inferSelect;
 export type BankQuestionInsert = typeof bankQuestions.$inferInsert;
-

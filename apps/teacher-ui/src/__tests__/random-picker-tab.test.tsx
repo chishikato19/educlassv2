@@ -14,8 +14,6 @@ if (typeof globalThis.ResizeObserver === 'undefined') {
   globalThis.ResizeObserver = MockResizeObserver as unknown as typeof ResizeObserver;
 }
 
-
-
 describe('RandomPickerTab Component', () => {
   afterEach(() => {
     cleanup();
@@ -485,4 +483,3 @@ describe('RandomPickerTab Component', () => {
     expect(screen.queryByText(/3 viên bi cùng tranh tài/i)).toBeNull();
   });
 });
-

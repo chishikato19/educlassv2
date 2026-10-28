@@ -1,8 +1,5 @@
 import React, { useState } from 'react';
-import type {
-  ProjectGradingState,
-  ProjectGradingStudentIntent,
-} from '@educlass/protocol';
+import type { ProjectGradingState, ProjectGradingStudentIntent } from '@educlass/protocol';
 import {
   findGroupByParticipantId,
   isParticipantLeader,
@@ -174,11 +171,14 @@ export const ProjectGradingStudentView: React.FC<ProjectGradingStudentViewProps>
         }}
       >
         <div style={{ fontSize: '48px', marginBottom: '12px' }}>⚠️</div>
-        <h3 style={{ fontSize: '18px', fontWeight: 700, margin: '0 0 8px 0', color: UI_COLORS.text }}>
+        <h3
+          style={{ fontSize: '18px', fontWeight: 700, margin: '0 0 8px 0', color: UI_COLORS.text }}
+        >
           Chưa được phân nhóm
         </h3>
         <p style={{ fontSize: '14px', color: UI_COLORS.textMuted, marginBottom: '24px' }}>
-          Bạn chưa được xếp vào nhóm/tổ nào trong tiết học này. Vui lòng báo thầy/cô để được thêm vào nhóm nhé!
+          Bạn chưa được xếp vào nhóm/tổ nào trong tiết học này. Vui lòng báo thầy/cô để được thêm
+          vào nhóm nhé!
         </p>
         <Button
           variant="secondary"
@@ -196,12 +196,12 @@ export const ProjectGradingStudentView: React.FC<ProjectGradingStudentViewProps>
   }
 
   // Danh sách thành viên khác cần nhóm trưởng chấm
-  const otherMembers = myGroup.memberParticipantIds.filter((id) => id !== participantId);
-  const gradedMembersCount = otherMembers.filter((id) => myTeamGrades[id] !== undefined).length;
+  const otherMembers = myGroup.memberParticipantIds.filter(id => id !== participantId);
+  const gradedMembersCount = otherMembers.filter(id => myTeamGrades[id] !== undefined).length;
 
   // Danh sách các nhóm khác cần chấm chéo
-  const otherGroups = config.groups.filter((g) => g.id !== myGroup.id);
-  const gradedCrossCount = otherGroups.filter((g) => myCrossGrades[g.id] !== undefined).length;
+  const otherGroups = config.groups.filter(g => g.id !== myGroup.id);
+  const gradedCrossCount = otherGroups.filter(g => myCrossGrades[g.id] !== undefined).length;
 
   function renderSwitchModal() {
     return (
@@ -212,7 +212,8 @@ export const ProjectGradingStudentView: React.FC<ProjectGradingStudentViewProps>
       >
         <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
           <p style={{ margin: 0, fontSize: '14px', color: UI_COLORS.text }}>
-            Hệ thống sẽ lưu lại điểm bạn vừa chấm và chuyển về màn hình danh sách lớp để bạn học sinh tiếp theo vào chấm trên máy này.
+            Hệ thống sẽ lưu lại điểm bạn vừa chấm và chuyển về màn hình danh sách lớp để bạn học
+            sinh tiếp theo vào chấm trên máy này.
           </p>
           <div style={{ display: 'flex', gap: '12px', justifyContent: 'flex-end' }}>
             <Button
@@ -483,14 +484,16 @@ export const ProjectGradingStudentView: React.FC<ProjectGradingStudentViewProps>
 
           {/* Bộ nhập điểm lớn vùng chạm >= 48px */}
           <div>
-            <label style={{ display: 'block', fontSize: '13px', fontWeight: 600, marginBottom: '8px' }}>
+            <label
+              style={{ display: 'block', fontSize: '13px', fontWeight: 600, marginBottom: '8px' }}
+            >
               Điểm số em tự đánh giá:
             </label>
             <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
               <button
                 type="button"
                 disabled={isFrozen || selfScore <= 0}
-                onClick={() => setSelfScore((s) => Math.max(0, Math.round((s - 0.5) * 10) / 10))}
+                onClick={() => setSelfScore(s => Math.max(0, Math.round((s - 0.5) * 10) / 10))}
                 style={{
                   width: '48px',
                   height: '48px',
@@ -512,7 +515,7 @@ export const ProjectGradingStudentView: React.FC<ProjectGradingStudentViewProps>
                 max={config.maxScore}
                 disabled={isFrozen}
                 value={selfScore}
-                onChange={(e) => {
+                onChange={e => {
                   const val = parseFloat(e.target.value);
                   if (!Number.isNaN(val)) setSelfScore(val);
                 }}
@@ -532,7 +535,9 @@ export const ProjectGradingStudentView: React.FC<ProjectGradingStudentViewProps>
               <button
                 type="button"
                 disabled={isFrozen || selfScore >= config.maxScore}
-                onClick={() => setSelfScore((s) => Math.min(config.maxScore, Math.round((s + 0.5) * 10) / 10))}
+                onClick={() =>
+                  setSelfScore(s => Math.min(config.maxScore, Math.round((s + 0.5) * 10) / 10))
+                }
                 style={{
                   width: '48px',
                   height: '48px',
@@ -550,7 +555,7 @@ export const ProjectGradingStudentView: React.FC<ProjectGradingStudentViewProps>
 
             {/* Quick score chips */}
             <div style={{ display: 'flex', gap: '6px', marginTop: '10px', flexWrap: 'wrap' }}>
-              {[7, 8, 8.5, 9, 9.5, 10].map((quick) => (
+              {[7, 8, 8.5, 9, 9.5, 10].map(quick => (
                 <button
                   key={quick}
                   type="button"
@@ -576,7 +581,9 @@ export const ProjectGradingStudentView: React.FC<ProjectGradingStudentViewProps>
           {/* Ô nhận xét */}
           {config.allowFeedbackComment && (
             <div>
-              <label style={{ display: 'block', fontSize: '13px', fontWeight: 600, marginBottom: '6px' }}>
+              <label
+                style={{ display: 'block', fontSize: '13px', fontWeight: 600, marginBottom: '6px' }}
+              >
                 Tự nhận xét về phần việc của em trong nhóm:
               </label>
               <textarea
@@ -584,7 +591,7 @@ export const ProjectGradingStudentView: React.FC<ProjectGradingStudentViewProps>
                 disabled={isFrozen}
                 placeholder="VD: Em đã hoàn thành đúng hạn slide thuyết trình, phối hợp tốt cùng các bạn..."
                 value={selfComment}
-                onChange={(e) => setSelfComment(e.target.value)}
+                onChange={e => setSelfComment(e.target.value)}
                 style={{
                   width: '100%',
                   padding: '10px 12px',
@@ -630,7 +637,8 @@ export const ProjectGradingStudentView: React.FC<ProjectGradingStudentViewProps>
                 🎉 Bạn đã hoàn thành tự chấm điểm!
               </div>
               <p style={{ margin: 0, fontSize: '13px', color: '#15803D' }}>
-                Nếu dùng chung thiết bị, hãy bấm nút bên dưới để chuyển lượt cho bạn tiếp theo vào chấm nhé.
+                Nếu dùng chung thiết bị, hãy bấm nút bên dưới để chuyển lượt cho bạn tiếp theo vào
+                chấm nhé.
               </p>
               <Button
                 variant="kahoot_green"
@@ -670,7 +678,8 @@ export const ProjectGradingStudentView: React.FC<ProjectGradingStudentViewProps>
               2. Chấm điểm các thành viên trong nhóm
             </h4>
             <div style={{ fontSize: '12px', color: UI_COLORS.textMuted, marginTop: '2px' }}>
-              Trọng số: {config.weights.teamMember}% • Đánh giá mức độ tích cực và đóng góp của từng bạn.
+              Trọng số: {config.weights.teamMember}% • Đánh giá mức độ tích cực và đóng góp của từng
+              bạn.
             </div>
           </div>
 
@@ -706,9 +715,17 @@ export const ProjectGradingStudentView: React.FC<ProjectGradingStudentViewProps>
                     gap: '12px',
                   }}
                 >
-                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                  <div
+                    style={{
+                      display: 'flex',
+                      justifyContent: 'space-between',
+                      alignItems: 'center',
+                    }}
+                  >
                     <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                      <span style={{ fontSize: '12px', color: UI_COLORS.textMuted, fontWeight: 700 }}>
+                      <span
+                        style={{ fontSize: '12px', color: UI_COLORS.textMuted, fontWeight: 700 }}
+                      >
                         #{idx + 1}
                       </span>
                       <span style={{ fontSize: '15px', fontWeight: 700, color: UI_COLORS.text }}>
@@ -751,7 +768,7 @@ export const ProjectGradingStudentView: React.FC<ProjectGradingStudentViewProps>
                       type="button"
                       disabled={isFrozen || score <= 0}
                       onClick={() =>
-                        setMemberScores((prev) => ({
+                        setMemberScores(prev => ({
                           ...prev,
                           [memberId]: Math.max(0, Math.round((score - 0.5) * 10) / 10),
                         }))
@@ -777,10 +794,10 @@ export const ProjectGradingStudentView: React.FC<ProjectGradingStudentViewProps>
                       max={config.maxScore}
                       disabled={isFrozen}
                       value={score}
-                      onChange={(e) => {
+                      onChange={e => {
                         const val = parseFloat(e.target.value);
                         if (!Number.isNaN(val)) {
-                          setMemberScores((prev) => ({ ...prev, [memberId]: val }));
+                          setMemberScores(prev => ({ ...prev, [memberId]: val }));
                         }
                       }}
                       style={{
@@ -799,9 +816,12 @@ export const ProjectGradingStudentView: React.FC<ProjectGradingStudentViewProps>
                       type="button"
                       disabled={isFrozen || score >= config.maxScore}
                       onClick={() =>
-                        setMemberScores((prev) => ({
+                        setMemberScores(prev => ({
                           ...prev,
-                          [memberId]: Math.min(config.maxScore, Math.round((score + 0.5) * 10) / 10),
+                          [memberId]: Math.min(
+                            config.maxScore,
+                            Math.round((score + 0.5) * 10) / 10
+                          ),
                         }))
                       }
                       style={{
@@ -825,8 +845,8 @@ export const ProjectGradingStudentView: React.FC<ProjectGradingStudentViewProps>
                       disabled={isFrozen}
                       placeholder="Nhận xét thành viên này (tùy chọn)..."
                       value={comment}
-                      onChange={(e) =>
-                        setMemberComments((prev) => ({ ...prev, [memberId]: e.target.value }))
+                      onChange={e =>
+                        setMemberComments(prev => ({ ...prev, [memberId]: e.target.value }))
                       }
                       style={{
                         padding: '8px 12px',
@@ -878,7 +898,8 @@ export const ProjectGradingStudentView: React.FC<ProjectGradingStudentViewProps>
               3. Chấm điểm chéo các nhóm bạn
             </h4>
             <div style={{ fontSize: '12px', color: UI_COLORS.textMuted, marginTop: '2px' }}>
-              Trọng số: {config.weights.crossTeam}% • Đánh giá sản phẩm và phần thuyết trình của nhóm khác.
+              Trọng số: {config.weights.crossTeam}% • Đánh giá sản phẩm và phần thuyết trình của
+              nhóm khác.
             </div>
           </div>
 
@@ -896,7 +917,7 @@ export const ProjectGradingStudentView: React.FC<ProjectGradingStudentViewProps>
               Lớp chưa có nhóm khác để chấm chéo.
             </div>
           ) : (
-            otherGroups.map((g) => {
+            otherGroups.map(g => {
               const currentGrade = myCrossGrades[g.id];
               const score = crossScores[g.id] ?? 8.0;
               const comment = crossComments[g.id] ?? '';
@@ -914,7 +935,13 @@ export const ProjectGradingStudentView: React.FC<ProjectGradingStudentViewProps>
                     gap: '12px',
                   }}
                 >
-                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                  <div
+                    style={{
+                      display: 'flex',
+                      justifyContent: 'space-between',
+                      alignItems: 'center',
+                    }}
+                  >
                     <div>
                       <span style={{ fontSize: '15px', fontWeight: 800, color: UI_COLORS.text }}>
                         {g.name}
@@ -961,7 +988,7 @@ export const ProjectGradingStudentView: React.FC<ProjectGradingStudentViewProps>
                       type="button"
                       disabled={isFrozen || score <= 0}
                       onClick={() =>
-                        setCrossScores((prev) => ({
+                        setCrossScores(prev => ({
                           ...prev,
                           [g.id]: Math.max(0, Math.round((score - 0.5) * 10) / 10),
                         }))
@@ -987,10 +1014,10 @@ export const ProjectGradingStudentView: React.FC<ProjectGradingStudentViewProps>
                       max={config.maxScore}
                       disabled={isFrozen}
                       value={score}
-                      onChange={(e) => {
+                      onChange={e => {
                         const val = parseFloat(e.target.value);
                         if (!Number.isNaN(val)) {
-                          setCrossScores((prev) => ({ ...prev, [g.id]: val }));
+                          setCrossScores(prev => ({ ...prev, [g.id]: val }));
                         }
                       }}
                       style={{
@@ -1009,7 +1036,7 @@ export const ProjectGradingStudentView: React.FC<ProjectGradingStudentViewProps>
                       type="button"
                       disabled={isFrozen || score >= config.maxScore}
                       onClick={() =>
-                        setCrossScores((prev) => ({
+                        setCrossScores(prev => ({
                           ...prev,
                           [g.id]: Math.min(config.maxScore, Math.round((score + 0.5) * 10) / 10),
                         }))
@@ -1035,8 +1062,8 @@ export const ProjectGradingStudentView: React.FC<ProjectGradingStudentViewProps>
                       disabled={isFrozen}
                       placeholder="Góp ý cho sản phẩm / thuyết trình nhóm bạn..."
                       value={comment}
-                      onChange={(e) =>
-                        setCrossComments((prev) => ({ ...prev, [g.id]: e.target.value }))
+                      onChange={e =>
+                        setCrossComments(prev => ({ ...prev, [g.id]: e.target.value }))
                       }
                       style={{
                         padding: '8px 12px',

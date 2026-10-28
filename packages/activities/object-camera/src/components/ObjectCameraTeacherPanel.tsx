@@ -68,22 +68,18 @@ export const ObjectCameraTeacherPanel: React.FC<ObjectCameraTeacherPanelProps> =
   const canvasRefSecondary = useRef<HTMLCanvasElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  const activePhoto = state.photos.find((p) => p.id === state.activePhotoId) || null;
-  const comparePhoto = state.photos.find((p) => p.id === state.comparePhotoId) || null;
+  const activePhoto = state.photos.find(p => p.id === state.activePhotoId) || null;
+  const comparePhoto = state.photos.find(p => p.id === state.comparePhotoId) || null;
 
   // Lấy danh sách nét vẽ cho từng ảnh
-  const annotationsPrimary = state.annotations.filter(
-    (a) => a.photoId === (activePhoto?.id || '')
-  );
+  const annotationsPrimary = state.annotations.filter(a => a.photoId === (activePhoto?.id || ''));
   const annotationsSecondary = state.annotations.filter(
-    (a) => a.photoId === (comparePhoto?.id || '')
+    a => a.photoId === (comparePhoto?.id || '')
   );
 
   // Helper lấy viewport riêng cho từng slot (Ảnh 1 hay Ảnh 2)
   const getSlotViewport = (slot: 'primary' | 'secondary') => {
-    return slot === 'secondary'
-      ? (state.compareViewport || state.viewport)
-      : state.viewport;
+    return slot === 'secondary' ? state.compareViewport || state.viewport : state.viewport;
   };
 
   // Viewport của khung đang được chọn chỉnh sửa
@@ -93,13 +89,13 @@ export const ObjectCameraTeacherPanel: React.FC<ObjectCameraTeacherPanelProps> =
   useEffect(() => {
     if (state.uploadToken) {
       fetch(`/api/object-camera/connect-info?token=${encodeURIComponent(state.uploadToken)}`)
-        .then((res) => res.json())
-        .then((data) => {
+        .then(res => res.json())
+        .then(data => {
           if (data && data.ok) {
             setConnectInfo(data);
           }
         })
-        .catch((err) => {
+        .catch(err => {
           console.error('Lỗi khi lấy thông tin kết nối LAN:', err);
         });
     }
@@ -163,7 +159,10 @@ export const ObjectCameraTeacherPanel: React.FC<ObjectCameraTeacherPanelProps> =
       ctx.scale(viewport.zoom, viewport.zoom);
 
       // Tính kích thước vẽ phù hợp tỉ lệ ảnh (tối đa diện tích khung nhìn)
-      const scale = Math.min((canvas.width * 0.98) / img.width, (canvas.height * 0.98) / img.height);
+      const scale = Math.min(
+        (canvas.width * 0.98) / img.width,
+        (canvas.height * 0.98) / img.height
+      );
       const drawWidth = img.width * scale;
       const drawHeight = img.height * scale;
       const drawX = -drawWidth / 2;
@@ -279,7 +278,7 @@ export const ObjectCameraTeacherPanel: React.FC<ObjectCameraTeacherPanelProps> =
   // Lắng nghe thay đổi kích thước cửa sổ / toàn màn hình để vẽ lại Canvas vừa khít
   useEffect(() => {
     const handleResize = () => {
-      setResizeTick((prev) => prev + 1);
+      setResizeTick(prev => prev + 1);
     };
 
     window.addEventListener('resize', handleResize);
@@ -375,7 +374,10 @@ export const ObjectCameraTeacherPanel: React.FC<ObjectCameraTeacherPanelProps> =
     const rx = dx * Math.cos(rad) - dy * Math.sin(rad);
     const ry = dx * Math.sin(rad) + dy * Math.cos(rad);
 
-    const scale = Math.min((canvas.width * 0.94) / targetPhoto.width, (canvas.height * 0.94) / targetPhoto.height);
+    const scale = Math.min(
+      (canvas.width * 0.94) / targetPhoto.width,
+      (canvas.height * 0.94) / targetPhoto.height
+    );
     const drawWidth = targetPhoto.width * scale;
     const drawHeight = targetPhoto.height * scale;
 
@@ -423,7 +425,12 @@ export const ObjectCameraTeacherPanel: React.FC<ObjectCameraTeacherPanelProps> =
           id: `stroke-${Date.now()}`,
           photoId: currentPhoto.id,
           tool: activeTool as AnnotationToolType,
-          color: activeTool === 'stamp_check' ? '#10B981' : activeTool === 'stamp_cross' ? '#EF4444' : '#F59E0B',
+          color:
+            activeTool === 'stamp_check'
+              ? '#10B981'
+              : activeTool === 'stamp_cross'
+                ? '#EF4444'
+                : '#F59E0B',
           size: 32,
           opacity: 1,
           points: [normPt],
@@ -472,7 +479,7 @@ export const ObjectCameraTeacherPanel: React.FC<ObjectCameraTeacherPanelProps> =
     if (isDrawing) {
       const normPt = getNormalizedPoint(e, canvas, currentPhoto, slotViewport);
       if (normPt) {
-        setCurrentPoints((prev) => [...prev, normPt]);
+        setCurrentPoints(prev => [...prev, normPt]);
       }
     }
   };
@@ -514,7 +521,10 @@ export const ObjectCameraTeacherPanel: React.FC<ObjectCameraTeacherPanelProps> =
     setActiveTarget(targetSlot);
     const slotViewport = getSlotViewport(targetSlot);
     const zoomFactor = e.deltaY < 0 ? 1.15 : 0.85;
-    const nextZoom = Math.max(0.2, Math.min(5, Number((slotViewport.zoom * zoomFactor).toFixed(2))));
+    const nextZoom = Math.max(
+      0.2,
+      Math.min(5, Number((slotViewport.zoom * zoomFactor).toFixed(2)))
+    );
     onSendIntent({
       type: 'UPDATE_VIEWPORT',
       viewport: { zoom: nextZoom },
@@ -533,7 +543,7 @@ export const ObjectCameraTeacherPanel: React.FC<ObjectCameraTeacherPanelProps> =
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ url: photo.url }),
-      }).catch((err) => {
+      }).catch(err => {
         console.warn('Lỗi khi xóa file tạm vật lý:', err);
       });
     }
@@ -546,7 +556,7 @@ export const ObjectCameraTeacherPanel: React.FC<ObjectCameraTeacherPanelProps> =
     }
 
     // Lấy danh sách URL các ảnh đã ghim cần giữ lại
-    const keepUrls = state.photos.filter((p) => p.isPinned).map((p) => p.url);
+    const keepUrls = state.photos.filter(p => p.isPinned).map(p => p.url);
 
     // 1. Gửi intent xóa trong state
     onSendIntent({ type: 'CLEAR_ALL_PHOTOS' });
@@ -556,7 +566,7 @@ export const ObjectCameraTeacherPanel: React.FC<ObjectCameraTeacherPanelProps> =
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ keepUrls }),
-    }).catch((err) => {
+    }).catch(err => {
       console.warn('Lỗi khi dọn rác file tạm:', err);
     });
   };
@@ -568,7 +578,7 @@ export const ObjectCameraTeacherPanel: React.FC<ObjectCameraTeacherPanelProps> =
       if (!file.type.startsWith('image/')) return;
 
       const reader = new FileReader();
-      reader.onload = async (event) => {
+      reader.onload = async event => {
         const base64Url = event.target?.result as string;
         if (!base64Url) return;
 
@@ -583,7 +593,7 @@ export const ObjectCameraTeacherPanel: React.FC<ObjectCameraTeacherPanelProps> =
                 base64: base64Url,
                 filename: file.name.replace(/\.[^/.]+$/, ''),
                 studentId: selectedStudentId || undefined,
-                studentName: participants.find((p) => p.id === selectedStudentId)?.displayName,
+                studentName: participants.find(p => p.id === selectedStudentId)?.displayName,
               }),
             });
             if (res.ok) {
@@ -605,7 +615,7 @@ export const ObjectCameraTeacherPanel: React.FC<ObjectCameraTeacherPanelProps> =
             height: img.height,
             capturedAt: Date.now() + index,
             studentId: selectedStudentId || undefined,
-            studentName: participants.find((p) => p.id === selectedStudentId)?.displayName,
+            studentName: participants.find(p => p.id === selectedStudentId)?.displayName,
             isPinned: false,
           };
 
@@ -674,11 +684,12 @@ export const ObjectCameraTeacherPanel: React.FC<ObjectCameraTeacherPanelProps> =
 
   // Thưởng EXP cho học sinh
   const handleAwardExp = (expAmount: number) => {
-    const activeCurrentPhoto = activeTarget === 'primary' ? activePhoto : (comparePhoto || activePhoto);
+    const activeCurrentPhoto =
+      activeTarget === 'primary' ? activePhoto : comparePhoto || activePhoto;
     const targetStudentId = activeCurrentPhoto?.studentId || selectedStudentId;
     const targetStudentName =
       activeCurrentPhoto?.studentName ||
-      participants.find((p) => p.id === targetStudentId)?.displayName ||
+      participants.find(p => p.id === targetStudentId)?.displayName ||
       'Học sinh';
 
     if (!targetStudentId) {
@@ -701,8 +712,11 @@ export const ObjectCameraTeacherPanel: React.FC<ObjectCameraTeacherPanelProps> =
 
   // Xuất ảnh kèm nét vẽ về máy tính
   const exportAnnotatedImage = () => {
-    const canvas = activeTarget === 'primary' ? canvasRefPrimary.current : (canvasRefSecondary.current || canvasRefPrimary.current);
-    const photoToExport = activeTarget === 'primary' ? activePhoto : (comparePhoto || activePhoto);
+    const canvas =
+      activeTarget === 'primary'
+        ? canvasRefPrimary.current
+        : canvasRefSecondary.current || canvasRefPrimary.current;
+    const photoToExport = activeTarget === 'primary' ? activePhoto : comparePhoto || activePhoto;
     if (!canvas || !photoToExport) return;
 
     const dataUrl = canvas.toDataURL('image/png');
@@ -821,12 +835,16 @@ export const ObjectCameraTeacherPanel: React.FC<ObjectCameraTeacherPanelProps> =
       <div className="flex items-center justify-between px-4 py-1.5 bg-slate-850 border-b border-slate-700/80 text-xs overflow-x-auto gap-4 shrink-0">
         {/* Nhóm công cụ vẽ */}
         <div className="flex items-center gap-1.5">
-          <span className="text-[11px] text-slate-400 font-semibold uppercase tracking-wider mr-1">Vẽ chữa:</span>
+          <span className="text-[11px] text-slate-400 font-semibold uppercase tracking-wider mr-1">
+            Vẽ chữa:
+          </span>
 
           <button
             onClick={() => setActiveTool('pen')}
             className={`flex items-center gap-1 px-2 py-1 rounded text-xs font-medium transition ${
-              activeTool === 'pen' ? 'bg-red-600 text-white shadow' : 'bg-slate-700/60 hover:bg-slate-700 text-slate-300'
+              activeTool === 'pen'
+                ? 'bg-red-600 text-white shadow'
+                : 'bg-slate-700/60 hover:bg-slate-700 text-slate-300'
             }`}
           >
             ✏️ Bút mực
@@ -834,7 +852,7 @@ export const ObjectCameraTeacherPanel: React.FC<ObjectCameraTeacherPanelProps> =
 
           {activeTool === 'pen' && (
             <div className="flex items-center gap-1 ml-1 bg-slate-800 px-1.5 py-0.5 rounded border border-slate-700">
-              {['#EF4444', '#3B82F6', '#10B981', '#111827'].map((c) => (
+              {['#EF4444', '#3B82F6', '#10B981', '#111827'].map(c => (
                 <button
                   key={c}
                   onClick={() => setPenColor(c)}
@@ -847,7 +865,7 @@ export const ObjectCameraTeacherPanel: React.FC<ObjectCameraTeacherPanelProps> =
                 min="2"
                 max="12"
                 value={penSize}
-                onChange={(e) => setPenSize(Number(e.target.value))}
+                onChange={e => setPenSize(Number(e.target.value))}
                 className="w-12 h-1 ml-1 accent-red-500 cursor-pointer"
                 title={`Cỡ nét: ${penSize}px`}
               />
@@ -857,7 +875,9 @@ export const ObjectCameraTeacherPanel: React.FC<ObjectCameraTeacherPanelProps> =
           <button
             onClick={() => setActiveTool('highlighter')}
             className={`flex items-center gap-1 px-2 py-1 rounded text-xs font-medium transition ${
-              activeTool === 'highlighter' ? 'bg-amber-500 text-slate-900 shadow font-bold' : 'bg-slate-700/60 hover:bg-slate-700 text-slate-300'
+              activeTool === 'highlighter'
+                ? 'bg-amber-500 text-slate-900 shadow font-bold'
+                : 'bg-slate-700/60 hover:bg-slate-700 text-slate-300'
             }`}
           >
             🖍️ Dạ quang
@@ -868,7 +888,9 @@ export const ObjectCameraTeacherPanel: React.FC<ObjectCameraTeacherPanelProps> =
             <button
               onClick={() => setActiveTool('stamp_check')}
               className={`px-1.5 py-0.5 rounded text-xs font-bold ${
-                activeTool === 'stamp_check' ? 'bg-emerald-600 text-white' : 'text-emerald-400 hover:bg-slate-700'
+                activeTool === 'stamp_check'
+                  ? 'bg-emerald-600 text-white'
+                  : 'text-emerald-400 hover:bg-slate-700'
               }`}
             >
               ✓ Đúng
@@ -876,7 +898,9 @@ export const ObjectCameraTeacherPanel: React.FC<ObjectCameraTeacherPanelProps> =
             <button
               onClick={() => setActiveTool('stamp_cross')}
               className={`px-1.5 py-0.5 rounded text-xs font-bold ${
-                activeTool === 'stamp_cross' ? 'bg-red-600 text-white' : 'text-red-400 hover:bg-slate-700'
+                activeTool === 'stamp_cross'
+                  ? 'bg-red-600 text-white'
+                  : 'text-red-400 hover:bg-slate-700'
               }`}
             >
               ✗ Sai
@@ -884,7 +908,9 @@ export const ObjectCameraTeacherPanel: React.FC<ObjectCameraTeacherPanelProps> =
             <button
               onClick={() => setActiveTool('stamp_star')}
               className={`px-1.5 py-0.5 rounded text-xs font-bold ${
-                activeTool === 'stamp_star' ? 'bg-amber-500 text-slate-900' : 'text-amber-400 hover:bg-slate-700'
+                activeTool === 'stamp_star'
+                  ? 'bg-amber-500 text-slate-900'
+                  : 'text-amber-400 hover:bg-slate-700'
               }`}
             >
               ★ Khen
@@ -892,14 +918,24 @@ export const ObjectCameraTeacherPanel: React.FC<ObjectCameraTeacherPanelProps> =
           </div>
 
           <button
-            onClick={() => onSendIntent({ type: 'UNDO_STROKE', photoId: activeTarget === 'primary' ? activePhoto?.id : comparePhoto?.id })}
+            onClick={() =>
+              onSendIntent({
+                type: 'UNDO_STROKE',
+                photoId: activeTarget === 'primary' ? activePhoto?.id : comparePhoto?.id,
+              })
+            }
             className="p-1 px-1.5 rounded hover:bg-slate-700 text-slate-300 text-xs ml-1"
             title="Hoàn tác nét vẽ (Undo)"
           >
             ↩ Hoàn tác
           </button>
           <button
-            onClick={() => onSendIntent({ type: 'CLEAR_ANNOTATIONS', photoId: activeTarget === 'primary' ? activePhoto?.id : comparePhoto?.id })}
+            onClick={() =>
+              onSendIntent({
+                type: 'CLEAR_ANNOTATIONS',
+                photoId: activeTarget === 'primary' ? activePhoto?.id : comparePhoto?.id,
+              })
+            }
             className="p-1 px-1.5 rounded hover:bg-slate-700 text-slate-400 hover:text-red-400 text-xs"
             title="Xóa hết nét vẽ trên ảnh này"
           >
@@ -913,7 +949,9 @@ export const ObjectCameraTeacherPanel: React.FC<ObjectCameraTeacherPanelProps> =
           <button
             onClick={() => onSendIntent({ type: 'SET_DISPLAY_MODE', mode: 'single' })}
             className={`px-2 py-0.5 rounded text-xs font-bold transition ${
-              state.displayMode === 'single' ? 'bg-blue-600 text-white shadow' : 'text-slate-300 hover:bg-slate-700'
+              state.displayMode === 'single'
+                ? 'bg-blue-600 text-white shadow'
+                : 'text-slate-300 hover:bg-slate-700'
             }`}
             title="Chiếu 1 ảnh đơn lớn ở giữa"
           >
@@ -922,7 +960,9 @@ export const ObjectCameraTeacherPanel: React.FC<ObjectCameraTeacherPanelProps> =
           <button
             onClick={() => onSendIntent({ type: 'SET_DISPLAY_MODE', mode: 'compare_vertical' })}
             className={`px-2 py-0.5 rounded text-xs font-bold transition ${
-              state.displayMode === 'compare_vertical' ? 'bg-blue-600 text-white shadow' : 'text-slate-300 hover:bg-slate-700'
+              state.displayMode === 'compare_vertical'
+                ? 'bg-blue-600 text-white shadow'
+                : 'text-slate-300 hover:bg-slate-700'
             }`}
             title="So sánh 2 ảnh chia đôi theo chiều dọc (Trái | Phải)"
           >
@@ -931,7 +971,9 @@ export const ObjectCameraTeacherPanel: React.FC<ObjectCameraTeacherPanelProps> =
           <button
             onClick={() => onSendIntent({ type: 'SET_DISPLAY_MODE', mode: 'compare_horizontal' })}
             className={`px-2 py-0.5 rounded text-xs font-bold transition ${
-              state.displayMode === 'compare_horizontal' ? 'bg-blue-600 text-white shadow' : 'text-slate-300 hover:bg-slate-700'
+              state.displayMode === 'compare_horizontal'
+                ? 'bg-blue-600 text-white shadow'
+                : 'text-slate-300 hover:bg-slate-700'
             }`}
             title="So sánh 2 ảnh chia đôi theo chiều ngang (Trên | Dưới)"
           >
@@ -946,7 +988,9 @@ export const ObjectCameraTeacherPanel: React.FC<ObjectCameraTeacherPanelProps> =
             <button
               onClick={() => setActiveTarget('primary')}
               className={`px-2 py-0.5 rounded text-xs font-bold transition flex items-center gap-1 ${
-                activeTarget === 'primary' ? 'bg-blue-600 text-white shadow' : 'text-slate-400 hover:bg-slate-700'
+                activeTarget === 'primary'
+                  ? 'bg-blue-600 text-white shadow'
+                  : 'text-slate-400 hover:bg-slate-700'
               }`}
               title="Đang điều khiển Phóng to / Xoay / Di chuyển cho Ảnh 1"
             >
@@ -955,7 +999,9 @@ export const ObjectCameraTeacherPanel: React.FC<ObjectCameraTeacherPanelProps> =
             <button
               onClick={() => setActiveTarget('secondary')}
               className={`px-2 py-0.5 rounded text-xs font-bold transition flex items-center gap-1 ${
-                activeTarget === 'secondary' ? 'bg-emerald-600 text-white shadow' : 'text-slate-400 hover:bg-slate-700'
+                activeTarget === 'secondary'
+                  ? 'bg-emerald-600 text-white shadow'
+                  : 'text-slate-400 hover:bg-slate-700'
               }`}
               title="Đang điều khiển Phóng to / Xoay / Di chuyển cho Ảnh 2"
             >
@@ -984,7 +1030,9 @@ export const ObjectCameraTeacherPanel: React.FC<ObjectCameraTeacherPanelProps> =
           <button
             onClick={() => setActiveTool(activeTool === 'crop' ? 'pen' : 'crop')}
             className={`p-1 px-2 rounded text-xs font-medium transition ${
-              activeTool === 'crop' ? 'bg-blue-600 text-white' : 'bg-slate-700/60 hover:bg-slate-700 text-slate-200'
+              activeTool === 'crop'
+                ? 'bg-blue-600 text-white'
+                : 'bg-slate-700/60 hover:bg-slate-700 text-slate-200'
             }`}
           >
             ✂️ Cắt ảnh
@@ -1013,7 +1061,7 @@ export const ObjectCameraTeacherPanel: React.FC<ObjectCameraTeacherPanelProps> =
 
           <select
             value={currentViewport.filter}
-            onChange={(e) =>
+            onChange={e =>
               onSendIntent({
                 type: 'UPDATE_VIEWPORT',
                 viewport: { filter: e.target.value as DocumentImageFilter },
@@ -1040,7 +1088,9 @@ export const ObjectCameraTeacherPanel: React.FC<ObjectCameraTeacherPanelProps> =
               onClick={() =>
                 onSendIntent({
                   type: 'UPDATE_VIEWPORT',
-                  viewport: { zoom: Math.max(0.2, Number((currentViewport.zoom - 0.2).toFixed(1))) },
+                  viewport: {
+                    zoom: Math.max(0.2, Number((currentViewport.zoom - 0.2).toFixed(1))),
+                  },
                   target: activeTarget,
                 })
               }
@@ -1049,7 +1099,10 @@ export const ObjectCameraTeacherPanel: React.FC<ObjectCameraTeacherPanelProps> =
             >
               -
             </button>
-            <span className="text-[11px] font-mono text-slate-300 min-w-8 text-center" title="Tỉ lệ phóng to">
+            <span
+              className="text-[11px] font-mono text-slate-300 min-w-8 text-center"
+              title="Tỉ lệ phóng to"
+            >
               {Math.round(currentViewport.zoom * 100)}%
             </span>
             <button
@@ -1077,10 +1130,7 @@ export const ObjectCameraTeacherPanel: React.FC<ObjectCameraTeacherPanelProps> =
       </div>
 
       {/* 3. KHU VỰC CHIẾU HÌNH ẢNH Ở GIỮA (CENTRAL STAGE — CHIẾM TOÀN BỘ KHÔNG GIAN CÒN LẠI) */}
-      <div
-        ref={stageRef}
-        className="flex-1 min-h-0 relative bg-slate-950 overflow-hidden flex"
-      >
+      <div ref={stageRef} className="flex-1 min-h-0 relative bg-slate-950 overflow-hidden flex">
         {/* Lớp phủ trực quan khi kéo file ảnh thả vào */}
         {isDragOver && (
           <div className="absolute inset-0 bg-blue-900/60 border-4 border-dashed border-blue-400 z-50 flex flex-col items-center justify-center text-white backdrop-blur-sm pointer-events-none">
@@ -1097,10 +1147,10 @@ export const ObjectCameraTeacherPanel: React.FC<ObjectCameraTeacherPanelProps> =
             {activePhoto ? (
               <canvas
                 ref={canvasRefPrimary}
-                onMouseDown={(e) => handleCanvasMouseDown(e, 'primary')}
-                onMouseMove={(e) => handleCanvasMouseMove(e, 'primary')}
+                onMouseDown={e => handleCanvasMouseDown(e, 'primary')}
+                onMouseMove={e => handleCanvasMouseMove(e, 'primary')}
                 onMouseUp={() => handleCanvasMouseUp('primary')}
-                onWheel={(e) => handleWheel(e, 'primary')}
+                onWheel={e => handleWheel(e, 'primary')}
                 className="w-full h-full block cursor-crosshair"
               />
             ) : (
@@ -1108,9 +1158,12 @@ export const ObjectCameraTeacherPanel: React.FC<ObjectCameraTeacherPanelProps> =
                 <div className="w-16 h-16 rounded-2xl bg-slate-800 border border-slate-700 flex items-center justify-center text-4xl mb-3 shadow-inner">
                   📷
                 </div>
-                <h3 className="text-base font-bold text-slate-200 mb-1">Chưa có ảnh nào được tải lên</h3>
+                <h3 className="text-base font-bold text-slate-200 mb-1">
+                  Chưa có ảnh nào được tải lên
+                </h3>
                 <p className="text-xs text-slate-400 mb-4">
-                  Bấm <strong className="text-emerald-400">"Quét mã chụp ảnh"</strong> trên điện thoại hoặc tải ảnh từ máy tính để bắt đầu chữa bài.
+                  Bấm <strong className="text-emerald-400">"Quét mã chụp ảnh"</strong> trên điện
+                  thoại hoặc tải ảnh từ máy tính để bắt đầu chữa bài.
                 </p>
                 <div className="flex gap-2">
                   <button
@@ -1133,29 +1186,40 @@ export const ObjectCameraTeacherPanel: React.FC<ObjectCameraTeacherPanelProps> =
           // Chế độ So sánh 2 ảnh: Chia đôi dọc (Trái | Phải) hoặc Chia đôi ngang (Trên | Dưới)
           <div
             className={`flex-1 w-full h-full flex ${
-              state.displayMode === 'compare_vertical' ? 'flex-row divide-x divide-slate-700' : 'flex-col divide-y divide-slate-700'
+              state.displayMode === 'compare_vertical'
+                ? 'flex-row divide-x divide-slate-700'
+                : 'flex-col divide-y divide-slate-700'
             }`}
           >
             {/* Khung 1 (Ảnh A) */}
             <div
               onClick={() => setActiveTarget('primary')}
               className={`flex-1 relative flex items-center justify-center overflow-hidden transition ${
-                activeTarget === 'primary' ? 'ring-2 ring-blue-500/80 bg-slate-900/40' : 'bg-slate-950'
+                activeTarget === 'primary'
+                  ? 'ring-2 ring-blue-500/80 bg-slate-900/40'
+                  : 'bg-slate-950'
               }`}
             >
               <div className="absolute top-2 left-2 z-10 bg-slate-900/90 border border-slate-700 text-xs px-2.5 py-1 rounded-lg flex items-center gap-1.5 shadow">
                 <span className="font-bold text-blue-400">Ảnh 1:</span>
-                <span className="truncate max-w-[140px]">{activePhoto?.studentName || activePhoto?.name || 'Chưa chọn ảnh'}</span>
-                {activeTarget === 'primary' && <span className="w-2 h-2 rounded-full bg-blue-500 animate-pulse" title="Đang tương tác ảnh này" />}
+                <span className="truncate max-w-[140px]">
+                  {activePhoto?.studentName || activePhoto?.name || 'Chưa chọn ảnh'}
+                </span>
+                {activeTarget === 'primary' && (
+                  <span
+                    className="w-2 h-2 rounded-full bg-blue-500 animate-pulse"
+                    title="Đang tương tác ảnh này"
+                  />
+                )}
               </div>
 
               {activePhoto ? (
                 <canvas
                   ref={canvasRefPrimary}
-                  onMouseDown={(e) => handleCanvasMouseDown(e, 'primary')}
-                  onMouseMove={(e) => handleCanvasMouseMove(e, 'primary')}
+                  onMouseDown={e => handleCanvasMouseDown(e, 'primary')}
+                  onMouseMove={e => handleCanvasMouseMove(e, 'primary')}
                   onMouseUp={() => handleCanvasMouseUp('primary')}
-                  onWheel={(e) => handleWheel(e, 'primary')}
+                  onWheel={e => handleWheel(e, 'primary')}
                   className="w-full h-full block cursor-crosshair"
                 />
               ) : (
@@ -1169,22 +1233,31 @@ export const ObjectCameraTeacherPanel: React.FC<ObjectCameraTeacherPanelProps> =
             <div
               onClick={() => setActiveTarget('secondary')}
               className={`flex-1 relative flex items-center justify-center overflow-hidden transition ${
-                activeTarget === 'secondary' ? 'ring-2 ring-emerald-500/80 bg-slate-900/40' : 'bg-slate-950'
+                activeTarget === 'secondary'
+                  ? 'ring-2 ring-emerald-500/80 bg-slate-900/40'
+                  : 'bg-slate-950'
               }`}
             >
               <div className="absolute top-2 left-2 z-10 bg-slate-900/90 border border-slate-700 text-xs px-2.5 py-1 rounded-lg flex items-center gap-1.5 shadow">
                 <span className="font-bold text-emerald-400">Ảnh 2:</span>
-                <span className="truncate max-w-[140px]">{comparePhoto?.studentName || comparePhoto?.name || 'Chưa chọn ảnh'}</span>
-                {activeTarget === 'secondary' && <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" title="Đang tương tác ảnh này" />}
+                <span className="truncate max-w-[140px]">
+                  {comparePhoto?.studentName || comparePhoto?.name || 'Chưa chọn ảnh'}
+                </span>
+                {activeTarget === 'secondary' && (
+                  <span
+                    className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"
+                    title="Đang tương tác ảnh này"
+                  />
+                )}
               </div>
 
               {comparePhoto ? (
                 <canvas
                   ref={canvasRefSecondary}
-                  onMouseDown={(e) => handleCanvasMouseDown(e, 'secondary')}
-                  onMouseMove={(e) => handleCanvasMouseMove(e, 'secondary')}
+                  onMouseDown={e => handleCanvasMouseDown(e, 'secondary')}
+                  onMouseMove={e => handleCanvasMouseMove(e, 'secondary')}
                   onMouseUp={() => handleCanvasMouseUp('secondary')}
-                  onWheel={(e) => handleWheel(e, 'secondary')}
+                  onWheel={e => handleWheel(e, 'secondary')}
                   className="w-full h-full block cursor-crosshair"
                 />
               ) : (
@@ -1209,7 +1282,9 @@ export const ObjectCameraTeacherPanel: React.FC<ObjectCameraTeacherPanelProps> =
         <div className="h-20 bg-slate-900/95 border-t border-slate-800 px-4 py-1.5 flex items-center gap-3 overflow-x-auto shrink-0 z-10">
           <div className="text-[11px] text-slate-400 font-semibold uppercase tracking-wider flex flex-col justify-center min-w-14 shrink-0">
             <span>Khay ảnh</span>
-            <span className="text-[10px] text-slate-500 font-normal">({state.photos.length} ảnh)</span>
+            <span className="text-[10px] text-slate-500 font-normal">
+              ({state.photos.length} ảnh)
+            </span>
           </div>
 
           <div className="flex items-center gap-2 h-full">
@@ -1224,9 +1299,10 @@ export const ObjectCameraTeacherPanel: React.FC<ObjectCameraTeacherPanelProps> =
               <span className="text-[10px] font-bold">Thêm ảnh</span>
             </button>
 
-            {state.photos.map((photo) => {
+            {state.photos.map(photo => {
               const isPrimarySelected = photo.id === state.activePhotoId;
-              const isSecondarySelected = state.displayMode !== 'single' && photo.id === state.comparePhotoId;
+              const isSecondarySelected =
+                state.displayMode !== 'single' && photo.id === state.comparePhotoId;
 
               return (
                 <div
@@ -1236,8 +1312,8 @@ export const ObjectCameraTeacherPanel: React.FC<ObjectCameraTeacherPanelProps> =
                     isPrimarySelected
                       ? 'border-blue-500 ring-2 ring-blue-500/50 scale-102'
                       : isSecondarySelected
-                      ? 'border-emerald-500 ring-2 ring-emerald-500/50 scale-102'
-                      : 'border-slate-700 hover:border-slate-500 opacity-80 hover:opacity-100'
+                        ? 'border-emerald-500 ring-2 ring-emerald-500/50 scale-102'
+                        : 'border-slate-700 hover:border-slate-500 opacity-80 hover:opacity-100'
                   }`}
                 >
                   <img src={photo.url} alt={photo.name} className="w-full h-full object-cover" />
@@ -1256,7 +1332,7 @@ export const ObjectCameraTeacherPanel: React.FC<ObjectCameraTeacherPanelProps> =
 
                   {/* Nút Xóa ảnh [X] */}
                   <button
-                    onClick={(e) => {
+                    onClick={e => {
                       e.stopPropagation();
                       handleDeletePhoto(photo);
                     }}
@@ -1268,12 +1344,18 @@ export const ObjectCameraTeacherPanel: React.FC<ObjectCameraTeacherPanelProps> =
 
                   {/* Nút Ghim ảnh [📌] */}
                   <button
-                    onClick={(e) => {
+                    onClick={e => {
                       e.stopPropagation();
-                      onSendIntent({ type: 'PIN_PHOTO', photoId: photo.id, isPinned: !photo.isPinned });
+                      onSendIntent({
+                        type: 'PIN_PHOTO',
+                        photoId: photo.id,
+                        isPinned: !photo.isPinned,
+                      });
                     }}
                     className={`absolute bottom-1 right-1 w-4 h-4 rounded-full flex items-center justify-center text-[10px] transition shadow ${
-                      photo.isPinned ? 'bg-amber-500 text-slate-900' : 'bg-slate-800/80 text-slate-300 opacity-0 group-hover:opacity-100'
+                      photo.isPinned
+                        ? 'bg-amber-500 text-slate-900'
+                        : 'bg-slate-800/80 text-slate-300 opacity-0 group-hover:opacity-100'
                     }`}
                     title={photo.isPinned ? 'Bỏ ghim ảnh' : 'Ghim lưu trữ tư liệu'}
                   >
@@ -1303,11 +1385,12 @@ export const ObjectCameraTeacherPanel: React.FC<ObjectCameraTeacherPanelProps> =
                 ? activePhoto?.studentId || selectedStudentId
                 : comparePhoto?.studentId || selectedStudentId
             }
-            onChange={(e) => {
+            onChange={e => {
               const studentIdVal = e.target.value;
               setSelectedStudentId(studentIdVal);
-              const sName = participants.find((p) => p.id === studentIdVal)?.displayName;
-              const targetPhoto = activeTarget === 'primary' ? activePhoto : (comparePhoto || activePhoto);
+              const sName = participants.find(p => p.id === studentIdVal)?.displayName;
+              const targetPhoto =
+                activeTarget === 'primary' ? activePhoto : comparePhoto || activePhoto;
               if (targetPhoto) {
                 onSendIntent({
                   type: 'ADD_PHOTO',
@@ -1322,7 +1405,7 @@ export const ObjectCameraTeacherPanel: React.FC<ObjectCameraTeacherPanelProps> =
             className="bg-slate-800 text-white px-2.5 py-1 rounded border border-slate-700 text-xs cursor-pointer focus:outline-none"
           >
             <option value="">-- Chọn học sinh sở hữu bài --</option>
-            {participants.map((p) => (
+            {participants.map(p => (
               <option key={p.id} value={p.id}>
                 {p.displayName} {p.isOnline ? '🟢' : ''}
               </option>
@@ -1381,10 +1464,14 @@ export const ObjectCameraTeacherPanel: React.FC<ObjectCameraTeacherPanelProps> =
                 <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
                 <span className="text-slate-400">Địa chỉ LAN:</span>
                 <strong className="text-emerald-400 font-mono text-[13px]">
-                  {connectInfo?.lanIp ? `${connectInfo.lanIp}:${connectInfo.port}` : 'Đang lấy IP mạng LAN...'}
+                  {connectInfo?.lanIp
+                    ? `${connectInfo.lanIp}:${connectInfo.port}`
+                    : 'Đang lấy IP mạng LAN...'}
                 </strong>
               </div>
-              <span className="text-[10px] text-slate-400 px-1.5 py-0.5 rounded bg-slate-700/80">Offline LAN</span>
+              <span className="text-[10px] text-slate-400 px-1.5 py-0.5 rounded bg-slate-700/80">
+                Offline LAN
+              </span>
             </div>
 
             {/* Khung hiển thị mã QR (Offline base64 PNG) */}
@@ -1435,7 +1522,8 @@ export const ObjectCameraTeacherPanel: React.FC<ObjectCameraTeacherPanelProps> =
                 </button>
               </div>
               <p className="text-[11px] text-slate-400 mt-1.5 leading-relaxed">
-                💡 <strong className="text-slate-300">Lưu ý:</strong> Điện thoại và máy tính cần kết nối chung một mạng Wi-Fi của lớp học.
+                💡 <strong className="text-slate-300">Lưu ý:</strong> Điện thoại và máy tính cần kết
+                nối chung một mạng Wi-Fi của lớp học.
               </p>
             </div>
 

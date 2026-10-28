@@ -182,7 +182,7 @@ export async function renderHtmlToCanvas(
       if (src) {
         try {
           const img = new Image();
-          await new Promise<void>((resolve) => {
+          await new Promise<void>(resolve => {
             img.onload = () => resolve();
             img.onerror = () => resolve();
             img.src = src;
@@ -269,7 +269,7 @@ export async function renderHtmlToCanvas(
         if (src) {
           try {
             const img = new Image();
-            await new Promise<void>((resolve) => {
+            await new Promise<void>(resolve => {
               img.onload = () => resolve();
               img.onerror = () => resolve();
               img.src = src;

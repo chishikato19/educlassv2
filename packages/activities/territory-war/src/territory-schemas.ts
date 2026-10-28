@@ -1,12 +1,12 @@
 import { z } from 'zod';
 
 export const TerrainTypeSchema = z.enum([
-  'plain',        // Đất thường (1 HP, 1 điểm, gia cố tối đa 1 lần)
-  'watchtower',   // Tháp canh (2 HP, 5 điểm, gia cố tối đa 2 lần)
+  'plain', // Đất thường (1 HP, 1 điểm, gia cố tối đa 1 lần)
+  'watchtower', // Tháp canh (2 HP, 5 điểm, gia cố tối đa 2 lần)
   'small_castle', // Lâu đài nhỏ (3 HP, 10 điểm, gia cố tối đa 3 lần)
-  'big_castle',   // Lâu đài lớn (5 HP, 20 điểm, gia cố tối đa 4 lần)
-  'mountain',     // Núi (Vật cản không thể đi qua - mở rộng)
-  'river',        // Sông (Mở rộng địa hình)
+  'big_castle', // Lâu đài lớn (5 HP, 20 điểm, gia cố tối đa 4 lần)
+  'mountain', // Núi (Vật cản không thể đi qua - mở rộng)
+  'river', // Sông (Mở rộng địa hình)
 ]);
 export type TerrainType = z.infer<typeof TerrainTypeSchema>;
 

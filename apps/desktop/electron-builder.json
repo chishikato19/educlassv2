@@ -22,10 +22,7 @@
     "!**/*.map",
     "!**/node_modules/@educlass/server/public/**"
   ],
-  "asarUnpack": [
-    "**/*.node",
-    "**/better-sqlite3/**"
-  ],
+  "asarUnpack": ["**/*.node", "**/better-sqlite3/**"],
   "extraResources": [
     {
       "from": "../../packages/server/public",
@@ -34,10 +31,7 @@
   ],
   "forceCodeSigning": false,
   "win": {
-    "target": [
-      "nsis",
-      "portable"
-    ],
+    "target": ["nsis", "portable"],
     "signAndEditExecutable": false
   },
   "portable": {

@@ -17,7 +17,10 @@ type FilterTab = 'all' | 'spotlight' | 'graded' | 'popular' | 'ranked';
 
 const COLOR_STYLES: Record<BoardColor, { card: string; header: string }> = {
   yellow: { card: 'bg-amber-50/90 border-amber-200', header: 'bg-amber-100/70 text-amber-900' },
-  mint: { card: 'bg-emerald-50/90 border-emerald-200', header: 'bg-emerald-100/70 text-emerald-900' },
+  mint: {
+    card: 'bg-emerald-50/90 border-emerald-200',
+    header: 'bg-emerald-100/70 text-emerald-900',
+  },
   blue: { card: 'bg-blue-50/90 border-blue-200', header: 'bg-blue-100/70 text-blue-900' },
   pink: { card: 'bg-pink-50/90 border-pink-200', header: 'bg-pink-100/70 text-pink-900' },
   purple: { card: 'bg-purple-50/90 border-purple-200', header: 'bg-purple-100/70 text-purple-900' },
@@ -50,12 +53,12 @@ export const InteractiveBoardTeacherPanel: React.FC<InteractiveBoardTeacherPanel
 
   const postsObj = state.posts || {};
   const postsList = Object.values(postsObj);
-  const pendingPosts = postsList.filter((p) => p.status === 'pending');
-  const approvedPosts = postsList.filter((p) => p.status === 'approved');
-  const activeSpotlightPost = approvedPosts.find((p) => p.isSpotlight);
+  const pendingPosts = postsList.filter(p => p.status === 'pending');
+  const approvedPosts = postsList.filter(p => p.status === 'approved');
+  const activeSpotlightPost = approvedPosts.find(p => p.isSpotlight);
 
   // Lọc bài đã duyệt theo bộ lọc
-  const filteredApprovedPosts = approvedPosts.filter((post) => {
+  const filteredApprovedPosts = approvedPosts.filter(post => {
     if (filter === 'spotlight') return post.isSpotlight;
     if (filter === 'graded') return post.teacherGrade !== null;
     if (filter === 'popular') return (post.likes || []).length + (post.hearts || []).length > 0;
@@ -81,23 +84,21 @@ export const InteractiveBoardTeacherPanel: React.FC<InteractiveBoardTeacherPanel
         <div>
           <div className="flex items-center gap-2">
             <span className="text-2xl">📌</span>
-            <h1 className="text-lg md:text-xl font-black text-slate-800">
-              {state.config.title}
-            </h1>
+            <h1 className="text-lg md:text-xl font-black text-slate-800">{state.config.title}</h1>
             <span
               className={`text-xs px-2.5 py-1 rounded-full font-bold ${
                 state.status === 'accepting'
                   ? 'bg-emerald-100 text-emerald-800'
                   : state.status === 'discussion_only'
-                  ? 'bg-blue-100 text-blue-800'
-                  : 'bg-slate-200 text-slate-700'
+                    ? 'bg-blue-100 text-blue-800'
+                    : 'bg-slate-200 text-slate-700'
               }`}
             >
               {state.status === 'accepting'
                 ? '📥 Đang nhận bài'
                 : state.status === 'discussion_only'
-                ? '💬 Chỉ thảo luận'
-                : '⏹ Đã kết thúc'}
+                  ? '💬 Chỉ thảo luận'
+                  : '⏹ Đã kết thúc'}
             </span>
           </div>
           <p className="text-xs text-slate-500 line-clamp-1 mt-0.5">{state.config.prompt}</p>
@@ -154,9 +155,7 @@ export const InteractiveBoardTeacherPanel: React.FC<InteractiveBoardTeacherPanel
           >
             <span>📺</span>
             <span>Màn Chiếu Cả Lớp</span>
-            {activeSpotlightPost && (
-              <span className="w-2 h-2 rounded-full bg-white animate-ping" />
-            )}
+            {activeSpotlightPost && <span className="w-2 h-2 rounded-full bg-white animate-ping" />}
           </button>
 
           {/* Nút Kết thúc hoạt động */}
@@ -178,8 +177,13 @@ export const InteractiveBoardTeacherPanel: React.FC<InteractiveBoardTeacherPanel
           <div className="flex items-center gap-2.5 text-xs md:text-sm font-black">
             <span className="text-2xl animate-bounce">🌟</span>
             <div>
-              <span>Đang chiếu bài của <strong>{activeSpotlightPost.authorName}</strong> lên Tiêu điểm Màn Chiếu!</span>
-              <p className="text-[11px] text-amber-100 font-normal">Bài làm đang được phóng to nổi bật cho toàn bộ học sinh quan sát</p>
+              <span>
+                Đang chiếu bài của <strong>{activeSpotlightPost.authorName}</strong> lên Tiêu điểm
+                Màn Chiếu!
+              </span>
+              <p className="text-[11px] text-amber-100 font-normal">
+                Bài làm đang được phóng to nổi bật cho toàn bộ học sinh quan sát
+              </p>
             </div>
           </div>
           <div className="flex items-center gap-2">
@@ -193,7 +197,9 @@ export const InteractiveBoardTeacherPanel: React.FC<InteractiveBoardTeacherPanel
             </button>
             <button
               type="button"
-              onClick={() => onSendIntent({ type: 'toggle_spotlight', postId: activeSpotlightPost.id })}
+              onClick={() =>
+                onSendIntent({ type: 'toggle_spotlight', postId: activeSpotlightPost.id })
+              }
               className="px-3 py-2 bg-amber-700/80 hover:bg-amber-800 text-white rounded-xl font-bold text-xs transition cursor-pointer"
               title="Dừng chiếu bài này"
             >
@@ -235,7 +241,7 @@ export const InteractiveBoardTeacherPanel: React.FC<InteractiveBoardTeacherPanel
                 </span>
               </div>
             ) : (
-              pendingPosts.map((post) => (
+              pendingPosts.map(post => (
                 <div
                   key={post.id}
                   className="p-3.5 bg-amber-50/50 rounded-2xl border border-amber-200/80 shadow-xs space-y-2.5"
@@ -245,7 +251,9 @@ export const InteractiveBoardTeacherPanel: React.FC<InteractiveBoardTeacherPanel
                       <div className="w-7 h-7 rounded-full bg-amber-200 text-amber-900 font-black text-xs flex items-center justify-center">
                         {post.authorName.charAt(0).toUpperCase()}
                       </div>
-                      <span className="font-extrabold text-slate-800 text-sm">{post.authorName}</span>
+                      <span className="font-extrabold text-slate-800 text-sm">
+                        {post.authorName}
+                      </span>
                     </div>
                     <span className="text-[10px] text-slate-400">
                       {new Date(post.createdAt).toLocaleTimeString([], {
@@ -342,7 +350,7 @@ export const InteractiveBoardTeacherPanel: React.FC<InteractiveBoardTeacherPanel
                 { id: 'graded', label: '✍️ Đã chấm' },
                 { id: 'popular', label: '❤️ Nhiều Like' },
                 { id: 'ranked', label: '🏆 Trao giải' },
-              ].map((tab) => (
+              ].map(tab => (
                 <button
                   key={tab.id}
                   type="button"
@@ -364,14 +372,16 @@ export const InteractiveBoardTeacherPanel: React.FC<InteractiveBoardTeacherPanel
             {filteredApprovedPosts.length === 0 ? (
               <div className="h-64 flex flex-col items-center justify-center text-slate-400 text-center">
                 <span className="text-4xl mb-2">📌</span>
-                <span className="text-sm font-semibold text-slate-600">Chưa có bài nào trong mục này</span>
+                <span className="text-sm font-semibold text-slate-600">
+                  Chưa có bài nào trong mục này
+                </span>
                 <span className="text-xs text-slate-400 mt-0.5">
                   Duyệt bài từ hàng đợi bên trái để hiển thị lên bảng lớp
                 </span>
               </div>
             ) : (
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                {filteredApprovedPosts.map((post) => {
+                {filteredApprovedPosts.map(post => {
                   const style = COLOR_STYLES[post.color] || COLOR_STYLES.yellow;
                   const isMuted = state.mutedParticipants.includes(post.participantId);
 
@@ -390,9 +400,13 @@ export const InteractiveBoardTeacherPanel: React.FC<InteractiveBoardTeacherPanel
                               {post.authorName.charAt(0).toUpperCase()}
                             </div>
                             <div>
-                              <span className="font-extrabold text-slate-800 text-sm">{post.authorName}</span>
+                              <span className="font-extrabold text-slate-800 text-sm">
+                                {post.authorName}
+                              </span>
                               {post.studentCode && (
-                                <span className="text-[10px] text-slate-400 ml-1">({post.studentCode})</span>
+                                <span className="text-[10px] text-slate-400 ml-1">
+                                  ({post.studentCode})
+                                </span>
                               )}
                             </div>
                           </div>
@@ -403,7 +417,9 @@ export const InteractiveBoardTeacherPanel: React.FC<InteractiveBoardTeacherPanel
                               type="button"
                               onClick={() => onSendIntent({ type: 'toggle_pin', postId: post.id })}
                               className={`p-1.5 rounded-lg text-xs transition ${
-                                post.isPinned ? 'bg-amber-400 text-white' : 'text-slate-400 hover:bg-black/5'
+                                post.isPinned
+                                  ? 'bg-amber-400 text-white'
+                                  : 'text-slate-400 hover:bg-black/5'
                               }`}
                               title={post.isPinned ? 'Bỏ ghim' : 'Ghim bài'}
                             >
@@ -423,10 +439,10 @@ export const InteractiveBoardTeacherPanel: React.FC<InteractiveBoardTeacherPanel
                                 {post.rankAward === 'top1'
                                   ? '🏆 Quán quân'
                                   : post.rankAward === 'top2'
-                                  ? '🥈 Á quân'
-                                  : post.rankAward === 'top3'
-                                  ? '🥉 Quý quân'
-                                  : '💡 Sáng tạo'}
+                                    ? '🥈 Á quân'
+                                    : post.rankAward === 'top3'
+                                      ? '🥉 Quý quân'
+                                      : '💡 Sáng tạo'}
                               </span>
                             )}
                           </div>
@@ -441,7 +457,9 @@ export const InteractiveBoardTeacherPanel: React.FC<InteractiveBoardTeacherPanel
                                   <span>📝</span> Phiếu bài tập:
                                 </span>
                                 <span className="px-2 py-0.5 rounded-full bg-indigo-100 text-indigo-800">
-                                  Đúng {post.worksheetResult.correctCount}/{post.worksheetResult.totalCount} câu ({post.worksheetResult.autoScore}/{post.worksheetResult.maxScore}đ)
+                                  Đúng {post.worksheetResult.correctCount}/
+                                  {post.worksheetResult.totalCount} câu (
+                                  {post.worksheetResult.autoScore}/{post.worksheetResult.maxScore}đ)
                                 </span>
                               </div>
                             </div>
@@ -496,7 +514,10 @@ export const InteractiveBoardTeacherPanel: React.FC<InteractiveBoardTeacherPanel
                               >
                                 <span>📊</span>
                                 <span>
-                                  TB: {post.peerAverageScore !== null ? `${post.peerAverageScore}★` : 'Chưa có'}
+                                  TB:{' '}
+                                  {post.peerAverageScore !== null
+                                    ? `${post.peerAverageScore}★`
+                                    : 'Chưa có'}
                                 </span>
                                 <span className="text-[10px] text-blue-500 font-normal">
                                   ({Object.keys(post.peerGrades || {}).length})
@@ -512,7 +533,9 @@ export const InteractiveBoardTeacherPanel: React.FC<InteractiveBoardTeacherPanel
                                   : 'bg-slate-100 text-slate-500'
                               }`}
                             >
-                              {post.teacherGrade !== null ? `GV: ${post.teacherGrade} đ` : 'Chưa chấm GV'}
+                              {post.teacherGrade !== null
+                                ? `GV: ${post.teacherGrade} đ`
+                                : 'Chưa chấm GV'}
                             </span>
                           </div>
 
@@ -528,7 +551,9 @@ export const InteractiveBoardTeacherPanel: React.FC<InteractiveBoardTeacherPanel
                             {/* Spotlight */}
                             <button
                               type="button"
-                              onClick={() => onSendIntent({ type: 'toggle_spotlight', postId: post.id })}
+                              onClick={() =>
+                                onSendIntent({ type: 'toggle_spotlight', postId: post.id })
+                              }
                               className={`min-h-[36px] px-2.5 py-1 rounded-xl font-bold text-xs transition flex items-center gap-1 ${
                                 post.isSpotlight
                                   ? 'bg-amber-500 text-white shadow-xs'
@@ -624,7 +649,7 @@ export const InteractiveBoardTeacherPanel: React.FC<InteractiveBoardTeacherPanel
                                   Chưa có bình luận nào
                                 </p>
                               ) : (
-                                (post.comments || []).map((cm) => (
+                                (post.comments || []).map(cm => (
                                   <div
                                     key={cm.id}
                                     className={`p-2 rounded-xl text-xs flex items-start justify-between gap-2 ${
@@ -669,8 +694,8 @@ export const InteractiveBoardTeacherPanel: React.FC<InteractiveBoardTeacherPanel
                               <input
                                 type="text"
                                 value={teacherCommentInput}
-                                onChange={(e) => setTeacherCommentInput(e.target.value)}
-                                onKeyDown={(e) => {
+                                onChange={e => setTeacherCommentInput(e.target.value)}
+                                onKeyDown={e => {
                                   if (e.key === 'Enter') handleSendTeacherComment(post.id);
                                 }}
                                 placeholder="Viết nhận xét với tư cách Giáo viên..."
@@ -717,7 +742,7 @@ export const InteractiveBoardTeacherPanel: React.FC<InteractiveBoardTeacherPanel
       {awardingPost && (
         <TeacherAwardModal
           post={awardingPost}
-          onAward={(rank) =>
+          onAward={rank =>
             onSendIntent({
               type: 'award_rank',
               postId: awardingPost.id,
@@ -731,7 +756,7 @@ export const InteractiveBoardTeacherPanel: React.FC<InteractiveBoardTeacherPanel
       {rejectingPost && (
         <TeacherRejectModal
           post={rejectingPost}
-          onReject={(reason) =>
+          onReject={reason =>
             onSendIntent({
               type: 'reject_post',
               postId: rejectingPost.id,

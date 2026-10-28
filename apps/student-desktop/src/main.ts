@@ -36,12 +36,12 @@ function getTrayIcon(): NativeImage {
       const dy = y - 7.5;
       const dist = Math.sqrt(dx * dx + dy * dy);
       if (dist <= 7) {
-        buffer[idx] = 79;       // R (#4F8CFF)
-        buffer[idx + 1] = 140;  // G
-        buffer[idx + 2] = 255;  // B
-        buffer[idx + 3] = 255;  // A
+        buffer[idx] = 79; // R (#4F8CFF)
+        buffer[idx + 1] = 140; // G
+        buffer[idx + 2] = 255; // B
+        buffer[idx + 3] = 255; // A
       } else {
-        buffer[idx + 3] = 0;    // Transparent
+        buffer[idx + 3] = 0; // Transparent
       }
     }
   }
@@ -72,9 +72,7 @@ function updateTrayMenu(): void {
     },
     { type: 'separator' },
     {
-      label: isInActiveSession
-        ? 'Thoát EduClass (Đang trong giờ học)'
-        : 'Thoát EduClass',
+      label: isInActiveSession ? 'Thoát EduClass (Đang trong giờ học)' : 'Thoát EduClass',
       enabled: !isInActiveSession,
       click: () => {
         isQuitting = true;
@@ -169,7 +167,8 @@ function disableKioskMode(): void {
  * Tạo cửa sổ chính độc lập cho học sinh
  */
 function createMainWindow(): void {
-  const isBackgroundMode = process.argv.includes('--background') || process.argv.includes('--hidden');
+  const isBackgroundMode =
+    process.argv.includes('--background') || process.argv.includes('--hidden');
 
   mainWindow = new BrowserWindow({
     width: 1080,
@@ -209,7 +208,9 @@ function createMainWindow(): void {
         mainWindow.setClosable(true);
       }
       updateTrayMenu();
-      console.info('[StudentDesktop] Đã kích hoạt phím cứu hộ giám thị / giáo viên (Emergency Unlock)');
+      console.info(
+        '[StudentDesktop] Đã kích hoạt phím cứu hộ giám thị / giáo viên (Emergency Unlock)'
+      );
       return;
     }
 
@@ -261,7 +262,7 @@ function createMainWindow(): void {
   });
 
   // Khi học sinh ấn nút X: Chặn tắt khi đang trong phiên học
-  mainWindow.on('close', (event) => {
+  mainWindow.on('close', event => {
     if (!isQuitting) {
       event.preventDefault();
       if ((currentSession !== null || isKioskMode) && !isTeacherEmergencyUnlock) {
@@ -300,11 +301,11 @@ app.whenReady().then(async () => {
   // 3. Khởi động UDP Beacon Listener (Wake-on-Session)
   beaconListener = new BeaconListener();
 
-  beaconListener.on('session-opened', (payload) => {
+  beaconListener.on('session-opened', payload => {
     handleSessionBeacon(payload);
   });
 
-  beaconListener.on('session-heartbeat', (payload) => {
+  beaconListener.on('session-heartbeat', payload => {
     // 1. Nếu học sinh chưa vào lớp (hoặc phiên khác), tự động kết nối
     if (!currentSession || currentSession.sessionId !== payload.sessionId) {
       handleSessionBeacon(payload);
@@ -325,7 +326,7 @@ app.whenReady().then(async () => {
     }
   });
 
-  beaconListener.on('session-closed', (payload) => {
+  beaconListener.on('session-closed', payload => {
     if (currentSession && currentSession.sessionId === payload.sessionId) {
       currentSession = null;
       lastSeenActivityRunId = null;

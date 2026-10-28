@@ -15,7 +15,9 @@ const ProjectGradingHostComponent: React.FC<ActivityHostProps> = ({
     <ProjectGradingTeacherPanel
       runId={runId}
       state={state as Parameters<typeof ProjectGradingTeacherPanel>[0]['state']}
-      onSendIntent={onSendIntent as Parameters<typeof ProjectGradingTeacherPanel>[0]['onSendIntent']}
+      onSendIntent={
+        onSendIntent as Parameters<typeof ProjectGradingTeacherPanel>[0]['onSendIntent']
+      }
       onEndActivity={onEndActivity}
     />
   );

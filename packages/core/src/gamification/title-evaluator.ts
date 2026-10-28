@@ -51,7 +51,11 @@ export const DEFAULT_TITLES: ReadonlyArray<Omit<TitleDto, 'id'>> = [
     iconKey: 'grad_cap',
     rule: {
       conditions: [
-        { type: 'exam_high_scores', threshold: 1, description: 'Đạt điểm giỏi (≥ 8.0) trong kỳ thi ít nhất 1 lần' },
+        {
+          type: 'exam_high_scores',
+          threshold: 1,
+          description: 'Đạt điểm giỏi (≥ 8.0) trong kỳ thi ít nhất 1 lần',
+        },
       ],
       description: 'Khẳng định tài năng trong các kỳ thi kiểm tra.',
     },
@@ -62,7 +66,11 @@ export const DEFAULT_TITLES: ReadonlyArray<Omit<TitleDto, 'id'>> = [
     iconKey: 'hundred',
     rule: {
       conditions: [
-        { type: 'exam_perfect', threshold: 1, description: 'Đạt điểm tuyệt đối (10/10) trong kỳ thi' },
+        {
+          type: 'exam_perfect',
+          threshold: 1,
+          description: 'Đạt điểm tuyệt đối (10/10) trong kỳ thi',
+        },
       ],
       description: 'Chính xác tuyệt đối không tì vết.',
     },
@@ -73,7 +81,11 @@ export const DEFAULT_TITLES: ReadonlyArray<Omit<TitleDto, 'id'>> = [
     iconKey: 'lightning',
     rule: {
       conditions: [
-        { type: 'quiz_streak', threshold: 1, description: 'Đạt chuỗi trả lời đúng tốc độ trong Quiz Live' },
+        {
+          type: 'quiz_streak',
+          threshold: 1,
+          description: 'Đạt chuỗi trả lời đúng tốc độ trong Quiz Live',
+        },
       ],
       description: 'Phản xạ nhanh như chớp và luôn chuẩn xác.',
     },
@@ -120,10 +132,7 @@ export function checkTitleCondition(
 /**
  * Kiểm tra xem học sinh có thỏa mãn toàn bộ điều kiện của luật danh hiệu hay không
  */
-export function isTitleEligible(
-  stats: StudentGamificationStats,
-  rule: TitleRule
-): boolean {
+export function isTitleEligible(stats: StudentGamificationStats, rule: TitleRule): boolean {
   if (!rule.conditions || rule.conditions.length === 0) {
     return false;
   }

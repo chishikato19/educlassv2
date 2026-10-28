@@ -211,4 +211,3 @@ export class ParticipantRepository {
     return null;
   }
 }
-

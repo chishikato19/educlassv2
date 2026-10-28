@@ -30,9 +30,9 @@ export function createOwnerGuard<T extends OwnableResource>(
 
     const resource = await getResource(request);
     if (!resource) {
-      reply
-        .status(404)
-        .send({ error: formatProtocolError('INTERNAL_ERROR', 'Không tìm thấy tài nguyên yêu cầu.') });
+      reply.status(404).send({
+        error: formatProtocolError('INTERNAL_ERROR', 'Không tìm thấy tài nguyên yêu cầu.'),
+      });
       return;
     }
 

@@ -68,7 +68,7 @@ export class StudentRepository {
     }
 
     const now = Date.now();
-    const payloads: StudentInsert[] = items.map((item) => ({
+    const payloads: StudentInsert[] = items.map(item => ({
       ...item,
       id: item.id ?? generateId(),
       createdAt: item.createdAt ?? now,
@@ -78,7 +78,7 @@ export class StudentRepository {
 
     await this.db.insert(students).values(payloads);
 
-    const insertedIds = payloads.map((p) => p.id);
+    const insertedIds = payloads.map(p => p.id);
     const result: StudentSelect[] = [];
     for (const id of insertedIds) {
       const s = await this.findById(id);

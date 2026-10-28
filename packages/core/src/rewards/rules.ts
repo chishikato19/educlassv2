@@ -216,7 +216,7 @@ export function findEffectiveRule(
   trigger: string
 ): RewardRuleItem | undefined {
   const key = getRuleKey(activityId, trigger);
-  return rules.find((r) => getRuleKey(r.activityId, r.trigger) === key);
+  return rules.find(r => getRuleKey(r.activityId, r.trigger) === key);
 }
 
 /**
@@ -265,13 +265,7 @@ export interface CalculateCappedExpResult {
  * - Trần session_cap: tổng EXP trong toàn bộ phiên không vượt quá mức cho phép
  */
 export function calculateCappedExp(params: CalculateCappedExpParams): CalculateCappedExpResult {
-  const {
-    expToGrant,
-    currentSessionExp,
-    sessionCap,
-    currentActivityExp,
-    activityCap,
-  } = params;
+  const { expToGrant, currentSessionExp, sessionCap, currentActivityExp, activityCap } = params;
 
   if (expToGrant <= 0) {
     return {

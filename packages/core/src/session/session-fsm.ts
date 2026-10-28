@@ -1,8 +1,4 @@
-import type {
-  IdentityMode,
-  SessionFsmEventType,
-  SessionStatus,
-} from '@educlass/protocol';
+import type { IdentityMode, SessionFsmEventType, SessionStatus } from '@educlass/protocol';
 
 /**
  * Trạng thái đầy đủ của Phiên học trong máy trạng thái hữu hạn (FSM)
@@ -97,10 +93,7 @@ export function getAllowedEvents(status: SessionStatus): readonly SessionFsmEven
 /**
  * Kiểm tra xem một sự kiện có được phép chuyển từ trạng thái hiện tại hay không
  */
-export function canTransition(
-  status: SessionStatus,
-  eventType: SessionFsmEventType
-): boolean {
+export function canTransition(status: SessionStatus, eventType: SessionFsmEventType): boolean {
   return SESSION_TRANSITION_TABLE[status][eventType] !== undefined;
 }
 

@@ -4,10 +4,7 @@ import type { GradeResult } from './types.js';
 /**
  * Chấm điểm câu hỏi TF (Đúng / Sai đơn lẻ)
  */
-export function gradeTf(
-  question: TfQuestion,
-  answer?: TfAnswer | null
-): GradeResult {
+export function gradeTf(question: TfQuestion, answer?: TfAnswer | null): GradeResult {
   const selected = answer?.selected ?? null;
   const isCorrect = selected !== null && selected === question.correct;
   const ratio = isCorrect ? 1.0 : 0.0;

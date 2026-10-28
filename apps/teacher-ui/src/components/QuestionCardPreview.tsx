@@ -91,7 +91,9 @@ export const QuestionCardPreview: React.FC<QuestionCardPreviewProps> = ({
           <span className="font-extrabold text-xs text-blue-700 bg-blue-50 border border-blue-200 px-2.5 py-1 rounded-lg">
             Câu {index + 1}
           </span>
-          <span className={`text-[11px] font-semibold px-2 py-0.5 rounded-md border ${typeInfo.badgeClass}`}>
+          <span
+            className={`text-[11px] font-semibold px-2 py-0.5 rounded-md border ${typeInfo.badgeClass}`}
+          >
             {typeInfo.label}
           </span>
           <span className="text-xs font-semibold text-slate-500 bg-slate-100 px-2 py-0.5 rounded-md">
@@ -320,20 +322,30 @@ export const QuestionCardPreview: React.FC<QuestionCardPreviewProps> = ({
           )}
 
           {/* 5. Nối cặp (Matching) */}
-          {question.type === 'matching' && Array.isArray((question as unknown as { pairs?: unknown[] }).pairs) && (
-            <div className="p-2.5 rounded-xl bg-cyan-50/60 border border-cyan-200 text-xs space-y-1.5">
-              <span className="font-bold text-cyan-900">🔗 Các cặp nối đúng:</span>
-              <div className="space-y-1">
-                {((question as unknown as { pairs: Array<{ left: unknown; right: unknown }> }).pairs).map((pair, pIdx) => (
-                  <div key={pIdx} className="flex items-center gap-2 bg-white px-2 py-1 rounded border border-cyan-100">
-                    <span className="font-medium text-slate-800">{getRichTextString(pair.left)}</span>
-                    <span className="text-cyan-600 font-bold">⟷</span>
-                    <span className="font-medium text-slate-800">{getRichTextString(pair.right)}</span>
-                  </div>
-                ))}
+          {question.type === 'matching' &&
+            Array.isArray((question as unknown as { pairs?: unknown[] }).pairs) && (
+              <div className="p-2.5 rounded-xl bg-cyan-50/60 border border-cyan-200 text-xs space-y-1.5">
+                <span className="font-bold text-cyan-900">🔗 Các cặp nối đúng:</span>
+                <div className="space-y-1">
+                  {(
+                    question as unknown as { pairs: Array<{ left: unknown; right: unknown }> }
+                  ).pairs.map((pair, pIdx) => (
+                    <div
+                      key={pIdx}
+                      className="flex items-center gap-2 bg-white px-2 py-1 rounded border border-cyan-100"
+                    >
+                      <span className="font-medium text-slate-800">
+                        {getRichTextString(pair.left)}
+                      </span>
+                      <span className="text-cyan-600 font-bold">⟷</span>
+                      <span className="font-medium text-slate-800">
+                        {getRichTextString(pair.right)}
+                      </span>
+                    </div>
+                  ))}
+                </div>
               </div>
-            </div>
-          )}
+            )}
 
           {/* Lời giải thích / Hướng dẫn giải nếu có */}
           {explanationText && (

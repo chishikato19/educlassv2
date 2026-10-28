@@ -1,8 +1,5 @@
 import { and, eq } from 'drizzle-orm';
-import {
-  DEFAULT_TITLES,
-  evaluateStudentTitleRules,
-} from '@educlass/core';
+import { DEFAULT_TITLES, evaluateStudentTitleRules } from '@educlass/core';
 import type { StudentGamificationStats, TitleDto } from '@educlass/protocol';
 import type { EduClassDatabase } from '../connection.js';
 import { generateId } from '../id.js';
@@ -38,7 +35,7 @@ export class TitleRepository {
     }
 
     if (toInsert.length > 0) {
-      this.db.transaction((tx) => {
+      this.db.transaction(tx => {
         for (const item of toInsert) {
           tx.insert(titles).values(item).run();
         }
@@ -66,7 +63,9 @@ export class TitleRepository {
   /**
    * Lấy danh sách danh hiệu mà học sinh đã được cấp
    */
-  async getStudentTitles(studentId: string): Promise<Array<TitleSelect & { awardedAt: number; sessionId?: string | null }>> {
+  async getStudentTitles(
+    studentId: string
+  ): Promise<Array<TitleSelect & { awardedAt: number; sessionId?: string | null }>> {
     const records = await this.db
       .select({
         id: titles.id,

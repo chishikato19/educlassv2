@@ -4,10 +4,7 @@ import {
   DuelModeSchema,
   DuelQuestionSchema,
 } from '../arcade-duel-schemas.js';
-import {
-  initPlayerState,
-  shuffleQuestionOptions,
-} from '../arcade-duel-logic.js';
+import { initPlayerState, shuffleQuestionOptions } from '../arcade-duel-logic.js';
 
 describe('Activity: Arcade Duel', () => {
   const sampleQuestion = {

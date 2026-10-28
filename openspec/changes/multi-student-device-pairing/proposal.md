@@ -3,15 +3,17 @@
 ## 1. Bối cảnh & Vấn đề (Context & Motivation)
 
 Tại hầu hết các trường phổ thông tại Việt Nam (Tiểu học, THCS, THPT), phòng thực hành tin học thường đối mặt với bài toán cơ sở vật chất:
-* Sĩ số lớp trung bình từ **35 – 45 học sinh**.
-* Số máy tính hoạt động ổn định trong phòng máy thường dao động từ **20 – 25 máy**.
-* Do đó, giáo viên bắt buộc phải tổ chức cho học sinh ngồi học theo mô hình: **2 học sinh 1 máy (Đôi bạn cùng tiến / Pair Work)** hoặc **3 học sinh 1 máy (Nhóm nhỏ / Small Group)**.
+
+- Sĩ số lớp trung bình từ **35 – 45 học sinh**.
+- Số máy tính hoạt động ổn định trong phòng máy thường dao động từ **20 – 25 máy**.
+- Do đó, giáo viên bắt buộc phải tổ chức cho học sinh ngồi học theo mô hình: **2 học sinh 1 máy (Đôi bạn cùng tiến / Pair Work)** hoặc **3 học sinh 1 máy (Nhóm nhỏ / Small Group)**.
 
 ### Hạn chế của hệ thống EduClass v2 hiện tại:
+
 1. **Mô hình "1 máy = 1 học sinh":** Màn hình vào lớp (`PickIdentity`) chỉ cho phép bấm chọn đúng 1 học sinh trong danh sách. Bạn ngồi cạnh không thể chọn tên mình vì trình duyệt đã vào phòng.
 2. **Học sinh bị ghi nhận "vắng mặt":** Bạn thứ 2/thứ 3 ngồi cùng máy không được ghi nhận điểm danh, danh sách lớp trên máy giáo viên hiển thị bạn đó chưa vào lớp (`isTaken = false`).
 3. **Mất quyền lợi EXP & Danh hiệu (Vi phạm D6 & D8):** Khi máy đó trả lời đúng câu hỏi Quizizz, chiến thắng game đối kháng hay được khen thưởng, EXP chỉ cộng cho bạn đầu tiên; bạn thứ 2 không nhận được EXP hay huy hiệu vào hồ sơ cá nhân.
-4. **Tùy chọn `allowTeams` hiện tại chưa đúng kịch bản:** Tùy chọn *"Cho phép chia đội/nhóm"* hiện tại là mô hình **nhóm phân tán** (mỗi học sinh ngồi 1 máy riêng rồi tự gõ cùng tên text nhóm), không giải quyết được bài toán ngồi chung máy vật lý.
+4. **Tùy chọn `allowTeams` hiện tại chưa đúng kịch bản:** Tùy chọn _"Cho phép chia đội/nhóm"_ hiện tại là mô hình **nhóm phân tán** (mỗi học sinh ngồi 1 máy riêng rồi tự gõ cùng tên text nhóm), không giải quyết được bài toán ngồi chung máy vật lý.
 
 ---
 
@@ -37,6 +39,7 @@ Tại hầu hết các trường phổ thông tại Việt Nam (Tiểu học, TH
 ## 3. Phạm vi (Scope)
 
 ### Trong phạm vi (In-Scope):
+
 - **Giao thức & DTO (`packages/protocol`)**:
   - Mở rộng `CreateSessionRequest`: bổ sung cấu hình ghép máy `allowPairing` và `maxStudentsPerDevice`.
   - Mở rộng `StudentJoinRequest`: bổ sung mảng `studentIds: string[]`.
@@ -56,4 +59,5 @@ Tại hầu hết các trường phổ thông tại Việt Nam (Tiểu học, TH
   - Màn hình xác thực PIN: Nhập mã PIN cho bạn có cài đặt mật khẩu.
 
 ### Ngoài phạm vi (Out-of-Scope):
+
 - Kỳ thi trắc nghiệm bảo mật cao cá nhân (Exam Kiosk): Ở chế độ thi nghiêm ngặt, phiên thi sẽ khuyến nghị hoặc bắt buộc chế độ 1 học sinh / 1 máy (hoặc dùng tính năng Thi nhiều ca / Multi-batch Exam đã có).

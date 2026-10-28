@@ -34,8 +34,15 @@ export const VolleyballTeacherPanel: React.FC<TeacherPanelProps> = ({
             </span>
           </div>
           <div className="text-xs text-slate-500 mt-1 flex items-center gap-3">
-            <span>Lượt đấu: <b>{state.currentRound}/5</b></span>
-            <span>Tiến độ bàn: <b>{finishedMatchupsCount}/{totalMatchupsCount} bàn xong</b></span>
+            <span>
+              Lượt đấu: <b>{state.currentRound}/5</b>
+            </span>
+            <span>
+              Tiến độ bàn:{' '}
+              <b>
+                {finishedMatchupsCount}/{totalMatchupsCount} bàn xong
+              </b>
+            </span>
           </div>
         </div>
 
@@ -59,10 +66,10 @@ export const VolleyballTeacherPanel: React.FC<TeacherPanelProps> = ({
               {state.currentRound < 3
                 ? 'Sang Lượt Sau'
                 : state.currentRound === 3
-                ? 'Tổng Kết Vòng Bảng'
-                : state.currentRound === 4
-                ? 'Vào Chung Kết Cúp'
-                : 'Tổng Kết Chung Cuộc'}
+                  ? 'Tổng Kết Vòng Bảng'
+                  : state.currentRound === 4
+                    ? 'Vào Chung Kết Cúp'
+                    : 'Tổng Kết Chung Cuộc'}
             </button>
           ) : (
             <button
@@ -156,18 +163,18 @@ export const VolleyballTeacherPanel: React.FC<TeacherPanelProps> = ({
                 tierKey === 'diamond'
                   ? 'Cúp Kim Cương (Vô địch)'
                   : tierKey === 'gold'
-                  ? 'Cúp Vàng (Top 2)'
-                  : tierKey === 'silver'
-                  ? 'Cúp Bạc (Top 3)'
-                  : 'Cúp Đồng (Khuyến khích)';
+                    ? 'Cúp Vàng (Top 2)'
+                    : tierKey === 'silver'
+                      ? 'Cúp Bạc (Top 3)'
+                      : 'Cúp Đồng (Khuyến khích)';
               const tierColor =
                 tierKey === 'diamond'
                   ? 'border-amber-300 bg-amber-50/50'
                   : tierKey === 'gold'
-                  ? 'border-yellow-200 bg-yellow-50/50'
-                  : tierKey === 'silver'
-                  ? 'border-slate-200 bg-slate-50/50'
-                  : 'border-orange-200 bg-orange-50/50';
+                    ? 'border-yellow-200 bg-yellow-50/50'
+                    : tierKey === 'silver'
+                      ? 'border-slate-200 bg-slate-50/50'
+                      : 'border-orange-200 bg-orange-50/50';
 
               return (
                 <div
@@ -199,8 +206,8 @@ export const VolleyballTeacherPanel: React.FC<TeacherPanelProps> = ({
                                   {m.matchType === 'final'
                                     ? 'Chung Kết'
                                     : m.matchType === 'third_place'
-                                    ? 'Tranh Hạng 3'
-                                    : 'Bán Kết'}
+                                      ? 'Tranh Hạng 3'
+                                      : 'Bán Kết'}
                                 </span>
                               </div>
                               <div className="flex items-center justify-between font-bold text-slate-800">

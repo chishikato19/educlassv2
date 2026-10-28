@@ -153,7 +153,14 @@ describe('Bảng Tương Tác - Logic Thuần Túy', () => {
           },
           peerAverageScore: 9,
           comments: [
-            { id: 'c1', participantId: 'p3', authorName: 'C', isTeacher: false, content: 'Hay quá', createdAt: 1000 },
+            {
+              id: 'c1',
+              participantId: 'p3',
+              authorName: 'C',
+              isTeacher: false,
+              content: 'Hay quá',
+              createdAt: 1000,
+            },
           ],
           teacherGrade: 9.5,
           rankAward: null,

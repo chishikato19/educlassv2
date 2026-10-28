@@ -407,12 +407,14 @@ export function ensureSchemaIntegrity(sqlite: DatabaseType): void {
 
   // 2. Đảm bảo cột academic_performance và elo luôn tồn tại trong bảng students
   try {
-    const studentColumns = sqlite
-      .prepare('PRAGMA table_info("students")')
-      .all() as Array<{ name: string }>;
+    const studentColumns = sqlite.prepare('PRAGMA table_info("students")').all() as Array<{
+      name: string;
+    }>;
     const hasAcademicPerformance = studentColumns.some(col => col.name === 'academic_performance');
     if (!hasAcademicPerformance && studentColumns.length > 0) {
-      sqlite.exec('ALTER TABLE "students" ADD COLUMN "academic_performance" TEXT NOT NULL DEFAULT \'dat\';');
+      sqlite.exec(
+        'ALTER TABLE "students" ADD COLUMN "academic_performance" TEXT NOT NULL DEFAULT \'dat\';'
+      );
     }
     const hasElo = studentColumns.some(col => col.name === 'elo');
     if (!hasElo && studentColumns.length > 0) {
@@ -511,19 +513,21 @@ export function ensureSchemaIntegrity(sqlite: DatabaseType): void {
       CREATE INDEX IF NOT EXISTS "idx_class_groups_class_id" ON "class_groups"("class_id");
     `);
 
-    const studentColumns = sqlite
-      .prepare('PRAGMA table_info("students")')
-      .all() as Array<{ name: string }>;
+    const studentColumns = sqlite.prepare('PRAGMA table_info("students")').all() as Array<{
+      name: string;
+    }>;
     const hasGroupId = studentColumns.some(col => col.name === 'group_id');
     if (!hasGroupId && studentColumns.length > 0) {
-      sqlite.exec('ALTER TABLE "students" ADD COLUMN "group_id" TEXT REFERENCES "class_groups"("id") ON DELETE SET NULL;');
+      sqlite.exec(
+        'ALTER TABLE "students" ADD COLUMN "group_id" TEXT REFERENCES "class_groups"("id") ON DELETE SET NULL;'
+      );
       sqlite.exec('CREATE INDEX IF NOT EXISTS "idx_students_group_id" ON "students"("group_id");');
     }
     // 6. Đảm bảo cột subject và avatar luôn tồn tại trong bảng users
     try {
-      const userColumns = sqlite
-        .prepare('PRAGMA table_info("users")')
-        .all() as Array<{ name: string }>;
+      const userColumns = sqlite.prepare('PRAGMA table_info("users")').all() as Array<{
+        name: string;
+      }>;
       const hasSubject = userColumns.some(col => col.name === 'subject');
       if (!hasSubject && userColumns.length > 0) {
         sqlite.exec('ALTER TABLE "users" ADD COLUMN "subject" TEXT;');

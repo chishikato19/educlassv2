@@ -154,34 +154,38 @@ export const authRoutes: FastifyPluginAsync<AuthRoutesOptions> = async (fastify,
    * POST /api/auth/change-password
    * Đổi mật khẩu hoặc mã PIN cá nhân cho người dùng đang đăng nhập
    */
-  fastify.post('/api/auth/change-password', { preHandler: authenticate }, async (request, reply) => {
-    const parseResult = ChangePasswordRequestSchema.safeParse(request.body);
-    if (!parseResult.success) {
-      reply.status(400).send({
-        error: formatProtocolError(
-          'INVALID_PAYLOAD',
-          parseResult.error.errors[0]?.message ?? 'Dữ liệu đổi mật khẩu không hợp lệ',
-          parseResult.error.format()
-        ),
-      });
-      return;
-    }
+  fastify.post(
+    '/api/auth/change-password',
+    { preHandler: authenticate },
+    async (request, reply) => {
+      const parseResult = ChangePasswordRequestSchema.safeParse(request.body);
+      if (!parseResult.success) {
+        reply.status(400).send({
+          error: formatProtocolError(
+            'INVALID_PAYLOAD',
+            parseResult.error.errors[0]?.message ?? 'Dữ liệu đổi mật khẩu không hợp lệ',
+            parseResult.error.format()
+          ),
+        });
+        return;
+      }
 
-    try {
-      await authService.changePassword(request.user!.id, parseResult.data);
-      return reply.status(200).send({
-        success: true,
-        message: 'Đổi mã PIN / mật khẩu thành công.',
-      });
-    } catch (err: unknown) {
-      if (err instanceof AuthError) {
-        return reply.status(err.statusCode).send({
-          error: formatProtocolError(err.code, err.message),
+      try {
+        await authService.changePassword(request.user!.id, parseResult.data);
+        return reply.status(200).send({
+          success: true,
+          message: 'Đổi mã PIN / mật khẩu thành công.',
+        });
+      } catch (err: unknown) {
+        if (err instanceof AuthError) {
+          return reply.status(err.statusCode).send({
+            error: formatProtocolError(err.code, err.message),
+          });
+        }
+        return reply.status(500).send({
+          error: formatProtocolError('INTERNAL_ERROR'),
         });
       }
-      return reply.status(500).send({
-        error: formatProtocolError('INTERNAL_ERROR'),
-      });
     }
-  });
+  );
 };

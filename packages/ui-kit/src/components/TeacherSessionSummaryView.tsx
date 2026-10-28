@@ -36,9 +36,10 @@ export const TeacherSessionSummaryView: React.FC<TeacherSessionSummaryViewProps>
   className = '',
 }) => {
   // Phòng vệ nếu report bị bọc trong { session, report }
-  const actualReport = (report && typeof report === 'object' && 'report' in (report as Record<string, unknown>))
-    ? ((report as unknown as { report: SessionReportDto }).report)
-    : report;
+  const actualReport =
+    report && typeof report === 'object' && 'report' in (report as Record<string, unknown>)
+      ? (report as unknown as { report: SessionReportDto }).report
+      : report;
 
   const snapshot = actualReport?.snapshot ?? {
     totalStudents: 0,
@@ -48,7 +49,12 @@ export const TeacherSessionSummaryView: React.FC<TeacherSessionSummaryViewProps>
     scoreboard: [],
     difficultQuestions: [],
     identityStats: { rosterSaved: 0, tempPinnedSaved: 0, guestEphemeral: 0, totalExpAwarded: 0 },
-    gamification: { topPodium: [], unlockedTitles: [], studentTitles: {}, identityStats: { rosterSaved: 0, tempPinnedSaved: 0, guestEphemeral: 0, totalExpAwarded: 0 } },
+    gamification: {
+      topPodium: [],
+      unlockedTitles: [],
+      studentTitles: {},
+      identityStats: { rosterSaved: 0, tempPinnedSaved: 0, guestEphemeral: 0, totalExpAwarded: 0 },
+    },
   };
   const sessionId = actualReport?.sessionId ?? '';
   const gamification: SessionGamificationSummary | undefined = snapshot?.gamification;
@@ -56,9 +62,12 @@ export const TeacherSessionSummaryView: React.FC<TeacherSessionSummaryViewProps>
   // Quyết định tab khởi đầu: nếu truyền defaultTab thì dùng;
   // nếu không truyền: nếu có gamification thì ưu tiên 'gamification', nếu không thì 'scoreboard'
   const initialTab =
-    defaultTab ?? (gamification?.topPodium && gamification.topPodium.length > 0 ? 'gamification' : 'scoreboard');
+    defaultTab ??
+    (gamification?.topPodium && gamification.topPodium.length > 0 ? 'gamification' : 'scoreboard');
 
-  const [activeTab, setActiveTab] = useState<'gamification' | 'scoreboard' | 'difficult'>(initialTab);
+  const [activeTab, setActiveTab] = useState<'gamification' | 'scoreboard' | 'difficult'>(
+    initialTab
+  );
   const [isProjectorMode, setIsProjectorMode] = useState<boolean>(false);
   const [exporting, setExporting] = useState<boolean>(false);
   const [exportError, setExportError] = useState<string>('');
@@ -96,9 +105,9 @@ export const TeacherSessionSummaryView: React.FC<TeacherSessionSummaryViewProps>
 
   // Top 3 Podium
   const topPodium = gamification?.topPodium ?? scoreboard.slice(0, 3);
-  const rank1 = topPodium.find((p) => p.rank === 1);
-  const rank2 = topPodium.find((p) => p.rank === 2);
-  const rank3 = topPodium.find((p) => p.rank === 3);
+  const rank1 = topPodium.find(p => p.rank === 1);
+  const rank2 = topPodium.find(p => p.rank === 2);
+  const rank3 = topPodium.find(p => p.rank === 3);
 
   const newTitles = gamification?.newTitlesAwarded ?? [];
   const identityStats = gamification?.identityStats;
@@ -128,7 +137,9 @@ export const TeacherSessionSummaryView: React.FC<TeacherSessionSummaryViewProps>
             }}
           >
             <div>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '6px' }}>
+              <div
+                style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '6px' }}
+              >
                 <span
                   style={{
                     display: 'inline-block',
@@ -143,7 +154,8 @@ export const TeacherSessionSummaryView: React.FC<TeacherSessionSummaryViewProps>
                   ✓ ĐÃ KẾT THÚC
                 </span>
                 <span style={{ fontSize: '14px', color: UI_COLORS.textMuted }}>
-                  Mã vào lớp: <strong style={{ color: UI_COLORS.primary }}>{snapshot.sessionCode}</strong>
+                  Mã vào lớp:{' '}
+                  <strong style={{ color: UI_COLORS.primary }}>{snapshot.sessionCode}</strong>
                 </span>
               </div>
               <h2 style={{ margin: 0, fontSize: '24px' }}>
@@ -235,10 +247,17 @@ export const TeacherSessionSummaryView: React.FC<TeacherSessionSummaryViewProps>
                 textAlign: 'center',
               }}
             >
-              <div style={{ fontSize: '13px', color: UI_COLORS.primary, fontWeight: 600 }}>Sĩ số tham gia</div>
+              <div style={{ fontSize: '13px', color: UI_COLORS.primary, fontWeight: 600 }}>
+                Sĩ số tham gia
+              </div>
               <div
                 data-testid="report-stat-total"
-                style={{ fontSize: '28px', fontWeight: 800, color: UI_COLORS.primary, marginTop: '4px' }}
+                style={{
+                  fontSize: '28px',
+                  fontWeight: 800,
+                  color: UI_COLORS.primary,
+                  marginTop: '4px',
+                }}
               >
                 {snapshot.totalParticipants}
               </div>
@@ -253,10 +272,17 @@ export const TeacherSessionSummaryView: React.FC<TeacherSessionSummaryViewProps>
                 textAlign: 'center',
               }}
             >
-              <div style={{ fontSize: '13px', color: UI_COLORS.success, fontWeight: 600 }}>Trực tuyến khi đóng</div>
+              <div style={{ fontSize: '13px', color: UI_COLORS.success, fontWeight: 600 }}>
+                Trực tuyến khi đóng
+              </div>
               <div
                 data-testid="report-stat-online"
-                style={{ fontSize: '28px', fontWeight: 800, color: UI_COLORS.success, marginTop: '4px' }}
+                style={{
+                  fontSize: '28px',
+                  fontWeight: 800,
+                  color: UI_COLORS.success,
+                  marginTop: '4px',
+                }}
               >
                 {snapshot.onlineParticipants}
               </div>
@@ -271,10 +297,17 @@ export const TeacherSessionSummaryView: React.FC<TeacherSessionSummaryViewProps>
                 textAlign: 'center',
               }}
             >
-              <div style={{ fontSize: '13px', color: UI_COLORS.textMuted, fontWeight: 600 }}>Số đội / nhóm</div>
+              <div style={{ fontSize: '13px', color: UI_COLORS.textMuted, fontWeight: 600 }}>
+                Số đội / nhóm
+              </div>
               <div
                 data-testid="report-stat-teams"
-                style={{ fontSize: '28px', fontWeight: 800, color: UI_COLORS.text, marginTop: '4px' }}
+                style={{
+                  fontSize: '28px',
+                  fontWeight: 800,
+                  color: UI_COLORS.text,
+                  marginTop: '4px',
+                }}
               >
                 {snapshot.teams.length}
               </div>
@@ -289,10 +322,17 @@ export const TeacherSessionSummaryView: React.FC<TeacherSessionSummaryViewProps>
                 textAlign: 'center',
               }}
             >
-              <div style={{ fontSize: '13px', color: UI_COLORS.primary, fontWeight: 600 }}>Điểm trung bình</div>
+              <div style={{ fontSize: '13px', color: UI_COLORS.primary, fontWeight: 600 }}>
+                Điểm trung bình
+              </div>
               <div
                 data-testid="report-stat-avg-score"
-                style={{ fontSize: '28px', fontWeight: 800, color: UI_COLORS.primary, marginTop: '4px' }}
+                style={{
+                  fontSize: '28px',
+                  fontWeight: 800,
+                  color: UI_COLORS.primary,
+                  marginTop: '4px',
+                }}
               >
                 {summary?.averageScore ?? 0}
               </div>
@@ -307,7 +347,9 @@ export const TeacherSessionSummaryView: React.FC<TeacherSessionSummaryViewProps>
                 textAlign: 'center',
               }}
             >
-              <div style={{ fontSize: '13px', color: '#7E22CE', fontWeight: 600 }}>Độ chính xác TB</div>
+              <div style={{ fontSize: '13px', color: '#7E22CE', fontWeight: 600 }}>
+                Độ chính xác TB
+              </div>
               <div
                 data-testid="report-stat-avg-accuracy"
                 style={{ fontSize: '28px', fontWeight: 800, color: '#7E22CE', marginTop: '4px' }}
@@ -325,7 +367,9 @@ export const TeacherSessionSummaryView: React.FC<TeacherSessionSummaryViewProps>
                 textAlign: 'center',
               }}
             >
-              <div style={{ fontSize: '13px', color: '#B45309', fontWeight: 600 }}>Tổng EXP đã trao</div>
+              <div style={{ fontSize: '13px', color: '#B45309', fontWeight: 600 }}>
+                Tổng EXP đã trao
+              </div>
               <div
                 data-testid="report-stat-total-exp"
                 style={{ fontSize: '28px', fontWeight: 800, color: '#B45309', marginTop: '4px' }}
@@ -356,7 +400,8 @@ export const TeacherSessionSummaryView: React.FC<TeacherSessionSummaryViewProps>
                 fontWeight: 700,
                 cursor: 'pointer',
                 color: activeTab === 'gamification' ? '#7C3AED' : UI_COLORS.textMuted,
-                borderBottom: activeTab === 'gamification' ? '3px solid #7C3AED' : '3px solid transparent',
+                borderBottom:
+                  activeTab === 'gamification' ? '3px solid #7C3AED' : '3px solid transparent',
                 marginBottom: '-2px',
                 whiteSpace: 'nowrap',
               }}
@@ -376,13 +421,17 @@ export const TeacherSessionSummaryView: React.FC<TeacherSessionSummaryViewProps>
                 fontWeight: 700,
                 cursor: 'pointer',
                 color: activeTab === 'scoreboard' ? UI_COLORS.primary : UI_COLORS.textMuted,
-                borderBottom: activeTab === 'scoreboard' ? `3px solid ${UI_COLORS.primary}` : '3px solid transparent',
+                borderBottom:
+                  activeTab === 'scoreboard'
+                    ? `3px solid ${UI_COLORS.primary}`
+                    : '3px solid transparent',
                 marginBottom: '-2px',
                 whiteSpace: 'nowrap',
               }}
               data-testid="tab-scoreboard"
             >
-              📊 Bảng điểm học sinh ({scoreboard.length > 0 ? scoreboard.length : snapshot.participants.length})
+              📊 Bảng điểm học sinh (
+              {scoreboard.length > 0 ? scoreboard.length : snapshot.participants.length})
             </button>
 
             <button
@@ -396,7 +445,10 @@ export const TeacherSessionSummaryView: React.FC<TeacherSessionSummaryViewProps>
                 fontWeight: 700,
                 cursor: 'pointer',
                 color: activeTab === 'difficult' ? UI_COLORS.error : UI_COLORS.textMuted,
-                borderBottom: activeTab === 'difficult' ? `3px solid ${UI_COLORS.error}` : '3px solid transparent',
+                borderBottom:
+                  activeTab === 'difficult'
+                    ? `3px solid ${UI_COLORS.error}`
+                    : '3px solid transparent',
                 marginBottom: '-2px',
                 whiteSpace: 'nowrap',
               }}
@@ -512,10 +564,14 @@ export const TeacherSessionSummaryView: React.FC<TeacherSessionSummaryViewProps>
                           >
                             {rank2.displayName}
                           </div>
-                          <div style={{ fontSize: '13px', fontWeight: 800, color: UI_COLORS.primary }}>
+                          <div
+                            style={{ fontSize: '13px', fontWeight: 800, color: UI_COLORS.primary }}
+                          >
                             {rank2.score.toLocaleString()} điểm
                           </div>
-                          <div style={{ fontSize: '12px', fontWeight: 600, color: UI_COLORS.success }}>
+                          <div
+                            style={{ fontSize: '12px', fontWeight: 600, color: UI_COLORS.success }}
+                          >
                             +{rank2.expEarned} EXP
                           </div>
                           {/* Khối Cột Bục */}
@@ -542,7 +598,9 @@ export const TeacherSessionSummaryView: React.FC<TeacherSessionSummaryViewProps>
                         </>
                       ) : (
                         <div style={{ height: '140px', display: 'flex', alignItems: 'center' }}>
-                          <span style={{ color: UI_COLORS.textMuted, fontSize: '13px' }}>Trống</span>
+                          <span style={{ color: UI_COLORS.textMuted, fontSize: '13px' }}>
+                            Trống
+                          </span>
                         </div>
                       )}
                     </div>
@@ -609,10 +667,14 @@ export const TeacherSessionSummaryView: React.FC<TeacherSessionSummaryViewProps>
                           >
                             {rank1.displayName}
                           </div>
-                          <div style={{ fontSize: '15px', fontWeight: 800, color: UI_COLORS.primary }}>
+                          <div
+                            style={{ fontSize: '15px', fontWeight: 800, color: UI_COLORS.primary }}
+                          >
                             {rank1.score.toLocaleString()} điểm
                           </div>
-                          <div style={{ fontSize: '13px', fontWeight: 700, color: UI_COLORS.success }}>
+                          <div
+                            style={{ fontSize: '13px', fontWeight: 700, color: UI_COLORS.success }}
+                          >
                             +{rank1.expEarned} EXP
                           </div>
                           {/* Khối Cột Bục */}
@@ -640,7 +702,9 @@ export const TeacherSessionSummaryView: React.FC<TeacherSessionSummaryViewProps>
                         </>
                       ) : (
                         <div style={{ height: '180px', display: 'flex', alignItems: 'center' }}>
-                          <span style={{ color: UI_COLORS.textMuted, fontSize: '13px' }}>Trống</span>
+                          <span style={{ color: UI_COLORS.textMuted, fontSize: '13px' }}>
+                            Trống
+                          </span>
                         </div>
                       )}
                     </div>
@@ -695,10 +759,14 @@ export const TeacherSessionSummaryView: React.FC<TeacherSessionSummaryViewProps>
                           >
                             {rank3.displayName}
                           </div>
-                          <div style={{ fontSize: '13px', fontWeight: 800, color: UI_COLORS.primary }}>
+                          <div
+                            style={{ fontSize: '13px', fontWeight: 800, color: UI_COLORS.primary }}
+                          >
                             {rank3.score.toLocaleString()} điểm
                           </div>
-                          <div style={{ fontSize: '12px', fontWeight: 600, color: UI_COLORS.success }}>
+                          <div
+                            style={{ fontSize: '12px', fontWeight: 600, color: UI_COLORS.success }}
+                          >
                             +{rank3.expEarned} EXP
                           </div>
                           {/* Khối Cột Bục */}
@@ -725,7 +793,9 @@ export const TeacherSessionSummaryView: React.FC<TeacherSessionSummaryViewProps>
                         </>
                       ) : (
                         <div style={{ height: '115px', display: 'flex', alignItems: 'center' }}>
-                          <span style={{ color: UI_COLORS.textMuted, fontSize: '13px' }}>Trống</span>
+                          <span style={{ color: UI_COLORS.textMuted, fontSize: '13px' }}>
+                            Trống
+                          </span>
                         </div>
                       )}
                     </div>
@@ -926,7 +996,9 @@ export const TeacherSessionSummaryView: React.FC<TeacherSessionSummaryViewProps>
                         fontSize: '13px',
                       }}
                     >
-                      <span style={{ color: UI_COLORS.textMuted }}>Tổng EXP bảo lưu vĩnh viễn:</span>
+                      <span style={{ color: UI_COLORS.textMuted }}>
+                        Tổng EXP bảo lưu vĩnh viễn:
+                      </span>
                       <strong style={{ color: UI_COLORS.success }}>
                         +{identityStats?.persistedExpTotal ?? 0} EXP
                       </strong>
@@ -939,7 +1011,9 @@ export const TeacherSessionSummaryView: React.FC<TeacherSessionSummaryViewProps>
                         fontSize: '13px',
                       }}
                     >
-                      <span style={{ color: UI_COLORS.textMuted }}>EXP tạm cần bảo lưu bằng PIN:</span>
+                      <span style={{ color: UI_COLORS.textMuted }}>
+                        EXP tạm cần bảo lưu bằng PIN:
+                      </span>
                       <strong style={{ color: '#B45309' }}>
                         +{identityStats?.unpersistedExpTotal ?? 0} EXP
                       </strong>
@@ -969,9 +1043,7 @@ export const TeacherSessionSummaryView: React.FC<TeacherSessionSummaryViewProps>
                     }}
                   >
                     <span>{rosterNeedingPin.length > 0 ? '⚠️' : '✅'}</span>
-                    <span>
-                      HỌC SINH CẦN CẤP / NHẬP MÃ PIN ({rosterNeedingPin.length})
-                    </span>
+                    <span>HỌC SINH CẦN CẤP / NHẬP MÃ PIN ({rosterNeedingPin.length})</span>
                   </h4>
 
                   {rosterNeedingPin.length === 0 ? (
@@ -999,8 +1071,9 @@ export const TeacherSessionSummaryView: React.FC<TeacherSessionSummaryViewProps>
                           lineHeight: '1.4',
                         }}
                       >
-                        Các học sinh dưới đây đã tích lũy EXP nhưng chưa thiết lập hoặc chưa đăng nhập bằng mã PIN. Hãy
-                        nhắc các em nhập mã PIN để không mất điểm ở các tiết học sau!
+                        Các học sinh dưới đây đã tích lũy EXP nhưng chưa thiết lập hoặc chưa đăng
+                        nhập bằng mã PIN. Hãy nhắc các em nhập mã PIN để không mất điểm ở các tiết
+                        học sau!
                       </div>
 
                       <div
@@ -1028,8 +1101,12 @@ export const TeacherSessionSummaryView: React.FC<TeacherSessionSummaryViewProps>
                               fontSize: '13px',
                             }}
                           >
-                            <span style={{ fontWeight: 700, color: UI_COLORS.text }}>{st.displayName}</span>
-                            <span style={{ fontWeight: 800, color: '#B45309' }}>+{st.expEarned} EXP</span>
+                            <span style={{ fontWeight: 700, color: UI_COLORS.text }}>
+                              {st.displayName}
+                            </span>
+                            <span style={{ fontWeight: 800, color: '#B45309' }}>
+                              +{st.expEarned} EXP
+                            </span>
                           </div>
                         ))}
                       </div>
@@ -1067,7 +1144,7 @@ export const TeacherSessionSummaryView: React.FC<TeacherSessionSummaryViewProps>
                     }}
                     data-testid="participants-report-list"
                   >
-                    {snapshot.participants.map((p) => (
+                    {snapshot.participants.map(p => (
                       <div
                         key={p.id}
                         data-testid={`report-participant-${p.id}`}
@@ -1082,7 +1159,9 @@ export const TeacherSessionSummaryView: React.FC<TeacherSessionSummaryViewProps>
                         }}
                       >
                         <div>
-                          <div style={{ fontWeight: 600, color: UI_COLORS.text }}>{p.displayName}</div>
+                          <div style={{ fontWeight: 600, color: UI_COLORS.text }}>
+                            {p.displayName}
+                          </div>
                           <div style={{ fontSize: '12px', color: UI_COLORS.textMuted }}>
                             {p.identityLevel === 'account' && '⭐ Có tài khoản'}
                             {p.identityLevel === 'roster' && '📋 Danh sách lớp'}
@@ -1108,7 +1187,7 @@ export const TeacherSessionSummaryView: React.FC<TeacherSessionSummaryViewProps>
                   }}
                   data-testid="scoreboard-list"
                 >
-                  {scoreboard.map((item) => {
+                  {scoreboard.map(item => {
                     const isTop1 = item.rank === 1;
                     const isTop2 = item.rank === 2;
                     const isTop3 = item.rank === 3;
@@ -1126,18 +1205,18 @@ export const TeacherSessionSummaryView: React.FC<TeacherSessionSummaryViewProps>
                           backgroundColor: isTop1
                             ? '#FEF3C7'
                             : isTop2
-                            ? '#F1F5F9'
-                            : isTop3
-                            ? '#FFEDD5'
-                            : '#FFFFFF',
+                              ? '#F1F5F9'
+                              : isTop3
+                                ? '#FFEDD5'
+                                : '#FFFFFF',
                           border: `1px solid ${
                             isTop1
                               ? '#FCD34D'
                               : isTop2
-                              ? '#CBD5E1'
-                              : isTop3
-                              ? '#FDBA74'
-                              : UI_COLORS.border
+                                ? '#CBD5E1'
+                                : isTop3
+                                  ? '#FDBA74'
+                                  : UI_COLORS.border
                           }`,
                         }}
                       >
@@ -1155,10 +1234,10 @@ export const TeacherSessionSummaryView: React.FC<TeacherSessionSummaryViewProps>
                               backgroundColor: isTop1
                                 ? '#F59E0B'
                                 : isTop2
-                                ? '#64748B'
-                                : isTop3
-                                ? '#D97706'
-                                : '#E2E8F0',
+                                  ? '#64748B'
+                                  : isTop3
+                                    ? '#D97706'
+                                    : '#E2E8F0',
                               color: '#FFFFFF',
                             }}
                             data-testid={`rank-badge-${item.rank}`}
@@ -1172,7 +1251,9 @@ export const TeacherSessionSummaryView: React.FC<TeacherSessionSummaryViewProps>
                           )}
 
                           <div>
-                            <div style={{ fontWeight: 700, fontSize: '15px', color: UI_COLORS.text }}>
+                            <div
+                              style={{ fontWeight: 700, fontSize: '15px', color: UI_COLORS.text }}
+                            >
                               {item.displayName}
                               {isTop1 && ' 👑'}
                             </div>
@@ -1288,7 +1369,9 @@ export const TeacherSessionSummaryView: React.FC<TeacherSessionSummaryViewProps>
                           </span>
                         </div>
 
-                        <div style={{ fontSize: '15px', fontWeight: 600, color: UI_COLORS.text }}>{q.stem}</div>
+                        <div style={{ fontSize: '15px', fontWeight: 600, color: UI_COLORS.text }}>
+                          {q.stem}
+                        </div>
 
                         {isSevere && (
                           <div
@@ -1301,7 +1384,8 @@ export const TeacherSessionSummaryView: React.FC<TeacherSessionSummaryViewProps>
                               gap: '4px',
                             }}
                           >
-                            ⚠️ Khuyến nghị: Giáo viên nên giảng lại hoặc cho cả lớp ôn tập kiến thức này.
+                            ⚠️ Khuyến nghị: Giáo viên nên giảng lại hoặc cho cả lớp ôn tập kiến thức
+                            này.
                           </div>
                         )}
                       </div>
@@ -1459,7 +1543,14 @@ export const TeacherSessionSummaryView: React.FC<TeacherSessionSummaryViewProps>
                     >
                       {rank2.displayName}
                     </div>
-                    <div style={{ fontSize: '18px', fontWeight: 800, color: '#60A5FA', marginTop: '4px' }}>
+                    <div
+                      style={{
+                        fontSize: '18px',
+                        fontWeight: 800,
+                        color: '#60A5FA',
+                        marginTop: '4px',
+                      }}
+                    >
                       {rank2.score.toLocaleString()} điểm
                     </div>
                     <div style={{ fontSize: '14px', fontWeight: 700, color: '#34D399' }}>
@@ -1549,7 +1640,14 @@ export const TeacherSessionSummaryView: React.FC<TeacherSessionSummaryViewProps>
                     >
                       {rank1.displayName}
                     </div>
-                    <div style={{ fontSize: '22px', fontWeight: 900, color: '#93C5FD', marginTop: '4px' }}>
+                    <div
+                      style={{
+                        fontSize: '22px',
+                        fontWeight: 900,
+                        color: '#93C5FD',
+                        marginTop: '4px',
+                      }}
+                    >
                       {rank1.score.toLocaleString()} điểm
                     </div>
                     <div style={{ fontSize: '16px', fontWeight: 800, color: '#4ADE80' }}>
@@ -1629,7 +1727,14 @@ export const TeacherSessionSummaryView: React.FC<TeacherSessionSummaryViewProps>
                     >
                       {rank3.displayName}
                     </div>
-                    <div style={{ fontSize: '18px', fontWeight: 800, color: '#60A5FA', marginTop: '4px' }}>
+                    <div
+                      style={{
+                        fontSize: '18px',
+                        fontWeight: 800,
+                        color: '#60A5FA',
+                        marginTop: '4px',
+                      }}
+                    >
                       {rank3.score.toLocaleString()} điểm
                     </div>
                     <div style={{ fontSize: '14px', fontWeight: 700, color: '#34D399' }}>
@@ -1673,7 +1778,14 @@ export const TeacherSessionSummaryView: React.FC<TeacherSessionSummaryViewProps>
                 overflowX: 'auto',
               }}
             >
-              <div style={{ fontWeight: 800, color: '#C4B5FD', fontSize: '16px', whiteSpace: 'nowrap' }}>
+              <div
+                style={{
+                  fontWeight: 800,
+                  color: '#C4B5FD',
+                  fontSize: '16px',
+                  whiteSpace: 'nowrap',
+                }}
+              >
                 🎖️ Danh hiệu mở khóa:
               </div>
               <div style={{ display: 'flex', gap: '14px', flexWrap: 'nowrap' }}>

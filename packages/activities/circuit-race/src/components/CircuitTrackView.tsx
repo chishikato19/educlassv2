@@ -293,9 +293,7 @@ export const CircuitTrackView: React.FC<CircuitTrackViewProps> = ({
                           {tileIcon}
                         </span>
                       )}
-                      <span>
-                        {tile.index === 0 ? 'X.Phát' : isFinish ? 'ĐÍCH' : tile.index}
-                      </span>
+                      <span>{tile.index === 0 ? 'X.Phát' : isFinish ? 'ĐÍCH' : tile.index}</span>
                     </div>
                   </div>
                 );

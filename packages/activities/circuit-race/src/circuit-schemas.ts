@@ -1,20 +1,20 @@
 import { z } from 'zod';
 
 export const CardTypeSchema = z.enum([
-  'leader_snare',     // 🧲 Kéo Top 1 lùi 3 ô
-  'front_hook',       // 🎣 Móc câu kéo người trước mặt lùi 2 ô
-  'banana_trap',     // 🍌 Bẫy vỏ chuối đặt tại ô rời đi
-  'whirlwind',       // 🌪️ Lốc xoáy đẩy lùi xung quanh 1 ô
-  'freeze',          // 🧊 Đóng băng người khác vòng sau
-  'swap',            // 🔄 Đổi vị trí với người trước mặt (cự ly <= 3)
-  'shield',          // 🛡️ Khiên hộ mệnh miễn nhiễm đòn & sa lầy
-  'mirror',          // 🪞 Gương phản đòn
-  'nitro',           // 🚀 Bình Nitro +2 bước đi
-  'handbrake',       // 🛑 Phanh khẩn cấp giảm 1-2 bước
-  'reroll',          // 🎲 Xúc xắc ma thuật gieo lại
-  'lucky_six',       // 👑 Xúc xắc hoàng gia luôn ra 6
-  'lifeline_5050',   // 💡 Phao cứu sinh loại 2 đáp án sai
-  'double_exp',      // 💎 Nhân đôi EXP vòng này
+  'leader_snare', // 🧲 Kéo Top 1 lùi 3 ô
+  'front_hook', // 🎣 Móc câu kéo người trước mặt lùi 2 ô
+  'banana_trap', // 🍌 Bẫy vỏ chuối đặt tại ô rời đi
+  'whirlwind', // 🌪️ Lốc xoáy đẩy lùi xung quanh 1 ô
+  'freeze', // 🧊 Đóng băng người khác vòng sau
+  'swap', // 🔄 Đổi vị trí với người trước mặt (cự ly <= 3)
+  'shield', // 🛡️ Khiên hộ mệnh miễn nhiễm đòn & sa lầy
+  'mirror', // 🪞 Gương phản đòn
+  'nitro', // 🚀 Bình Nitro +2 bước đi
+  'handbrake', // 🛑 Phanh khẩn cấp giảm 1-2 bước
+  'reroll', // 🎲 Xúc xắc ma thuật gieo lại
+  'lucky_six', // 👑 Xúc xắc hoàng gia luôn ra 6
+  'lifeline_5050', // 💡 Phao cứu sinh loại 2 đáp án sai
+  'double_exp', // 💎 Nhân đôi EXP vòng này
 ]);
 export type CardType = z.infer<typeof CardTypeSchema>;
 
@@ -29,10 +29,10 @@ export const CardSchema = z.object({
 export type Card = z.infer<typeof CardSchema>;
 
 export const TileTypeSchema = z.enum([
-  'normal',     // Ô thường
-  'boost',      // 🚀 Tăng tốc (+2 ô)
-  'mud',        // 🕳️ Sa lầy
-  'mystery',    // 🎁 Rương may mắn (nhận thêm thẻ)
+  'normal', // Ô thường
+  'boost', // 🚀 Tăng tốc (+2 ô)
+  'mud', // 🕳️ Sa lầy
+  'mystery', // 🎁 Rương may mắn (nhận thêm thẻ)
   'checkpoint', // 🛑 Trạm kiểm soát
 ]);
 export type TileType = z.infer<typeof TileTypeSchema>;
@@ -149,11 +149,13 @@ export const CircuitStateSchema = z.object({
   actionExpiresAt: z.number().default(0),
   actionWindowSeconds: z.number().default(10),
   independentStudentQuestionOrder: z.boolean().default(false),
-  podium: z.object({
-    rank1: z.string().optional(),
-    rank2: z.string().optional(),
-    rank3: z.string().optional(),
-  }).default({}),
+  podium: z
+    .object({
+      rank1: z.string().optional(),
+      rank2: z.string().optional(),
+      rank3: z.string().optional(),
+    })
+    .default({}),
 });
 export type CircuitState = z.infer<typeof CircuitStateSchema>;
 

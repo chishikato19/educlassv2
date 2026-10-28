@@ -1,13 +1,6 @@
 import * as XLSX from 'xlsx';
-import {
-  type Question,
-  gradeQuestion,
-  richTextToString,
-} from '@educlass/question-kit';
-import type {
-  ExamResult,
-  ParticipantExamStatus,
-} from './exam-schemas.js';
+import { type Question, gradeQuestion, richTextToString } from '@educlass/question-kit';
+import type { ExamResult, ParticipantExamStatus } from './exam-schemas.js';
 import { unmapStudentAnswer } from './exam-shuffler.js';
 
 export interface ScoreBucket {
@@ -67,11 +60,61 @@ export function calculateScoreDistribution(
 ): ExamOverviewReport {
   if (!results || results.length === 0) {
     const emptyBuckets: ScoreBucket[] = [
-      { id: 'under_5', label: 'Dưới 5.0 (Yếu/Kém)', range: '< 5.0', minScore: 0, maxScore: 4.99, count: 0, percentage: 0, color: '#EF4444', studentNames: [] },
-      { id: '5_to_6_5', label: '5.0 - < 6.5 (Trung bình)', range: '5.0 - < 6.5', minScore: 5.0, maxScore: 6.49, count: 0, percentage: 0, color: '#F59E0B', studentNames: [] },
-      { id: '6_5_to_8', label: '6.5 - < 8.0 (Khá)', range: '6.5 - < 8.0', minScore: 6.5, maxScore: 7.99, count: 0, percentage: 0, color: '#3B82F6', studentNames: [] },
-      { id: '8_to_9', label: '8.0 - < 9.0 (Giỏi)', range: '8.0 - < 9.0', minScore: 8.0, maxScore: 8.99, count: 0, percentage: 0, color: '#10B981', studentNames: [] },
-      { id: '9_to_10', label: '9.0 - 10.0 (Xuất sắc)', range: '9.0 - 10.0', minScore: 9.0, maxScore: 10.0, count: 0, percentage: 0, color: '#8B5CF6', studentNames: [] },
+      {
+        id: 'under_5',
+        label: 'Dưới 5.0 (Yếu/Kém)',
+        range: '< 5.0',
+        minScore: 0,
+        maxScore: 4.99,
+        count: 0,
+        percentage: 0,
+        color: '#EF4444',
+        studentNames: [],
+      },
+      {
+        id: '5_to_6_5',
+        label: '5.0 - < 6.5 (Trung bình)',
+        range: '5.0 - < 6.5',
+        minScore: 5.0,
+        maxScore: 6.49,
+        count: 0,
+        percentage: 0,
+        color: '#F59E0B',
+        studentNames: [],
+      },
+      {
+        id: '6_5_to_8',
+        label: '6.5 - < 8.0 (Khá)',
+        range: '6.5 - < 8.0',
+        minScore: 6.5,
+        maxScore: 7.99,
+        count: 0,
+        percentage: 0,
+        color: '#3B82F6',
+        studentNames: [],
+      },
+      {
+        id: '8_to_9',
+        label: '8.0 - < 9.0 (Giỏi)',
+        range: '8.0 - < 9.0',
+        minScore: 8.0,
+        maxScore: 8.99,
+        count: 0,
+        percentage: 0,
+        color: '#10B981',
+        studentNames: [],
+      },
+      {
+        id: '9_to_10',
+        label: '9.0 - 10.0 (Xuất sắc)',
+        range: '9.0 - 10.0',
+        minScore: 9.0,
+        maxScore: 10.0,
+        count: 0,
+        percentage: 0,
+        color: '#8B5CF6',
+        studentNames: [],
+      },
     ];
 
     return {
@@ -87,11 +130,12 @@ export function calculateScoreDistribution(
     };
   }
 
-  const scores = results.map((r) => {
+  const scores = results.map(r => {
     // Quy đổi điểm về thang standardMax (ví dụ 10) nếu bài thi dùng thang điểm khác
     const rawScore = r.score;
     const max = r.maxScore > 0 ? r.maxScore : standardMax;
-    const normalized = standardMax === max ? rawScore : Math.round((rawScore / max) * standardMax * 100) / 100;
+    const normalized =
+      standardMax === max ? rawScore : Math.round((rawScore / max) * standardMax * 100) / 100;
     return {
       normalized,
       displayName: r.displayName,
@@ -99,7 +143,7 @@ export function calculateScoreDistribution(
     };
   });
 
-  const numericScores = scores.map((s) => s.normalized).sort((a, b) => a - b);
+  const numericScores = scores.map(s => s.normalized).sort((a, b) => a - b);
   const total = numericScores.length;
   const sum = numericScores.reduce((acc, s) => acc + s, 0);
   const averageScore = Math.round((sum / total) * 100) / 100;
@@ -137,7 +181,7 @@ export function calculateScoreDistribution(
     }
   }
 
-  const passCount = scores.filter((s) => s.normalized >= 5.0).length;
+  const passCount = scores.filter(s => s.normalized >= 5.0).length;
   const passRate = Math.round((passCount / total) * 100);
 
   const buckets: ScoreBucket[] = [
@@ -200,7 +244,7 @@ export function calculateScoreDistribution(
 
   return {
     totalParticipants: total,
-    submittedCount: results.filter((r) => r.submittedAt !== null).length,
+    submittedCount: results.filter(r => r.submittedAt !== null).length,
     averageScore,
     highestScore,
     lowestScore,
@@ -276,8 +320,8 @@ export function calculateQuestionAnalysis(
       totalAttempts > 0
         ? Math.round((incorrectCount / totalAttempts) * 100)
         : totalStudents > 0
-        ? 0
-        : 0;
+          ? 0
+          : 0;
 
     let options: QuestionOptionBreakdown[] | undefined;
     if (origQ.type === 'mcq4' && Array.isArray(origQ.options)) {
@@ -328,9 +372,7 @@ export interface GenerateExamExcelParams {
  * 3. Phân tích câu hỏi
  * 4. Ma trận làm bài
  */
-export function generateExamExcelWorkbook(
-  params: GenerateExamExcelParams
-): XLSX.WorkBook {
+export function generateExamExcelWorkbook(params: GenerateExamExcelParams): XLSX.WorkBook {
   const { examTitle, durationMinutes = 45, questions, results, participants } = params;
   const overview = calculateScoreDistribution(results);
   const questionAnalysis =
@@ -403,7 +445,7 @@ export function generateExamExcelWorkbook(
     'Thời gian nộp bài',
   ];
 
-  const studentRows = results.map((r) => {
+  const studentRows = results.map(r => {
     const p = participants[r.participantId];
     const startedAt = p?.startedAt;
     const submittedAt = r.submittedAt ?? p?.submittedAt;
@@ -440,7 +482,7 @@ export function generateExamExcelWorkbook(
 
   const baseOptionLetters = ['A', 'B', 'C', 'D'];
 
-  const summaryMatrixRows = results.map((r) => {
+  const summaryMatrixRows = results.map(r => {
     const p = participants[r.participantId];
     const startedAt = p?.startedAt;
     const submittedAt = r.submittedAt ?? p?.submittedAt;
@@ -480,14 +522,17 @@ export function generateExamExcelWorkbook(
         }
 
         if (q.type === 'mcq4') {
-          const letter = rev && rev['studentChoiceLabel']
-            ? String(rev['studentChoiceLabel'])
-            : (() => {
-                const selectedIdx = mapped && mapped.type === 'mcq4' ? mapped.selected : null;
-                return typeof selectedIdx === 'number' && selectedIdx >= 0 && selectedIdx < 4
-                  ? baseOptionLetters[selectedIdx]
-                  : (typeof rawAns === 'number' && rawAns >= 0 && rawAns < 4 ? baseOptionLetters[rawAns] : '-');
-              })();
+          const letter =
+            rev && rev['studentChoiceLabel']
+              ? String(rev['studentChoiceLabel'])
+              : (() => {
+                  const selectedIdx = mapped && mapped.type === 'mcq4' ? mapped.selected : null;
+                  return typeof selectedIdx === 'number' && selectedIdx >= 0 && selectedIdx < 4
+                    ? baseOptionLetters[selectedIdx]
+                    : typeof rawAns === 'number' && rawAns >= 0 && rawAns < 4
+                      ? baseOptionLetters[rawAns]
+                      : '-';
+                })();
           row.push(`${letter} (${isCorrect ? 'Đúng' : 'Sai'})`);
         } else if (q.type === 'tf') {
           const selectedBool = mapped && mapped.type === 'tf' ? mapped.selected : rawAns;
@@ -521,7 +566,7 @@ export function generateExamExcelWorkbook(
     'Số bạn bỏ trống',
   ];
 
-  const questionRows = questionAnalysis.map((q) => [
+  const questionRows = questionAnalysis.map(q => [
     q.order,
     q.questionId,
     q.type,
@@ -539,7 +584,7 @@ export function generateExamExcelWorkbook(
 
   // --- SHEET 5: Ma trận làm bài ---
   const matrixHeaders = ['Họ và tên thí sinh', ...questions.map((_, idx) => `Câu ${idx + 1}`)];
-  const matrixRows = results.map((r) => {
+  const matrixRows = results.map(r => {
     const p = participants[r.participantId];
     const row: Array<string | number> = [r.displayName];
 
@@ -579,9 +624,7 @@ export function generateExamExcelWorkbook(
 /**
  * Xuất dữ liệu báo cáo kỳ thi thành Uint8Array để lưu trữ hoặc tải về
  */
-export function exportExamExcelBuffer(
-  params: GenerateExamExcelParams
-): Uint8Array {
+export function exportExamExcelBuffer(params: GenerateExamExcelParams): Uint8Array {
   const workbook = generateExamExcelWorkbook(params);
   return XLSX.write(workbook, { type: 'buffer', bookType: 'xlsx' }) as Uint8Array;
 }

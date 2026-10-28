@@ -7,7 +7,7 @@ export const DEFAULT_ELO = 1000;
 export const MIN_ELO = 100;
 export const MAX_ELO = 3000;
 export const K_FACTOR_STANDARD = 24; // Dành cho bài thi / Quiz cá nhân
-export const K_FACTOR_TEAM = 32;     // Dành cho thi đấu đồng đội (Đại Chiến Lãnh Thổ)
+export const K_FACTOR_TEAM = 32; // Dành cho thi đấu đồng đội (Đại Chiến Lãnh Thổ)
 
 /**
  * Tính xác suất thắng / điểm kỳ vọng (Expected Score) theo công thức Elo chuẩn:
@@ -26,7 +26,7 @@ export function clampElo(elo: number): number {
 
 /**
  * Tính biến động Elo cho trò chơi cá nhân (Quizizz, Kahoot, Quiz Live, Trắc nghiệm)
- * 
+ *
  * @param currentElo Điểm Elo hiện tại của học sinh
  * @param scorePercentage Tỉ lệ điểm đạt được của học sinh (0.0 đến 1.0, ví dụ đúng 8/10 câu = 0.8)
  * @param classAveragePercentage Tỉ lệ điểm trung bình của cả lớp (0.0 đến 1.0, ví dụ 0.6)
@@ -67,7 +67,7 @@ export interface TeamMemberEloInput {
 
 /**
  * Tính biến động Elo cho trận đấu đồng đội 2 phe (Đại Chiến Lãnh Thổ)
- * 
+ *
  * - Đội thắng được cộng điểm, đội thua bị trừ điểm dựa trên chênh lệch Elo trung bình.
  * - Thành viên có đóng góp cao (MVP) được tăng thưởng / giảm phạt.
  * - Thành viên không có đóng góp gì (0 điểm) bị giảm thưởng.
@@ -86,13 +86,15 @@ export function calculateTeamMatchElo(
   }
 
   // 1. Tính Elo trung bình của 2 đội
-  const blueAvgElo = teamBlue.length > 0
-    ? teamBlue.reduce((sum, m) => sum + (m.elo || DEFAULT_ELO), 0) / teamBlue.length
-    : DEFAULT_ELO;
+  const blueAvgElo =
+    teamBlue.length > 0
+      ? teamBlue.reduce((sum, m) => sum + (m.elo || DEFAULT_ELO), 0) / teamBlue.length
+      : DEFAULT_ELO;
 
-  const redAvgElo = teamRed.length > 0
-    ? teamRed.reduce((sum, m) => sum + (m.elo || DEFAULT_ELO), 0) / teamRed.length
-    : DEFAULT_ELO;
+  const redAvgElo =
+    teamRed.length > 0
+      ? teamRed.reduce((sum, m) => sum + (m.elo || DEFAULT_ELO), 0) / teamRed.length
+      : DEFAULT_ELO;
 
   // 2. Điểm kỳ vọng của mỗi đội
   const expectedBlue = getExpectedScore(blueAvgElo, redAvgElo);
@@ -177,7 +179,7 @@ export interface BalancedTeamsResult<T> {
 
 /**
  * Thuật toán chia đều học sinh vào 2 phe Xanh - Đỏ cân bằng nhất theo Elo ẩn
- * 
+ *
  * Kết hợp:
  * 1. Sắp xếp theo Elo giảm dần (kèm jitter nhẹ để tạo biến số tự nhiên).
  * 2. Phân bổ kiểu Snake Draft (ABBA BAAB...)

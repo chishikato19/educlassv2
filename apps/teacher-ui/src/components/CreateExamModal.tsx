@@ -90,7 +90,7 @@ export const CreateExamModal: React.FC<CreateExamModalProps> = ({
     setIsLoadingSets(true);
     api
       .getQuestionSets()
-      .then((sets) => {
+      .then(sets => {
         if (!isMounted) return;
         setQuestionSets(sets);
         if (sets.length > 0 && !questionSetId) {
@@ -137,7 +137,7 @@ export const CreateExamModal: React.FC<CreateExamModalProps> = ({
     setIsLoadingQuestions(true);
     api
       .getQuestionSet(questionSetId)
-      .then((qs) => {
+      .then(qs => {
         if (!isMounted) return;
         const rawQs = (qs.questions as Array<Record<string, unknown>>) || [];
         const mapped = rawQs.map((q, idx) => ({
@@ -162,7 +162,7 @@ export const CreateExamModal: React.FC<CreateExamModalProps> = ({
   // Khi giáo viên chọn một bộ đề khác, gợi ý tự động điền tiêu đề & môn
   const handleSelectQuestionSet = (setId: string) => {
     setQuestionSetId(setId);
-    const chosen = questionSets.find((q) => q.id === setId);
+    const chosen = questionSets.find(q => q.id === setId);
     if (chosen) {
       setTitle(chosen.title);
       if (chosen.subject) {
@@ -173,7 +173,10 @@ export const CreateExamModal: React.FC<CreateExamModalProps> = ({
 
   // Tính tổng điểm hiện tại của toàn bộ câu hỏi
   const currentTotalScore = useMemo(() => {
-    const sum = questions.reduce((acc, q) => acc + (typeof q['points'] === 'number' ? (q['points'] as number) : 0), 0);
+    const sum = questions.reduce(
+      (acc, q) => acc + (typeof q['points'] === 'number' ? (q['points'] as number) : 0),
+      0
+    );
     return Math.round(sum * 100) / 100;
   }, [questions]);
 
@@ -199,7 +202,7 @@ export const CreateExamModal: React.FC<CreateExamModalProps> = ({
   // Gán cùng một mức điểm cho tất cả câu hỏi
   const handleApplySameScore = (pts: number) => {
     if (questions.length === 0 || pts <= 0) return;
-    const updated = questions.map((q) => ({
+    const updated = questions.map(q => ({
       ...q,
       points: pts,
     }));
@@ -294,7 +297,14 @@ export const CreateExamModal: React.FC<CreateExamModalProps> = ({
             <div style={{ fontSize: '18px', fontWeight: 800, color: UI_COLORS.text }}>
               Tạo Kỳ Thi Mới Theo Ca
             </div>
-            <div style={{ fontSize: '13px', color: UI_COLORS.textMuted, fontWeight: 500, marginTop: '2px' }}>
+            <div
+              style={{
+                fontSize: '13px',
+                color: UI_COLORS.textMuted,
+                fontWeight: 500,
+                marginTop: '2px',
+              }}
+            >
               Thiết lập bài kiểm tra lưu trữ lâu dài, chia ca thi độc lập cho cả lớp
             </div>
           </div>
@@ -302,20 +312,31 @@ export const CreateExamModal: React.FC<CreateExamModalProps> = ({
       }
       onClose={() => !isSubmitting && onClose()}
     >
-      <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '18px', padding: '4px 0' }}>
+      <form
+        onSubmit={handleSubmit}
+        style={{ display: 'flex', flexDirection: 'column', gap: '18px', padding: '4px 0' }}
+      >
         {/* 1. Tên bài thi & Môn học */}
         <div style={{ display: 'flex', gap: '14px', flexWrap: 'wrap' }}>
           <div style={{ flex: '2 1 300px' }}>
-            <label style={{ display: 'block', fontSize: '13px', fontWeight: 700, color: UI_COLORS.text, marginBottom: '6px' }}>
+            <label
+              style={{
+                display: 'block',
+                fontSize: '13px',
+                fontWeight: 700,
+                color: UI_COLORS.text,
+                marginBottom: '6px',
+              }}
+            >
               Tiêu đề kỳ thi <span style={{ color: '#DC2626' }}>*</span>
             </label>
             <input
               type="text"
               placeholder="VD: Kiểm tra 1 tiết Tin học - Giữa HK1"
               value={title}
-              onChange={(e) => {
+              onChange={e => {
                 setTitle(e.target.value);
-                if (formErrors['title']) setFormErrors((prev) => ({ ...prev, title: '' }));
+                if (formErrors['title']) setFormErrors(prev => ({ ...prev, title: '' }));
               }}
               style={{
                 width: '100%',
@@ -328,21 +349,31 @@ export const CreateExamModal: React.FC<CreateExamModalProps> = ({
               }}
             />
             {formErrors['title'] && (
-              <span style={{ fontSize: '12px', color: '#DC2626', marginTop: '4px', display: 'block' }}>
+              <span
+                style={{ fontSize: '12px', color: '#DC2626', marginTop: '4px', display: 'block' }}
+              >
                 {formErrors['title']}
               </span>
             )}
           </div>
 
           <div style={{ flex: '1 1 140px' }}>
-            <label style={{ display: 'block', fontSize: '13px', fontWeight: 700, color: UI_COLORS.text, marginBottom: '6px' }}>
+            <label
+              style={{
+                display: 'block',
+                fontSize: '13px',
+                fontWeight: 700,
+                color: UI_COLORS.text,
+                marginBottom: '6px',
+              }}
+            >
               Môn học
             </label>
             <input
               type="text"
               placeholder="VD: Tin học, Toán..."
               value={subject}
-              onChange={(e) => setSubject(e.target.value)}
+              onChange={e => setSubject(e.target.value)}
               style={{
                 width: '100%',
                 boxSizing: 'border-box',
@@ -356,7 +387,15 @@ export const CreateExamModal: React.FC<CreateExamModalProps> = ({
           </div>
 
           <div style={{ flex: '1 1 160px' }}>
-            <label style={{ display: 'block', fontSize: '13px', fontWeight: 700, color: UI_COLORS.text, marginBottom: '6px' }}>
+            <label
+              style={{
+                display: 'block',
+                fontSize: '13px',
+                fontWeight: 700,
+                color: UI_COLORS.text,
+                marginBottom: '6px',
+              }}
+            >
               📁 Thư mục lưu trữ
             </label>
             <input
@@ -364,7 +403,7 @@ export const CreateExamModal: React.FC<CreateExamModalProps> = ({
               list="create-exam-folder-datalist"
               placeholder="VD: Giữa HK1, 15 Phút..."
               value={folder}
-              onChange={(e) => setFolder(e.target.value)}
+              onChange={e => setFolder(e.target.value)}
               style={{
                 width: '100%',
                 boxSizing: 'border-box',
@@ -376,7 +415,7 @@ export const CreateExamModal: React.FC<CreateExamModalProps> = ({
               }}
             />
             <datalist id="create-exam-folder-datalist">
-              {existingFolders.map((f) => (
+              {existingFolders.map(f => (
                 <option key={f} value={f} />
               ))}
             </datalist>
@@ -387,14 +426,22 @@ export const CreateExamModal: React.FC<CreateExamModalProps> = ({
         <div style={{ display: 'flex', gap: '14px', flexWrap: 'wrap' }}>
           {/* Lớp học */}
           <div style={{ flex: '1 1 240px' }}>
-            <label style={{ display: 'block', fontSize: '13px', fontWeight: 700, color: UI_COLORS.text, marginBottom: '6px' }}>
+            <label
+              style={{
+                display: 'block',
+                fontSize: '13px',
+                fontWeight: 700,
+                color: UI_COLORS.text,
+                marginBottom: '6px',
+              }}
+            >
               Lớp học áp dụng <span style={{ color: '#DC2626' }}>*</span>
             </label>
             <select
               value={classId}
-              onChange={(e) => {
+              onChange={e => {
                 setClassId(e.target.value);
-                if (formErrors['classId']) setFormErrors((prev) => ({ ...prev, classId: '' }));
+                if (formErrors['classId']) setFormErrors(prev => ({ ...prev, classId: '' }));
               }}
               style={{
                 width: '100%',
@@ -412,7 +459,7 @@ export const CreateExamModal: React.FC<CreateExamModalProps> = ({
               {classes.length === 0 ? (
                 <option value="">Chưa có lớp nào trong hệ thống</option>
               ) : (
-                classes.map((c) => (
+                classes.map(c => (
                   <option key={c.id} value={c.id}>
                     🏫 {c.name}
                   </option>
@@ -420,7 +467,9 @@ export const CreateExamModal: React.FC<CreateExamModalProps> = ({
               )}
             </select>
             {formErrors['classId'] && (
-              <span style={{ fontSize: '12px', color: '#DC2626', marginTop: '4px', display: 'block' }}>
+              <span
+                style={{ fontSize: '12px', color: '#DC2626', marginTop: '4px', display: 'block' }}
+              >
                 {formErrors['classId']}
               </span>
             )}
@@ -428,14 +477,23 @@ export const CreateExamModal: React.FC<CreateExamModalProps> = ({
 
           {/* Bộ đề từ Kho đề */}
           <div style={{ flex: '1 1 240px' }}>
-            <label style={{ display: 'block', fontSize: '13px', fontWeight: 700, color: UI_COLORS.text, marginBottom: '6px' }}>
+            <label
+              style={{
+                display: 'block',
+                fontSize: '13px',
+                fontWeight: 700,
+                color: UI_COLORS.text,
+                marginBottom: '6px',
+              }}
+            >
               Bộ đề từ Kho đề thi <span style={{ color: '#DC2626' }}>*</span>
             </label>
             <select
               value={questionSetId}
-              onChange={(e) => {
+              onChange={e => {
                 handleSelectQuestionSet(e.target.value);
-                if (formErrors['questionSetId']) setFormErrors((prev) => ({ ...prev, questionSetId: '' }));
+                if (formErrors['questionSetId'])
+                  setFormErrors(prev => ({ ...prev, questionSetId: '' }));
               }}
               disabled={isLoadingSets}
               style={{
@@ -456,18 +514,21 @@ export const CreateExamModal: React.FC<CreateExamModalProps> = ({
               ) : questionSets.length === 0 ? (
                 <option value="">Chưa có bộ đề nào trong Kho đề</option>
               ) : (
-                questionSets.map((qs) => {
-                  const isMatrix = qs.tags?.some((t) => t.toLowerCase().includes('ma trận')) || false;
+                questionSets.map(qs => {
+                  const isMatrix = qs.tags?.some(t => t.toLowerCase().includes('ma trận')) || false;
                   return (
                     <option key={qs.id} value={qs.id}>
-                      {isMatrix ? '🎯 [Ma trận] ' : '📚 '}{qs.title} ({qs.questionCount} câu)
+                      {isMatrix ? '🎯 [Ma trận] ' : '📚 '}
+                      {qs.title} ({qs.questionCount} câu)
                     </option>
                   );
                 })
               )}
             </select>
             {formErrors['questionSetId'] && (
-              <span style={{ fontSize: '12px', color: '#DC2626', marginTop: '4px', display: 'block' }}>
+              <span
+                style={{ fontSize: '12px', color: '#DC2626', marginTop: '4px', display: 'block' }}
+              >
                 {formErrors['questionSetId']}
               </span>
             )}
@@ -487,7 +548,15 @@ export const CreateExamModal: React.FC<CreateExamModalProps> = ({
               gap: '12px',
             }}
           >
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '8px' }}>
+            <div
+              style={{
+                display: 'flex',
+                justifyContent: 'space-between',
+                alignItems: 'center',
+                flexWrap: 'wrap',
+                gap: '8px',
+              }}
+            >
               <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                 <span style={{ fontSize: '18px' }}>⚖️</span>
                 <span style={{ fontSize: '14px', fontWeight: 700, color: UI_COLORS.text }}>
@@ -520,9 +589,11 @@ export const CreateExamModal: React.FC<CreateExamModalProps> = ({
                   display: 'flex',
                   alignItems: 'center',
                   gap: '6px',
-                  backgroundColor: currentTotalScore === 10 || currentTotalScore === 7 ? '#DCFCE7' : '#EFF6FF',
+                  backgroundColor:
+                    currentTotalScore === 10 || currentTotalScore === 7 ? '#DCFCE7' : '#EFF6FF',
                   border: `1px solid ${currentTotalScore === 10 || currentTotalScore === 7 ? '#86EFAC' : '#BFDBFE'}`,
-                  color: currentTotalScore === 10 || currentTotalScore === 7 ? '#15803D' : '#1D4ED8',
+                  color:
+                    currentTotalScore === 10 || currentTotalScore === 7 ? '#15803D' : '#1D4ED8',
                   padding: '4px 12px',
                   borderRadius: '20px',
                   fontSize: '13px',
@@ -538,7 +609,9 @@ export const CreateExamModal: React.FC<CreateExamModalProps> = ({
             {questions.length > 0 && (
               <>
                 {/* Các nút chia đều nhanh 10đ / 7đ */}
-                <div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: '8px' }}>
+                <div
+                  style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: '8px' }}
+                >
                   <span style={{ fontSize: '13px', color: UI_COLORS.textMuted, fontWeight: 600 }}>
                     Chia nhanh:
                   </span>
@@ -596,7 +669,7 @@ export const CreateExamModal: React.FC<CreateExamModalProps> = ({
                       max={100}
                       step={0.5}
                       value={targetTotalScore}
-                      onChange={(e) => {
+                      onChange={e => {
                         const val = parseFloat(e.target.value);
                         setTargetTotalScore(isNaN(val) ? 0 : val);
                       }}
@@ -638,7 +711,7 @@ export const CreateExamModal: React.FC<CreateExamModalProps> = ({
                       max={20}
                       step={0.1}
                       value={scorePerQuestionInput}
-                      onChange={(e) => {
+                      onChange={e => {
                         const val = parseFloat(e.target.value);
                         setScorePerQuestionInput(isNaN(val) ? 0 : val);
                       }}
@@ -676,7 +749,7 @@ export const CreateExamModal: React.FC<CreateExamModalProps> = ({
                   <div style={{ marginLeft: 'auto' }}>
                     <button
                       type="button"
-                      onClick={() => setShowQuestionDetailList((prev) => !prev)}
+                      onClick={() => setShowQuestionDetailList(prev => !prev)}
                       style={{
                         padding: '6px 12px',
                         backgroundColor: showQuestionDetailList ? '#EEF2FF' : '#FFFFFF',
@@ -688,7 +761,9 @@ export const CreateExamModal: React.FC<CreateExamModalProps> = ({
                         cursor: 'pointer',
                       }}
                     >
-                      {showQuestionDetailList ? '▲ Thu gọn danh sách câu' : `👁️ Sửa điểm từng câu (${questions.length} câu)`}
+                      {showQuestionDetailList
+                        ? '▲ Thu gọn danh sách câu'
+                        : `👁️ Sửa điểm từng câu (${questions.length} câu)`}
                     </button>
                   </div>
                 </div>
@@ -705,13 +780,23 @@ export const CreateExamModal: React.FC<CreateExamModalProps> = ({
                       padding: '8px',
                     }}
                   >
-                    <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '12.5px' }}>
+                    <table
+                      style={{ width: '100%', borderCollapse: 'collapse', fontSize: '12.5px' }}
+                    >
                       <thead>
-                        <tr style={{ borderBottom: '1px solid #E2E8F0', color: '#64748B', textAlign: 'left' }}>
+                        <tr
+                          style={{
+                            borderBottom: '1px solid #E2E8F0',
+                            color: '#64748B',
+                            textAlign: 'left',
+                          }}
+                        >
                           <th style={{ padding: '6px 8px', width: '45px' }}>Câu</th>
                           <th style={{ padding: '6px 8px', width: '90px' }}>Loại câu</th>
                           <th style={{ padding: '6px 8px' }}>Nội dung câu hỏi</th>
-                          <th style={{ padding: '6px 8px', width: '100px', textAlign: 'right' }}>Điểm số</th>
+                          <th style={{ padding: '6px 8px', width: '100px', textAlign: 'right' }}>
+                            Điểm số
+                          </th>
                         </tr>
                       </thead>
                       <tbody>
@@ -722,10 +807,10 @@ export const CreateExamModal: React.FC<CreateExamModalProps> = ({
                             qType === 'mcq4'
                               ? 'Trắc nghiệm'
                               : qType === 'tf'
-                              ? 'Đúng/Sai'
-                              : qType === 'short'
-                              ? 'Điền ngắn'
-                              : qType;
+                                ? 'Đúng/Sai'
+                                : qType === 'short'
+                                  ? 'Điền ngắn'
+                                  : qType;
 
                           return (
                             <tr key={idx} style={{ borderBottom: '1px solid #F1F5F9' }}>
@@ -764,7 +849,7 @@ export const CreateExamModal: React.FC<CreateExamModalProps> = ({
                                   max={100}
                                   step={0.1}
                                   value={pts}
-                                  onChange={(e) => {
+                                  onChange={e => {
                                     const val = parseFloat(e.target.value);
                                     handleUpdateQuestionPoint(idx, isNaN(val) ? 0 : val);
                                   }}
@@ -778,7 +863,11 @@ export const CreateExamModal: React.FC<CreateExamModalProps> = ({
                                     textAlign: 'right',
                                   }}
                                 />
-                                <span style={{ marginLeft: '4px', fontSize: '11px', color: '#64748B' }}>đ</span>
+                                <span
+                                  style={{ marginLeft: '4px', fontSize: '11px', color: '#64748B' }}
+                                >
+                                  đ
+                                </span>
                               </td>
                             </tr>
                           );
@@ -799,7 +888,7 @@ export const CreateExamModal: React.FC<CreateExamModalProps> = ({
             (activeSession as { classId?: string | null })?.classId ??
             null;
           const isFreeSession = Boolean(activeSession) && !currentSessionClassId;
-          const selectedClass = classes.find((c) => c.id === classId);
+          const selectedClass = classes.find(c => c.id === classId);
           if (!isFreeSession) return null;
 
           return (
@@ -816,15 +905,22 @@ export const CreateExamModal: React.FC<CreateExamModalProps> = ({
             >
               <span style={{ fontSize: '18px', lineHeight: 1 }}>⚠️</span>
               <div style={{ fontSize: '12.5px', color: '#92400E', lineHeight: 1.5 }}>
-                <strong style={{ color: '#B45309' }}>Lưu ý: Tiết học hiện tại đang là Phiên tự do!</strong>
+                <strong style={{ color: '#B45309' }}>
+                  Lưu ý: Tiết học hiện tại đang là Phiên tự do!
+                </strong>
                 <div style={{ marginTop: '2px' }}>
-                  Kỳ thi này được gắn với <strong>{selectedClass?.name || 'Lớp đã chọn'}</strong>, nhưng phiên học hiện tại không chọn danh sách lớp (học sinh chỉ gõ tên tự do khi vào phòng).
+                  Kỳ thi này được gắn với <strong>{selectedClass?.name || 'Lớp đã chọn'}</strong>,
+                  nhưng phiên học hiện tại không chọn danh sách lớp (học sinh chỉ gõ tên tự do khi
+                  vào phòng).
                 </div>
                 <div style={{ marginTop: '4px', color: '#15803D', fontWeight: 600 }}>
-                  ✓ Hệ thống vẫn tự động lưu đầy đủ điểm số và bài thi của học sinh tự do vào báo cáo.
+                  ✓ Hệ thống vẫn tự động lưu đầy đủ điểm số và bài thi của học sinh tự do vào báo
+                  cáo.
                 </div>
                 <div style={{ marginTop: '2px', color: '#B45309' }}>
-                  💡 Để học sinh tự động đăng nhập đúng mã và danh sách lớp chính thức, thầy/cô nên kết thúc phiên hiện tại và <u>Tạo phiên mới theo lớp {selectedClass?.name || ''}</u>.
+                  💡 Để học sinh tự động đăng nhập đúng mã và danh sách lớp chính thức, thầy/cô nên
+                  kết thúc phiên hiện tại và{' '}
+                  <u>Tạo phiên mới theo lớp {selectedClass?.name || ''}</u>.
                 </div>
               </div>
             </div>
@@ -833,7 +929,15 @@ export const CreateExamModal: React.FC<CreateExamModalProps> = ({
 
         {/* 3. Thời gian làm bài (phút) */}
         <div>
-          <label style={{ display: 'block', fontSize: '13px', fontWeight: 700, color: UI_COLORS.text, marginBottom: '6px' }}>
+          <label
+            style={{
+              display: 'block',
+              fontSize: '13px',
+              fontWeight: 700,
+              color: UI_COLORS.text,
+              marginBottom: '6px',
+            }}
+          >
             Thời lượng làm bài (phút) <span style={{ color: '#DC2626' }}>*</span>
           </label>
           <div style={{ display: 'flex', alignItems: 'center', gap: '10px', flexWrap: 'wrap' }}>
@@ -842,7 +946,7 @@ export const CreateExamModal: React.FC<CreateExamModalProps> = ({
               min={1}
               max={180}
               value={durationMinutes}
-              onChange={(e) => {
+              onChange={e => {
                 const val = parseInt(e.target.value, 10);
                 setDurationMinutes(isNaN(val) ? 0 : val);
               }}
@@ -859,7 +963,7 @@ export const CreateExamModal: React.FC<CreateExamModalProps> = ({
 
             {/* Các nút bấm chọn nhanh thời lượng */}
             <div style={{ display: 'flex', gap: '6px', flexWrap: 'wrap' }}>
-              {[15, 30, 45, 60, 90].map((mins) => (
+              {[15, 30, 45, 60, 90].map(mins => (
                 <button
                   key={mins}
                   type="button"
@@ -895,7 +999,14 @@ export const CreateExamModal: React.FC<CreateExamModalProps> = ({
             gap: '12px',
           }}
         >
-          <div style={{ fontSize: '13px', fontWeight: 700, color: UI_COLORS.text, marginBottom: '2px' }}>
+          <div
+            style={{
+              fontSize: '13px',
+              fontWeight: 700,
+              color: UI_COLORS.text,
+              marginBottom: '2px',
+            }}
+          >
             ⚙️ Tùy chọn chống gian lận & Trả kết quả
           </div>
 
@@ -912,11 +1023,17 @@ export const CreateExamModal: React.FC<CreateExamModalProps> = ({
             <input
               type="checkbox"
               checked={shuffleQuestions}
-              onChange={(e) => setShuffleQuestions(e.target.checked)}
-              style={{ width: '18px', height: '18px', accentColor: UI_COLORS.primary, cursor: 'pointer' }}
+              onChange={e => setShuffleQuestions(e.target.checked)}
+              style={{
+                width: '18px',
+                height: '18px',
+                accentColor: UI_COLORS.primary,
+                cursor: 'pointer',
+              }}
             />
             <span>
-              <strong>Xáo trộn thứ tự câu hỏi:</strong> Mỗi học sinh nhận đề với thứ tự câu hỏi ngẫu nhiên khác nhau.
+              <strong>Xáo trộn thứ tự câu hỏi:</strong> Mỗi học sinh nhận đề với thứ tự câu hỏi ngẫu
+              nhiên khác nhau.
             </span>
           </label>
 
@@ -933,11 +1050,17 @@ export const CreateExamModal: React.FC<CreateExamModalProps> = ({
             <input
               type="checkbox"
               checked={shuffleOptions}
-              onChange={(e) => setShuffleOptions(e.target.checked)}
-              style={{ width: '18px', height: '18px', accentColor: UI_COLORS.primary, cursor: 'pointer' }}
+              onChange={e => setShuffleOptions(e.target.checked)}
+              style={{
+                width: '18px',
+                height: '18px',
+                accentColor: UI_COLORS.primary,
+                cursor: 'pointer',
+              }}
             />
             <span>
-              <strong>Xáo trộn thứ tự đáp án (A, B, C, D):</strong> Đảo ngẫu nhiên vị trí các lựa chọn trong từng câu.
+              <strong>Xáo trộn thứ tự đáp án (A, B, C, D):</strong> Đảo ngẫu nhiên vị trí các lựa
+              chọn trong từng câu.
             </span>
           </label>
 
@@ -954,11 +1077,17 @@ export const CreateExamModal: React.FC<CreateExamModalProps> = ({
             <input
               type="checkbox"
               checked={allowViewScore}
-              onChange={(e) => setAllowViewScore(e.target.checked)}
-              style={{ width: '18px', height: '18px', accentColor: UI_COLORS.primary, cursor: 'pointer' }}
+              onChange={e => setAllowViewScore(e.target.checked)}
+              style={{
+                width: '18px',
+                height: '18px',
+                accentColor: UI_COLORS.primary,
+                cursor: 'pointer',
+              }}
             />
             <span>
-              <strong>Cho xem điểm sau khi nộp:</strong> Hiển thị điểm số ngay khi học sinh hoàn thành bài thi.
+              <strong>Cho xem điểm sau khi nộp:</strong> Hiển thị điểm số ngay khi học sinh hoàn
+              thành bài thi.
             </span>
           </label>
 
@@ -975,24 +1104,38 @@ export const CreateExamModal: React.FC<CreateExamModalProps> = ({
             <input
               type="checkbox"
               checked={allowViewReview}
-              onChange={(e) => setAllowViewReview(e.target.checked)}
-              style={{ width: '18px', height: '18px', accentColor: UI_COLORS.primary, cursor: 'pointer' }}
+              onChange={e => setAllowViewReview(e.target.checked)}
+              style={{
+                width: '18px',
+                height: '18px',
+                accentColor: UI_COLORS.primary,
+                cursor: 'pointer',
+              }}
             />
             <span>
-              <strong>Cho xem lại bài & đáp án đúng:</strong> Học sinh có thể xem lại các câu đúng/sai sau khi nộp.
+              <strong>Cho xem lại bài & đáp án đúng:</strong> Học sinh có thể xem lại các câu
+              đúng/sai sau khi nộp.
             </span>
           </label>
 
           {/* Mật khẩu bảo vệ */}
           <div style={{ marginTop: '4px', paddingTop: '10px', borderTop: '1px solid #E2E8F0' }}>
-            <label style={{ display: 'block', fontSize: '13px', fontWeight: 600, color: UI_COLORS.text, marginBottom: '6px' }}>
+            <label
+              style={{
+                display: 'block',
+                fontSize: '13px',
+                fontWeight: 600,
+                color: UI_COLORS.text,
+                marginBottom: '6px',
+              }}
+            >
               🔒 Mật khẩu vào thi (Tùy chọn, để trống nếu không yêu cầu):
             </label>
             <input
               type="text"
               placeholder="VD: 123456"
               value={password}
-              onChange={(e) => setPassword(e.target.value)}
+              onChange={e => setPassword(e.target.value)}
               style={{
                 width: '100%',
                 maxWidth: '240px',

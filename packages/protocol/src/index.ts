@@ -21,4 +21,3 @@ export * from './powerups.js';
 export * from './interactive-board.js';
 export * from './discovery.js';
 export * from './version.js';
-

@@ -1,7 +1,12 @@
 import { asc, eq, inArray } from 'drizzle-orm';
 import type { EduClassDatabase } from '../connection.js';
 import { generateId } from '../id.js';
-import { classGroups, students, type ClassGroupInsert, type ClassGroupSelect } from '../schema/index.js';
+import {
+  classGroups,
+  students,
+  type ClassGroupInsert,
+  type ClassGroupSelect,
+} from '../schema/index.js';
 import type { StudentSelect } from './student-repository.js';
 
 export interface UpdateClassGroupData {
@@ -107,10 +112,7 @@ export class ClassGroupRepository {
 
     if (studentId) {
       // Đảm bảo học sinh này thuộc nhóm
-      await this.db
-        .update(students)
-        .set({ groupId })
-        .where(eq(students.id, studentId));
+      await this.db.update(students).set({ groupId }).where(eq(students.id, studentId));
     }
 
     await this.db
@@ -143,10 +145,7 @@ export class ClassGroupRepository {
         .where(eq(classGroups.leaderStudentId, studentId));
     }
 
-    await this.db
-      .update(students)
-      .set({ groupId })
-      .where(eq(students.id, studentId));
+    await this.db.update(students).set({ groupId }).where(eq(students.id, studentId));
 
     return true;
   }
@@ -156,10 +155,7 @@ export class ClassGroupRepository {
    */
   async deleteById(id: string): Promise<boolean> {
     // Đưa học sinh trong nhóm về groupId = null
-    await this.db
-      .update(students)
-      .set({ groupId: null })
-      .where(eq(students.groupId, id));
+    await this.db.update(students).set({ groupId: null }).where(eq(students.groupId, id));
 
     const result = await this.db.delete(classGroups).where(eq(classGroups.id, id));
     return (result.changes ?? 0) > 0;
@@ -170,19 +166,16 @@ export class ClassGroupRepository {
    */
   async getGroupsOverview(classId: string): Promise<ClassGroupsOverview> {
     const groupList = await this.listByClassId(classId);
-    const allStudents = await this.db
-      .select()
-      .from(students)
-      .where(eq(students.classId, classId));
+    const allStudents = await this.db.select().from(students).where(eq(students.classId, classId));
 
     const studentMap = new Map<string, StudentSelect>();
     for (const s of allStudents) {
       studentMap.set(s.id, s);
     }
 
-    const groupsWithMembers: ClassGroupWithMembers[] = groupList.map((grp) => {
-      const members = allStudents.filter((s) => s.groupId === grp.id);
-      const leader = grp.leaderStudentId ? studentMap.get(grp.leaderStudentId) ?? null : null;
+    const groupsWithMembers: ClassGroupWithMembers[] = groupList.map(grp => {
+      const members = allStudents.filter(s => s.groupId === grp.id);
+      const leader = grp.leaderStudentId ? (studentMap.get(grp.leaderStudentId) ?? null) : null;
       return {
         group: grp,
         members,
@@ -190,7 +183,7 @@ export class ClassGroupRepository {
       };
     });
 
-    const unassignedStudents = allStudents.filter((s) => !s.groupId);
+    const unassignedStudents = allStudents.filter(s => !s.groupId);
 
     return {
       groups: groupsWithMembers,
@@ -213,15 +206,12 @@ export class ClassGroupRepository {
     const autoAssignLeader = options.autoAssignLeader ?? true;
 
     // 1. Lấy toàn bộ học sinh của lớp
-    const allStudents = await this.db
-      .select()
-      .from(students)
-      .where(eq(students.classId, classId));
+    const allStudents = await this.db.select().from(students).where(eq(students.classId, classId));
 
     // 2. Xóa các nhóm cũ của lớp này
     const oldGroups = await this.listByClassId(classId);
     if (oldGroups.length > 0) {
-      const oldGroupIds = oldGroups.map((g) => g.id);
+      const oldGroupIds = oldGroups.map(g => g.id);
       await this.db
         .update(students)
         .set({ groupId: null })
@@ -250,7 +240,7 @@ export class ClassGroupRepository {
 
     if (allStudents.length === 0) {
       return {
-        groups: newGroups.map((group) => ({ group, members: [], leader: null })),
+        groups: newGroups.map(group => ({ group, members: [], leader: null })),
         unassignedStudents: [],
       };
     }

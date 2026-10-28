@@ -115,7 +115,7 @@ describe('TitleRepository & Student Avatar', () => {
       });
 
       expect(newlyAwarded.length).toBeGreaterThanOrEqual(2);
-      const keys = newlyAwarded.map((t) => t.key);
+      const keys = newlyAwarded.map(t => t.key);
       expect(keys).toContain('tan_binh');
       expect(keys).toContain('cham_chi');
 

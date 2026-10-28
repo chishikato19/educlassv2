@@ -1,5 +1,5 @@
 /* EduClass v2 Teacher UI - Global Styles */
-@import "tailwindcss";
+@import 'tailwindcss';
 @source "../../../packages";
 @import 'katex/dist/katex.min.css';
 
@@ -17,7 +17,9 @@
   --color-border: #e2e8f0;
 }
 
-html, body, #root {
+html,
+body,
+#root {
   height: 100%;
   width: 100%;
   margin: 0;
@@ -25,7 +27,8 @@ html, body, #root {
 }
 
 body {
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  font-family:
+    -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
   background-color: var(--color-bg);
   color: var(--color-text);
   -webkit-font-smoothing: antialiased;
@@ -35,6 +38,8 @@ button {
   font-family: inherit;
 }
 
-input, textarea, select {
+input,
+textarea,
+select {
   font-family: inherit;
 }

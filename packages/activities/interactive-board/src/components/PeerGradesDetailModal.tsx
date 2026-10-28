@@ -52,7 +52,7 @@ export const PeerGradesDetailModal: React.FC<PeerGradesDetailModalProps> = ({
               Chưa có bạn nào chấm điểm bài này
             </div>
           ) : (
-            gradesList.map((item) => (
+            gradesList.map(item => (
               <div
                 key={item.participantId}
                 className="p-3 bg-slate-50 rounded-2xl border border-slate-200 flex items-center justify-between"
@@ -64,7 +64,10 @@ export const PeerGradesDetailModal: React.FC<PeerGradesDetailModalProps> = ({
                   <div>
                     <span className="font-bold text-slate-800 text-sm">{item.authorName}</span>
                     <p className="text-[10px] text-slate-400">
-                      {new Date(item.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                      {new Date(item.createdAt).toLocaleTimeString([], {
+                        hour: '2-digit',
+                        minute: '2-digit',
+                      })}
                     </p>
                   </div>
                 </div>

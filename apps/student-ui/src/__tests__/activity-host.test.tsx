@@ -5,13 +5,7 @@ import { ActivityHost } from '../components/ActivityHost.js';
 
 describe('ActivityHost UI Component (apps/student-ui)', () => {
   it('renders idle state when no active activity', () => {
-    render(
-      <ActivityHost
-        activeActivity={null}
-        participantId="p_1"
-        onSendIntent={vi.fn()}
-      />
-    );
+    render(<ActivityHost activeActivity={null} participantId="p_1" onSendIntent={vi.fn()} />);
 
     expect(screen.getByTestId('activity-host-idle')).toBeDefined();
     expect(screen.getByText('Đang chờ hoạt động mới')).toBeDefined();
@@ -105,7 +99,7 @@ describe('ActivityHost UI Component (apps/student-ui)', () => {
               },
             ],
             participants: {
-              'p_student': {
+              p_student: {
                 participantId: 'p_student',
                 displayName: 'Học sinh Mai',
                 authenticated: true,

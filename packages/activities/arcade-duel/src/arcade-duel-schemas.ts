@@ -1,15 +1,11 @@
 import { z } from 'zod';
-import {
-  ActiveEffectSchema,
-  CombatEventSchema,
-  PowerUpInventorySchema,
-} from '@educlass/protocol';
+import { ActiveEffectSchema, CombatEventSchema, PowerUpInventorySchema } from '@educlass/protocol';
 
 /**
  * 2 chế độ thi đấu của Đối Kháng 1vs1
  */
 export const DuelModeSchema = z.enum([
-  'sync_turn',  // Cùng trả lời câu hỏi (Màn hình chia 3, đấu trí từng câu)
+  'sync_turn', // Cùng trả lời câu hỏi (Màn hình chia 3, đấu trí từng câu)
   'speed_race', // Đua tốc độ (Màn hình chia đôi 50/50 dọc, độc lập tiến độ)
 ]);
 export type DuelMode = z.infer<typeof DuelModeSchema>;

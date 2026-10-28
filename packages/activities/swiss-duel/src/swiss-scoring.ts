@@ -43,9 +43,10 @@ export function shuffleQuestionOptions(
   }
 
   const origIdx = toOptionIndex(question.correctAnswer);
-  const origText = typeof question.correctAnswer === 'string'
-    ? question.correctAnswer.trim().toLowerCase()
-    : undefined;
+  const origText =
+    typeof question.correctAnswer === 'string'
+      ? question.correctAnswer.trim().toLowerCase()
+      : undefined;
 
   const paired = question.options.map((text, index) => {
     const isCorrect =

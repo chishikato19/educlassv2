@@ -1,9 +1,6 @@
 import { describe, expect, it, vi } from 'vitest';
 import type { ActivityContext } from '@educlass/core';
-import {
-  PdfPresenterActivity,
-  calculateExpandedHeight,
-} from '../index.js';
+import { PdfPresenterActivity, calculateExpandedHeight } from '../index.js';
 
 describe('PdfPresenter Activity Plugin (@educlass/activity-pdf-presenter)', () => {
   const mockCtx: ActivityContext = {
@@ -101,22 +98,26 @@ describe('PdfPresenter Activity Plugin (@educlass/activity-pdf-presenter)', () =
     });
 
     // 2. Thêm nét bút dạ quang vàng
-    const stateWithStroke2 = PdfPresenterActivity.server.onTeacherIntent(mockCtx, stateWithStroke1, {
-      type: 'add_stroke',
-      stroke: {
-        id: 'stroke_2',
-        pageNumber: 1,
-        tool: 'highlighter',
-        color: '#FDE047',
-        size: 18,
-        opacity: 0.4,
-        points: [
-          { x: 0.3, y: 0.4 },
-          { x: 0.4, y: 0.5 },
-        ],
-        createdAt: 1728000001000,
-      },
-    });
+    const stateWithStroke2 = PdfPresenterActivity.server.onTeacherIntent(
+      mockCtx,
+      stateWithStroke1,
+      {
+        type: 'add_stroke',
+        stroke: {
+          id: 'stroke_2',
+          pageNumber: 1,
+          tool: 'highlighter',
+          color: '#FDE047',
+          size: 18,
+          opacity: 0.4,
+          points: [
+            { x: 0.3, y: 0.4 },
+            { x: 0.4, y: 0.5 },
+          ],
+          createdAt: 1728000001000,
+        },
+      }
+    );
 
     expect(stateWithStroke2.strokes).toHaveLength(2);
 

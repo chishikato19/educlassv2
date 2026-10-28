@@ -10,10 +10,7 @@ import type {
 import { renderLatexInText } from '@educlass/question-kit';
 import { api } from '../api/client.js';
 import { BankCurriculumTree } from './BankCurriculumTree.js';
-import {
-  DifficultyFilterBar,
-  getDifficultyBadgeInfo,
-} from './DifficultyFilterBar.js';
+import { DifficultyFilterBar, getDifficultyBadgeInfo } from './DifficultyFilterBar.js';
 import { BankWordImportModal } from './BankWordImportModal.js';
 
 export interface BankQuestionTabProps {
@@ -163,7 +160,7 @@ export const BankQuestionTab: React.FC<BankQuestionTabProps> = ({
       const content = JSON.parse(q.contentJson) as ParsedMcqContent;
       setFormStemText(content.stem?.text || '');
       if (content.options && content.options.length > 0) {
-        setFormOptions(content.options.map((o) => o.text));
+        setFormOptions(content.options.map(o => o.text));
       } else {
         setFormOptions(['', '', '', '']);
       }
@@ -295,12 +292,12 @@ export const BankQuestionTab: React.FC<BankQuestionTabProps> = ({
           currentSubject={subject}
           selectedChapter={selectedChapter}
           selectedLesson={selectedLesson}
-          onGradeChange={(newGrade) => {
+          onGradeChange={newGrade => {
             setGrade(newGrade);
             setSelectedChapter(null);
             setSelectedLesson(null);
           }}
-          onSubjectChange={(newSubj) => {
+          onSubjectChange={newSubj => {
             setSubject(newSubj);
             setSelectedChapter(null);
             setSelectedLesson(null);
@@ -309,7 +306,7 @@ export const BankQuestionTab: React.FC<BankQuestionTabProps> = ({
             setSelectedChapter(chap);
             setSelectedLesson(les);
           }}
-          onSelectChapter={(chap) => {
+          onSelectChapter={chap => {
             setSelectedChapter(chap);
             setSelectedLesson(null);
           }}
@@ -340,7 +337,10 @@ export const BankQuestionTab: React.FC<BankQuestionTabProps> = ({
               )}
             </div>
             <h2 className="text-lg font-bold text-zinc-900 dark:text-zinc-100 flex items-center gap-2">
-              <span>{selectedLesson || (selectedChapter ? 'Tất cả bài trong chương' : 'Toàn bộ câu hỏi')}</span>
+              <span>
+                {selectedLesson ||
+                  (selectedChapter ? 'Tất cả bài trong chương' : 'Toàn bộ câu hỏi')}
+              </span>
               <span className="text-xs px-2.5 py-0.5 rounded-full font-bold bg-zinc-100 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-300">
                 {questions.length} câu
               </span>
@@ -402,7 +402,7 @@ export const BankQuestionTab: React.FC<BankQuestionTabProps> = ({
               type="text"
               placeholder="Tìm kiếm nội dung đề bài..."
               value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
+              onChange={e => setSearchTerm(e.target.value)}
               className="w-full text-xs font-medium pl-8 pr-3 py-2 rounded-xl bg-zinc-50 dark:bg-zinc-800/80 border border-zinc-200 dark:border-zinc-700 text-zinc-800 dark:text-zinc-200 placeholder-zinc-400 focus:outline-none focus:ring-2 focus:ring-blue-500 min-h-[44px]"
             />
             <span className="absolute left-2.5 top-1/2 -translate-y-1/2 text-zinc-400 text-xs">
@@ -573,16 +573,23 @@ export const BankQuestionTab: React.FC<BankQuestionTabProps> = ({
                   )}
 
                   {/* Trường hợp câu Đúng/Sai đơn lẻ */}
-                  {typeof parsedAnswer.correct === 'boolean' && (!parsedContent.options || parsedContent.options.length === 0) && (
-                    <div className="p-2.5 rounded-xl border border-zinc-200 dark:border-zinc-800 bg-zinc-50/60 dark:bg-zinc-900/40 text-xs flex items-center gap-2">
-                      <span className="font-bold text-zinc-600 dark:text-zinc-400">Đáp án chuẩn:</span>
-                      <span className={`px-2.5 py-0.5 rounded font-bold border ${
-                        parsedAnswer.correct ? 'bg-emerald-100 text-emerald-800 border-emerald-300' : 'bg-rose-100 text-rose-800 border-rose-300'
-                      }`}>
-                        {parsedAnswer.correct ? '✓ ĐÚNG (True)' : '✗ SAI (False)'}
-                      </span>
-                    </div>
-                  )}
+                  {typeof parsedAnswer.correct === 'boolean' &&
+                    (!parsedContent.options || parsedContent.options.length === 0) && (
+                      <div className="p-2.5 rounded-xl border border-zinc-200 dark:border-zinc-800 bg-zinc-50/60 dark:bg-zinc-900/40 text-xs flex items-center gap-2">
+                        <span className="font-bold text-zinc-600 dark:text-zinc-400">
+                          Đáp án chuẩn:
+                        </span>
+                        <span
+                          className={`px-2.5 py-0.5 rounded font-bold border ${
+                            parsedAnswer.correct
+                              ? 'bg-emerald-100 text-emerald-800 border-emerald-300'
+                              : 'bg-rose-100 text-rose-800 border-rose-300'
+                          }`}
+                        >
+                          {parsedAnswer.correct ? '✓ ĐÚNG (True)' : '✗ SAI (False)'}
+                        </span>
+                      </div>
+                    )}
 
                   {/* Lời Giải Thích (Nếu Có) */}
                   {parsedAnswer.explanation && (
@@ -639,7 +646,7 @@ export const BankQuestionTab: React.FC<BankQuestionTabProps> = ({
                     type="text"
                     required
                     value={formChapter}
-                    onChange={(e) => setFormChapter(e.target.value)}
+                    onChange={e => setFormChapter(e.target.value)}
                     placeholder="VD: Chương 1: Ứng dụng đạo hàm"
                     className="w-full text-xs font-semibold px-3 py-2 rounded-xl bg-white dark:bg-zinc-800 border border-zinc-300 dark:border-zinc-700 focus:outline-none focus:ring-2 focus:ring-blue-500 min-h-[44px]"
                   />
@@ -652,7 +659,7 @@ export const BankQuestionTab: React.FC<BankQuestionTabProps> = ({
                     type="text"
                     required
                     value={formLesson}
-                    onChange={(e) => setFormLesson(e.target.value)}
+                    onChange={e => setFormLesson(e.target.value)}
                     placeholder="VD: Bài 1: Tính đơn điệu"
                     className="w-full text-xs font-semibold px-3 py-2 rounded-xl bg-white dark:bg-zinc-800 border border-zinc-300 dark:border-zinc-700 focus:outline-none focus:ring-2 focus:ring-blue-500 min-h-[44px]"
                   />
@@ -667,7 +674,7 @@ export const BankQuestionTab: React.FC<BankQuestionTabProps> = ({
                   </label>
                   <select
                     value={formDifficulty}
-                    onChange={(e) => setFormDifficulty(e.target.value as DifficultyLevel)}
+                    onChange={e => setFormDifficulty(e.target.value as DifficultyLevel)}
                     className="w-full text-xs font-semibold px-3 py-2 rounded-xl bg-white dark:bg-zinc-800 border border-zinc-300 dark:border-zinc-700 focus:outline-none focus:ring-2 focus:ring-blue-500 min-h-[44px] cursor-pointer"
                   >
                     <option value="nb">● Nhận biết (NB)</option>
@@ -686,7 +693,7 @@ export const BankQuestionTab: React.FC<BankQuestionTabProps> = ({
                     min="1"
                     max="100"
                     value={formPoints}
-                    onChange={(e) => setFormPoints(Number(e.target.value))}
+                    onChange={e => setFormPoints(Number(e.target.value))}
                     className="w-full text-xs font-semibold px-3 py-2 rounded-xl bg-white dark:bg-zinc-800 border border-zinc-300 dark:border-zinc-700 focus:outline-none focus:ring-2 focus:ring-blue-500 min-h-[44px]"
                   />
                 </div>
@@ -701,7 +708,7 @@ export const BankQuestionTab: React.FC<BankQuestionTabProps> = ({
                   required
                   rows={3}
                   value={formStemText}
-                  onChange={(e) => setFormStemText(e.target.value)}
+                  onChange={e => setFormStemText(e.target.value)}
                   placeholder="Nhập nội dung đề bài, ví dụ: Cho hàm số $y = f(x)$ có bảng biến thiên như sau..."
                   className="w-full text-xs font-medium p-3 rounded-xl bg-white dark:bg-zinc-800 border border-zinc-300 dark:border-zinc-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
                 />
@@ -732,7 +739,7 @@ export const BankQuestionTab: React.FC<BankQuestionTabProps> = ({
                       <input
                         type="text"
                         value={optText}
-                        onChange={(e) => {
+                        onChange={e => {
                           const updated = [...formOptions];
                           updated[optIdx] = e.target.value;
                           setFormOptions(updated);
@@ -757,7 +764,7 @@ export const BankQuestionTab: React.FC<BankQuestionTabProps> = ({
                 <textarea
                   rows={2}
                   value={formExplanation}
-                  onChange={(e) => setFormExplanation(e.target.value)}
+                  onChange={e => setFormExplanation(e.target.value)}
                   placeholder="Nhập hướng dẫn giải hoặc lời giải chi tiết..."
                   className="w-full text-xs font-medium p-3 rounded-xl bg-white dark:bg-zinc-800 border border-zinc-300 dark:border-zinc-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
                 />
@@ -797,7 +804,8 @@ export const BankQuestionTab: React.FC<BankQuestionTabProps> = ({
                 Xóa câu hỏi khỏi ngân hàng?
               </h4>
               <p className="text-xs text-zinc-500 dark:text-zinc-400">
-                Hành động này không thể hoàn tác. Các tệp ảnh mồ côi (nếu không còn dùng ở đề thi nào) sẽ được tự động dọn dẹp sạch sẽ.
+                Hành động này không thể hoàn tác. Các tệp ảnh mồ côi (nếu không còn dùng ở đề thi
+                nào) sẽ được tự động dọn dẹp sạch sẽ.
               </p>
             </div>
             <div className="flex items-center justify-center gap-2 pt-2">
@@ -831,7 +839,7 @@ export const BankQuestionTab: React.FC<BankQuestionTabProps> = ({
           currentChapter={selectedChapter}
           currentLesson={selectedLesson}
           onClose={() => setIsWordModalOpen(false)}
-          onSuccess={(count) => {
+          onSuccess={count => {
             onShowToast?.(`Đã nhập thành công ${count} câu hỏi vào ngân hàng!`);
             loadTree();
             loadQuestions();

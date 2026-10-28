@@ -272,7 +272,8 @@ export async function buildServer(options: BuildServerOptions = {}): Promise<Fas
     (options.dbPath ? path.dirname(options.dbPath) : path.join(process.cwd(), 'data'));
 
   const resolvedAssetsDir = options.assetsDir ?? path.join(resolvedDataDir, 'assets');
-  const resolvedSubmissionsDir = options.submissionsDir ?? path.join(resolvedDataDir, 'submissions');
+  const resolvedSubmissionsDir =
+    options.submissionsDir ?? path.join(resolvedDataDir, 'submissions');
   const resolvedMaterialsDir = options.materialsDir ?? path.join(resolvedDataDir, 'materials');
   const resolvedTempDir = options.tempDir ?? path.join(resolvedDataDir, 'temp', 'object-camera');
 
@@ -345,7 +346,6 @@ export async function buildServer(options: BuildServerOptions = {}): Promise<Fas
     authService,
     videoRepo,
   });
-
 
   // Đăng ký Sessions routes (Mở phiên, chọn lớp/tự do, mã 6 số, QR, tra cứu, HS vào lớp, đóng phiên & báo cáo, thưởng EXP)
   await app.register(sessionsRoutes, {

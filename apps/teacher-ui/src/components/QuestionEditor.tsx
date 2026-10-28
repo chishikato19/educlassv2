@@ -42,13 +42,11 @@ export const QuestionEditor: React.FC<QuestionEditorProps> = ({
   // Điểm số & lời giải thích
   const [points, setPoints] = useState<number>(initialQuestion?.points ?? 10);
   const [explanation, setExplanation] = useState<RichText>(
-    initialQuestion?.explanation ?? emptyRichText(),
+    initialQuestion?.explanation ?? emptyRichText()
   );
 
   // Nội dung câu hỏi dẫn (stem)
-  const [stem, setStem] = useState<RichText>(
-    initialQuestion?.stem ?? emptyRichText(),
-  );
+  const [stem, setStem] = useState<RichText>(initialQuestion?.stem ?? emptyRichText());
 
   // State MCQ4: options là mảng tuple 4 phần tử tương ứng A, B, C, D
   const [mcqOptions, setMcqOptions] = useState<[RichText, RichText, RichText, RichText]>(() => {
@@ -144,7 +142,7 @@ export const QuestionEditor: React.FC<QuestionEditorProps> = ({
         const parsed = Mcq4QuestionSchema.safeParse(questionPayload);
         if (!parsed.success) {
           setErrorMessage(
-            parsed.error.errors[0]?.message ?? 'Dữ liệu câu hỏi trắc nghiệm không hợp lệ.',
+            parsed.error.errors[0]?.message ?? 'Dữ liệu câu hỏi trắc nghiệm không hợp lệ.'
           );
           return;
         }
@@ -168,7 +166,7 @@ export const QuestionEditor: React.FC<QuestionEditorProps> = ({
         const parsed = TfQuestionSchema.safeParse(questionPayload);
         if (!parsed.success) {
           setErrorMessage(
-            parsed.error.errors[0]?.message ?? 'Dữ liệu câu hỏi Đúng / Sai không hợp lệ.',
+            parsed.error.errors[0]?.message ?? 'Dữ liệu câu hỏi Đúng / Sai không hợp lệ.'
           );
           return;
         }
@@ -192,14 +190,14 @@ export const QuestionEditor: React.FC<QuestionEditorProps> = ({
         const parsed = TfGroupQuestionSchema.safeParse(questionPayload);
         if (!parsed.success) {
           setErrorMessage(
-            parsed.error.errors[0]?.message ?? 'Dữ liệu câu hỏi Đúng / Sai nhóm không hợp lệ.',
+            parsed.error.errors[0]?.message ?? 'Dữ liệu câu hỏi Đúng / Sai nhóm không hợp lệ.'
           );
           return;
         }
 
         onSave(parsed.data);
       } else if (type === 'short') {
-        const filteredAccepted = shortAccepted.map((s) => s.trim()).filter((s) => s.length > 0);
+        const filteredAccepted = shortAccepted.map(s => s.trim()).filter(s => s.length > 0);
         if (filteredAccepted.length === 0) {
           setErrorMessage('Vui lòng nhập ít nhất một đáp án được chấp nhận.');
           return;
@@ -218,7 +216,7 @@ export const QuestionEditor: React.FC<QuestionEditorProps> = ({
         const parsed = ShortQuestionSchema.safeParse(questionPayload);
         if (!parsed.success) {
           setErrorMessage(
-            parsed.error.errors[0]?.message ?? 'Dữ liệu câu hỏi trả lời ngắn không hợp lệ.',
+            parsed.error.errors[0]?.message ?? 'Dữ liệu câu hỏi trả lời ngắn không hợp lệ.'
           );
           return;
         }
@@ -317,9 +315,7 @@ export const QuestionEditor: React.FC<QuestionEditorProps> = ({
       {/* Khu vực nhập phương án / đáp án theo loại câu hỏi */}
       {type === 'mcq4' && (
         <div className="space-y-4">
-          <h3 className="text-sm font-bold text-gray-800">
-            Các lựa chọn (chọn 1 phương án đúng):
-          </h3>
+          <h3 className="text-sm font-bold text-gray-800">Các lựa chọn (chọn 1 phương án đúng):</h3>
           {optionLabels.map((optLabel, idx) => (
             <div key={optLabel} className="flex items-start gap-3">
               <div className="pt-2">
@@ -338,7 +334,7 @@ export const QuestionEditor: React.FC<QuestionEditorProps> = ({
               <div className="flex-1">
                 <RichTextEditor
                   value={mcqOptions[idx]!}
-                  onChange={(val) => {
+                  onChange={val => {
                     const newOpts = [...mcqOptions] as [RichText, RichText, RichText, RichText];
                     newOpts[idx] = val;
                     setMcqOptions(newOpts);
@@ -437,7 +433,7 @@ export const QuestionEditor: React.FC<QuestionEditorProps> = ({
               </div>
               <RichTextEditor
                 value={tfGroupItems[idx]!}
-                onChange={(val) => {
+                onChange={val => {
                   const newItems = [...tfGroupItems] as [RichText, RichText, RichText, RichText];
                   newItems[idx] = val;
                   setTfGroupItems(newItems);
@@ -458,7 +454,7 @@ export const QuestionEditor: React.FC<QuestionEditorProps> = ({
             <button
               type="button"
               data-testid="btn-add-accepted-answer"
-              onClick={() => setShortAccepted((prev) => [...prev, ''])}
+              onClick={() => setShortAccepted(prev => [...prev, ''])}
               className="px-3 py-2 text-xs font-medium bg-blue-50 text-blue-700 rounded-md hover:bg-blue-100 min-h-[48px] flex items-center gap-1"
             >
               + Thêm đáp án chấp nhận
@@ -472,7 +468,7 @@ export const QuestionEditor: React.FC<QuestionEditorProps> = ({
                   type="text"
                   data-testid={`input-accepted-answer-${idx}`}
                   value={ans}
-                  onChange={(e) => {
+                  onChange={e => {
                     const newArr = [...shortAccepted];
                     newArr[idx] = e.target.value;
                     setShortAccepted(newArr);
@@ -483,9 +479,7 @@ export const QuestionEditor: React.FC<QuestionEditorProps> = ({
                 {shortAccepted.length > 1 && (
                   <button
                     type="button"
-                    onClick={() =>
-                      setShortAccepted((prev) => prev.filter((_, i) => i !== idx))
-                    }
+                    onClick={() => setShortAccepted(prev => prev.filter((_, i) => i !== idx))}
                     className="px-3 py-2 text-xs font-semibold text-red-600 hover:bg-red-50 rounded-md min-h-[48px]"
                     title="Xóa đáp án này"
                   >
@@ -500,7 +494,7 @@ export const QuestionEditor: React.FC<QuestionEditorProps> = ({
             <input
               type="checkbox"
               checked={shortCaseSensitive}
-              onChange={(e) => setShortCaseSensitive(e.target.checked)}
+              onChange={e => setShortCaseSensitive(e.target.checked)}
               className="w-4 h-4 text-blue-600 rounded focus:ring-blue-500"
             />
             <span className="text-sm text-gray-700">Phân biệt chữ hoa / chữ thường</span>
@@ -511,15 +505,13 @@ export const QuestionEditor: React.FC<QuestionEditorProps> = ({
       {/* Cài đặt điểm & Lời giải thích */}
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-4 border-t border-gray-100">
         <div>
-          <label className="block text-sm font-semibold text-gray-700 mb-1">
-            Điểm số câu hỏi:
-          </label>
+          <label className="block text-sm font-semibold text-gray-700 mb-1">Điểm số câu hỏi:</label>
           <input
             type="number"
             step="0.1"
             min="0"
             value={points}
-            onChange={(e) => setPoints(parseFloat(e.target.value) || 0)}
+            onChange={e => setPoints(parseFloat(e.target.value) || 0)}
             className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500 min-h-[48px]"
           />
         </div>

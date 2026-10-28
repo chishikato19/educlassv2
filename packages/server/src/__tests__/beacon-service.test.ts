@@ -13,7 +13,7 @@ describe('BeaconService', () => {
       service = null;
     }
     if (testReceiver) {
-      await new Promise<void>((resolve) => {
+      await new Promise<void>(resolve => {
         testReceiver?.close(() => resolve());
       });
       testReceiver = null;
@@ -53,13 +53,13 @@ describe('BeaconService', () => {
 
     // Tạo socket receiver giả lập Client học sinh lắng nghe trên 127.0.0.1
     testReceiver = dgram.createSocket({ type: 'udp4', reuseAddr: true });
-    await new Promise<void>((resolve) => {
+    await new Promise<void>(resolve => {
       testReceiver!.bind(testPort, '127.0.0.1', () => {
         resolve();
       });
     });
 
-    testReceiver.on('message', (msg) => {
+    testReceiver.on('message', msg => {
       try {
         const parsed = JSON.parse(msg.toString('utf-8')) as unknown;
         const result = DiscoveryBeaconPayloadSchema.safeParse(parsed);
@@ -86,7 +86,7 @@ describe('BeaconService', () => {
     });
 
     // Chờ 300ms để gói tin đến
-    await new Promise((r) => setTimeout(r, 300));
+    await new Promise(r => setTimeout(r, 300));
 
     expect(receivedPackets.length).toBeGreaterThanOrEqual(1);
     const firstPacket = receivedPackets[0];

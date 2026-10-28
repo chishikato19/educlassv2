@@ -9,3 +9,13 @@ everything-everywhere-for-antigravity
 docs
 pnpm-lock.yaml
 AGENTS.md
+packages/server/public
+apps/*/public/pdf.worker.mjs
+*.worker.*
+*.min.js
+*.min.css
+*.exe
+*.blockmap
+*.node
+data/
+

@@ -116,7 +116,9 @@ function checkAndFinalizeRoundTimeout(ctx: ActivityContext, st: SwissDuelState):
     (st.roundQuestions || []).reduce(
       (acc, q) => acc + (q.timeLimit || st.timeLimitPerQuestion || 30),
       0
-    ) || (st.timeLimitPerQuestion * 2) || 60;
+    ) ||
+    st.timeLimitPerQuestion * 2 ||
+    60;
 
   // 3s độ trễ mạng dự phòng
   const deadline = st.roundStartedAt + (roundTotalSeconds + 3) * 1000;
@@ -205,7 +207,10 @@ function checkAndFinalizeRoundTimeout(ctx: ActivityContext, st: SwissDuelState):
     }
   }
 
-  if (anyUnfinished || (st.matchups.length > 0 && st.matchups.every(m => m.player1Answered && m.player2Answered))) {
+  if (
+    anyUnfinished ||
+    (st.matchups.length > 0 && st.matchups.every(m => m.player1Answered && m.player2Answered))
+  ) {
     st.status = 'round_review';
     st.countdownEndsAt = ctx.now() + 10000;
     st.leaderboard = calculateSwissLeaderboard(st.participants);
@@ -224,7 +229,8 @@ export const SwissDuelActivity: ActivityDefinition<
   name: 'Đấu Cờ Thụy Sỹ',
   version: 1,
   icon: '♟️',
-  description: 'Đấu trí 1v1 theo thể thức Thụy Sỹ cổ điển: so tài 2 câu/vòng, thắng 2đ, hòa 1đ, tự động xếp bàn',
+  description:
+    'Đấu trí 1v1 theo thể thức Thụy Sỹ cổ điển: so tài 2 câu/vòng, thắng 2đ, hòa 1đ, tự động xếp bàn',
   capabilities: ['screen'],
   rewardTriggers: [
     'win_match',
@@ -258,16 +264,13 @@ export const SwissDuelActivity: ActivityDefinition<
 
       activeRunQuestions.set(ctx.runId, questionsToUse);
 
-      const totalRounds = cfg.mode === 'questions'
-        ? Math.max(1, Math.floor(questionsToUse.length / 2))
-        : 10;
+      const totalRounds =
+        cfg.mode === 'questions' ? Math.max(1, Math.floor(questionsToUse.length / 2)) : 10;
 
       const roundQuestions = getQuestionsForRound(questionsToUse, 0, cfg.mode);
       const publicRoundQuestions = stripAnswerKeys(roundQuestions);
 
-      const endTime = cfg.mode === 'time'
-        ? ctx.now() + cfg.timeLimitMinutes * 60 * 1000
-        : null;
+      const endTime = cfg.mode === 'time' ? ctx.now() + cfg.timeLimitMinutes * 60 * 1000 : null;
 
       return {
         title: cfg.title,
@@ -314,9 +317,10 @@ export const SwissDuelActivity: ActivityDefinition<
 
       // Khởi tạo học sinh vào danh sách nếu chưa có
       if (!st.participants[participantId]) {
-        const studentName = ('displayName' in parsed.data && parsed.data.displayName)
-          ? parsed.data.displayName
-          : `Kỳ thủ ${participantId.slice(0, 4)}`;
+        const studentName =
+          'displayName' in parsed.data && parsed.data.displayName
+            ? parsed.data.displayName
+            : `Kỳ thủ ${participantId.slice(0, 4)}`;
 
         st.participants[participantId] = {
           participantId,
@@ -415,7 +419,11 @@ export const SwissDuelActivity: ActivityDefinition<
         }
 
         // Nếu cả 2 bạn trong bàn đều đã nộp bài -> Đánh giá kết quả bàn đấu
-        if (matchup.player1Answered && matchup.player2Answered && matchup.result === 'in_progress') {
+        if (
+          matchup.player1Answered &&
+          matchup.player2Answered &&
+          matchup.result === 'in_progress'
+        ) {
           matchup.result = evaluateMatchupResult(matchup.player1Score, matchup.player2Score);
 
           const p1 = st.participants[matchup.player1Id]!;
@@ -446,9 +454,8 @@ export const SwissDuelActivity: ActivityDefinition<
         }
 
         // Kiểm tra xem tất cả các bàn đã hoàn thành chưa
-        const allMatchesDone = st.matchups.length > 0 && st.matchups.every(
-          m => m.player1Answered && m.player2Answered
-        );
+        const allMatchesDone =
+          st.matchups.length > 0 && st.matchups.every(m => m.player1Answered && m.player2Answered);
 
         if (allMatchesDone) {
           st.status = 'round_review';
@@ -487,11 +494,7 @@ export const SwissDuelActivity: ActivityDefinition<
       return { ...st };
     },
 
-    onTeacherIntent(
-      ctx: ActivityContext,
-      st: SwissDuelState,
-      intent: unknown
-    ): SwissDuelState {
+    onTeacherIntent(ctx: ActivityContext, st: SwissDuelState, intent: unknown): SwissDuelState {
       // Tự động chốt bàn nếu hết thời gian hiệp đấu
       st = checkAndFinalizeRoundTimeout(ctx, st);
 
@@ -563,10 +566,7 @@ export const SwissDuelActivity: ActivityDefinition<
       }
     },
 
-    onEnd(
-      ctx: ActivityContext,
-      st: SwissDuelState
-    ): SwissDuelResult[] {
+    onEnd(ctx: ActivityContext, st: SwissDuelState): SwissDuelResult[] {
       const standings = calculateSwissLeaderboard(st.participants);
 
       // Trao thưởng Top 1, Top 2, Top 3

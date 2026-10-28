@@ -52,7 +52,7 @@ describe('BankCurriculumTree Component (Task 3.2)', () => {
         onSubjectChange={onSubjectChange}
         onSelectLesson={onSelectLesson}
         onClearSelection={onClearSelection}
-      />,
+      />
     );
 
     // Kiểm tra render tổng số câu (15 + 5 = 20 câu)
@@ -76,14 +76,14 @@ describe('BankCurriculumTree Component (Task 3.2)', () => {
         onSubjectChange={vi.fn()}
         onSelectLesson={onSelectLesson}
         onClearSelection={vi.fn()}
-      />,
+      />
     );
 
     const lessonBtn = screen.getByTitle('Bài 1: Tính đơn điệu (8 câu)');
     fireEvent.click(lessonBtn);
     expect(onSelectLesson).toHaveBeenCalledWith(
       'Chương 1: Ứng dụng đạo hàm',
-      'Bài 1: Tính đơn điệu',
+      'Bài 1: Tính đơn điệu'
     );
   });
 
@@ -99,12 +99,12 @@ describe('BankCurriculumTree Component (Task 3.2)', () => {
         onSubjectChange={vi.fn()}
         onSelectLesson={vi.fn()}
         onClearSelection={vi.fn()}
-      />,
+      />
     );
 
     expect(screen.getByText('Chưa có câu hỏi')).toBeDefined();
     expect(
-      screen.getByText('Môn Vật lý - Khối 10 chưa có bài học nào trong ngân hàng.'),
+      screen.getByText('Môn Vật lý - Khối 10 chưa có bài học nào trong ngân hàng.')
     ).toBeDefined();
   });
 });

@@ -47,11 +47,7 @@ export const ArcadeDuelActivity: ActivityDefinition<
       return st;
     },
 
-    onTeacherIntent(
-      _ctx: ActivityContext,
-      st: ArcadeDuelState,
-      intent: unknown
-    ): ArcadeDuelState {
+    onTeacherIntent(_ctx: ActivityContext, st: ArcadeDuelState, intent: unknown): ArcadeDuelState {
       const parsed = intent as {
         type: string;
         teamId?: 'blue' | 'red';

@@ -5,12 +5,14 @@
 Trong phương pháp dạy học theo định hướng phát triển phẩm chất và năng lực (GDPT 2018), **Dạy học dự án (Project-Based Learning - PBL)** và hoạt động làm việc nhóm là hình thức tổ chức dạy học phổ biến. Một thách thức lớn của giáo viên là đánh giá kết quả dự án một cách công bằng, khách quan và toàn diện.
 
 Mô hình đánh giá dự án chuẩn giáo dục hiện đại đòi hỏi **đánh giá đa chiều 360 độ**, kết hợp 4 nguồn dữ liệu:
+
 1. **Điểm cá nhân tự đánh giá:** Học sinh tự chấm điểm mức độ tham gia, nỗ lực và đóng góp của bản thân.
 2. **Điểm tổ trưởng/nhóm trưởng chấm thành viên:** Nhóm trưởng đánh giá trách nhiệm và mức độ hoàn thành nhiệm vụ của từng bạn trong nhóm.
 3. **Điểm các nhóm khác chấm chéo:** Nhóm trưởng (đại diện nhóm) đánh giá sản phẩm, báo cáo và phần thuyết trình của các nhóm bạn.
 4. **Điểm giáo viên chấm:** Giáo viên đánh giá chuyên môn cho toàn nhóm hoặc từng cá nhân.
 
 ### Thực tế phòng học tại Việt Nam và hạn chế hiện tại:
+
 1. **Chưa có cấu trúc nhóm cố định theo lớp học:** Hiện tại EduClass v2 chỉ có chia nhóm tạm thời trong từng phiên học (`teams`). Khi giáo viên mở tiết học mới, thông tin nhóm bị mất, giáo viên phải tạo lại từ đầu.
 2. **Thiếu công cụ chia nhóm linh hoạt:** Chưa có tính năng chia đều học sinh ngẫu nhiên vào 4 nhóm (hoặc N nhóm) và kéo thả di chuyển học sinh giữa các nhóm ngay trong phần quản lý lớp học.
 3. **Chưa có module Chấm điểm dự án:** Chưa có cơ chế thu thập đồng thời 4 cột điểm, tính điểm tổng kết theo trọng số (%) tùy biến và xuất báo cáo tổng hợp.
@@ -45,6 +47,7 @@ Mô hình đánh giá dự án chuẩn giáo dục hiện đại đòi hỏi **�
 ## 3. Phạm vi (Scope)
 
 ### Trong phạm vi (In-Scope):
+
 - **Cơ sở dữ liệu (`packages/db`)**:
   - Thêm bảng `class_groups` (id, classId, name, orderIndex, leaderStudentId, createdAt).
   - Thêm trường `groupId` vào bảng `students` để liên kết học sinh với nhóm trong lớp.
@@ -63,6 +66,7 @@ Mô hình đánh giá dự án chuẩn giáo dục hiện đại đòi hỏi **�
   - Nút chuyển đổi tài khoản / đổi bạn khác vào chấm trên cùng thiết bị.
 
 ### Ngoài phạm vi (Out-of-Scope):
+
 - Soạn thảo Rubric ma trận tiêu chí phức tạp nhiều cấp độ (chốt nhập điểm trực tiếp thang 10 kèm nhận xét).
 - Chấm bài tập đính kèm file dung lượng lớn (hoạt động này tập trung vào khâu hội đồng chấm điểm và tổng hợp kết quả dự án).
 

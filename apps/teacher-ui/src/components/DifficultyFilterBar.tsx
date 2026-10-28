@@ -17,36 +17,44 @@ export const DIFFICULTY_CONFIG: Record<DifficultyLevel, DifficultyBadgeInfo> = {
     label: 'Nhận biết',
     shortLabel: 'NB',
     shapeIcon: '●',
-    badgeClass: 'bg-emerald-50 text-emerald-700 border-emerald-300 dark:bg-emerald-950/40 dark:text-emerald-300 dark:border-emerald-700',
+    badgeClass:
+      'bg-emerald-50 text-emerald-700 border-emerald-300 dark:bg-emerald-950/40 dark:text-emerald-300 dark:border-emerald-700',
     activeBtnClass: 'bg-emerald-600 text-white border-emerald-600 shadow-sm shadow-emerald-500/30',
-    inactiveBtnClass: 'bg-white text-emerald-800 border-emerald-200 hover:bg-emerald-50 hover:border-emerald-400 dark:bg-zinc-800 dark:text-emerald-300 dark:border-emerald-800 dark:hover:bg-zinc-700',
+    inactiveBtnClass:
+      'bg-white text-emerald-800 border-emerald-200 hover:bg-emerald-50 hover:border-emerald-400 dark:bg-zinc-800 dark:text-emerald-300 dark:border-emerald-800 dark:hover:bg-zinc-700',
   },
   th: {
     key: 'th',
     label: 'Thông hiểu',
     shortLabel: 'TH',
     shapeIcon: '■',
-    badgeClass: 'bg-sky-50 text-sky-700 border-sky-300 dark:bg-sky-950/40 dark:text-sky-300 dark:border-sky-700',
+    badgeClass:
+      'bg-sky-50 text-sky-700 border-sky-300 dark:bg-sky-950/40 dark:text-sky-300 dark:border-sky-700',
     activeBtnClass: 'bg-sky-600 text-white border-sky-600 shadow-sm shadow-sky-500/30',
-    inactiveBtnClass: 'bg-white text-sky-800 border-sky-200 hover:bg-sky-50 hover:border-sky-400 dark:bg-zinc-800 dark:text-sky-300 dark:border-sky-800 dark:hover:bg-zinc-700',
+    inactiveBtnClass:
+      'bg-white text-sky-800 border-sky-200 hover:bg-sky-50 hover:border-sky-400 dark:bg-zinc-800 dark:text-sky-300 dark:border-sky-800 dark:hover:bg-zinc-700',
   },
   vd: {
     key: 'vd',
     label: 'Vận dụng',
     shortLabel: 'VD',
     shapeIcon: '▲',
-    badgeClass: 'bg-amber-50 text-amber-800 border-amber-300 dark:bg-amber-950/40 dark:text-amber-300 dark:border-amber-700',
+    badgeClass:
+      'bg-amber-50 text-amber-800 border-amber-300 dark:bg-amber-950/40 dark:text-amber-300 dark:border-amber-700',
     activeBtnClass: 'bg-amber-600 text-white border-amber-600 shadow-sm shadow-amber-500/30',
-    inactiveBtnClass: 'bg-white text-amber-800 border-amber-200 hover:bg-amber-50 hover:border-amber-400 dark:bg-zinc-800 dark:text-amber-300 dark:border-amber-800 dark:hover:bg-zinc-700',
+    inactiveBtnClass:
+      'bg-white text-amber-800 border-amber-200 hover:bg-amber-50 hover:border-amber-400 dark:bg-zinc-800 dark:text-amber-300 dark:border-amber-800 dark:hover:bg-zinc-700',
   },
   vdc: {
     key: 'vdc',
     label: 'Vận dụng cao',
     shortLabel: 'VDC',
     shapeIcon: '◆',
-    badgeClass: 'bg-rose-50 text-rose-700 border-rose-300 dark:bg-rose-950/40 dark:text-rose-300 dark:border-rose-700',
+    badgeClass:
+      'bg-rose-50 text-rose-700 border-rose-300 dark:bg-rose-950/40 dark:text-rose-300 dark:border-rose-700',
     activeBtnClass: 'bg-rose-600 text-white border-rose-600 shadow-sm shadow-rose-500/30',
-    inactiveBtnClass: 'bg-white text-rose-800 border-rose-200 hover:bg-rose-50 hover:border-rose-400 dark:bg-zinc-800 dark:text-rose-300 dark:border-rose-800 dark:hover:bg-zinc-700',
+    inactiveBtnClass:
+      'bg-white text-rose-800 border-rose-200 hover:bg-rose-50 hover:border-rose-400 dark:bg-zinc-800 dark:text-rose-300 dark:border-rose-800 dark:hover:bg-zinc-700',
   },
 };
 
@@ -73,11 +81,12 @@ export const DifficultyFilterBar: React.FC<DifficultyFilterBarProps> = ({
 }) => {
   const levels: DifficultyLevel[] = ['nb', 'th', 'vd', 'vdc'];
 
-  const calculatedTotal = totalCount !== undefined
-    ? totalCount
-    : counts
-      ? counts.nb + counts.th + counts.vd + counts.vdc
-      : undefined;
+  const calculatedTotal =
+    totalCount !== undefined
+      ? totalCount
+      : counts
+        ? counts.nb + counts.th + counts.vd + counts.vdc
+        : undefined;
 
   return (
     <div
@@ -110,7 +119,7 @@ export const DifficultyFilterBar: React.FC<DifficultyFilterBarProps> = ({
       </button>
 
       {/* 4 Nút Mức Độ Chuẩn Bộ GD&ĐT */}
-      {levels.map((lvl) => {
+      {levels.map(lvl => {
         const info = DIFFICULTY_CONFIG[lvl];
         const isSelected = selectedDifficulty === lvl;
         const count = counts ? counts[lvl] : undefined;
@@ -126,19 +135,14 @@ export const DifficultyFilterBar: React.FC<DifficultyFilterBarProps> = ({
               isSelected ? info.activeBtnClass : info.inactiveBtnClass
             }`}
           >
-            <span
-              className="text-xs font-mono select-none"
-              aria-hidden="true"
-            >
+            <span className="text-xs font-mono select-none" aria-hidden="true">
               {info.shapeIcon}
             </span>
             <span>{compact ? info.shortLabel : info.label}</span>
             {count !== undefined && (
               <span
                 className={`px-1.5 py-0.5 text-xs rounded-full font-bold ${
-                  isSelected
-                    ? 'bg-white/20 text-white'
-                    : 'bg-black/5 text-current dark:bg-white/10'
+                  isSelected ? 'bg-white/20 text-white' : 'bg-black/5 text-current dark:bg-white/10'
                 }`}
               >
                 {count}

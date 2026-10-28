@@ -88,11 +88,7 @@ describe('ExamReportsTab Component', () => {
   it('hiển thị danh sách các kỳ thi và thông tin tiến độ', async () => {
     const showToast = vi.fn();
     render(
-      <ExamReportsTab
-        classes={mockClasses}
-        activeSession={mockSession}
-        onShowToast={showToast}
-      />
+      <ExamReportsTab classes={mockClasses} activeSession={mockSession} onShowToast={showToast} />
     );
 
     // Chờ nạp dữ liệu xong
@@ -113,11 +109,7 @@ describe('ExamReportsTab Component', () => {
   it('mở modal xác nhận khi bấm mở ca tiếp theo trong phiên học', async () => {
     const showToast = vi.fn();
     render(
-      <ExamReportsTab
-        classes={mockClasses}
-        activeSession={mockSession}
-        onShowToast={showToast}
-      />
+      <ExamReportsTab classes={mockClasses} activeSession={mockSession} onShowToast={showToast} />
     );
 
     await waitFor(() => {
@@ -150,11 +142,7 @@ describe('ExamReportsTab Component', () => {
   it('mở modal xác nhận khi bấm tạm dừng ca thi đang mở', async () => {
     const showToast = vi.fn();
     render(
-      <ExamReportsTab
-        classes={mockClasses}
-        activeSession={mockSession}
-        onShowToast={showToast}
-      />
+      <ExamReportsTab classes={mockClasses} activeSession={mockSession} onShowToast={showToast} />
     );
 
     await waitFor(() => {
@@ -185,11 +173,7 @@ describe('ExamReportsTab Component', () => {
     vi.spyOn(api, 'getExams').mockResolvedValue([]);
     const showToast = vi.fn();
     render(
-      <ExamReportsTab
-        classes={mockClasses}
-        activeSession={mockSession}
-        onShowToast={showToast}
-      />
+      <ExamReportsTab classes={mockClasses} activeSession={mockSession} onShowToast={showToast} />
     );
 
     await waitFor(() => {

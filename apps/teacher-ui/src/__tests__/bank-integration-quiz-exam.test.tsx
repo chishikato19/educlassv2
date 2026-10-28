@@ -63,7 +63,12 @@ describe('Task 4.3: Integration between Question Bank Matrix and Quizizz / Exam'
           id: 'q_matrix_nb',
           type: 'mcq4',
           stem: { text: 'Cho hàm số y = f(x). Khẳng định nào sau đây đúng?', images: [] },
-          options: [{ text: 'Phương án A' }, { text: 'Phương án B' }, { text: 'Phương án C' }, { text: 'Phương án D' }],
+          options: [
+            { text: 'Phương án A' },
+            { text: 'Phương án B' },
+            { text: 'Phương án C' },
+            { text: 'Phương án D' },
+          ],
           correct: 1,
           points: 10,
         },
@@ -93,7 +98,7 @@ describe('Task 4.3: Integration between Question Bank Matrix and Quizizz / Exam'
         onStartActivity={handleStartActivity}
         onSendTeacherIntent={vi.fn()}
         onEndActivity={vi.fn()}
-      />,
+      />
     );
 
     // 1. Mở modal cấu hình cho Quiz Live
@@ -107,11 +112,9 @@ describe('Task 4.3: Integration between Question Bank Matrix and Quizizz / Exam'
     // 2. Kiểm tra nhãn hiển thị trong dropdown bộ đề
     const selectElem = screen.getByRole('combobox');
     expect(
-      screen.getByText('🎯 [Ma trận] Đề Ôn Tập Ma Trận Học Kỳ 1 (4 câu) - Toán'),
+      screen.getByText('🎯 [Ma trận] Đề Ôn Tập Ma Trận Học Kỳ 1 (4 câu) - Toán')
     ).toBeDefined();
-    expect(
-      screen.getByText('Đề Tự Luận Nhập Tay (5 câu) - Vật lý'),
-    ).toBeDefined();
+    expect(screen.getByText('Đề Tự Luận Nhập Tay (5 câu) - Vật lý')).toBeDefined();
 
     // 3. Chọn bộ đề sinh từ Ma trận
     act(() => {
@@ -162,13 +165,19 @@ describe('Task 4.3: Integration between Question Bank Matrix and Quizizz / Exam'
             correctAnswer: ['5', '5.0'],
           }),
         ]),
-      }),
+      })
     );
   });
 
   it('CreateExamModal displays matrix badge and creates exam successfully', async () => {
     const mockClasses: ClassDto[] = [
-      { id: 'class_12a1', name: '12A1', ownerId: 'teacher_1', year: 2026, createdAt: 1700000000000 },
+      {
+        id: 'class_12a1',
+        name: '12A1',
+        ownerId: 'teacher_1',
+        year: 2026,
+        createdAt: 1700000000000,
+      },
     ];
     const mockQuestionSetsList: QuestionSetItem[] = [
       {
@@ -194,7 +203,7 @@ describe('Task 4.3: Integration between Question Bank Matrix and Quizizz / Exam'
         onShowToast={vi.fn()}
         onSuccess={handleSuccess}
         questionSets={mockQuestionSetsList}
-      />,
+      />
     );
 
     // Kiểm tra dropdown hiển thị ký hiệu ma trận
@@ -213,7 +222,7 @@ describe('Task 4.3: Integration between Question Bank Matrix and Quizizz / Exam'
           questionSetId: 'set_matrix_01',
           title: 'Đề Ma Trận Khối 12',
           subject: 'Toán',
-        }),
+        })
       );
       expect(handleSuccess).toHaveBeenCalled();
     });
@@ -241,7 +250,7 @@ describe('Task 4.3: Integration between Question Bank Matrix and Quizizz / Exam'
         onCloneQuestionSet={vi.fn()}
         onExportQuestionSet={vi.fn()}
         onImportQuestionSet={vi.fn()}
-      />,
+      />
     );
 
     expect(screen.getByTestId('badge-matrix-set_matrix_01')).toBeDefined();

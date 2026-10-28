@@ -67,9 +67,7 @@ export const TerritoryGrid: React.FC<TerritoryGridProps> = ({
           const posY = padding + cell.y * (cellSize + gap);
 
           const isTargetable =
-            interactive &&
-            viewerTeam &&
-            canTeamTargetCell(cells, viewerTeam, cell.id).allowed;
+            interactive && viewerTeam && canTeamTargetCell(cells, viewerTeam, cell.id).allowed;
 
           const isLocked = cell.lockedBy !== null;
           const isMyLock = currentLockedCellId === cell.id;
@@ -130,7 +128,15 @@ export const TerritoryGrid: React.FC<TerritoryGridProps> = ({
                 x={cellSize / 2}
                 y={cell.terrain === 'plain' ? cellSize / 2 + 6 : cellSize / 2 - 2}
                 textAnchor="middle"
-                fontSize={cell.terrain === 'big_castle' ? 32 : cell.terrain === 'small_castle' ? 26 : cell.terrain === 'watchtower' ? 24 : 18}
+                fontSize={
+                  cell.terrain === 'big_castle'
+                    ? 32
+                    : cell.terrain === 'small_castle'
+                      ? 26
+                      : cell.terrain === 'watchtower'
+                        ? 24
+                        : 18
+                }
                 fill="#ffffff"
                 className="pointer-events-none select-none"
               >
@@ -148,19 +154,15 @@ export const TerritoryGrid: React.FC<TerritoryGridProps> = ({
                   fill="#ffffff"
                   className="pointer-events-none select-none drop-shadow"
                 >
-                  {cell.owner === 'neutral' ? (
-                    // Giằng co máu khi trung lập
-                    cell.tugOfWarHp > 0 ? (
-                      `🔵 +${cell.tugOfWarHp}/${cell.maxHp}`
-                    ) : cell.tugOfWarHp < 0 ? (
-                      `🔴 ${cell.tugOfWarHp}/${cell.maxHp}`
-                    ) : (
-                      `HP ${cell.maxHp}`
-                    )
-                  ) : (
-                    // Đã chiếm
-                    `HP ${cell.currentHp}/${cell.maxHp}${cell.reinforceLevel > 0 ? ` 🛡️+${cell.reinforceLevel}` : ''}`
-                  )}
+                  {cell.owner === 'neutral'
+                    ? // Giằng co máu khi trung lập
+                      cell.tugOfWarHp > 0
+                      ? `🔵 +${cell.tugOfWarHp}/${cell.maxHp}`
+                      : cell.tugOfWarHp < 0
+                        ? `🔴 ${cell.tugOfWarHp}/${cell.maxHp}`
+                        : `HP ${cell.maxHp}`
+                    : // Đã chiếm
+                      `HP ${cell.currentHp}/${cell.maxHp}${cell.reinforceLevel > 0 ? ` 🛡️+${cell.reinforceLevel}` : ''}`}
                 </text>
               )}
 
@@ -214,13 +216,7 @@ export const TerritoryGrid: React.FC<TerritoryGridProps> = ({
 
               {/* Dấu hiệu ô có thể đánh của tôi */}
               {isTargetable && !isLocked && (
-                <circle
-                  cx={cellSize - 12}
-                  cy={12}
-                  r={6}
-                  fill="#f59e0b"
-                  className="animate-ping"
-                />
+                <circle cx={cellSize - 12} cy={12} r={6} fill="#f59e0b" className="animate-ping" />
               )}
             </g>
           );

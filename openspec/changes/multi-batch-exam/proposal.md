@@ -3,6 +3,7 @@
 ## 1. Bối cảnh & Vấn đề (Context & Motivation)
 
 Hiện tại trong EduClass v2:
+
 - Hoạt động `ExamActivity` đang chạy hoàn toàn phụ thuộc vào vòng đời của một phiên học trực tiếp (`session`). Dữ liệu làm bài được lưu tạm thời trong RAM máy chủ giáo viên (`activeExamConfigs`), và chỉ được đóng gói vào `session_reports` dưới dạng một khối JSON snapshot gộp khi phiên học kết thúc.
 - **Thực tế trường học:** Tại hầu hết các trường phổ thông ở Việt Nam, phòng thực hành tin học chỉ có khoảng 20 máy tính, trong khi sĩ số lớp học thường từ 35 - 45 học sinh. Do đó, giáo viên bắt buộc phải **chia ca thi**:
   - **Tiết 1 (Ca 1):** 20 học sinh đầu tiên vào máy, làm bài trọn vẹn và nộp bài.

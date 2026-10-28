@@ -18,7 +18,7 @@ export const MagicDeckMode: React.FC<RandomPickerModeProps> = ({
   const rightHalfRef = useRef<HTMLDivElement>(null);
 
   // Kiểm tra xem đã có lá bài nào lật mở chưa
-  const hasRevealedCard = magicCards.some((c) => c.isRevealed);
+  const hasRevealedCard = magicCards.some(c => c.isRevealed);
 
   // Tạo danh sách 9 lá bài mặc định
   const displayCards: MagicCardItem[] =

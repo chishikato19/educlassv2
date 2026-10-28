@@ -4,13 +4,13 @@ import { soundManager } from '../sound.js';
 
 type EliminationPhase =
   | 'idle'
-  | 'ready'        // Thời gian đợi 1 giây trước khi bắt đầu (tất cả học sinh hiển thị đầy đủ)
-  | 'stage1'       // Loại dần về 5 ô
-  | 'top5_pause'   // Dừng công bố TOP 5
-  | 'stage2'       // Loại từ 5 về 3 ô
-  | 'top3_pause'   // Dừng công bố TOP 3
-  | 'stage3'       // Loại từ 3 về 1 ô
-  | 'winner';      // Vinh quang còn 1 ô duy nhất
+  | 'ready' // Thời gian đợi 1 giây trước khi bắt đầu (tất cả học sinh hiển thị đầy đủ)
+  | 'stage1' // Loại dần về 5 ô
+  | 'top5_pause' // Dừng công bố TOP 5
+  | 'stage2' // Loại từ 5 về 3 ô
+  | 'top3_pause' // Dừng công bố TOP 3
+  | 'stage3' // Loại từ 3 về 1 ô
+  | 'winner'; // Vinh quang còn 1 ô duy nhất
 
 // Bảng màu gradient phong phú cho các ô học sinh
 const CARD_COLOR_PALETTES = [
@@ -85,7 +85,7 @@ export const EliminationGridMode: React.FC<RandomPickerModeProps> = ({
   // Quản lý timeout để dọn dẹp an toàn
   const timeoutsRef = useRef<number[]>([]);
   const clearAllTimeouts = () => {
-    timeoutsRef.current.forEach((t) => window.clearTimeout(t));
+    timeoutsRef.current.forEach(t => window.clearTimeout(t));
     timeoutsRef.current = [];
   };
 
@@ -137,7 +137,7 @@ export const EliminationGridMode: React.FC<RandomPickerModeProps> = ({
       setPhase('winner');
       // Giữ người chiến thắng là ô duy nhất không bị loại
       const allExceptWinner = new Set(
-        candidates.filter((s) => s.id !== selectedStudent.id).map((s) => s.id)
+        candidates.filter(s => s.id !== selectedStudent.id).map(s => s.id)
       );
       setEliminatedIds(allExceptWinner);
       setEliminatingIds(new Set());
@@ -159,7 +159,7 @@ export const EliminationGridMode: React.FC<RandomPickerModeProps> = ({
     const totalCount = pool.length;
 
     // Danh sách học sinh thua cuộc (loại trừ người chiến thắng)
-    const losers = pool.filter((s) => s.id !== selectedStudent.id);
+    const losers = pool.filter(s => s.id !== selectedStudent.id);
 
     // Xáo trộn ngẫu nhiên danh sách losers
     const shuffledLosers = [...losers].sort(() => Math.random() - 0.5);
@@ -210,19 +210,19 @@ export const EliminationGridMode: React.FC<RandomPickerModeProps> = ({
         const timeToStart = cumulativeTime + index * stepDelay;
 
         addTimeout(() => {
-          setEliminatingIds((prev) => new Set(prev).add(loser.id));
+          setEliminatingIds(prev => new Set(prev).add(loser.id));
           soundManager.playEliminationTick();
           const remainingCount = totalCount - (index + 1);
           setStatusMessage(`⚡ VÒNG 1: Còn lại ${remainingCount} bạn...`);
         }, timeToStart);
 
         addTimeout(() => {
-          setEliminatingIds((prev) => {
+          setEliminatingIds(prev => {
             const next = new Set(prev);
             next.delete(loser.id);
             return next;
           });
-          setEliminatedIds((prev) => new Set(prev).add(loser.id));
+          setEliminatedIds(prev => new Set(prev).add(loser.id));
         }, timeToStart + flashDuration);
       });
 
@@ -248,19 +248,19 @@ export const EliminationGridMode: React.FC<RandomPickerModeProps> = ({
         const eliminationTime = cumulativeTime + 200 + index * 500;
 
         addTimeout(() => {
-          setEliminatingIds((prev) => new Set(prev).add(loser.id));
+          setEliminatingIds(prev => new Set(prev).add(loser.id));
           soundManager.playDramaticHit();
           const remaining = 5 - (index + 1);
           setStatusMessage(`⚔️ VÒNG 2: Còn lại ${remaining} bạn!`);
         }, eliminationTime);
 
         addTimeout(() => {
-          setEliminatingIds((prev) => {
+          setEliminatingIds(prev => {
             const next = new Set(prev);
             next.delete(loser.id);
             return next;
           });
-          setEliminatedIds((prev) => new Set(prev).add(loser.id));
+          setEliminatedIds(prev => new Set(prev).add(loser.id));
         }, eliminationTime + 180);
       });
 
@@ -287,7 +287,7 @@ export const EliminationGridMode: React.FC<RandomPickerModeProps> = ({
         const eliminationTime = cumulativeTime + delayBeforeThis;
 
         addTimeout(() => {
-          setEliminatingIds((prev) => new Set(prev).add(loser.id));
+          setEliminatingIds(prev => new Set(prev).add(loser.id));
           soundManager.playDramaticHit();
           if (index === 0 && stage3Losers.length > 1) {
             setStatusMessage('💥 ĐỐI ĐẦU 1 VS 1: Ai sẽ là người chiến thắng?!');
@@ -295,12 +295,12 @@ export const EliminationGridMode: React.FC<RandomPickerModeProps> = ({
         }, eliminationTime);
 
         addTimeout(() => {
-          setEliminatingIds((prev) => {
+          setEliminatingIds(prev => {
             const next = new Set(prev);
             next.delete(loser.id);
             return next;
           });
-          setEliminatedIds((prev) => new Set(prev).add(loser.id));
+          setEliminatedIds(prev => new Set(prev).add(loser.id));
         }, eliminationTime + 200);
       });
 
@@ -323,16 +323,16 @@ export const EliminationGridMode: React.FC<RandomPickerModeProps> = ({
       stage2Losers.forEach((loser, index) => {
         const eliminationTime = cumulativeTime + 400 + index * 1200;
         addTimeout(() => {
-          setEliminatingIds((prev) => new Set(prev).add(loser.id));
+          setEliminatingIds(prev => new Set(prev).add(loser.id));
           soundManager.playDramaticHit();
         }, eliminationTime);
         addTimeout(() => {
-          setEliminatingIds((prev) => {
+          setEliminatingIds(prev => {
             const next = new Set(prev);
             next.delete(loser.id);
             return next;
           });
-          setEliminatedIds((prev) => new Set(prev).add(loser.id));
+          setEliminatedIds(prev => new Set(prev).add(loser.id));
         }, eliminationTime + 250);
       });
       cumulativeTime += 3000;
@@ -352,19 +352,19 @@ export const EliminationGridMode: React.FC<RandomPickerModeProps> = ({
       stage3Losers.forEach((loser, index) => {
         const eliminationTime = cumulativeTime + (index === 0 ? 500 : 2000);
         addTimeout(() => {
-          setEliminatingIds((prev) => new Set(prev).add(loser.id));
+          setEliminatingIds(prev => new Set(prev).add(loser.id));
           soundManager.playDramaticHit();
           if (index === 0 && stage3Losers.length > 1) {
             setStatusMessage('💥 ĐỐI ĐẦU 1 VS 1: Ai sẽ là người chiến thắng?!');
           }
         }, eliminationTime);
         addTimeout(() => {
-          setEliminatingIds((prev) => {
+          setEliminatingIds(prev => {
             const next = new Set(prev);
             next.delete(loser.id);
             return next;
           });
-          setEliminatedIds((prev) => new Set(prev).add(loser.id));
+          setEliminatedIds(prev => new Set(prev).add(loser.id));
         }, eliminationTime + 300);
       });
       cumulativeTime += 3200;
@@ -383,18 +383,19 @@ export const EliminationGridMode: React.FC<RandomPickerModeProps> = ({
       }, cumulativeTime);
 
       stage3Losers.forEach((loser, index) => {
-        const eliminationTime = cumulativeTime + (index === 0 && stage3Losers.length > 1 ? 2500 : 5500);
+        const eliminationTime =
+          cumulativeTime + (index === 0 && stage3Losers.length > 1 ? 2500 : 5500);
         addTimeout(() => {
-          setEliminatingIds((prev) => new Set(prev).add(loser.id));
+          setEliminatingIds(prev => new Set(prev).add(loser.id));
           soundManager.playDramaticHit();
         }, eliminationTime);
         addTimeout(() => {
-          setEliminatingIds((prev) => {
+          setEliminatingIds(prev => {
             const next = new Set(prev);
             next.delete(loser.id);
             return next;
           });
-          setEliminatedIds((prev) => new Set(prev).add(loser.id));
+          setEliminatedIds(prev => new Set(prev).add(loser.id));
         }, eliminationTime + 350);
       });
       cumulativeTime += 7000;
@@ -418,12 +419,16 @@ export const EliminationGridMode: React.FC<RandomPickerModeProps> = ({
 
   // Danh sách học sinh ứng viên
   const studentPool = useMemo(() => {
-    return candidates && candidates.length > 0 ? candidates : selectedStudent ? [selectedStudent] : [];
+    return candidates && candidates.length > 0
+      ? candidates
+      : selectedStudent
+        ? [selectedStudent]
+        : [];
   }, [candidates, selectedStudent]);
 
   // Số lượng ô còn sống sót hiện tại
   const survivingStudents = useMemo(() => {
-    return studentPool.filter((s) => !eliminatedIds.has(s.id));
+    return studentPool.filter(s => !eliminatedIds.has(s.id));
   }, [studentPool, eliminatedIds]);
 
   // =========================================================================
@@ -496,7 +501,15 @@ export const EliminationGridMode: React.FC<RandomPickerModeProps> = ({
       <div className="w-full max-w-4xl mb-3 flex flex-col sm:flex-row items-center justify-between gap-3 px-4 py-2 rounded-2xl bg-slate-900/80 border border-indigo-900/60 backdrop-blur-md shadow-xl shrink-0">
         <div className="flex items-center gap-2.5">
           <span className="text-xl animate-pulse">
-            {phase === 'winner' ? '🏆' : phase === 'stage3' ? '👑' : phase === 'top3_pause' ? '⚡' : phase === 'top5_pause' ? '🔥' : '⚔️'}
+            {phase === 'winner'
+              ? '🏆'
+              : phase === 'stage3'
+                ? '👑'
+                : phase === 'top3_pause'
+                  ? '⚡'
+                  : phase === 'top5_pause'
+                    ? '🔥'
+                    : '⚔️'}
           </span>
           <span className="font-extrabold text-sm sm:text-base text-amber-300 tracking-wide drop-shadow">
             {statusMessage}
@@ -511,10 +524,10 @@ export const EliminationGridMode: React.FC<RandomPickerModeProps> = ({
               survivingStudents.length === 1
                 ? 'bg-amber-500 text-slate-950 ring-2 ring-yellow-300 animate-bounce'
                 : survivingStudents.length <= 3
-                ? 'bg-amber-600/90 text-white ring-2 ring-amber-400'
-                : survivingStudents.length <= 5
-                ? 'bg-cyan-600/90 text-white ring-2 ring-cyan-400'
-                : 'bg-indigo-950 text-indigo-200 border border-indigo-700/60'
+                  ? 'bg-amber-600/90 text-white ring-2 ring-amber-400'
+                  : survivingStudents.length <= 5
+                    ? 'bg-cyan-600/90 text-white ring-2 ring-cyan-400'
+                    : 'bg-indigo-950 text-indigo-200 border border-indigo-700/60'
             }`}
           >
             {survivingStudents.length} / {studentPool.length} ô
@@ -541,9 +554,11 @@ export const EliminationGridMode: React.FC<RandomPickerModeProps> = ({
           {studentPool.map((student, index) => {
             const isEliminated = eliminatedIds.has(student.id);
             const isEliminating = eliminatingIds.has(student.id);
-            const isWinner = (phase === 'winner' || isCompleted) && selectedStudent?.id === student.id;
+            const isWinner =
+              (phase === 'winner' || isCompleted) && selectedStudent?.id === student.id;
             const isTop3 = survivingStudents.length <= 3 && !isEliminated;
-            const isTop5 = survivingStudents.length <= 5 && survivingStudents.length > 3 && !isEliminated;
+            const isTop5 =
+              survivingStudents.length <= 5 && survivingStudents.length > 3 && !isEliminated;
 
             // QUY TẮC GIỮ NGUYÊN VỊ TRÍ:
             // Khi ô biến mất, vẫn giữ nguyên khối placeholder để lưới KHÔNG bị dồn lại
@@ -565,13 +580,17 @@ export const EliminationGridMode: React.FC<RandomPickerModeProps> = ({
             // Định dạng phong cách ô gần vuông theo từng giai đoạn
             let cardStyle = `bg-gradient-to-br ${colorClass} border shadow-lg hover:border-white/50`;
             if (isEliminating) {
-              cardStyle = 'bg-rose-950/95 border-rose-500 ring-4 ring-rose-500 text-white scale-90 opacity-70 animate-pulse';
+              cardStyle =
+                'bg-rose-950/95 border-rose-500 ring-4 ring-rose-500 text-white scale-90 opacity-70 animate-pulse';
             } else if (isWinner) {
-              cardStyle = 'bg-gradient-to-br from-amber-400 via-yellow-300 to-amber-500 border-yellow-200 text-slate-950 ring-4 ring-yellow-300 shadow-[0_0_40px_rgba(250,204,21,0.95)] scale-110 z-20 animate-bounce';
+              cardStyle =
+                'bg-gradient-to-br from-amber-400 via-yellow-300 to-amber-500 border-yellow-200 text-slate-950 ring-4 ring-yellow-300 shadow-[0_0_40px_rgba(250,204,21,0.95)] scale-110 z-20 animate-bounce';
             } else if (isTop3) {
-              cardStyle = 'bg-gradient-to-br from-amber-950/95 via-orange-900/90 to-amber-900/95 border-amber-400 text-amber-100 ring-2 ring-amber-400 shadow-[0_0_20px_rgba(251,191,36,0.6)] scale-105 z-10';
+              cardStyle =
+                'bg-gradient-to-br from-amber-950/95 via-orange-900/90 to-amber-900/95 border-amber-400 text-amber-100 ring-2 ring-amber-400 shadow-[0_0_20px_rgba(251,191,36,0.6)] scale-105 z-10';
             } else if (isTop5) {
-              cardStyle = 'bg-gradient-to-br from-sky-950/95 via-indigo-900/90 to-cyan-950/95 border-cyan-400 text-cyan-100 ring-2 ring-cyan-400 shadow-[0_0_15px_rgba(6,182,212,0.5)] scale-[1.02]';
+              cardStyle =
+                'bg-gradient-to-br from-sky-950/95 via-indigo-900/90 to-cyan-950/95 border-cyan-400 text-cyan-100 ring-2 ring-cyan-400 shadow-[0_0_15px_rgba(6,182,212,0.5)] scale-[1.02]';
             }
 
             return (
@@ -588,16 +607,16 @@ export const EliminationGridMode: React.FC<RandomPickerModeProps> = ({
                       cellHeight >= 85
                         ? 'text-xs px-1.5 py-0.5'
                         : cellHeight >= 65
-                        ? 'text-[10px] px-1 py-0.2'
-                        : 'text-[9px] px-0.5 py-0'
+                          ? 'text-[10px] px-1 py-0.2'
+                          : 'text-[9px] px-0.5 py-0'
                     } ${
                       isWinner
                         ? 'bg-slate-950 text-amber-300'
                         : isTop3
-                        ? 'bg-amber-400 text-slate-950'
-                        : isTop5
-                        ? 'bg-cyan-400 text-slate-950'
-                        : 'bg-black/40 text-white/90'
+                          ? 'bg-amber-400 text-slate-950'
+                          : isTop5
+                            ? 'bg-cyan-400 text-slate-950'
+                            : 'bg-black/40 text-white/90'
                     }`}
                   >
                     #{index + 1}
@@ -624,10 +643,10 @@ export const EliminationGridMode: React.FC<RandomPickerModeProps> = ({
                       isWinner
                         ? 'text-slate-950 font-black'
                         : isTop3
-                        ? 'text-amber-100 font-black'
-                        : isTop5
-                        ? 'text-cyan-100 font-black'
-                        : 'text-white font-extrabold'
+                          ? 'text-amber-100 font-black'
+                          : isTop5
+                            ? 'text-cyan-100 font-black'
+                            : 'text-white font-extrabold'
                     }`}
                   >
                     {givenName}

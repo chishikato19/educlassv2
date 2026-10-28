@@ -31,7 +31,12 @@ import { APP_VERSION } from '@educlass/protocol';
 
 export const SERVER_NAME = 'educlass-server';
 
-export function getServerStatus(): { server: string; db: string; qkVersion: number; version: string } {
+export function getServerStatus(): {
+  server: string;
+  db: string;
+  qkVersion: number;
+  version: string;
+} {
   return {
     server: SERVER_NAME,
     db: DB_MODULE_NAME,

@@ -38,7 +38,7 @@ function richTextToString(raw: unknown): string {
   if (typeof obj['text'] === 'string') return obj['text'];
   if (Array.isArray(obj['runs'])) {
     return (obj['runs'] as Array<Record<string, unknown>>)
-      .map((r) => (typeof r['text'] === 'string' ? r['text'] : ''))
+      .map(r => (typeof r['text'] === 'string' ? r['text'] : ''))
       .join('');
   }
   return '';
@@ -83,20 +83,25 @@ export const StudentExamReviewModal: React.FC<StudentExamReviewModalProps> = ({
       return rawList.map((item, idx) => {
         const order = typeof item['order'] === 'number' ? item['order'] : idx + 1;
         const qId = String(item['questionId'] || item['id'] || `q${order}`);
-        const origQ = questions.find((q) => q['id'] === qId || q['orderIndex'] === order - 1) ?? questions[idx];
+        const origQ =
+          questions.find(q => q['id'] === qId || q['orderIndex'] === order - 1) ?? questions[idx];
 
         const stemText =
           typeof item['stemText'] === 'string' && item['stemText'].trim()
             ? item['stemText']
             : origQ
-            ? richTextToString(origQ['stem'])
-            : `Câu hỏi ${order}`;
+              ? richTextToString(origQ['stem'])
+              : `Câu hỏi ${order}`;
 
         let stemImages: string[] = [];
         if (Array.isArray(item['stemImages']) && item['stemImages'].length > 0) {
           stemImages = item['stemImages'] as string[];
         } else if (origQ) {
-          if (origQ['stem'] && typeof origQ['stem'] === 'object' && Array.isArray((origQ['stem'] as Record<string, unknown>)['images'])) {
+          if (
+            origQ['stem'] &&
+            typeof origQ['stem'] === 'object' &&
+            Array.isArray((origQ['stem'] as Record<string, unknown>)['images'])
+          ) {
             stemImages = (origQ['stem'] as Record<string, unknown>)['images'] as string[];
           } else if (Array.isArray(origQ['images'])) {
             stemImages = origQ['images'] as string[];
@@ -108,8 +113,8 @@ export const StudentExamReviewModal: React.FC<StudentExamReviewModalProps> = ({
           typeof item['points'] === 'number'
             ? item['points']
             : origQ && typeof origQ['points'] === 'number'
-            ? origQ['points']
-            : 0.5;
+              ? origQ['points']
+              : 0.5;
         const pointsEarned = typeof item['pointsEarned'] === 'number' ? item['pointsEarned'] : 0;
         const isCorrect = item['isCorrect'] === true || item['correct'] === true;
 
@@ -121,7 +126,11 @@ export const StudentExamReviewModal: React.FC<StudentExamReviewModalProps> = ({
               optImages = opt['images'] as string[];
             } else if (origQ && Array.isArray(origQ['options'])) {
               const origOpt = origQ['options'][oIdx];
-              if (origOpt && typeof origOpt === 'object' && Array.isArray((origOpt as Record<string, unknown>)['images'])) {
+              if (
+                origOpt &&
+                typeof origOpt === 'object' &&
+                Array.isArray((origOpt as Record<string, unknown>)['images'])
+              ) {
                 optImages = (origOpt as Record<string, unknown>)['images'] as string[];
               }
             }
@@ -134,14 +143,18 @@ export const StudentExamReviewModal: React.FC<StudentExamReviewModalProps> = ({
           });
         }
 
-        const studentChoiceLabel = item['studentChoiceLabel'] ? String(item['studentChoiceLabel']) : null;
-        const correctChoiceLabel = item['correctChoiceLabel'] ? String(item['correctChoiceLabel']) : null;
+        const studentChoiceLabel = item['studentChoiceLabel']
+          ? String(item['studentChoiceLabel'])
+          : null;
+        const correctChoiceLabel = item['correctChoiceLabel']
+          ? String(item['correctChoiceLabel'])
+          : null;
         const explanation =
           typeof item['explanation'] === 'string' && item['explanation'].trim()
             ? item['explanation']
             : origQ && origQ['explanation']
-            ? richTextToString(origQ['explanation'])
-            : undefined;
+              ? richTextToString(origQ['explanation'])
+              : undefined;
 
         return {
           questionId: qId,
@@ -169,11 +182,13 @@ export const StudentExamReviewModal: React.FC<StudentExamReviewModalProps> = ({
       const qId = String(q['id'] || `q${order}`);
       const stemText = richTextToString(q['stem']) || `Câu hỏi ${order}`;
       const stemImages =
-        q['stem'] && typeof q['stem'] === 'object' && Array.isArray((q['stem'] as Record<string, unknown>)['images'])
+        q['stem'] &&
+        typeof q['stem'] === 'object' &&
+        Array.isArray((q['stem'] as Record<string, unknown>)['images'])
           ? ((q['stem'] as Record<string, unknown>)['images'] as string[])
           : Array.isArray(q['images'])
-          ? (q['images'] as string[])
-          : [];
+            ? (q['images'] as string[])
+            : [];
       const type = String(q['type'] || 'mcq4');
       const points = typeof q['points'] === 'number' ? q['points'] : 0.5;
 
@@ -189,7 +204,11 @@ export const StudentExamReviewModal: React.FC<StudentExamReviewModalProps> = ({
       if (type === 'mcq4' && Array.isArray(q['options'])) {
         options = (q['options'] as unknown[]).map((opt, optIdx) => {
           let optImages: string[] = [];
-          if (typeof opt === 'object' && opt !== null && Array.isArray((opt as Record<string, unknown>)['images'])) {
+          if (
+            typeof opt === 'object' &&
+            opt !== null &&
+            Array.isArray((opt as Record<string, unknown>)['images'])
+          ) {
             optImages = (opt as Record<string, unknown>)['images'] as string[];
           }
           return {
@@ -218,7 +237,11 @@ export const StudentExamReviewModal: React.FC<StudentExamReviewModalProps> = ({
           isCorrect = true;
         }
       } else {
-        if (rawAns !== undefined && correctRaw !== undefined && String(rawAns).trim().toLowerCase() === String(correctRaw).trim().toLowerCase()) {
+        if (
+          rawAns !== undefined &&
+          correctRaw !== undefined &&
+          String(rawAns).trim().toLowerCase() === String(correctRaw).trim().toLowerCase()
+        ) {
           isCorrect = true;
         }
       }
@@ -245,15 +268,15 @@ export const StudentExamReviewModal: React.FC<StudentExamReviewModalProps> = ({
   // Lọc câu hỏi theo Đúng / Sai
   const filteredReviews = useMemo(() => {
     if (filterType === 'correct') {
-      return parsedReviews.filter((q) => q.isCorrect);
+      return parsedReviews.filter(q => q.isCorrect);
     }
     if (filterType === 'wrong') {
-      return parsedReviews.filter((q) => !q.isCorrect);
+      return parsedReviews.filter(q => !q.isCorrect);
     }
     return parsedReviews;
   }, [parsedReviews, filterType]);
 
-  const correctCount = parsedReviews.filter((q) => q.isCorrect).length;
+  const correctCount = parsedReviews.filter(q => q.isCorrect).length;
   const wrongCount = parsedReviews.length - correctCount;
 
   if (!isOpen || !record) return null;
@@ -270,7 +293,9 @@ export const StudentExamReviewModal: React.FC<StudentExamReviewModalProps> = ({
               Chi Tiết Bài Làm: {record.studentName}
             </div>
             <div style={{ fontSize: '12.5px', color: UI_COLORS.textMuted, marginTop: '2px' }}>
-              {className ? `Lớp: ${className}` : ''} {record.studentCode ? `• Mã HS: ${record.studentCode}` : ''} • Ca thi {record.batchIndex}
+              {className ? `Lớp: ${className}` : ''}{' '}
+              {record.studentCode ? `• Mã HS: ${record.studentCode}` : ''} • Ca thi{' '}
+              {record.batchIndex}
               {examTitle ? ` • Đề: ${examTitle}` : ''}
             </div>
           </div>
@@ -300,7 +325,8 @@ export const StudentExamReviewModal: React.FC<StudentExamReviewModalProps> = ({
                 width: '54px',
                 height: '54px',
                 borderRadius: '50%',
-                backgroundColor: record.score >= 0.5 * (record.maxScore || 10) ? '#DCFCE7' : '#FEE2E2',
+                backgroundColor:
+                  record.score >= 0.5 * (record.maxScore || 10) ? '#DCFCE7' : '#FEE2E2',
                 border: `2px solid ${record.score >= 0.5 * (record.maxScore || 10) ? '#86EFAC' : '#FCA5A5'}`,
                 display: 'flex',
                 alignItems: 'center',
@@ -317,7 +343,8 @@ export const StudentExamReviewModal: React.FC<StudentExamReviewModalProps> = ({
                 ĐIỂM ĐẠT ĐƯỢC: {record.score} / {record.maxScore || 10}đ
               </div>
               <div style={{ fontSize: '12.5px', color: '#475569', marginTop: '2px' }}>
-                Đúng <strong>{correctCount}</strong> / {parsedReviews.length} câu ({record.percentage}%)
+                Đúng <strong>{correctCount}</strong> / {parsedReviews.length} câu (
+                {record.percentage}%)
               </div>
             </div>
           </div>
@@ -325,13 +352,17 @@ export const StudentExamReviewModal: React.FC<StudentExamReviewModalProps> = ({
           {/* Thời gian làm bài & Nộp bài */}
           <div style={{ display: 'flex', gap: '16px', fontSize: '12.5px', color: '#475569' }}>
             <div>
-              <div style={{ color: UI_COLORS.textMuted, fontSize: '11px', fontWeight: 600 }}>THỜI GIAN LÀM</div>
+              <div style={{ color: UI_COLORS.textMuted, fontSize: '11px', fontWeight: 600 }}>
+                THỜI GIAN LÀM
+              </div>
               <div style={{ fontWeight: 700, color: UI_COLORS.text, marginTop: '2px' }}>
                 ⏱️ {record.timeSpentSeconds > 0 ? formatSeconds(record.timeSpentSeconds) : '—'}
               </div>
             </div>
             <div>
-              <div style={{ color: UI_COLORS.textMuted, fontSize: '11px', fontWeight: 600 }}>NỘP BÀI LÚC</div>
+              <div style={{ color: UI_COLORS.textMuted, fontSize: '11px', fontWeight: 600 }}>
+                NỘP BÀI LÚC
+              </div>
               <div style={{ fontWeight: 700, color: UI_COLORS.text, marginTop: '2px' }}>
                 📅 {formatDateTime(record.submittedAt)}
               </div>
@@ -422,7 +453,7 @@ export const StudentExamReviewModal: React.FC<StudentExamReviewModalProps> = ({
               Không có câu hỏi nào trong danh mục này.
             </div>
           ) : (
-            filteredReviews.map((q) => {
+            filteredReviews.map(q => {
               const hasAnswered = q.studentChoiceLabel !== null || q.studentRawAnswer !== undefined;
 
               return (
@@ -440,7 +471,15 @@ export const StudentExamReviewModal: React.FC<StudentExamReviewModalProps> = ({
                   }}
                 >
                   {/* Dòng Header câu: Câu X, Điểm số, Huy hiệu Đúng/Sai */}
-                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '8px' }}>
+                  <div
+                    style={{
+                      display: 'flex',
+                      justifyContent: 'space-between',
+                      alignItems: 'center',
+                      flexWrap: 'wrap',
+                      gap: '8px',
+                    }}
+                  >
                     <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                       <span
                         style={{
@@ -454,7 +493,9 @@ export const StudentExamReviewModal: React.FC<StudentExamReviewModalProps> = ({
                       >
                         Câu {q.order}
                       </span>
-                      <span style={{ fontSize: '12px', fontWeight: 600, color: UI_COLORS.textMuted }}>
+                      <span
+                        style={{ fontSize: '12px', fontWeight: 600, color: UI_COLORS.textMuted }}
+                      >
                         ({q.pointsEarned > 0 ? `+${q.pointsEarned}đ` : '0đ'} / {q.points}đ)
                       </span>
                     </div>
@@ -479,7 +520,12 @@ export const StudentExamReviewModal: React.FC<StudentExamReviewModalProps> = ({
 
                   {/* Nội dung đề câu hỏi (Render công thức toán KaTeX) */}
                   <div
-                    style={{ fontSize: '14.5px', fontWeight: 600, color: UI_COLORS.text, lineHeight: 1.6 }}
+                    style={{
+                      fontSize: '14.5px',
+                      fontWeight: 600,
+                      color: UI_COLORS.text,
+                      lineHeight: 1.6,
+                    }}
                     dangerouslySetInnerHTML={{
                       __html: renderLatexInText(q.stemText),
                     }}
@@ -487,7 +533,9 @@ export const StudentExamReviewModal: React.FC<StudentExamReviewModalProps> = ({
 
                   {/* Ảnh minh họa câu hỏi nếu có */}
                   {q.stemImages && q.stemImages.length > 0 && (
-                    <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap', margin: '4px 0' }}>
+                    <div
+                      style={{ display: 'flex', gap: '10px', flexWrap: 'wrap', margin: '4px 0' }}
+                    >
                       {q.stemImages.map((imgUrl, iIdx) => {
                         const resolvedUrl = resolveAssetUrl(imgUrl);
                         return (
@@ -515,8 +563,15 @@ export const StudentExamReviewModal: React.FC<StudentExamReviewModalProps> = ({
 
                   {/* Danh sách các lựa chọn đáp án (Trắc nghiệm A, B, C, D) */}
                   {q.options && q.options.length > 0 ? (
-                    <div style={{ display: 'flex', flexDirection: 'column', gap: '6px', marginTop: '4px' }}>
-                      {q.options.map((opt) => {
+                    <div
+                      style={{
+                        display: 'flex',
+                        flexDirection: 'column',
+                        gap: '6px',
+                        marginTop: '4px',
+                      }}
+                    >
+                      {q.options.map(opt => {
                         const isStudentPick = q.studentChoiceLabel === opt.label;
                         const isCorrectOpt = q.correctChoiceLabel === opt.label;
 
@@ -563,8 +618,8 @@ export const StudentExamReviewModal: React.FC<StudentExamReviewModalProps> = ({
                                 backgroundColor: isCorrectOpt
                                   ? '#16A34A'
                                   : isStudentPick
-                                  ? '#DC2626'
-                                  : '#CBD5E1',
+                                    ? '#DC2626'
+                                    : '#CBD5E1',
                                 color: isCorrectOpt || isStudentPick ? '#FFFFFF' : '#334155',
                                 fontSize: '12px',
                                 flexShrink: 0,
@@ -580,7 +635,14 @@ export const StudentExamReviewModal: React.FC<StudentExamReviewModalProps> = ({
                                 }}
                               />
                               {opt.images && opt.images.length > 0 && (
-                                <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap', marginTop: '6px' }}>
+                                <div
+                                  style={{
+                                    display: 'flex',
+                                    gap: '8px',
+                                    flexWrap: 'wrap',
+                                    marginTop: '6px',
+                                  }}
+                                >
                                   {opt.images.map((imgUrl, oImgIdx) => {
                                     const optResolved = resolveAssetUrl(imgUrl);
                                     return (
@@ -656,20 +718,30 @@ export const StudentExamReviewModal: React.FC<StudentExamReviewModalProps> = ({
                       }}
                     >
                       <div style={{ display: 'flex', gap: '8px', alignItems: 'baseline' }}>
-                        <span style={{ fontWeight: 600, color: UI_COLORS.textMuted }}>Học sinh trả lời:</span>
+                        <span style={{ fontWeight: 600, color: UI_COLORS.textMuted }}>
+                          Học sinh trả lời:
+                        </span>
                         <strong
                           style={{ color: q.isCorrect ? '#16A34A' : '#DC2626' }}
                           dangerouslySetInnerHTML={{
-                            __html: q.studentRawAnswer !== undefined ? renderLatexInText(String(q.studentRawAnswer)) : 'Chưa có câu trả lời',
+                            __html:
+                              q.studentRawAnswer !== undefined
+                                ? renderLatexInText(String(q.studentRawAnswer))
+                                : 'Chưa có câu trả lời',
                           }}
                         />
                       </div>
                       <div style={{ display: 'flex', gap: '8px', alignItems: 'baseline' }}>
-                        <span style={{ fontWeight: 600, color: UI_COLORS.textMuted }}>Đáp án chính xác:</span>
+                        <span style={{ fontWeight: 600, color: UI_COLORS.textMuted }}>
+                          Đáp án chính xác:
+                        </span>
                         <strong
                           style={{ color: '#16A34A' }}
                           dangerouslySetInnerHTML={{
-                            __html: q.correctRawAnswer !== undefined ? renderLatexInText(String(q.correctRawAnswer)) : '—',
+                            __html:
+                              q.correctRawAnswer !== undefined
+                                ? renderLatexInText(String(q.correctRawAnswer))
+                                : '—',
                           }}
                         />
                       </div>
@@ -753,7 +825,7 @@ export const StudentExamReviewModal: React.FC<StudentExamReviewModalProps> = ({
         >
           <div
             style={{ position: 'relative', maxWidth: '95vw', maxHeight: '90vh' }}
-            onClick={(e) => e.stopPropagation()}
+            onClick={e => e.stopPropagation()}
           >
             <img
               src={previewImg}

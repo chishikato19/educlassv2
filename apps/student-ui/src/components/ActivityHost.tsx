@@ -38,23 +38,44 @@ export interface StudentViewComponentProps<St = unknown> {
 }
 
 // Bảng ánh xạ các Student View tương ứng với activityId
-const studentViewRegistry: Record<
-  string,
-  React.ComponentType<StudentViewComponentProps<never>>
-> = {
-  'quick-poll': QuickPollStudentView as unknown as React.ComponentType<StudentViewComponentProps<never>>,
-  'quiz-live': QuizLiveStudentView as unknown as React.ComponentType<StudentViewComponentProps<never>>,
-  'exam': ExamStudentView as unknown as React.ComponentType<StudentViewComponentProps<never>>,
-  'swiss-duel': SwissDuelStudentView as unknown as React.ComponentType<StudentViewComponentProps<never>>,
-  'pdf-presenter': PdfPresenterStudentView as unknown as React.ComponentType<StudentViewComponentProps<never>>,
-  'object-camera': ObjectCameraStudentView as unknown as React.ComponentType<StudentViewComponentProps<never>>,
-  'territory-war': TerritoryStudentView as unknown as React.ComponentType<StudentViewComponentProps<never>>,
-  'project-grading': ProjectGradingStudentView as unknown as React.ComponentType<StudentViewComponentProps<never>>,
-  'arcade-duel': ArcadeDuelStudentView as unknown as React.ComponentType<StudentViewComponentProps<never>>,
-  'interactive-board': InteractiveBoardStudentView as unknown as React.ComponentType<StudentViewComponentProps<never>>,
-  'circuit-race': CircuitStudentView as unknown as React.ComponentType<StudentViewComponentProps<never>>,
-  'volleyball-tournament': VolleyballStudentView as unknown as React.ComponentType<StudentViewComponentProps<never>>,
-  'faction-duel': FactionDuelStudentView as unknown as React.ComponentType<StudentViewComponentProps<never>>,
+const studentViewRegistry: Record<string, React.ComponentType<StudentViewComponentProps<never>>> = {
+  'quick-poll': QuickPollStudentView as unknown as React.ComponentType<
+    StudentViewComponentProps<never>
+  >,
+  'quiz-live': QuizLiveStudentView as unknown as React.ComponentType<
+    StudentViewComponentProps<never>
+  >,
+  exam: ExamStudentView as unknown as React.ComponentType<StudentViewComponentProps<never>>,
+  'swiss-duel': SwissDuelStudentView as unknown as React.ComponentType<
+    StudentViewComponentProps<never>
+  >,
+  'pdf-presenter': PdfPresenterStudentView as unknown as React.ComponentType<
+    StudentViewComponentProps<never>
+  >,
+  'object-camera': ObjectCameraStudentView as unknown as React.ComponentType<
+    StudentViewComponentProps<never>
+  >,
+  'territory-war': TerritoryStudentView as unknown as React.ComponentType<
+    StudentViewComponentProps<never>
+  >,
+  'project-grading': ProjectGradingStudentView as unknown as React.ComponentType<
+    StudentViewComponentProps<never>
+  >,
+  'arcade-duel': ArcadeDuelStudentView as unknown as React.ComponentType<
+    StudentViewComponentProps<never>
+  >,
+  'interactive-board': InteractiveBoardStudentView as unknown as React.ComponentType<
+    StudentViewComponentProps<never>
+  >,
+  'circuit-race': CircuitStudentView as unknown as React.ComponentType<
+    StudentViewComponentProps<never>
+  >,
+  'volleyball-tournament': VolleyballStudentView as unknown as React.ComponentType<
+    StudentViewComponentProps<never>
+  >,
+  'faction-duel': FactionDuelStudentView as unknown as React.ComponentType<
+    StudentViewComponentProps<never>
+  >,
 };
 
 /**
@@ -66,7 +87,6 @@ export function registerStudentView(
 ): void {
   studentViewRegistry[activityId] = viewComponent;
 }
-
 
 /**
  * ActivityHost - Khung chứa hoạt động dành cho Học sinh (mobile-first, viewport 360x640)
@@ -87,9 +107,7 @@ export const ActivityHost: React.FC<ActivityHostProps> = ({
       >
         <div className="text-5xl">🏁</div>
         <h2 className="text-xl font-bold text-gray-800">Tiết học đã kết thúc</h2>
-        <p className="text-base text-gray-600">
-          Cảm ơn bạn đã tham gia tiết học sôi nổi!
-        </p>
+        <p className="text-base text-gray-600">Cảm ơn bạn đã tham gia tiết học sôi nổi!</p>
       </div>
     );
   }
@@ -115,8 +133,7 @@ export const ActivityHost: React.FC<ActivityHostProps> = ({
   }
 
   const ViewComponent = studentViewRegistry[activeActivity.activityId] as
-    | React.ComponentType<StudentViewComponentProps<unknown>>
-    | undefined;
+    React.ComponentType<StudentViewComponentProps<unknown>> | undefined;
 
   if (!ViewComponent) {
     return (

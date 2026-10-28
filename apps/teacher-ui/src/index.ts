@@ -23,4 +23,3 @@ export const APP_ROLE = 'teacher';
 export function getTeacherThemeColor(): string {
   return UI_COLORS.primary;
 }
-

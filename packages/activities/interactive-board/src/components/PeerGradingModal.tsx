@@ -16,7 +16,8 @@ export const PeerGradingModal: React.FC<PeerGradingModalProps> = ({
   onGrade,
   onClose,
 }) => {
-  const existingGrade = (post.peerGrades || {})[currentParticipantId]?.score ?? Math.min(8, maxGrade);
+  const existingGrade =
+    (post.peerGrades || {})[currentParticipantId]?.score ?? Math.min(8, maxGrade);
   const [score, setScore] = useState<number>(existingGrade);
 
   // Sinh các nút điểm nhanh tiện lợi
@@ -64,7 +65,7 @@ export const PeerGradingModal: React.FC<PeerGradingModalProps> = ({
 
           {/* Các nút bấm chọn điểm nhanh */}
           <div className="grid grid-cols-3 gap-2">
-            {quickScores.map((val) => (
+            {quickScores.map(val => (
               <button
                 key={val}
                 type="button"
@@ -88,7 +89,7 @@ export const PeerGradingModal: React.FC<PeerGradingModalProps> = ({
               max={maxGrade}
               step={maxGrade === 10 ? '0.5' : '1'}
               value={score}
-              onChange={(e) => setScore(parseFloat(e.target.value))}
+              onChange={e => setScore(parseFloat(e.target.value))}
               className="w-full accent-amber-500 cursor-pointer h-2 bg-slate-200 rounded-lg"
             />
           </div>

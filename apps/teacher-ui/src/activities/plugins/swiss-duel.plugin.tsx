@@ -25,6 +25,7 @@ export const swissDuelPlugin: ActivityHostPlugin = {
   id: 'swiss-duel',
   name: 'Đấu Cờ Thụy Sỹ',
   icon: '♟️',
-  description: 'Đấu trí đối kháng 1v1 theo thể thức Thụy Sỹ cổ điển: so tài 2 câu/vòng, thắng 2đ, hòa 1đ',
+  description:
+    'Đấu trí đối kháng 1v1 theo thể thức Thụy Sỹ cổ điển: so tài 2 câu/vòng, thắng 2đ, hòa 1đ',
   component: SwissDuelHostComponent,
 };

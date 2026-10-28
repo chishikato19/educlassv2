@@ -253,7 +253,9 @@ describe('Quiz Live Activity Server Lifecycle (Task 3.3)', () => {
     expect(prog?.lastAnswer?.selectedAnswer).toBe(1);
     expect(prog?.lastAnswer?.explanation).toBe('Hà Nội là thủ đô của CHXHCN Việt Nam từ năm 1976.');
     expect(prog?.answers['0']?.correctAnswer).toBe(0);
-    expect(prog?.answers['0']?.explanation).toBe('Hà Nội là thủ đô của CHXHCN Việt Nam từ năm 1976.');
+    expect(prog?.answers['0']?.explanation).toBe(
+      'Hà Nội là thủ đô của CHXHCN Việt Nam từ năm 1976.'
+    );
   });
 
   it('allows students to restart and replay quiz in quizizz mode when allowReplay is enabled', () => {

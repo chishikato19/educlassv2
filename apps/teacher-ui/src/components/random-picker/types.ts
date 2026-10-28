@@ -170,4 +170,3 @@ export type RandomPickerSyncMessage =
   | {
       type: 'RESET';
     };
-

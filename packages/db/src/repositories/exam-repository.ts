@@ -76,9 +76,13 @@ export class ExamRepository {
       conditions.push(eq(exams.status, filter.status));
     }
 
-    const query = conditions.length > 0
-      ? this.db.select().from(exams).where(and(...conditions))
-      : this.db.select().from(exams);
+    const query =
+      conditions.length > 0
+        ? this.db
+            .select()
+            .from(exams)
+            .where(and(...conditions))
+        : this.db.select().from(exams);
 
     return query.orderBy(desc(exams.createdAt));
   }

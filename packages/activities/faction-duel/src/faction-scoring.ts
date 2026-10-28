@@ -39,7 +39,9 @@ export function checkAnswerCorrectness(question: FactionQuestion, answer: unknow
 
   if (question.type === 'short') {
     const strAnswer = String(answer).trim().toLowerCase();
-    const strCorrect = String(question.correctAnswer ?? '').trim().toLowerCase();
+    const strCorrect = String(question.correctAnswer ?? '')
+      .trim()
+      .toLowerCase();
     return strAnswer.length > 0 && strAnswer === strCorrect;
   }
 
@@ -220,9 +222,10 @@ export function evaluateFactionMatchup(
 /**
  * Tổng hợp điểm cộng thêm của mỗi phe từ các trận đã hoàn thành trong vòng
  */
-export function aggregateTeamScores(
-  matchups: FactionMatchup[]
-): { addBlue: number; addRed: number } {
+export function aggregateTeamScores(matchups: FactionMatchup[]): {
+  addBlue: number;
+  addRed: number;
+} {
   let addBlue = 0;
   let addRed = 0;
   for (const m of matchups) {

@@ -9,7 +9,14 @@ import {
 export const QuizLiveModeSchema = z.enum(['kahoot', 'quizizz']);
 export type QuizLiveMode = z.infer<typeof QuizLiveModeSchema>;
 
-export const QuizQuestionTypeSchema = z.enum(['mcq4', 'tf', 'tf_group', 'short', 'matching', 'cloze_drag']);
+export const QuizQuestionTypeSchema = z.enum([
+  'mcq4',
+  'tf',
+  'tf_group',
+  'short',
+  'matching',
+  'cloze_drag',
+]);
 export type QuizQuestionType = z.infer<typeof QuizQuestionTypeSchema>;
 
 export const QuizQuestionSchema = z.object({
@@ -36,11 +43,15 @@ export const QuizQuestionSchema = z.object({
   template: z.string().optional(),
   blanks: z.array(z.object({ id: z.string(), position: z.number().optional() })).optional(),
   wordBank: z.array(z.string()).optional(),
-  items: z.array(z.object({
-    id: z.string().optional(),
-    text: z.union([z.string(), z.object({ text: z.string() })]),
-    correct: z.boolean().optional(),
-  })).optional(),
+  items: z
+    .array(
+      z.object({
+        id: z.string().optional(),
+        text: z.union([z.string(), z.object({ text: z.string() })]),
+        correct: z.boolean().optional(),
+      })
+    )
+    .optional(),
 });
 export type QuizQuestion = z.infer<typeof QuizQuestionSchema>;
 
@@ -158,10 +169,14 @@ export const QuizLiveStateSchema = z.object({
       template: z.string().optional(),
       blanks: z.array(z.object({ id: z.string(), position: z.number().optional() })).optional(),
       wordBank: z.array(z.string()).optional(),
-      items: z.array(z.object({
-        id: z.string().optional(),
-        text: z.union([z.string(), z.object({ text: z.string() })]),
-      })).optional(),
+      items: z
+        .array(
+          z.object({
+            id: z.string().optional(),
+            text: z.union([z.string(), z.object({ text: z.string() })]),
+          })
+        )
+        .optional(),
     })
   ),
   currentCorrectAnswer: z.unknown().optional(),

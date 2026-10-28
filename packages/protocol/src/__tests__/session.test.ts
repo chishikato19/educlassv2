@@ -391,9 +391,7 @@ describe('Session Protocol Schemas (packages/protocol)', () => {
           { reason: 'Phát biểu đúng câu khó', exp: 20, ts: 1700001000000 },
           { reason: 'Hoàn thành Quiz Live', exp: 65, ts: 1700002000000 },
         ],
-        newTitlesAwarded: [
-          { key: 'sieu_cap', name: 'Siêu cấp tiến bộ', iconKey: 'rocket' },
-        ],
+        newTitlesAwarded: [{ key: 'sieu_cap', name: 'Siêu cấp tiến bộ', iconKey: 'rocket' }],
         avatar: {
           base: 'fox' as const,
           color: '#FF6B6B',
@@ -562,6 +560,3 @@ describe('Session Protocol Schemas (packages/protocol)', () => {
     });
   });
 });
-
-
-

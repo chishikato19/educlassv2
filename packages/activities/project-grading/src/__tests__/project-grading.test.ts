@@ -231,7 +231,7 @@ describe('ProjectGradingActivity Module', () => {
     expect(directResults.length).toBe(5);
 
     const results = ProjectGradingActivity.server.onEnd(ctx, state);
-    const hs2Result = results.find((r) => r.participantId === 'hs-2');
+    const hs2Result = results.find(r => r.participantId === 'hs-2');
     expect(hs2Result).toBeDefined();
     expect(hs2Result?.selfScore).toBe(10.0);
     expect(hs2Result?.teamMemberScore).toBe(9.0);

@@ -148,10 +148,10 @@ export const MysteryBoxMode: React.FC<RandomPickerModeProps> = ({
                     isOpenedWinner
                       ? '-translate-y-16 rotate-12 opacity-80'
                       : isOpenedLoser
-                      ? '-translate-y-8 -rotate-6 opacity-60'
-                      : isSelected
-                      ? 'animate-pulse'
-                      : ''
+                        ? '-translate-y-8 -rotate-6 opacity-60'
+                        : isSelected
+                          ? 'animate-pulse'
+                          : ''
                   }`}
                 >
                   {/* Cục nơ hoa trên nắp */}
@@ -162,9 +162,7 @@ export const MysteryBoxMode: React.FC<RandomPickerModeProps> = ({
 
                 {/* Huy hiệu số thứ tự hộp quà ở giữa */}
                 <div className="z-10 w-12 h-12 rounded-full bg-slate-950/80 border-2 border-amber-300/80 flex flex-col items-center justify-center shadow-lg">
-                  <span className="text-xs text-amber-300 font-mono font-black">
-                    #{idx + 1}
-                  </span>
+                  <span className="text-xs text-amber-300 font-mono font-black">#{idx + 1}</span>
                 </div>
 
                 {/* Nhãn trạng thái bên dưới hộp */}
@@ -172,10 +170,10 @@ export const MysteryBoxMode: React.FC<RandomPickerModeProps> = ({
                   {isOpenedWinner
                     ? '✨ MỞ HỘP ✨'
                     : isOpenedLoser
-                    ? 'ĐÃ MỞ'
-                    : isSelected
-                    ? '👉 ĐÃ CHỌN'
-                    : theme.name}
+                      ? 'ĐÃ MỞ'
+                      : isSelected
+                        ? '👉 ĐÃ CHỌN'
+                        : theme.name}
                 </div>
               </div>
             </div>

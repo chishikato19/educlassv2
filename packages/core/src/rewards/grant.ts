@@ -69,7 +69,13 @@ export async function grantReward(
   options: GrantRewardOptions,
   storage?: RewardStorageAdapter
 ): Promise<GrantRewardResult> {
-  const { participant, studentState, exp, reason = 'Thưởng từ giáo viên', timestamp = Date.now() } = options;
+  const {
+    participant,
+    studentState,
+    exp,
+    reason = 'Thưởng từ giáo viên',
+    timestamp = Date.now(),
+  } = options;
 
   if (exp <= 0) {
     throw new Error(`Số lượng EXP thưởng phải là số dương lớn hơn 0 (nhận được: ${exp})`);

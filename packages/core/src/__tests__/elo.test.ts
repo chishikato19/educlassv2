@@ -42,7 +42,7 @@ describe('Elo Engine & Matchmaking', () => {
     it('updates team members based on match outcome and individual contribution', () => {
       const teamBlue = [
         { id: 'b1', elo: 1100, contribution: 25 }, // MVP
-        { id: 'b2', elo: 1000, contribution: 5 },  // Đóng góp ít
+        { id: 'b2', elo: 1000, contribution: 5 }, // Đóng góp ít
       ];
       const teamRed = [
         { id: 'r1', elo: 1050, contribution: 15 },
@@ -98,7 +98,7 @@ describe('Elo Engine & Matchmaking', () => {
 
       const groups = balanceNTeamsByElo(students, 3);
       expect(groups).toHaveLength(3);
-      groups.forEach((g) => {
+      groups.forEach(g => {
         expect(g.members).toHaveLength(2);
       });
     });

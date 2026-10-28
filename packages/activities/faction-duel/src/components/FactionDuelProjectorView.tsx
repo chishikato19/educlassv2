@@ -24,7 +24,8 @@ export const FactionDuelProjectorView: React.FC<ProjectorViewProps> = ({ state }
               {state.title || 'ĐẠI CHIẾN XANH ĐỎ'}
             </h1>
             <p className="text-xs font-semibold text-slate-400">
-              Lượt {state.currentRound} / {state.totalRounds} • Mỗi trận {state.questionsPerMatch} câu
+              Lượt {state.currentRound} / {state.totalRounds} • Mỗi trận {state.questionsPerMatch}{' '}
+              câu
             </p>
           </div>
         </div>
@@ -107,7 +108,9 @@ export const FactionDuelProjectorView: React.FC<ProjectorViewProps> = ({ state }
       <div className="flex-1 overflow-y-auto pr-1">
         <div className="grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3">
           {state.currentMatchups.map((match, idx) => {
-            const bluePlayer = state.teamBlue.find(m => m.participantId === match.blueParticipantId);
+            const bluePlayer = state.teamBlue.find(
+              m => m.participantId === match.blueParticipantId
+            );
             const redPlayer = state.teamRed.find(m => m.participantId === match.redParticipantId);
 
             const isDone = match.status === 'completed';
@@ -122,8 +125,8 @@ export const FactionDuelProjectorView: React.FC<ProjectorViewProps> = ({ state }
                     ? match.winner === 'blue'
                       ? 'bg-blue-950/40 border-blue-500/40'
                       : match.winner === 'red'
-                      ? 'bg-red-950/40 border-red-500/40'
-                      : 'bg-slate-900 border-slate-700'
+                        ? 'bg-red-950/40 border-red-500/40'
+                        : 'bg-slate-900 border-slate-700'
                     : 'bg-slate-900/80 border-slate-800'
                 }`}
               >
@@ -146,8 +149,8 @@ export const FactionDuelProjectorView: React.FC<ProjectorViewProps> = ({ state }
                       {match.winner === 'blue'
                         ? '🔵 Xanh thắng'
                         : match.winner === 'red'
-                        ? '🔴 Đỏ thắng'
-                        : '🤝 Hòa'}
+                          ? '🔴 Đỏ thắng'
+                          : '🤝 Hòa'}
                     </span>
                   ) : (
                     <span className="text-[10px] text-slate-400">Đang đấu...</span>

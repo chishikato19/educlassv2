@@ -155,9 +155,7 @@ export const AvatarCustomizer: React.FC<AvatarCustomizerProps> = ({
         <div className="relative group">
           <StudentAvatar config={draftConfig} size="2xl" showBorder />
         </div>
-        <span className="mt-2 text-xs font-bold text-slate-600">
-          Xem trước diện mạo
-        </span>
+        <span className="mt-2 text-xs font-bold text-slate-600">Xem trước diện mạo</span>
 
         <button
           type="button"
@@ -182,7 +180,10 @@ export const AvatarCustomizer: React.FC<AvatarCustomizerProps> = ({
           >
             ❮
           </button>
-          <div ref={tabsRef} className="flex-1 flex overflow-x-auto gap-1.5 p-1 bg-slate-100 rounded-xl no-scrollbar scroll-smooth">
+          <div
+            ref={tabsRef}
+            className="flex-1 flex overflow-x-auto gap-1.5 p-1 bg-slate-100 rounded-xl no-scrollbar scroll-smooth"
+          >
             {(
               [
                 { id: 'base', label: 'Nhân vật', icon: '🐻' },
@@ -193,7 +194,7 @@ export const AvatarCustomizer: React.FC<AvatarCustomizerProps> = ({
                 { id: 'glasses', label: 'Kính mắt', icon: '👓' },
                 { id: 'color', label: 'Màu sắc', icon: '🎨' },
               ] as const
-            ).map((tab) => {
+            ).map(tab => {
               const isActive = activeTab === tab.id;
               return (
                 <button
@@ -228,7 +229,7 @@ export const AvatarCustomizer: React.FC<AvatarCustomizerProps> = ({
           {/* TAB 1: NHÂN VẬT */}
           {activeTab === 'base' && (
             <div className="grid grid-cols-4 gap-2">
-              {BASES.map((item) => {
+              {BASES.map(item => {
                 const isSelected = draftConfig.base === item.id;
                 const isLocked = studentLevel < item.unlockLevel;
                 return (
@@ -237,7 +238,9 @@ export const AvatarCustomizer: React.FC<AvatarCustomizerProps> = ({
                     type="button"
                     disabled={isLocked}
                     title={isLocked ? `Cần đạt Cấp độ ${item.unlockLevel}` : item.label}
-                    onClick={() => !isLocked && setDraftConfig((prev) => ({ ...prev, base: item.id }))}
+                    onClick={() =>
+                      !isLocked && setDraftConfig(prev => ({ ...prev, base: item.id }))
+                    }
                     className={`min-h-[56px] flex flex-col items-center justify-center p-1.5 rounded-xl border transition-all ${
                       isLocked ? 'opacity-40 cursor-not-allowed bg-slate-100' : 'cursor-pointer'
                     } ${
@@ -257,13 +260,13 @@ export const AvatarCustomizer: React.FC<AvatarCustomizerProps> = ({
           {/* TAB 2: MŨ NÓN */}
           {activeTab === 'headwear' && (
             <div className="grid grid-cols-3 gap-2">
-              {HEADWEARS.map((item) => {
+              {HEADWEARS.map(item => {
                 const isSelected = draftConfig.headwear === item.id;
                 return (
                   <button
                     key={item.id}
                     type="button"
-                    onClick={() => setDraftConfig((prev) => ({ ...prev, headwear: item.id }))}
+                    onClick={() => setDraftConfig(prev => ({ ...prev, headwear: item.id }))}
                     className={`min-h-[50px] flex items-center justify-center gap-1.5 p-2 rounded-xl border transition-all cursor-pointer ${
                       isSelected
                         ? 'border-blue-500 bg-blue-50/70 ring-2 ring-blue-400'
@@ -281,13 +284,13 @@ export const AvatarCustomizer: React.FC<AvatarCustomizerProps> = ({
           {/* TAB 3: TRANG PHỤC */}
           {activeTab === 'outfit' && (
             <div className="grid grid-cols-3 gap-2">
-              {OUTFITS.map((item) => {
+              {OUTFITS.map(item => {
                 const isSelected = draftConfig.outfit === item.id;
                 return (
                   <button
                     key={item.id}
                     type="button"
-                    onClick={() => setDraftConfig((prev) => ({ ...prev, outfit: item.id }))}
+                    onClick={() => setDraftConfig(prev => ({ ...prev, outfit: item.id }))}
                     className={`min-h-[50px] flex items-center justify-center gap-1.5 p-2 rounded-xl border transition-all cursor-pointer ${
                       isSelected
                         ? 'border-blue-500 bg-blue-50/70 ring-2 ring-blue-400'
@@ -305,13 +308,13 @@ export const AvatarCustomizer: React.FC<AvatarCustomizerProps> = ({
           {/* TAB 4: ĐÔI CÁNH */}
           {activeTab === 'wings' && (
             <div className="grid grid-cols-3 gap-2">
-              {WINGS.map((item) => {
+              {WINGS.map(item => {
                 const isSelected = draftConfig.wings === item.id;
                 return (
                   <button
                     key={item.id}
                     type="button"
-                    onClick={() => setDraftConfig((prev) => ({ ...prev, wings: item.id }))}
+                    onClick={() => setDraftConfig(prev => ({ ...prev, wings: item.id }))}
                     className={`min-h-[50px] flex items-center justify-center gap-1.5 p-2 rounded-xl border transition-all cursor-pointer ${
                       isSelected
                         ? 'border-blue-500 bg-blue-50/70 ring-2 ring-blue-400'
@@ -329,13 +332,13 @@ export const AvatarCustomizer: React.FC<AvatarCustomizerProps> = ({
           {/* TAB 5: ĐẠO CỤ CẦM TAY */}
           {activeTab === 'held' && (
             <div className="grid grid-cols-3 gap-2">
-              {HELDS.map((item) => {
+              {HELDS.map(item => {
                 const isSelected = draftConfig.held === item.id;
                 return (
                   <button
                     key={item.id}
                     type="button"
-                    onClick={() => setDraftConfig((prev) => ({ ...prev, held: item.id }))}
+                    onClick={() => setDraftConfig(prev => ({ ...prev, held: item.id }))}
                     className={`min-h-[50px] flex items-center justify-center gap-1.5 p-2 rounded-xl border transition-all cursor-pointer ${
                       isSelected
                         ? 'border-blue-500 bg-blue-50/70 ring-2 ring-blue-400'
@@ -353,13 +356,13 @@ export const AvatarCustomizer: React.FC<AvatarCustomizerProps> = ({
           {/* TAB 6: KÍNH MẮT */}
           {activeTab === 'glasses' && (
             <div className="grid grid-cols-2 gap-2">
-              {GLASSES.map((item) => {
+              {GLASSES.map(item => {
                 const isSelected = draftConfig.glasses === item.id;
                 return (
                   <button
                     key={item.id}
                     type="button"
-                    onClick={() => setDraftConfig((prev) => ({ ...prev, glasses: item.id }))}
+                    onClick={() => setDraftConfig(prev => ({ ...prev, glasses: item.id }))}
                     className={`min-h-[48px] flex items-center justify-center gap-2 p-2 rounded-xl border transition-all cursor-pointer ${
                       isSelected
                         ? 'border-blue-500 bg-blue-50/70 ring-2 ring-blue-400'
@@ -377,15 +380,17 @@ export const AvatarCustomizer: React.FC<AvatarCustomizerProps> = ({
           {/* TAB 7: MÀU NỀN */}
           {activeTab === 'color' && (
             <div className="grid grid-cols-4 gap-2.5">
-              {COLORS.map((col) => {
+              {COLORS.map(col => {
                 const isSelected = draftConfig.color === col.hex;
                 return (
                   <button
                     key={col.hex}
                     type="button"
-                    onClick={() => setDraftConfig((prev) => ({ ...prev, color: col.hex }))}
+                    onClick={() => setDraftConfig(prev => ({ ...prev, color: col.hex }))}
                     className={`min-h-[44px] flex items-center justify-center gap-1.5 p-1.5 rounded-xl border transition-all cursor-pointer ${
-                      isSelected ? 'ring-2 ring-blue-500 border-transparent shadow-xs' : 'border-slate-200'
+                      isSelected
+                        ? 'ring-2 ring-blue-500 border-transparent shadow-xs'
+                        : 'border-slate-200'
                     }`}
                     style={{ backgroundColor: `${col.hex}15` }}
                   >

@@ -72,7 +72,9 @@ export const StudentAvatar: React.FC<StudentAvatarProps> = ({
           {/* Cổ và thân cơ bản */}
           <path
             d="M26 86 C26 70 36 64 50 64 C64 64 74 70 74 86 C74 95 26 95 26 86 Z"
-            fill={outfit === 'jersey' ? '#EF4444' : outfit === 'wizard_robe' ? '#7C3AED' : '#FFFFFF'}
+            fill={
+              outfit === 'jersey' ? '#EF4444' : outfit === 'wizard_robe' ? '#7C3AED' : '#FFFFFF'
+            }
           />
 
           {outfit === 'school_uniform' && (
@@ -100,7 +102,10 @@ export const StudentAvatar: React.FC<StudentAvatarProps> = ({
 
           {outfit === 'wizard_robe' && (
             <g>
-              <polygon points="50,70 52,74 56,74 53,77 54,81 50,78 46,81 47,77 44,74 48,74" fill="#FBBF24" />
+              <polygon
+                points="50,70 52,74 56,74 53,77 54,81 50,78 46,81 47,77 44,74 48,74"
+                fill="#FBBF24"
+              />
             </g>
           )}
         </g>
@@ -169,7 +174,12 @@ export const StudentAvatar: React.FC<StudentAvatarProps> = ({
             <circle cx="58" cy="42" r="1" fill="white" />
             {/* Mũi gấu */}
             <ellipse cx="50" cy="51" rx="3.5" ry="2.5" fill="#1F2937" />
-            <path d="M50 53.5 L50 56 M47 57 Q50 59 53 57" stroke="#1F2937" strokeWidth="1" fill="none" />
+            <path
+              d="M50 53.5 L50 56 M47 57 Q50 59 53 57"
+              stroke="#1F2937"
+              strokeWidth="1"
+              fill="none"
+            />
           </g>
         )}
 
@@ -210,7 +220,15 @@ export const StudentAvatar: React.FC<StudentAvatarProps> = ({
             <circle cx="58" cy="44.5" r="1.2" fill="white" />
             {/* Mũi & răng thỏ */}
             <polygon points="48,52 52,52 50,54" fill="#F472B6" />
-            <rect x="48.5" y="55" width="3" height="3" fill="#FFFFFF" stroke="#D1D5DB" strokeWidth="0.5" />
+            <rect
+              x="48.5"
+              y="55"
+              width="3"
+              height="3"
+              fill="#FFFFFF"
+              stroke="#D1D5DB"
+              strokeWidth="0.5"
+            />
           </g>
         )}
 
@@ -250,7 +268,15 @@ export const StudentAvatar: React.FC<StudentAvatarProps> = ({
             <rect x="37" y="39" width="8" height="6" rx="2" fill="#38BDF8" />
             <rect x="55" y="39" width="8" height="6" rx="2" fill="#38BDF8" />
             {/* Miệng vạch sóng */}
-            <line x1="42" y1="50" x2="58" y2="50" stroke="#38BDF8" strokeWidth="1.5" strokeDasharray="2 1" />
+            <line
+              x1="42"
+              y1="50"
+              x2="58"
+              y2="50"
+              stroke="#38BDF8"
+              strokeWidth="1.5"
+              strokeDasharray="2 1"
+            />
           </g>
         )}
 
@@ -289,26 +315,75 @@ export const StudentAvatar: React.FC<StudentAvatarProps> = ({
             <path d="M52 40 L70 40 L67 52 L55 52 Z" fill="#0F172A" />
             <line x1="47" y1="42" x2="53" y2="42" stroke="#0F172A" strokeWidth="3" />
             {/* Vạch lóa sáng trên kính râm */}
-            <line x1="33" y1="43" x2="40" y2="49" stroke="#FFFFFF" strokeWidth="1" strokeOpacity="0.6" />
-            <line x1="55" y1="43" x2="62" y2="49" stroke="#FFFFFF" strokeWidth="1" strokeOpacity="0.6" />
+            <line
+              x1="33"
+              y1="43"
+              x2="40"
+              y2="49"
+              stroke="#FFFFFF"
+              strokeWidth="1"
+              strokeOpacity="0.6"
+            />
+            <line
+              x1="55"
+              y1="43"
+              x2="62"
+              y2="49"
+              stroke="#FFFFFF"
+              strokeWidth="1"
+              strokeOpacity="0.6"
+            />
           </g>
         )}
 
         {glasses === 'blush_star' && (
           <g id="blush-star">
             {/* Ngôi sao má hồng 2 bên */}
-            <text x="29" y="54" fill="#F43F5E" fontSize="9" textAnchor="middle">⭐</text>
-            <text x="71" y="54" fill="#F43F5E" fontSize="9" textAnchor="middle">⭐</text>
+            <text x="29" y="54" fill="#F43F5E" fontSize="9" textAnchor="middle">
+              ⭐
+            </text>
+            <text x="71" y="54" fill="#F43F5E" fontSize="9" textAnchor="middle">
+              ⭐
+            </text>
           </g>
         )}
 
         {headwear === 'straw' && (
           <g id="straw-hat">
             <polygon points="50,14 20,34 80,34" fill="#FEF08A" stroke="#CA8A04" strokeWidth="1" />
-            <line x1="50" y1="14" x2="35" y2="34" stroke="#EAB308" strokeWidth="0.8" opacity="0.7" />
-            <line x1="50" y1="14" x2="50" y2="34" stroke="#EAB308" strokeWidth="0.8" opacity="0.7" />
-            <line x1="50" y1="14" x2="65" y2="34" stroke="#EAB308" strokeWidth="0.8" opacity="0.7" />
-            <path d="M30 34 Q36 48 50 50 Q64 48 70 34" stroke="#F43F5E" strokeWidth="1.5" fill="none" />
+            <line
+              x1="50"
+              y1="14"
+              x2="35"
+              y2="34"
+              stroke="#EAB308"
+              strokeWidth="0.8"
+              opacity="0.7"
+            />
+            <line
+              x1="50"
+              y1="14"
+              x2="50"
+              y2="34"
+              stroke="#EAB308"
+              strokeWidth="0.8"
+              opacity="0.7"
+            />
+            <line
+              x1="50"
+              y1="14"
+              x2="65"
+              y2="34"
+              stroke="#EAB308"
+              strokeWidth="0.8"
+              opacity="0.7"
+            />
+            <path
+              d="M30 34 Q36 48 50 50 Q64 48 70 34"
+              stroke="#F43F5E"
+              strokeWidth="1.5"
+              fill="none"
+            />
           </g>
         )}
 
@@ -344,7 +419,12 @@ export const StudentAvatar: React.FC<StudentAvatarProps> = ({
 
         {headwear === 'crown' && (
           <g id="crown">
-            <polygon points="30,28 32,16 42,23 50,12 58,23 68,16 70,28" fill="#FBBF24" stroke="#D97706" strokeWidth="1" />
+            <polygon
+              points="30,28 32,16 42,23 50,12 58,23 68,16 70,28"
+              fill="#FBBF24"
+              stroke="#D97706"
+              strokeWidth="1"
+            />
             <circle cx="32" cy="16" r="2" fill="#EF4444" />
             <circle cx="50" cy="12" r="2.5" fill="#3B82F6" />
             <circle cx="68" cy="16" r="2" fill="#10B981" />
@@ -361,7 +441,15 @@ export const StudentAvatar: React.FC<StudentAvatarProps> = ({
         {/* 5. Đạo cụ cầm tay (Held) */}
         {held === 'pencil' && (
           <g id="held-pencil" transform="translate(68, 60) rotate(20)">
-            <rect x="0" y="0" width="6" height="22" fill="#FACC15" stroke="#CA8A04" strokeWidth="1" />
+            <rect
+              x="0"
+              y="0"
+              width="6"
+              height="22"
+              fill="#FACC15"
+              stroke="#CA8A04"
+              strokeWidth="1"
+            />
             <polygon points="0,0 6,0 3,-7" fill="#FDE68A" />
             <polygon points="2,-4 4,-4 3,-7" fill="#1E293B" />
             <rect x="0" y="17" width="6" height="5" fill="#F472B6" />
@@ -371,7 +459,12 @@ export const StudentAvatar: React.FC<StudentAvatarProps> = ({
         {held === 'wand' && (
           <g id="held-wand" transform="translate(68, 62) rotate(15)">
             <rect x="2" y="0" width="3" height="22" fill="#94A3B8" rx="1" />
-            <polygon points="3.5,-4 5,1 10,1 6,5 7,10 3.5,7 0,10 1,5 -3,1 2,1" fill="#F59E0B" stroke="#D97706" strokeWidth="1" />
+            <polygon
+              points="3.5,-4 5,1 10,1 6,5 7,10 3.5,7 0,10 1,5 -3,1 2,1"
+              fill="#F59E0B"
+              stroke="#D97706"
+              strokeWidth="1"
+            />
             <circle cx="3.5" cy="3" r="1.5" fill="#FFFFFF" />
           </g>
         )}

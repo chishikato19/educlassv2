@@ -168,7 +168,9 @@ export const AssignmentStudentView: React.FC<AssignmentStudentViewProps> = ({
           <div className="flex items-center gap-3">
             <span className="text-3xl">📁</span>
             <div>
-              <h2 className="text-lg md:text-xl font-bold text-gray-800">{state.title || 'Thu - phát bài tập'}</h2>
+              <h2 className="text-lg md:text-xl font-bold text-gray-800">
+                {state.title || 'Thu - phát bài tập'}
+              </h2>
               <p className="text-xs text-gray-500">
                 Học sinh: <strong className="text-gray-700">{displayName}</strong>
               </p>
@@ -221,7 +223,10 @@ export const AssignmentStudentView: React.FC<AssignmentStudentViewProps> = ({
                 <div className="flex items-center gap-3 min-w-0">
                   <span className="text-2xl">📄</span>
                   <div className="min-w-0">
-                    <p className="text-xs md:text-sm font-bold text-gray-800 truncate" title={m.name}>
+                    <p
+                      className="text-xs md:text-sm font-bold text-gray-800 truncate"
+                      title={m.name}
+                    >
                       {m.name}
                     </p>
                     <p className="text-[11px] text-gray-400">{formatFileSize(m.size)}</p>
@@ -271,7 +276,9 @@ export const AssignmentStudentView: React.FC<AssignmentStudentViewProps> = ({
             <div className="flex items-center gap-2.5 min-w-0">
               <span className="text-2xl">📑</span>
               <div className="min-w-0">
-                <p className="text-xs md:text-sm font-bold text-gray-800 truncate">{mySubmission.fileName}</p>
+                <p className="text-xs md:text-sm font-bold text-gray-800 truncate">
+                  {mySubmission.fileName}
+                </p>
                 <p className="text-[11px] text-gray-400">{formatFileSize(mySubmission.fileSize)}</p>
               </div>
             </div>
@@ -287,7 +294,9 @@ export const AssignmentStudentView: React.FC<AssignmentStudentViewProps> = ({
 
           {state.allowResubmit && !state.isLocked && (
             <div className="pt-2 border-t border-gray-200">
-              <p className="text-xs text-gray-500 mb-2">Thầy/Cô cho phép nộp lại nếu bạn muốn gửi bản sửa đổi:</p>
+              <p className="text-xs text-gray-500 mb-2">
+                Thầy/Cô cho phép nộp lại nếu bạn muốn gửi bản sửa đổi:
+              </p>
               <label
                 htmlFor={fileInputId}
                 className="w-full min-h-[48px] py-2 px-4 bg-gray-100 hover:bg-gray-200 text-gray-700 font-bold rounded-xl text-xs md:text-sm flex items-center justify-center gap-2 transition-colors cursor-pointer"
@@ -334,8 +343,8 @@ export const AssignmentStudentView: React.FC<AssignmentStudentViewProps> = ({
               isDragOver
                 ? 'border-blue-500 bg-blue-50/50 scale-[1.01]'
                 : selectedFile
-                ? 'border-emerald-400 bg-emerald-50/30'
-                : 'border-gray-300 hover:border-blue-400 bg-gray-50/50'
+                  ? 'border-emerald-400 bg-emerald-50/30'
+                  : 'border-gray-300 hover:border-blue-400 bg-gray-50/50'
             }`}
           >
             {selectedFile ? (
@@ -424,7 +433,9 @@ export const AssignmentStudentView: React.FC<AssignmentStudentViewProps> = ({
             <div className="flex items-center justify-between p-4 border-b border-gray-200 bg-gray-50">
               <div className="flex items-center gap-2 min-w-0">
                 <span className="text-xl">📄</span>
-                <h4 className="text-sm font-bold text-gray-800 truncate">{activeMaterialPopup.name}</h4>
+                <h4 className="text-sm font-bold text-gray-800 truncate">
+                  {activeMaterialPopup.name}
+                </h4>
               </div>
               <button
                 type="button"
@@ -438,7 +449,9 @@ export const AssignmentStudentView: React.FC<AssignmentStudentViewProps> = ({
             <div className="p-4 flex-1 overflow-auto flex flex-col items-center justify-center text-center">
               <span className="text-5xl mb-3">📚</span>
               <p className="text-sm font-bold text-gray-800 mb-1">{activeMaterialPopup.name}</p>
-              <p className="text-xs text-gray-500 mb-4">{formatFileSize(activeMaterialPopup.size)}</p>
+              <p className="text-xs text-gray-500 mb-4">
+                {formatFileSize(activeMaterialPopup.size)}
+              </p>
 
               <div className="flex gap-2">
                 <a

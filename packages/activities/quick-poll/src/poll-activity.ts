@@ -121,11 +121,7 @@ export const QuickPollActivity: ActivityDefinition<
       };
     },
 
-    onTeacherIntent(
-      _ctx: ActivityContext,
-      st: QuickPollState,
-      intent: unknown
-    ): QuickPollState {
+    onTeacherIntent(_ctx: ActivityContext, st: QuickPollState, intent: unknown): QuickPollState {
       const teacherIntentSchema = z.discriminatedUnion('type', [
         z.object({ type: z.literal('toggle_lock') }),
         z.object({ type: z.literal('reset_votes') }),

@@ -2,11 +2,7 @@
 import { describe, expect, it, vi } from 'vitest';
 import { render, screen, fireEvent } from '@testing-library/react';
 import type { QuizLiveState } from '../quiz-schemas.js';
-import {
-  QuizLiveProjectorView,
-  QuizLiveStudentView,
-  QuizLiveTeacherPanel,
-} from '../quiz-views.js';
+import { QuizLiveProjectorView, QuizLiveStudentView, QuizLiveTeacherPanel } from '../quiz-views.js';
 
 const mockState: QuizLiveState = {
   title: 'Thử thách Tri thức',

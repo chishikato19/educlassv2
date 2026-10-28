@@ -56,17 +56,19 @@ export const FactionMatchupSchema = z.object({
   blueParticipantId: z.string(),
   redParticipantId: z.string(),
   isCloneMatch: z.boolean().optional(),
-  
+
   // Bản ghi đáp án theo questionId
   blueAnswers: z.record(FactionMatchupAnswerSchema).default({}),
   redAnswers: z.record(FactionMatchupAnswerSchema).default({}),
-  
+
   status: z.enum(['in_progress', 'completed']).default('in_progress'),
   winner: z.enum(['blue', 'red', 'draw']).optional(),
-  awardedPoints: z.object({
-    blue: z.number().nonnegative().default(0),
-    red: z.number().nonnegative().default(0),
-  }).default({ blue: 0, red: 0 }),
+  awardedPoints: z
+    .object({
+      blue: z.number().nonnegative().default(0),
+      red: z.number().nonnegative().default(0),
+    })
+    .default({ blue: 0, red: 0 }),
   isUnderdogWin: z.boolean().optional(),
 });
 export type FactionMatchup = z.infer<typeof FactionMatchupSchema>;
@@ -78,12 +80,14 @@ export const FactionPickPhaseSchema = z.object({
   attackingTeam: z.enum(['blue', 'red']),
   expiresAt: z.number(),
   claimedTargetIds: z.array(z.string()).default([]),
-  pairs: z.array(
-    z.object({
-      attackerId: z.string(),
-      targetId: z.string(),
-    })
-  ).default([]),
+  pairs: z
+    .array(
+      z.object({
+        attackerId: z.string(),
+        targetId: z.string(),
+      })
+    )
+    .default([]),
 });
 export type FactionPickPhase = z.infer<typeof FactionPickPhaseSchema>;
 
@@ -91,41 +95,38 @@ export type FactionPickPhase = z.infer<typeof FactionPickPhaseSchema>;
  * Trạng thái State toàn cục của hoạt động Đại Chiến Xanh Đỏ
  */
 export const FactionDuelStateSchema = z.object({
-  status: z.enum([
-    'lobby',
-    'team_reveal',
-    'round_active',
-    'round_eval',
-    'pick_phase',
-    'finished',
-  ]).default('lobby'),
-  
+  status: z
+    .enum(['lobby', 'team_reveal', 'round_active', 'round_eval', 'pick_phase', 'finished'])
+    .default('lobby'),
+
   title: z.string().default('Đại Chiến Xanh Đỏ (thử nghiệm)'),
   currentRound: z.number().int().nonnegative().default(0),
   totalRounds: z.number().int().positive().default(5),
   questionsPerMatch: z.number().int().min(1).max(5).default(2),
-  
+
   teamBlue: z.array(FactionMemberSchema).default([]),
   teamRed: z.array(FactionMemberSchema).default([]),
-  
+
   scoreBlue: z.number().nonnegative().default(0),
   scoreRed: z.number().nonnegative().default(0),
-  
+
   currentMatchups: z.array(FactionMatchupSchema).default([]),
-  matchHistory: z.array(
-    z.object({
-      round: z.number().int(),
-      p1: z.string(),
-      p2: z.string(),
-    })
-  ).default([]),
-  
+  matchHistory: z
+    .array(
+      z.object({
+        round: z.number().int(),
+        p1: z.string(),
+        p2: z.string(),
+      })
+    )
+    .default([]),
+
   pickPhase: FactionPickPhaseSchema.optional(),
   currentQuestions: z.array(FactionQuestionSchema).default([]),
   roundStartTime: z.number().optional(),
   roundEndTime: z.number().optional(),
   cloneParticipantId: z.string().optional(),
-  
+
   // Tùy chọn cấu hình hoạt động
   shuffleQuestions: z.boolean().default(true),
   shuffleOptions: z.boolean().default(true),

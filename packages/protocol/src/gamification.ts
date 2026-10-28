@@ -26,12 +26,7 @@ export const HeadwearTypeSchema = z.enum([
 ]);
 export type HeadwearType = z.infer<typeof HeadwearTypeSchema>;
 
-export const GlassesTypeSchema = z.enum([
-  'none',
-  'glasses',
-  'sunglasses',
-  'blush_star',
-]);
+export const GlassesTypeSchema = z.enum(['none', 'glasses', 'sunglasses', 'blush_star']);
 export type GlassesType = z.infer<typeof GlassesTypeSchema>;
 
 export const OutfitTypeSchema = z.enum([
@@ -43,18 +38,10 @@ export const OutfitTypeSchema = z.enum([
 ]);
 export type OutfitType = z.infer<typeof OutfitTypeSchema>;
 
-export const WingsTypeSchema = z.enum([
-  'none',
-  'angel',
-  'bat',
-]);
+export const WingsTypeSchema = z.enum(['none', 'angel', 'bat']);
 export type WingsType = z.infer<typeof WingsTypeSchema>;
 
-export const HeldTypeSchema = z.enum([
-  'none',
-  'pencil',
-  'wand',
-]);
+export const HeldTypeSchema = z.enum(['none', 'pencil', 'wand']);
 export type HeldType = z.infer<typeof HeldTypeSchema>;
 
 export const AvatarConfigSchema = z.object({

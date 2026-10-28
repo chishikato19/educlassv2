@@ -91,10 +91,7 @@ export class ChatRepository {
       // 3. Tin riêng do chính học sinh này gửi đi (fromParticipantId = pid)
       filterCondition = and(
         eq(chatMessages.sessionId, sessionId),
-        or(
-          isNull(chatMessages.toParticipantId),
-          eq(chatMessages.toParticipantId, pid)
-        )
+        or(isNull(chatMessages.toParticipantId), eq(chatMessages.toParticipantId, pid))
       )!;
     }
 
@@ -120,7 +117,7 @@ export class ChatRepository {
     // Trả về thứ tự thời gian tăng dần để UI render từ trên xuống dưới
     const sorted = rows.reverse();
 
-    return sorted.map((row) => ({
+    return sorted.map(row => ({
       id: row.id,
       sessionId: row.sessionId,
       fromParticipantId: row.fromParticipantId,

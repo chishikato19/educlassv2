@@ -94,7 +94,7 @@ export const SessionReportsTab: React.FC<SessionReportsTabProps> = ({
       setActiveQuizRuns(activeRuns);
 
       // Tự động chọn mục đầu tiên nếu chưa chọn
-      setSelectedKey((prevKey) => {
+      setSelectedKey(prevKey => {
         if (prevKey) return prevKey;
         if (activeRuns.length > 0) {
           const lastActive = activeRuns[activeRuns.length - 1];
@@ -141,9 +141,13 @@ export const SessionReportsTab: React.FC<SessionReportsTabProps> = ({
           sessionCode: activeSession.session?.joinCode || '',
           className: activeSession.className || 'Tiết học hiện tại',
           runId: run.runId,
-          runIndex: run.runIndex ?? (idx + 1),
+          runIndex: run.runIndex ?? idx + 1,
           title: run.title || `Quizizz Lần ${idx + 1}`,
-          timeStr: run.endedAt ? formatTimeOnly(run.endedAt) : (run.startedAt ? formatTimeOnly(run.startedAt) : 'Vừa xong'),
+          timeStr: run.endedAt
+            ? formatTimeOnly(run.endedAt)
+            : run.startedAt
+              ? formatTimeOnly(run.startedAt)
+              : 'Vừa xong',
           timestamp: run.endedAt ?? run.startedAt ?? Date.now(),
           totalParticipants: run.totalParticipants,
           averageScore: run.averageScore,
@@ -156,7 +160,7 @@ export const SessionReportsTab: React.FC<SessionReportsTabProps> = ({
     }
 
     // B. Các lần thi Quizizz trong các phiên đã đóng trong CSDL
-    reports.forEach((r) => {
+    reports.forEach(r => {
       const qRuns = r.quizRuns || [];
 
       if (qRuns.length > 0) {
@@ -169,7 +173,7 @@ export const SessionReportsTab: React.FC<SessionReportsTabProps> = ({
             sessionCode: r.sessionCode,
             className: r.className || 'Phiên học',
             runId: run.runId,
-            runIndex: run.runIndex ?? (idx + 1),
+            runIndex: run.runIndex ?? idx + 1,
             title: run.title || `Quizizz Lần ${idx + 1}`,
             timeStr: run.endedAt ? formatDateTime(run.endedAt) : formatDateTime(r.createdAt),
             timestamp: run.endedAt ?? r.createdAt,
@@ -231,7 +235,7 @@ export const SessionReportsTab: React.FC<SessionReportsTabProps> = ({
   const filteredEntries = useMemo(() => {
     if (!searchQuery.trim()) return allEntries;
     const q = searchQuery.toLowerCase();
-    return allEntries.filter((item) => {
+    return allEntries.filter(item => {
       const title = item.title.toLowerCase();
       const code = item.sessionCode.toLowerCase();
       const cls = item.className.toLowerCase();
@@ -242,13 +246,16 @@ export const SessionReportsTab: React.FC<SessionReportsTabProps> = ({
   // Mục báo cáo đang được chọn để hiển thị
   const selectedEntry = useMemo(() => {
     if (!selectedKey) return allEntries[0] || null;
-    return allEntries.find((e) => e.key === selectedKey) || allEntries[0] || null;
+    return allEntries.find(e => e.key === selectedKey) || allEntries[0] || null;
   }, [allEntries, selectedKey]);
 
   // Xử lý xuất Excel cho lần thi đang chọn
   const handleExport = (entry: QuizReportEntry) => {
     if (entry.type === 'quiz_run' && entry.runId) {
-      window.open(`/api/sessions/${entry.sessionId}/quiz-runs/${entry.runId}/export-excel`, '_blank');
+      window.open(
+        `/api/sessions/${entry.sessionId}/quiz-runs/${entry.runId}/export-excel`,
+        '_blank'
+      );
       return;
     }
     if (onExportExcel) {
@@ -279,24 +286,18 @@ export const SessionReportsTab: React.FC<SessionReportsTabProps> = ({
             📊 Báo Cáo & Tổng Kết Quizizz
           </h2>
           <p style={{ margin: '4px 0 0 0', fontSize: '14px', color: UI_COLORS.textMuted }}>
-            Lưu trữ chi tiết từng lần thi Quizizz trong phiên, bảo toàn bảng xếp hạng, điểm số và tỉ lệ chính xác.
+            Lưu trữ chi tiết từng lần thi Quizizz trong phiên, bảo toàn bảng xếp hạng, điểm số và tỉ
+            lệ chính xác.
           </p>
         </div>
 
         <div style={{ display: 'flex', gap: '10px' }}>
-          <Button
-            variant="secondary"
-            onClick={() => void loadData()}
-            disabled={isLoading}
-          >
+          <Button variant="secondary" onClick={() => void loadData()} disabled={isLoading}>
             {isLoading ? 'Đang nạp...' : '🔄 Làm mới'}
           </Button>
 
           {selectedEntry && (
-            <Button
-              variant="primary"
-              onClick={() => handleExport(selectedEntry)}
-            >
+            <Button variant="primary" onClick={() => handleExport(selectedEntry)}>
               📥 Xuất file Excel lần thi này
             </Button>
           )}
@@ -316,7 +317,14 @@ export const SessionReportsTab: React.FC<SessionReportsTabProps> = ({
         <div style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
           <Card>
             <div style={{ padding: '4px' }}>
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px' }}>
+              <div
+                style={{
+                  display: 'flex',
+                  justifyContent: 'space-between',
+                  alignItems: 'center',
+                  marginBottom: '12px',
+                }}
+              >
                 <span style={{ fontWeight: 700, fontSize: '15px', color: UI_COLORS.text }}>
                   🎯 Danh sách các lần thi ({allEntries.length})
                 </span>
@@ -341,7 +349,7 @@ export const SessionReportsTab: React.FC<SessionReportsTabProps> = ({
                 type="text"
                 placeholder="Tìm theo tên bài, mã phòng..."
                 value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
+                onChange={e => setSearchQuery(e.target.value)}
                 style={{
                   width: '100%',
                   padding: '8px 12px',
@@ -364,11 +372,18 @@ export const SessionReportsTab: React.FC<SessionReportsTabProps> = ({
                 }}
               >
                 {filteredEntries.length === 0 ? (
-                  <div style={{ textAlign: 'center', padding: '32px 8px', color: UI_COLORS.textMuted, fontSize: '13px' }}>
+                  <div
+                    style={{
+                      textAlign: 'center',
+                      padding: '32px 8px',
+                      color: UI_COLORS.textMuted,
+                      fontSize: '13px',
+                    }}
+                  >
                     Chưa có lần thi Quizizz nào được lưu trữ.
                   </div>
                 ) : (
-                  filteredEntries.map((item) => {
+                  filteredEntries.map(item => {
                     const isSelected = selectedKey === item.key;
                     const isTotal = item.type === 'session_total';
 
@@ -387,12 +402,24 @@ export const SessionReportsTab: React.FC<SessionReportsTabProps> = ({
                             ? `2px solid ${item.isActive ? UI_COLORS.success : UI_COLORS.primary}`
                             : `1px solid ${UI_COLORS.border}`,
                           backgroundColor: isSelected
-                            ? (item.isActive ? '#ECFDF5' : '#EFF6FF')
-                            : (item.isActive ? '#F0FDF4' : isTotal ? '#F8FAFC' : '#FFFFFF'),
+                            ? item.isActive
+                              ? '#ECFDF5'
+                              : '#EFF6FF'
+                            : item.isActive
+                              ? '#F0FDF4'
+                              : isTotal
+                                ? '#F8FAFC'
+                                : '#FFFFFF',
                           transition: 'all 0.15s ease',
                         }}
                       >
-                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                        <div
+                          style={{
+                            display: 'flex',
+                            justifyContent: 'space-between',
+                            alignItems: 'center',
+                          }}
+                        >
                           <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
                             {item.isActive ? (
                               <span
@@ -422,7 +449,13 @@ export const SessionReportsTab: React.FC<SessionReportsTabProps> = ({
                               </span>
                             ) : null}
 
-                            <span style={{ fontWeight: 700, fontSize: '12px', color: UI_COLORS.primary }}>
+                            <span
+                              style={{
+                                fontWeight: 700,
+                                fontSize: '12px',
+                                color: UI_COLORS.primary,
+                              }}
+                            >
                               Mã: {item.sessionCode}
                             </span>
                           </div>
@@ -443,9 +476,12 @@ export const SessionReportsTab: React.FC<SessionReportsTabProps> = ({
                           {item.title}
                         </div>
 
-                        <div style={{ fontSize: '12px', color: UI_COLORS.textMuted, marginTop: '3px' }}>
+                        <div
+                          style={{ fontSize: '12px', color: UI_COLORS.textMuted, marginTop: '3px' }}
+                        >
                           {item.className ? `${item.className} • ` : ''}
-                          👥 {item.totalParticipants} học sinh • 🎯 ĐTB: {item.averageScore.toLocaleString()}
+                          👥 {item.totalParticipants} học sinh • 🎯 ĐTB:{' '}
+                          {item.averageScore.toLocaleString()}
                         </div>
                       </div>
                     );
@@ -460,12 +496,15 @@ export const SessionReportsTab: React.FC<SessionReportsTabProps> = ({
         <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
           {!selectedEntry ? (
             <Card>
-              <div style={{ textAlign: 'center', padding: '60px 20px', color: UI_COLORS.textMuted }}>
+              <div
+                style={{ textAlign: 'center', padding: '60px 20px', color: UI_COLORS.textMuted }}
+              >
                 <p style={{ fontSize: '18px', fontWeight: 700, color: UI_COLORS.text }}>
                   Chưa có dữ liệu bài thi Quizizz
                 </p>
                 <p style={{ fontSize: '14px', maxWidth: '440px', margin: '8px auto 20px' }}>
-                  Khi học sinh hoàn thành bất kỳ lần thi Quizizz nào trong tiết học, kết quả từng lần sẽ tự động được lưu và hiển thị riêng biệt tại đây.
+                  Khi học sinh hoàn thành bất kỳ lần thi Quizizz nào trong tiết học, kết quả từng
+                  lần sẽ tự động được lưu và hiển thị riêng biệt tại đây.
                 </p>
                 {onNewSession && (
                   <Button variant="primary" onClick={onNewSession}>
@@ -478,10 +517,25 @@ export const SessionReportsTab: React.FC<SessionReportsTabProps> = ({
             <>
               {/* Thẻ Header Chi Tiết Lần Thi */}
               <Card>
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '12px' }}>
+                <div
+                  style={{
+                    display: 'flex',
+                    justifyContent: 'space-between',
+                    alignItems: 'center',
+                    flexWrap: 'wrap',
+                    gap: '12px',
+                  }}
+                >
                   <div>
                     <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                      <h3 style={{ margin: 0, fontSize: '20px', fontWeight: 800, color: UI_COLORS.text }}>
+                      <h3
+                        style={{
+                          margin: 0,
+                          fontSize: '20px',
+                          fontWeight: 800,
+                          color: UI_COLORS.text,
+                        }}
+                      >
                         {selectedEntry.title}
                       </h3>
                       {selectedEntry.isActive && (
@@ -495,13 +549,17 @@ export const SessionReportsTab: React.FC<SessionReportsTabProps> = ({
                             borderRadius: '12px',
                           }}
                         >
-                          {selectedEntry.runIndex ? `Lần thi ${selectedEntry.runIndex} (Tiết này)` : 'Vừa làm xong'}
+                          {selectedEntry.runIndex
+                            ? `Lần thi ${selectedEntry.runIndex} (Tiết này)`
+                            : 'Vừa làm xong'}
                         </span>
                       )}
                     </div>
 
                     <div style={{ fontSize: '13px', color: UI_COLORS.textMuted, marginTop: '4px' }}>
-                      Mã phòng: <strong>{selectedEntry.sessionCode}</strong> • Lớp: <strong>{selectedEntry.className}</strong> • Thời gian: {selectedEntry.timeStr}
+                      Mã phòng: <strong>{selectedEntry.sessionCode}</strong> • Lớp:{' '}
+                      <strong>{selectedEntry.className}</strong> • Thời gian:{' '}
+                      {selectedEntry.timeStr}
                     </div>
                   </div>
 
@@ -535,27 +593,71 @@ export const SessionReportsTab: React.FC<SessionReportsTabProps> = ({
                     borderTop: `1px solid ${UI_COLORS.border}`,
                   }}
                 >
-                  <div style={{ backgroundColor: '#F8FAFC', padding: '12px', borderRadius: '10px', textAlign: 'center' }}>
-                    <div style={{ fontSize: '12px', color: UI_COLORS.textMuted }}>Số học sinh dự thi</div>
-                    <div style={{ fontSize: '20px', fontWeight: 800, color: UI_COLORS.primary, marginTop: '2px' }}>
-                      {selectedEntry.totalParticipants}
+                  <div
+                    style={{
+                      backgroundColor: '#F8FAFC',
+                      padding: '12px',
+                      borderRadius: '10px',
+                      textAlign: 'center',
+                    }}
+                  >
+                    <div style={{ fontSize: '12px', color: UI_COLORS.textMuted }}>
+                      Số học sinh dự thi
                     </div>
-                  </div>
-
-                  <div style={{ backgroundColor: '#F8FAFC', padding: '12px', borderRadius: '10px', textAlign: 'center' }}>
-                    <div style={{ fontSize: '12px', color: UI_COLORS.textMuted }}>Điểm trung bình</div>
-                    <div style={{ fontSize: '20px', fontWeight: 800, color: UI_COLORS.text, marginTop: '2px' }}>
-                      {selectedEntry.averageScore.toLocaleString()}
-                    </div>
-                  </div>
-
-                  <div style={{ backgroundColor: '#F8FAFC', padding: '12px', borderRadius: '10px', textAlign: 'center' }}>
-                    <div style={{ fontSize: '12px', color: UI_COLORS.textMuted }}>Tỉ lệ đúng TB</div>
                     <div
                       style={{
                         fontSize: '20px',
                         fontWeight: 800,
-                        color: selectedEntry.averageAccuracy >= 70 ? UI_COLORS.success : UI_COLORS.warning,
+                        color: UI_COLORS.primary,
+                        marginTop: '2px',
+                      }}
+                    >
+                      {selectedEntry.totalParticipants}
+                    </div>
+                  </div>
+
+                  <div
+                    style={{
+                      backgroundColor: '#F8FAFC',
+                      padding: '12px',
+                      borderRadius: '10px',
+                      textAlign: 'center',
+                    }}
+                  >
+                    <div style={{ fontSize: '12px', color: UI_COLORS.textMuted }}>
+                      Điểm trung bình
+                    </div>
+                    <div
+                      style={{
+                        fontSize: '20px',
+                        fontWeight: 800,
+                        color: UI_COLORS.text,
+                        marginTop: '2px',
+                      }}
+                    >
+                      {selectedEntry.averageScore.toLocaleString()}
+                    </div>
+                  </div>
+
+                  <div
+                    style={{
+                      backgroundColor: '#F8FAFC',
+                      padding: '12px',
+                      borderRadius: '10px',
+                      textAlign: 'center',
+                    }}
+                  >
+                    <div style={{ fontSize: '12px', color: UI_COLORS.textMuted }}>
+                      Tỉ lệ đúng TB
+                    </div>
+                    <div
+                      style={{
+                        fontSize: '20px',
+                        fontWeight: 800,
+                        color:
+                          selectedEntry.averageAccuracy >= 70
+                            ? UI_COLORS.success
+                            : UI_COLORS.warning,
                         marginTop: '2px',
                       }}
                     >
@@ -563,10 +665,26 @@ export const SessionReportsTab: React.FC<SessionReportsTabProps> = ({
                     </div>
                   </div>
 
-                  <div style={{ backgroundColor: '#F8FAFC', padding: '12px', borderRadius: '10px', textAlign: 'center' }}>
+                  <div
+                    style={{
+                      backgroundColor: '#F8FAFC',
+                      padding: '12px',
+                      borderRadius: '10px',
+                      textAlign: 'center',
+                    }}
+                  >
                     <div style={{ fontSize: '12px', color: UI_COLORS.textMuted }}>Tổng số câu</div>
-                    <div style={{ fontSize: '20px', fontWeight: 800, color: UI_COLORS.text, marginTop: '2px' }}>
-                      {selectedEntry.totalQuestions > 0 ? selectedEntry.totalQuestions : (selectedEntry.scoreboard[0]?.totalQuestions || '—')}
+                    <div
+                      style={{
+                        fontSize: '20px',
+                        fontWeight: 800,
+                        color: UI_COLORS.text,
+                        marginTop: '2px',
+                      }}
+                    >
+                      {selectedEntry.totalQuestions > 0
+                        ? selectedEntry.totalQuestions
+                        : selectedEntry.scoreboard[0]?.totalQuestions || '—'}
                     </div>
                   </div>
                 </div>
@@ -589,17 +707,34 @@ export const SessionReportsTab: React.FC<SessionReportsTabProps> = ({
               {/* Chế độ xem: BẢNG TỔNG KẾT QUIZIZZ CỦA LẦN THI ĐANG CHỌN (Họ tên, Điểm số, Tỉ lệ đúng, Vị thứ) */}
               {viewMode === 'quiz_table' && (
                 <Card>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '14px' }}>
+                  <div
+                    style={{
+                      display: 'flex',
+                      justifyContent: 'space-between',
+                      alignItems: 'center',
+                      marginBottom: '14px',
+                    }}
+                  >
                     <div style={{ fontWeight: 800, fontSize: '16px', color: UI_COLORS.text }}>
                       📋 Bảng Điểm Chi Tiết ({selectedEntry.scoreboard.length} học sinh)
                     </div>
                     <div style={{ fontSize: '12px', color: UI_COLORS.textMuted }}>
-                      {selectedEntry.runIndex ? `Kết quả của Lần thi số ${selectedEntry.runIndex}` : 'Kết quả bài thi'}
+                      {selectedEntry.runIndex
+                        ? `Kết quả của Lần thi số ${selectedEntry.runIndex}`
+                        : 'Kết quả bài thi'}
                     </div>
                   </div>
 
                   {selectedEntry.scoreboard.length === 0 ? (
-                    <div style={{ textAlign: 'center', padding: '36px', color: UI_COLORS.textMuted, backgroundColor: '#F8FAFC', borderRadius: '10px' }}>
+                    <div
+                      style={{
+                        textAlign: 'center',
+                        padding: '36px',
+                        color: UI_COLORS.textMuted,
+                        backgroundColor: '#F8FAFC',
+                        borderRadius: '10px',
+                      }}
+                    >
                       Không có dữ liệu bài làm của học sinh trong lần thi này.
                     </div>
                   ) : (
@@ -622,14 +757,26 @@ export const SessionReportsTab: React.FC<SessionReportsTabProps> = ({
                               fontSize: '13px',
                             }}
                           >
-                            <th style={{ padding: '12px 14px', width: '90px', textAlign: 'center' }}>VỊ THỨ</th>
+                            <th
+                              style={{ padding: '12px 14px', width: '90px', textAlign: 'center' }}
+                            >
+                              VỊ THỨ
+                            </th>
                             <th style={{ padding: '12px 14px' }}>HỌ VÀ TÊN</th>
-                            <th style={{ padding: '12px 14px', textAlign: 'right', width: '150px' }}>ĐIỂM SỐ</th>
-                            <th style={{ padding: '12px 14px', textAlign: 'center', width: '220px' }}>TỈ LỆ ĐÚNG</th>
+                            <th
+                              style={{ padding: '12px 14px', textAlign: 'right', width: '150px' }}
+                            >
+                              ĐIỂM SỐ
+                            </th>
+                            <th
+                              style={{ padding: '12px 14px', textAlign: 'center', width: '220px' }}
+                            >
+                              TỈ LỆ ĐÚNG
+                            </th>
                           </tr>
                         </thead>
                         <tbody>
-                          {selectedEntry.scoreboard.map((item) => {
+                          {selectedEntry.scoreboard.map(item => {
                             const isTop1 = item.rank === 1;
                             const isTop2 = item.rank === 2;
                             const isTop3 = item.rank === 3;
@@ -642,10 +789,10 @@ export const SessionReportsTab: React.FC<SessionReportsTabProps> = ({
                                   backgroundColor: isTop1
                                     ? '#FEFCE8'
                                     : isTop2
-                                    ? '#F8FAFC'
-                                    : isTop3
-                                    ? '#FFF7ED'
-                                    : '#FFFFFF',
+                                      ? '#F8FAFC'
+                                      : isTop3
+                                        ? '#FFF7ED'
+                                        : '#FFFFFF',
                                   transition: 'background-color 0.15s ease',
                                 }}
                               >
@@ -664,25 +811,45 @@ export const SessionReportsTab: React.FC<SessionReportsTabProps> = ({
                                       backgroundColor: isTop1
                                         ? '#F59E0B'
                                         : isTop2
-                                        ? '#64748B'
-                                        : isTop3
-                                        ? '#D97706'
-                                        : '#E2E8F0',
+                                          ? '#64748B'
+                                          : isTop3
+                                            ? '#D97706'
+                                            : '#E2E8F0',
                                       color: isTop1 || isTop2 || isTop3 ? '#FFFFFF' : '#334155',
-                                      boxShadow: isTop1 ? '0 2px 8px rgba(245, 158, 11, 0.4)' : 'none',
+                                      boxShadow: isTop1
+                                        ? '0 2px 8px rgba(245, 158, 11, 0.4)'
+                                        : 'none',
                                     }}
                                   >
-                                    {isTop1 ? '👑 1' : isTop2 ? '🥈 2' : isTop3 ? '🥉 3' : item.rank}
+                                    {isTop1
+                                      ? '👑 1'
+                                      : isTop2
+                                        ? '🥈 2'
+                                        : isTop3
+                                          ? '🥉 3'
+                                          : item.rank}
                                   </div>
                                 </td>
 
                                 {/* 2. HỌ VÀ TÊN */}
                                 <td style={{ padding: '14px' }}>
                                   <div style={{ display: 'flex', flexDirection: 'column' }}>
-                                    <span style={{ fontWeight: 700, fontSize: '15px', color: UI_COLORS.text }}>
+                                    <span
+                                      style={{
+                                        fontWeight: 700,
+                                        fontSize: '15px',
+                                        color: UI_COLORS.text,
+                                      }}
+                                    >
                                       {item.displayName}
                                     </span>
-                                    <span style={{ fontSize: '12px', color: UI_COLORS.textMuted, marginTop: '2px' }}>
+                                    <span
+                                      style={{
+                                        fontSize: '12px',
+                                        color: UI_COLORS.textMuted,
+                                        marginTop: '2px',
+                                      }}
+                                    >
                                       {item.identityLevel === 'account' && '⭐ Có tài khoản'}
                                       {item.identityLevel === 'roster' && '📋 Danh sách lớp'}
                                       {item.identityLevel === 'guest' && '👤 Khách tự do'}
@@ -700,10 +867,17 @@ export const SessionReportsTab: React.FC<SessionReportsTabProps> = ({
                                       color: isTop1 ? '#D97706' : UI_COLORS.primary,
                                     }}
                                   >
-                                    {item.score.toLocaleString()} <span style={{ fontSize: '12px', fontWeight: 600 }}>điểm</span>
+                                    {item.score.toLocaleString()}{' '}
+                                    <span style={{ fontSize: '12px', fontWeight: 600 }}>điểm</span>
                                   </div>
                                   {item.expEarned > 0 && (
-                                    <div style={{ fontSize: '12px', fontWeight: 600, color: UI_COLORS.success }}>
+                                    <div
+                                      style={{
+                                        fontSize: '12px',
+                                        fontWeight: 600,
+                                        color: UI_COLORS.success,
+                                      }}
+                                    >
                                       +{item.expEarned} EXP
                                     </div>
                                   )}
@@ -711,22 +885,34 @@ export const SessionReportsTab: React.FC<SessionReportsTabProps> = ({
 
                                 {/* 4. TỈ LỆ ĐÚNG */}
                                 <td style={{ padding: '14px', textAlign: 'center' }}>
-                                  <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '4px' }}>
-                                    <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                                  <div
+                                    style={{
+                                      display: 'flex',
+                                      flexDirection: 'column',
+                                      alignItems: 'center',
+                                      gap: '4px',
+                                    }}
+                                  >
+                                    <div
+                                      style={{ display: 'flex', alignItems: 'center', gap: '6px' }}
+                                    >
                                       <span
                                         style={{
                                           fontWeight: 800,
                                           fontSize: '15px',
-                                          color: item.accuracy >= 70
-                                            ? UI_COLORS.success
-                                            : item.accuracy >= 50
-                                            ? '#F59E0B'
-                                            : UI_COLORS.error,
+                                          color:
+                                            item.accuracy >= 70
+                                              ? UI_COLORS.success
+                                              : item.accuracy >= 50
+                                                ? '#F59E0B'
+                                                : UI_COLORS.error,
                                         }}
                                       >
                                         {item.accuracy}%
                                       </span>
-                                      <span style={{ fontSize: '12px', color: UI_COLORS.textMuted }}>
+                                      <span
+                                        style={{ fontSize: '12px', color: UI_COLORS.textMuted }}
+                                      >
                                         (Đúng {item.correctCount}/{item.totalQuestions} câu)
                                       </span>
                                     </div>
@@ -745,11 +931,12 @@ export const SessionReportsTab: React.FC<SessionReportsTabProps> = ({
                                         style={{
                                           width: `${Math.min(100, Math.max(0, item.accuracy))}%`,
                                           height: '100%',
-                                          backgroundColor: item.accuracy >= 70
-                                            ? UI_COLORS.success
-                                            : item.accuracy >= 50
-                                            ? '#F59E0B'
-                                            : UI_COLORS.error,
+                                          backgroundColor:
+                                            item.accuracy >= 70
+                                              ? UI_COLORS.success
+                                              : item.accuracy >= 50
+                                                ? '#F59E0B'
+                                                : UI_COLORS.error,
                                           borderRadius: '3px',
                                         }}
                                       />

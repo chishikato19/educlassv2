@@ -34,7 +34,9 @@ export const VolleyballProjectorView: React.FC<ProjectorViewProps> = ({ state })
             </div>
             <div className="w-full bg-slate-700/80 border-t-4 border-slate-300 rounded-t-2xl h-44 flex flex-col items-center justify-center shadow-lg">
               <span className="text-3xl font-black text-slate-200">#2</span>
-              <span className="text-xs text-slate-300 font-semibold mt-1">Á Quân Cúp Kim Cương</span>
+              <span className="text-xs text-slate-300 font-semibold mt-1">
+                Á Quân Cúp Kim Cương
+              </span>
             </div>
           </div>
 
@@ -59,7 +61,9 @@ export const VolleyballProjectorView: React.FC<ProjectorViewProps> = ({ state })
             </div>
             <div className="w-full bg-amber-950/80 border-t-4 border-amber-700 rounded-t-2xl h-36 flex flex-col items-center justify-center shadow-lg">
               <span className="text-2xl font-black text-amber-300">#3</span>
-              <span className="text-xs text-amber-200/80 font-semibold mt-1">Hạng Ba Kim Cương</span>
+              <span className="text-xs text-amber-200/80 font-semibold mt-1">
+                Hạng Ba Kim Cương
+              </span>
             </div>
           </div>
         </div>
@@ -101,7 +105,9 @@ export const VolleyballProjectorView: React.FC<ProjectorViewProps> = ({ state })
               {state.title}
             </h1>
             <p className="text-sm text-slate-400 mt-0.5">
-              {state.currentStage === 'pools' ? 'Giai đoạn 1: Thi Đấu Vòng Bảng' : 'Giai đoạn 2: Vòng Bắt Cặp Xếp Hạng 4 Cúp'}
+              {state.currentStage === 'pools'
+                ? 'Giai đoạn 1: Thi Đấu Vòng Bảng'
+                : 'Giai đoạn 2: Vòng Bắt Cặp Xếp Hạng 4 Cúp'}
             </p>
           </div>
         </div>
@@ -194,18 +200,18 @@ export const VolleyballProjectorView: React.FC<ProjectorViewProps> = ({ state })
                 tierKey === 'diamond'
                   ? 'CÚP KIM CƯƠNG'
                   : tierKey === 'gold'
-                  ? 'CÚP VÀNG'
-                  : tierKey === 'silver'
-                  ? 'CÚP BẠC'
-                  : 'CÚP ĐỒNG';
+                    ? 'CÚP VÀNG'
+                    : tierKey === 'silver'
+                      ? 'CÚP BẠC'
+                      : 'CÚP ĐỒNG';
               const tierBorder =
                 tierKey === 'diamond'
                   ? 'border-amber-400/60 bg-amber-950/20'
                   : tierKey === 'gold'
-                  ? 'border-yellow-400/40 bg-yellow-950/20'
-                  : tierKey === 'silver'
-                  ? 'border-slate-400/40 bg-slate-900/40'
-                  : 'border-orange-500/40 bg-orange-950/20';
+                    ? 'border-yellow-400/40 bg-yellow-950/20'
+                    : tierKey === 'silver'
+                      ? 'border-slate-400/40 bg-slate-900/40'
+                      : 'border-orange-500/40 bg-orange-950/20';
 
               return (
                 <div
@@ -238,8 +244,8 @@ export const VolleyballProjectorView: React.FC<ProjectorViewProps> = ({ state })
                                   {m.matchType === 'final'
                                     ? 'Chung Kết'
                                     : m.matchType === 'third_place'
-                                    ? 'Tranh Hạng 3'
-                                    : 'Bán Kết'}
+                                      ? 'Tranh Hạng 3'
+                                      : 'Bán Kết'}
                                 </span>
                               </div>
                               <div className="flex items-center justify-between font-bold text-sm text-slate-200">

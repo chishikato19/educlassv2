@@ -25,6 +25,7 @@ export const territoryWarPlugin: ActivityHostPlugin = {
   id: 'territory-war',
   name: 'Đại Chiến Lãnh Thổ',
   icon: '🏰',
-  description: 'Tranh đoạt lãnh thổ chiến thuật chia 2 phe Xanh - Đỏ thời gian thực với bản đồ lâu đài và tháp canh',
+  description:
+    'Tranh đoạt lãnh thổ chiến thuật chia 2 phe Xanh - Đỏ thời gian thực với bản đồ lâu đài và tháp canh',
   component: TerritoryWarHostComponent,
 };

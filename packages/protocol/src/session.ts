@@ -63,7 +63,7 @@ export const CreateSessionRequestSchema = z
     settings: SessionSettingsSchema.optional(),
   })
   .refine(
-    (data) => {
+    data => {
       // Khi chọn chế độ roster_only thì bắt buộc phải có lớp học
       if (data.identityMode === 'roster_only' && !data.classId) {
         return false;
@@ -184,7 +184,8 @@ export const StudentJoinRequestSchema = z
     teamName: z.string().min(1).max(30).optional(),
   })
   .refine(
-    (data) => Boolean(data.studentId || (data.studentIds && data.studentIds.length > 0) || data.nickname),
+    data =>
+      Boolean(data.studentId || (data.studentIds && data.studentIds.length > 0) || data.nickname),
     {
       message: 'Vui lòng chọn tên trong danh sách hoặc nhập nickname.',
       path: ['nickname'],
@@ -544,5 +545,3 @@ export const SessionReportsListResponseSchema = z.object({
   reports: z.array(SessionReportListItemSchema),
 });
 export type SessionReportsListResponse = z.infer<typeof SessionReportsListResponseSchema>;
-
-

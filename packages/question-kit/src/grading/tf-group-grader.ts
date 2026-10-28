@@ -60,7 +60,7 @@ export function gradeTfGroup(
     },
   ];
 
-  const correctCount = itemDetails.filter((item) => item.isCorrect).length as 0 | 1 | 2 | 3 | 4;
+  const correctCount = itemDetails.filter(item => item.isCorrect).length as 0 | 1 | 2 | 3 | 4;
   const ratio = appliedScale[correctCount] ?? 0.0;
   const rawPoints = question.points * ratio;
   const pointsEarned = Math.round(rawPoints * 10000) / 10000;
@@ -69,7 +69,7 @@ export function gradeTfGroup(
   const isPartial = ratio > 0 && ratio < 1.0;
 
   let feedback: string;
-  if (!answer || selectedList.every((s) => s === null)) {
+  if (!answer || selectedList.every(s => s === null)) {
     feedback = 'Học sinh chưa trả lời câu hỏi này.';
   } else if (isCorrect) {
     feedback = 'Xuất sắc! Đúng cả 4/4 ý (100% điểm).';

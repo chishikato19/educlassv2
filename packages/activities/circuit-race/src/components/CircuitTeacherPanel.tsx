@@ -139,7 +139,12 @@ export const CircuitTeacherPanel: React.FC<TeacherPanelProps> = ({
               )}
             </div>
             <div style={{ fontSize: '12px', color: '#64748B', marginTop: '4px' }}>
-              Đã nộp: <strong>{answeredCount}/{totalStudents}</strong> học sinh ({percentAnswered}%) • Độ dài đường đua: <strong>{state.track.length} ô</strong>
+              Đã nộp:{' '}
+              <strong>
+                {answeredCount}/{totalStudents}
+              </strong>{' '}
+              học sinh ({percentAnswered}%) • Độ dài đường đua:{' '}
+              <strong>{state.track.length} ô</strong>
             </div>
           </div>
         </div>
@@ -300,7 +305,14 @@ export const CircuitTeacherPanel: React.FC<TeacherPanelProps> = ({
                     fontWeight: 700,
                   }}
                 >
-                  <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', maxWidth: '140px' }}>
+                  <span
+                    style={{
+                      overflow: 'hidden',
+                      textOverflow: 'ellipsis',
+                      whiteSpace: 'nowrap',
+                      maxWidth: '140px',
+                    }}
+                  >
                     {idx === 0 ? '🥇' : idx === 1 ? '🥈' : idx === 2 ? '🥉' : `#${idx + 1}`}{' '}
                     {p.displayName}
                   </span>
@@ -319,7 +331,9 @@ export const CircuitTeacherPanel: React.FC<TeacherPanelProps> = ({
               boxShadow: '0 2px 8px rgba(0,0,0,0.05)',
             }}
           >
-            <div style={{ fontSize: '13px', fontWeight: 800, color: '#334155', marginBottom: '8px' }}>
+            <div
+              style={{ fontSize: '13px', fontWeight: 800, color: '#334155', marginBottom: '8px' }}
+            >
               ⚔️ Bảng Tin Chiến Sự
             </div>
             <div
@@ -332,7 +346,14 @@ export const CircuitTeacherPanel: React.FC<TeacherPanelProps> = ({
               }}
             >
               {state.battleLogs.length === 0 ? (
-                <div style={{ color: '#94A3B8', fontSize: '11px', textAlign: 'center', padding: '12px 0' }}>
+                <div
+                  style={{
+                    color: '#94A3B8',
+                    fontSize: '11px',
+                    textAlign: 'center',
+                    padding: '12px 0',
+                  }}
+                >
                   Chưa có sự kiện nào
                 </div>
               ) : (

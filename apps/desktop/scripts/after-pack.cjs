@@ -20,7 +20,10 @@ exports.default = async function afterPack(context) {
 
   const sourceCandidates = [
     path.join(__dirname, '../bin/better_sqlite3_electron.node'),
-    path.join(__dirname, '../../node_modules/.pnpm/better-sqlite3@11.10.0/node_modules/better-sqlite3/build/Release/better_sqlite3.node'),
+    path.join(
+      __dirname,
+      '../../node_modules/.pnpm/better-sqlite3@11.10.0/node_modules/better-sqlite3/build/Release/better_sqlite3.node'
+    ),
   ];
 
   const sourcePath = sourceCandidates.find(p => fs.existsSync(p));

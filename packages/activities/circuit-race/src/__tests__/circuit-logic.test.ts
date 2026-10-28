@@ -10,7 +10,12 @@ import {
 } from '../circuit-logic.js';
 import type { CircuitQuestion, CircuitState, CircuitParticipant } from '../circuit-schemas.js';
 
-function mockParticipant(id: string, name: string, pos: number, extra: Partial<CircuitParticipant> = {}): CircuitParticipant {
+function mockParticipant(
+  id: string,
+  name: string,
+  pos: number,
+  extra: Partial<CircuitParticipant> = {}
+): CircuitParticipant {
   return {
     participantId: id,
     displayName: name,

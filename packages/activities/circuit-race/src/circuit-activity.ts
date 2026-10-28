@@ -55,9 +55,7 @@ function advanceCircuitRound(
   resolveMovement(st, trackLength);
 
   // Kiểm tra điều kiện về đích (Có ai chạm hoặc vượt ô cuối cùng hoặc hết câu hỏi)
-  const finishers = Object.values(st.participants).filter(
-    p => p.position >= trackLength - 1
-  );
+  const finishers = Object.values(st.participants).filter(p => p.position >= trackLength - 1);
   const isLastRound = st.round >= st.totalRounds;
 
   if (finishers.length > 0 || isLastRound) {
@@ -133,10 +131,7 @@ function advanceCircuitRound(
 /**
  * Kiểm tra các mốc thời gian tự động (Auto-advance FSM)
  */
-function checkAndAdvanceCircuitState(
-  ctx: ActivityContext,
-  st: CircuitState
-): CircuitState {
+function checkAndAdvanceCircuitState(ctx: ActivityContext, st: CircuitState): CircuitState {
   if (st.phase === 'podium' || st.phase === 'waiting') return st;
 
   const now = ctx.now();
@@ -176,16 +171,13 @@ function checkAndAdvanceCircuitState(
   return st;
 }
 
-export const CircuitRaceActivity: ActivityDefinition<
-  CircuitConfig,
-  CircuitState,
-  CircuitResult
-> = {
+export const CircuitRaceActivity: ActivityDefinition<CircuitConfig, CircuitState, CircuitResult> = {
   id: 'circuit-race',
   name: 'Đường Đua Tri Thức',
   version: 1,
   icon: '🏎️',
-  description: 'Trò chơi đua cờ đường đua gamification tương tác thời gian thực với thẻ bổ trợ và xúc xắc',
+  description:
+    'Trò chơi đua cờ đường đua gamification tương tác thời gian thực với thẻ bổ trợ và xúc xắc',
   rewardTriggers: ['correct_answer', 'podium_win', 'streak_3', 'race_finish'],
   configSchema: CircuitConfigSchema,
   stateSchema: CircuitStateSchema,
@@ -304,10 +296,18 @@ export const CircuitRaceActivity: ActivityDefinition<
       // 2. INTENT: Nộp câu trả lời
       if (rawIntent.type === 'submit_answer') {
         if (st.phase !== 'question') {
-          return { ok: false, code: 'INVALID_PHASE', reason: 'Không trong thời gian nhận câu trả lời' };
+          return {
+            ok: false,
+            code: 'INVALID_PHASE',
+            reason: 'Không trong thời gian nhận câu trả lời',
+          };
         }
         if (participant.answeredCurrent) {
-          return { ok: false, code: 'ALREADY_ANSWERED', reason: 'Bạn đã nộp câu trả lời cho vòng này rồi' };
+          return {
+            ok: false,
+            code: 'ALREADY_ANSWERED',
+            reason: 'Bạn đã nộp câu trả lời cho vòng này rồi',
+          };
         }
 
         // Lấy đúng câu hỏi của học sinh này (nếu độc lập hoặc chung)
@@ -363,10 +363,18 @@ export const CircuitRaceActivity: ActivityDefinition<
       // 3. INTENT: Sử dụng thẻ bổ trợ
       if (rawIntent.type === 'use_card') {
         if (st.phase !== 'action_window') {
-          return { ok: false, code: 'INVALID_PHASE', reason: 'Chỉ được dùng thẻ trong thời gian dùng thẻ' };
+          return {
+            ok: false,
+            code: 'INVALID_PHASE',
+            reason: 'Chỉ được dùng thẻ trong thời gian dùng thẻ',
+          };
         }
         if (!participant.answeredCurrent || !participant.lastAnswerCorrect) {
-          return { ok: false, code: 'NOT_ELIGIBLE', reason: 'Bạn cần trả lời đúng để sử dụng thẻ bổ trợ' };
+          return {
+            ok: false,
+            code: 'NOT_ELIGIBLE',
+            reason: 'Bạn cần trả lời đúng để sử dụng thẻ bổ trợ',
+          };
         }
 
         const cardIdx = participant.inventory.findIndex(c => c.id === rawIntent.cardId);
@@ -413,11 +421,7 @@ export const CircuitRaceActivity: ActivityDefinition<
       return checkAndAdvanceCircuitState(ctx, st);
     },
 
-    onTeacherIntent(
-      ctx: ActivityContext,
-      st: CircuitState,
-      intent: unknown
-    ): CircuitState {
+    onTeacherIntent(ctx: ActivityContext, st: CircuitState, intent: unknown): CircuitState {
       const cfg = activeRunConfigs.get(ctx.runId);
       const trackLength = cfg?.trackLength ?? 50;
       const raw = intent as { type?: string };

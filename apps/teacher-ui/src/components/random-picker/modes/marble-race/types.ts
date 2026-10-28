@@ -2,9 +2,9 @@ import type { PickerStudent } from '@educlass/protocol';
 
 export type MarbleRaceScenario =
   | 'chaos_bottleneck' // Hỗn chiến phút chót (bầy đàn chen chúc đến tận miệng phễu)
-  | 'wire_to_wire'      // Kẻ thống trị (dẫn đầu tuyệt đối từ đầu đến cuối)
-  | 'comeback'          // Cú lội ngược dòng (khởi đầu ở sau, bứt phá chặng cuối)
-  | 'duel';             // Song mã tranh hùng (2 viên bi so kè 1v1 sát nút)
+  | 'wire_to_wire' // Kẻ thống trị (dẫn đầu tuyệt đối từ đầu đến cuối)
+  | 'comeback' // Cú lội ngược dòng (khởi đầu ở sau, bứt phá chặng cuối)
+  | 'duel'; // Song mã tranh hùng (2 viên bi so kè 1v1 sát nút)
 
 export interface MarbleEntity {
   id: string;

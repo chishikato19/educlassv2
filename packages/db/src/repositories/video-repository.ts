@@ -60,7 +60,9 @@ export class VideoRepository {
 
     if (filter?.search && filter.search.trim() !== '') {
       const term = `%${filter.search.trim()}%`;
-      query = query.where(or(like(videos.title, term), like(videos.description, term))) as typeof query;
+      query = query.where(
+        or(like(videos.title, term), like(videos.description, term))
+      ) as typeof query;
     }
 
     const rows = await query.orderBy(desc(videos.createdAt));
@@ -77,7 +79,14 @@ export class VideoRepository {
       .groupBy(videos.category);
 
     const categories = rows.map(r => r.category).filter(Boolean);
-    const defaults = ['Khởi động', 'Bài giảng', 'Khoa học', 'Toán học', 'Tiếng Anh', 'Kỹ năng sống'];
+    const defaults = [
+      'Khởi động',
+      'Bài giảng',
+      'Khoa học',
+      'Toán học',
+      'Tiếng Anh',
+      'Kỹ năng sống',
+    ];
     const merged = Array.from(new Set([...defaults, ...categories]));
     return merged;
   }

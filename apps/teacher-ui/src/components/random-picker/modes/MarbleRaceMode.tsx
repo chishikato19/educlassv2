@@ -24,12 +24,7 @@ import type {
   StageMarker,
 } from './marble-race/types.js';
 
-const SCENARIOS: MarbleRaceScenario[] = [
-  'chaos_bottleneck',
-  'wire_to_wire',
-  'comeback',
-  'duel',
-];
+const SCENARIOS: MarbleRaceScenario[] = ['chaos_bottleneck', 'wire_to_wire', 'comeback', 'duel'];
 
 export const MarbleRaceMode: React.FC<RandomPickerModeProps> = ({
   isPicking,
@@ -99,7 +94,8 @@ export const MarbleRaceMode: React.FC<RandomPickerModeProps> = ({
       setActualWinner(null);
 
       // Chọn ngẫu nhiên kịch bản
-      const nextScenario = SCENARIOS[Math.floor(Math.random() * SCENARIOS.length)] ?? 'chaos_bottleneck';
+      const nextScenario =
+        SCENARIOS[Math.floor(Math.random() * SCENARIOS.length)] ?? 'chaos_bottleneck';
       setScenario(nextScenario);
 
       // Chọn ngẫu nhiên bản đồ đua
@@ -154,9 +150,12 @@ export const MarbleRaceMode: React.FC<RandomPickerModeProps> = ({
         // Sau khi đã có quán quân cán đích, khóa camera tại vạch đích để vinh danh người chiến thắng
         targetCameraY = FINISH_LINE_Y - viewportHeight * 0.48;
       } else {
-        const activeMarbles = marblesRef.current.filter((m) => !m.hasFinished);
+        const activeMarbles = marblesRef.current.filter(m => !m.hasFinished);
         if (activeMarbles.length > 0) {
-          const leadMarble = activeMarbles.reduce((max, m) => (m.y > max.y ? m : max), activeMarbles[0]!);
+          const leadMarble = activeMarbles.reduce(
+            (max, m) => (m.y > max.y ? m : max),
+            activeMarbles[0]!
+          );
           targetCameraY = leadMarble.y - viewportHeight * 0.38;
         } else {
           targetCameraY = FINISH_LINE_Y - viewportHeight * 0.48;
@@ -171,13 +170,17 @@ export const MarbleRaceMode: React.FC<RandomPickerModeProps> = ({
       // 3. Cập nhật HUD định kỳ (mỗi 80ms)
       if (timestamp - lastHudUpdateTime > 80) {
         lastHudUpdateTime = timestamp;
-        const top5 = [...marblesRef.current]
-          .sort((a, b) => a.rank - b.rank)
-          .slice(0, 5);
+        const top5 = [...marblesRef.current].sort((a, b) => a.rank - b.rank).slice(0, 5);
         setLeaderboard(top5);
 
         const deepestY = marblesRef.current.reduce((max, m) => Math.max(max, m.y), 0);
-        const progress = Math.min(100, Math.max(0, Math.round(((deepestY - START_GATE_Y) / (FINISH_LINE_Y - START_GATE_Y)) * 100)));
+        const progress = Math.min(
+          100,
+          Math.max(
+            0,
+            Math.round(((deepestY - START_GATE_Y) / (FINISH_LINE_Y - START_GATE_Y)) * 100)
+          )
+        );
         setRaceProgress(progress);
       }
 
@@ -250,7 +253,8 @@ export const MarbleRaceMode: React.FC<RandomPickerModeProps> = ({
               </span>
             </div>
             <p className="text-[11px] text-slate-300 font-medium">
-              Bản đồ: <span className="text-amber-300 font-bold">{currentMap.name}</span> — {currentMap.subtitle}
+              Bản đồ: <span className="text-amber-300 font-bold">{currentMap.name}</span> —{' '}
+              {currentMap.subtitle}
             </p>
           </div>
         </div>
@@ -341,10 +345,10 @@ export const MarbleRaceMode: React.FC<RandomPickerModeProps> = ({
                     idx === 0
                       ? 'bg-amber-500/20 border-amber-400 text-amber-300 shadow-sm'
                       : idx === 1
-                      ? 'bg-slate-300/20 border-slate-300 text-slate-200'
-                      : idx === 2
-                      ? 'bg-amber-700/20 border-amber-600 text-amber-400'
-                      : 'bg-indigo-950/50 border-indigo-900/50 text-indigo-200'
+                        ? 'bg-slate-300/20 border-slate-300 text-slate-200'
+                        : idx === 2
+                          ? 'bg-amber-700/20 border-amber-600 text-amber-400'
+                          : 'bg-indigo-950/50 border-indigo-900/50 text-indigo-200'
                   }`}
                 >
                   <div className="flex items-center gap-1.5 truncate">
@@ -355,9 +359,7 @@ export const MarbleRaceMode: React.FC<RandomPickerModeProps> = ({
                       className="w-2.5 h-2.5 rounded-full inline-block shrink-0 border border-white/60"
                       style={{ backgroundColor: m.color }}
                     />
-                    <span className="truncate max-w-[95px] sm:max-w-[105px]">
-                      {m.student.name}
-                    </span>
+                    <span className="truncate max-w-[95px] sm:max-w-[105px]">{m.student.name}</span>
                   </div>
                   <span className="text-[10px] text-slate-400 font-mono ml-1">
                     {m.hasFinished ? '🏁' : `${Math.round(m.y / 50)}m`}
@@ -377,10 +379,12 @@ export const MarbleRaceMode: React.FC<RandomPickerModeProps> = ({
                 Sẵn Sàng Mở Cổng Thả Bi!
               </h3>
               <p className="text-sm text-indigo-200 max-w-md mt-1 font-medium">
-                Bản đồ: <strong className="text-amber-400">{currentMap.name}</strong> ({currentMap.subtitle})
+                Bản đồ: <strong className="text-amber-400">{currentMap.name}</strong> (
+                {currentMap.subtitle})
               </p>
               <p className="text-xs text-slate-300 max-w-md mt-0.5">
-                Kịch bản: <strong className="text-amber-300">{activeScenarioInfo.name}</strong> — {activeScenarioInfo.desc}.
+                Kịch bản: <strong className="text-amber-300">{activeScenarioInfo.name}</strong> —{' '}
+                {activeScenarioInfo.desc}.
               </p>
             </div>
             <button
@@ -459,12 +463,9 @@ function drawTrackBackground(
   }
 }
 
-function drawWalls(
-  ctx: CanvasRenderingContext2D,
-  track: MarbleRaceTrack
-): void {
+function drawWalls(ctx: CanvasRenderingContext2D, track: MarbleRaceTrack): void {
   ctx.lineCap = 'round';
-  track.walls.forEach((w) => {
+  track.walls.forEach(w => {
     ctx.shadowColor = w.color;
     ctx.shadowBlur = 10;
     ctx.strokeStyle = w.color;
@@ -510,7 +511,7 @@ function drawStageMarkers(ctx: CanvasRenderingContext2D, stages: StageMarker[]):
   ctx.save();
   ctx.font = 'bold 12px sans-serif';
   ctx.textAlign = 'left';
-  stages.forEach((st) => {
+  stages.forEach(st => {
     ctx.fillStyle = st.color;
     ctx.shadowColor = st.color;
     ctx.shadowBlur = 8;
@@ -519,12 +520,8 @@ function drawStageMarkers(ctx: CanvasRenderingContext2D, stages: StageMarker[]):
   ctx.restore();
 }
 
-function drawPegs(
-  ctx: CanvasRenderingContext2D,
-  track: MarbleRaceTrack,
-  now: number
-): void {
-  track.pegs.forEach((peg) => {
+function drawPegs(ctx: CanvasRenderingContext2D, track: MarbleRaceTrack, now: number): void {
+  track.pegs.forEach(peg => {
     const isLit = peg.lastHitTime && now - peg.lastHitTime < 180;
     ctx.save();
     ctx.beginPath();
@@ -546,12 +543,8 @@ function drawPegs(
   });
 }
 
-function drawVortices(
-  ctx: CanvasRenderingContext2D,
-  track: MarbleRaceTrack,
-  _now: number
-): void {
-  track.vortices.forEach((vt) => {
+function drawVortices(ctx: CanvasRenderingContext2D, track: MarbleRaceTrack, _now: number): void {
+  track.vortices.forEach(vt => {
     ctx.save();
     ctx.translate(vt.x, vt.y);
 
@@ -585,12 +578,8 @@ function drawVortices(
   });
 }
 
-function drawBumpers(
-  ctx: CanvasRenderingContext2D,
-  track: MarbleRaceTrack,
-  now: number
-): void {
-  track.bumpers.forEach((bp) => {
+function drawBumpers(ctx: CanvasRenderingContext2D, track: MarbleRaceTrack, now: number): void {
+  track.bumpers.forEach(bp => {
     const isLit = bp.lastHitTime && now - bp.lastHitTime < 220;
     const r = bp.radius * bp.pulseScale;
 
@@ -619,11 +608,8 @@ function drawBumpers(
   });
 }
 
-function drawSpinners(
-  ctx: CanvasRenderingContext2D,
-  track: MarbleRaceTrack
-): void {
-  track.spinners.forEach((sp) => {
+function drawSpinners(ctx: CanvasRenderingContext2D, track: MarbleRaceTrack): void {
+  track.spinners.forEach(sp => {
     ctx.save();
     ctx.translate(sp.x, sp.y);
 
@@ -653,11 +639,8 @@ function drawSpinners(
   });
 }
 
-function drawSeeSaws(
-  ctx: CanvasRenderingContext2D,
-  track: MarbleRaceTrack
-): void {
-  track.seeSaws.forEach((ss) => {
+function drawSeeSaws(ctx: CanvasRenderingContext2D, track: MarbleRaceTrack): void {
+  track.seeSaws.forEach(ss => {
     ctx.save();
     ctx.translate(ss.x, ss.y);
     ctx.rotate(ss.angle);
@@ -689,14 +672,10 @@ function drawSeeSaws(
   });
 }
 
-function drawTurboPads(
-  ctx: CanvasRenderingContext2D,
-  track: MarbleRaceTrack,
-  now: number
-): void {
+function drawTurboPads(ctx: CanvasRenderingContext2D, track: MarbleRaceTrack, now: number): void {
   if (!track.turboPads) return;
 
-  track.turboPads.forEach((pad) => {
+  track.turboPads.forEach(pad => {
     ctx.save();
     ctx.translate(pad.x, pad.y);
     ctx.rotate(pad.angle);
@@ -764,7 +743,7 @@ function drawShortcutGaps(ctx: CanvasRenderingContext2D, mapId: string): void {
   ctx.shadowColor = '#f59e0b';
   ctx.shadowBlur = 8;
 
-  shortcutLocations.forEach((loc) => {
+  shortcutLocations.forEach(loc => {
     ctx.fillText('🕳️ ĐƯỜNG TẮT ⬇', loc.x, loc.y - 12);
   });
 
@@ -803,7 +782,7 @@ function drawFinishLine(ctx: CanvasRenderingContext2D): void {
 function drawMarbles(ctx: CanvasRenderingContext2D, marbles: MarbleEntity[], now: number): void {
   const sorted = [...marbles].sort((a, b) => a.y - b.y);
 
-  sorted.forEach((m) => {
+  sorted.forEach(m => {
     ctx.save();
 
     // 0. Hiệu ứng hào quang Turbo Boost khi đang bứt tốc

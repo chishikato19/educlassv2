@@ -56,9 +56,16 @@ export const AdminCreateUserRequestSchema = z.object({
     .trim()
     .min(3, 'Tên đăng nhập phải có ít nhất 3 ký tự')
     .max(50, 'Tên đăng nhập không được vượt quá 50 ký tự')
-    .regex(/^[a-zA-Z0-9_.-]+$/, 'Tên đăng nhập chỉ được chứa chữ cái, số, dấu chấm, gạch dưới hoặc gạch ngang'),
+    .regex(
+      /^[a-zA-Z0-9_.-]+$/,
+      'Tên đăng nhập chỉ được chứa chữ cái, số, dấu chấm, gạch dưới hoặc gạch ngang'
+    ),
   password: z.string().min(6, 'Mật khẩu phải có ít nhất 6 ký tự'),
-  displayName: z.string().trim().min(1, 'Vui lòng nhập tên hiển thị').max(100, 'Tên hiển thị tối đa 100 ký tự'),
+  displayName: z
+    .string()
+    .trim()
+    .min(1, 'Vui lòng nhập tên hiển thị')
+    .max(100, 'Tên hiển thị tối đa 100 ký tự'),
   role: UserRoleSchema.default('teacher'),
 });
 
@@ -124,7 +131,11 @@ export const RegisterTeacherRequestSchema = z.object({
     .min(2, 'Tên đăng nhập phải có ít nhất 2 ký tự')
     .max(50, 'Tên đăng nhập không được vượt quá 50 ký tự')
     .regex(/^[a-zA-Z0-9_.-]+$/, 'Tên đăng nhập chỉ gồm chữ không dấu, số, dấu chấm hoặc gạch dưới'),
-  displayName: z.string().trim().min(2, 'Họ và tên phải có ít nhất 2 ký tự').max(100, 'Họ và tên tối đa 100 ký tự'),
+  displayName: z
+    .string()
+    .trim()
+    .min(2, 'Họ và tên phải có ít nhất 2 ký tự')
+    .max(100, 'Họ và tên tối đa 100 ký tự'),
   subject: z.string().trim().max(100, 'Tên môn học tối đa 100 ký tự').optional(),
 });
 
@@ -138,4 +149,3 @@ export const ResetTeacherPinRequestSchema = z.object({
 });
 
 export type ResetTeacherPinRequest = z.infer<typeof ResetTeacherPinRequestSchema>;
-

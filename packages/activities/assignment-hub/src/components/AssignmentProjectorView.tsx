@@ -41,7 +41,9 @@ export const AssignmentProjectorView: React.FC<AssignmentProjectorViewProps> = (
             📁
           </div>
           <div>
-            <h1 className="text-2xl md:text-3xl font-black tracking-tight">{state.title || 'Thu - phát bài tập'}</h1>
+            <h1 className="text-2xl md:text-3xl font-black tracking-tight">
+              {state.title || 'Thu - phát bài tập'}
+            </h1>
             <p className="text-sm text-indigo-200/80 mt-0.5">
               {state.isLocked ? '🔒 Cổng nộp bài đã đóng' : '🟢 Đang mở cổng thu bài trực tiếp'}
             </p>
@@ -51,12 +53,16 @@ export const AssignmentProjectorView: React.FC<AssignmentProjectorViewProps> = (
         {/* Big Progress Counter */}
         <div className="flex items-center gap-6 bg-white/5 border border-white/10 px-6 py-3 rounded-2xl backdrop-blur-md">
           <div className="text-right">
-            <span className="text-xs text-indigo-300 font-semibold block uppercase tracking-wider">Tiến độ nộp bài</span>
+            <span className="text-xs text-indigo-300 font-semibold block uppercase tracking-wider">
+              Tiến độ nộp bài
+            </span>
             <span className="text-2xl md:text-3xl font-black text-emerald-400">{percent}%</span>
           </div>
           <div className="h-10 w-px bg-white/15" />
           <div className="text-left">
-            <span className="text-xs text-indigo-300 font-semibold block uppercase tracking-wider">Số học sinh</span>
+            <span className="text-xs text-indigo-300 font-semibold block uppercase tracking-wider">
+              Số học sinh
+            </span>
             <span className="text-2xl md:text-3xl font-black text-white">
               {submittedCount} <span className="text-lg font-normal text-white/50">/ {total}</span>
             </span>
@@ -88,7 +94,9 @@ export const AssignmentProjectorView: React.FC<AssignmentProjectorViewProps> = (
                 <span className="text-xs font-mono opacity-60">#{idx + 1}</span>
                 <span
                   className={`w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold ${
-                    st.submitted ? 'bg-emerald-500 text-white shadow-xs' : 'bg-white/10 text-white/40'
+                    st.submitted
+                      ? 'bg-emerald-500 text-white shadow-xs'
+                      : 'bg-white/10 text-white/40'
                   }`}
                 >
                   {st.submitted ? '✓' : '…'}

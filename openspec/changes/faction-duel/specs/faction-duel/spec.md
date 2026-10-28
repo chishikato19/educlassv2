@@ -3,6 +3,7 @@
 ## 1. Yêu cầu Khởi tạo & Phân Đội (Team Formation)
 
 ### 1.1 Cân bằng Elo 2 Phe
+
 - **GIAO THỨC**: Khi giáo viên bắt đầu hoạt động, hệ thống tiếp nhận danh sách học sinh tham gia (`participants`).
 - **THUẬT TOÁN**: Gọi hàm `balanceTwoTeamsByElo(candidates, { balanceMethod: 'elo', jitter: true })` từ `@educlass/core/src/elo`.
 - **KẾT QUẢ**:
@@ -11,6 +12,7 @@
   - Đảm bảo chênh lệch Elo giữa 2 đội là nhỏ nhất có thể.
 
 ### 1.2 Xử lý Sĩ số Lẻ (Odd Count & Clone)
+
 - **ĐIỀU KIỆN**: Nếu số lượng thành viên giữa 2 đội chênh lệch (ví dụ 1 phe $N$ người, 1 phe $N+1$ người):
   - Hệ thống chọn **ngẫu nhiên** 1 học sinh bên phe ít người hơn để gán nhãn `isClone: true` cho lượt đấu đó.
   - Mỗi lượt đấu mới sẽ chọn lại người clone ngẫu nhiên khác nhau để đảm bảo công bằng.
@@ -21,10 +23,12 @@
 ## 2. Quy trình Ghép Cặp (Pairing & Drafting Phase)
 
 ### 2.1 Lượt 1 (Mở màn)
+
 - Hệ thống ghép cặp ngẫu nhiên hoàn toàn 1-1 giữa các thành viên của `teamBlue` và `teamRed`.
 - Nếu có học sinh clone, học sinh đó được ghép với 2 người bên phe đông hơn.
 
 ### 2.2 Lượt 2 trở đi: Pha Chọn Đấu Thủ 15 Giây (15s Pick Phase)
+
 - **XÁC ĐỊNH PHE ƯU TIÊN**:
   - So sánh tổng điểm tích lũy: Đội có tổng điểm cao hơn là **Phe Thắng (Attacking Team)**.
   - Nếu hòa điểm: Hệ thống tung đồng xu hoặc bốc thăm ngẫu nhiên một phe được quyền chọn trước.
@@ -47,6 +51,7 @@
 ## 3. Quy trình Thi Đấu Đồng Loạt (Simultaneous Duel)
 
 ### 3.1 Cấu trúc Trận đấu & Cấu Hình Câu Hỏi
+
 - **Số câu mỗi trận (`questionsPerMatch`)**: Giáo viên có thể tùy chọn từ 1 đến 5 câu (mặc định: **2 câu**).
 - **Xáo trộn ngẫu nhiên (Shuffling)**:
   - `shuffleQuestions`: Mặc định bật `true`, đảo thứ tự câu hỏi ngẫu nhiên trong mỗi trận đấu.
@@ -57,6 +62,7 @@
 - Giao diện thi đấu hỗ trợ trắc nghiệm 4 lựa chọn (MCQ), Đúng/Sai đơn (TF) và Trả lời ngắn (Short Answer).
 
 ### 3.2 Đánh giá Kết quả Trận & Trọng số Elo
+
 - So sánh số câu đúng giữa 2 người chơi trong cặp đấu:
   - Ai có nhiều câu đúng hơn $\rightarrow$ Thắng trận.
   - Nếu bằng số câu đúng $\rightarrow$ So sánh tổng thời gian hoàn thành (ai nhanh hơn thì thắng).
@@ -75,6 +81,7 @@
 ## 4. Giao diện & Hiển Thị (UI/UX)
 
 ### 4.1 Màn hình Học sinh (Student View)
+
 - Responsive mobile-first (360x640).
 - Màn hình Pick Phase:
   - Đối với phe thắng: Danh sách đối thủ, đồng hồ đếm ngược 15s to rõ, nút chọn nhanh.
@@ -82,11 +89,13 @@
 - Màn hình Thi đấu: 2 câu hỏi làm bài mượt mà, phản hồi lập tức.
 
 ### 4.2 Màn hình Máy Chiếu (Projector View)
+
 - Bố cục phân đôi 2 phe Xanh - Đỏ.
 - Thanh kéo co tỷ lệ điểm số ở giữa.
 - Hiệu ứng tia sét / đường nối khi các cặp đấu được xác lập trong 15s Pick Phase.
 - Bảng tin chiến sự hiển thị các pha "Lật Kèo Ngoạn Mục (+3đ)".
 
 ### 4.3 Màn hình Giáo viên (Teacher Panel)
+
 - Điều khiển vòng đấu (Bắt đầu, Tạm dừng, Bỏ qua câu, Kết thúc).
 - Giám sát tiến độ làm bài của tất cả các bàn đấu theo thời gian thực.

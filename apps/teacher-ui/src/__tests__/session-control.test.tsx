@@ -509,5 +509,3 @@ describe('SessionControl UI Component (apps/teacher-ui)', () => {
     expect(handleResolveHand).toHaveBeenCalledWith('p_1');
   });
 });
-
-

@@ -19,7 +19,7 @@ export interface QuestionItemData {
   id: string;
   setId: string;
   orderIndex: number;
-  type: typeof questions.$inferSelect['type'];
+  type: (typeof questions.$inferSelect)['type'];
   contentJson: string;
   answerJson: string;
   points: number;
@@ -31,7 +31,7 @@ export interface QuestionSetWithQuestions extends QuestionSetData {
 
 export interface CreateQuestionInput {
   id?: string;
-  type: typeof questions.$inferInsert['type'];
+  type: (typeof questions.$inferInsert)['type'];
   contentJson: string;
   answerJson: string;
   points?: number;
@@ -125,11 +125,7 @@ export class QuestionSetRepository {
    * Tìm bộ câu hỏi theo ID (kèm số lượng câu hỏi)
    */
   async findById(id: string): Promise<QuestionSetData | null> {
-    const sets = await this.db
-      .select()
-      .from(questionSets)
-      .where(eq(questionSets.id, id))
-      .limit(1);
+    const sets = await this.db.select().from(questionSets).where(eq(questionSets.id, id)).limit(1);
 
     const set = sets[0];
     if (!set) return null;
@@ -167,7 +163,7 @@ export class QuestionSetRepository {
 
     return {
       ...set,
-      questions: questionList.map((q) => ({
+      questions: questionList.map(q => ({
         id: q.id,
         setId: q.setId,
         orderIndex: q.orderIndex,
@@ -210,7 +206,7 @@ export class QuestionSetRepository {
       : await this.db.select().from(questionSets);
 
     // Lấy count của câu hỏi cho từng set
-    const allSetIds = sets.map((s) => s.id);
+    const allSetIds = sets.map(s => s.id);
     const countMap = new Map<string, number>();
 
     if (allSetIds.length > 0) {
@@ -220,7 +216,7 @@ export class QuestionSetRepository {
       }
     }
 
-    return sets.map((set) => ({
+    return sets.map(set => ({
       id: set.id,
       ownerId: set.ownerId,
       title: set.title,
@@ -288,7 +284,7 @@ export class QuestionSetRepository {
       .where(eq(questions.setId, setId))
       .orderBy(asc(questions.orderIndex));
 
-    return result.map((q) => ({
+    return result.map(q => ({
       id: q.id,
       setId: q.setId,
       orderIndex: q.orderIndex,
@@ -321,7 +317,7 @@ export class QuestionSetRepository {
       grade: original.grade,
       tags: [...original.tags],
       schemaVersion: original.schemaVersion,
-      questions: original.questions.map((q) => ({
+      questions: original.questions.map(q => ({
         type: q.type,
         contentJson: q.contentJson,
         answerJson: q.answerJson,

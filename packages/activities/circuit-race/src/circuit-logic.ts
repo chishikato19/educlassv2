@@ -244,7 +244,9 @@ export function gradeCircuitAnswer(
   }
 
   if (question.type === 'short') {
-    const rawAnswer = String(studentAnswer ?? '').trim().toLowerCase();
+    const rawAnswer = String(studentAnswer ?? '')
+      .trim()
+      .toLowerCase();
     let isCorrect = false;
 
     if (Array.isArray(question.correctAnswer)) {
@@ -252,7 +254,10 @@ export function gradeCircuitAnswer(
         ans => String(ans).trim().toLowerCase() === rawAnswer
       );
     } else {
-      isCorrect = String(question.correctAnswer ?? '').trim().toLowerCase() === rawAnswer;
+      isCorrect =
+        String(question.correctAnswer ?? '')
+          .trim()
+          .toLowerCase() === rawAnswer;
     }
 
     return {
@@ -504,7 +509,8 @@ export function applyCardEffect(
 
   if (cardType === 'leader_snare') {
     target = findLeader(state.participants, sourceId);
-    if (!target) return { success: false, message: 'Bạn đang dẫn đầu hoặc không có ai phía trước!' };
+    if (!target)
+      return { success: false, message: 'Bạn đang dẫn đầu hoặc không có ai phía trước!' };
   } else if (cardType === 'front_hook') {
     target = findNearestFrontParticipant(state.participants, sourceId);
     if (!target) return { success: false, message: 'Không có ai đang đứng phía trước bạn!' };

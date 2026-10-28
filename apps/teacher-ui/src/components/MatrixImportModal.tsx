@@ -122,15 +122,15 @@ export const MatrixImportModal: React.FC<MatrixImportModalProps> = ({
     let isMounted = true;
     setIsLoadingStats(true);
 
-    const lessonsList = selectedLessons.map((l) => l.lesson);
+    const lessonsList = selectedLessons.map(l => l.lesson);
     api
       .getMatrixStats({ grade, subject, lessons: lessonsList })
-      .then((res) => {
+      .then(res => {
         if (isMounted) {
           setStatsMap(res.stats || {});
         }
       })
-      .catch((err) => {
+      .catch(err => {
         console.error('Lỗi khi tải thống kê ma trận:', err);
       })
       .finally(() => {
@@ -144,11 +144,11 @@ export const MatrixImportModal: React.FC<MatrixImportModalProps> = ({
 
   // Toggle chọn một bài học
   const handleToggleLesson = (chapter: string, lesson: string) => {
-    setSelectedLessons((prev) => {
-      const exists = prev.some((l) => l.chapter === chapter && l.lesson === lesson);
+    setSelectedLessons(prev => {
+      const exists = prev.some(l => l.chapter === chapter && l.lesson === lesson);
       if (exists) {
-        const next = prev.filter((l) => !(l.chapter === chapter && l.lesson === lesson));
-        setCountsMap((cm) => {
+        const next = prev.filter(l => !(l.chapter === chapter && l.lesson === lesson));
+        setCountsMap(cm => {
           const updated = { ...cm };
           delete updated[lesson];
           return updated;
@@ -161,13 +161,9 @@ export const MatrixImportModal: React.FC<MatrixImportModalProps> = ({
   };
 
   // Cập nhật số câu muốn bốc cho một bài
-  const handleUpdateCount = (
-    lesson: string,
-    diff: DifficultyLevel,
-    valStr: string,
-  ) => {
+  const handleUpdateCount = (lesson: string, diff: DifficultyLevel, valStr: string) => {
     const num = Math.max(0, parseInt(valStr, 10) || 0);
-    setCountsMap((prev) => {
+    setCountsMap(prev => {
       const current = prev[lesson] || { nb: 0, th: 0, vd: 0, vdc: 0 };
       return {
         ...prev,
@@ -234,7 +230,9 @@ export const MatrixImportModal: React.FC<MatrixImportModalProps> = ({
       return;
     }
     if (totals.hasOverflow) {
-      setErrorMessage('Có câu hỏi yêu cầu vượt quá số lượng sẵn có trong kho. Vui lòng kiểm tra các ô màu đỏ!');
+      setErrorMessage(
+        'Có câu hỏi yêu cầu vượt quá số lượng sẵn có trong kho. Vui lòng kiểm tra các ô màu đỏ!'
+      );
       return;
     }
 
@@ -246,7 +244,7 @@ export const MatrixImportModal: React.FC<MatrixImportModalProps> = ({
         title: title.trim(),
         grade,
         subject: subject.trim(),
-        matrix: selectedLessons.map((l) => ({
+        matrix: selectedLessons.map(l => ({
           chapter: l.chapter,
           lesson: l.lesson,
           counts: countsMap[l.lesson] || { nb: 0, th: 0, vd: 0, vdc: 0 },
@@ -260,9 +258,7 @@ export const MatrixImportModal: React.FC<MatrixImportModalProps> = ({
       setSwapMessage(null);
       setStep('preview');
     } catch (err: unknown) {
-      setErrorMessage(
-        err instanceof Error ? err.message : 'Có lỗi khi bốc câu hỏi từ ma trận',
-      );
+      setErrorMessage(err instanceof Error ? err.message : 'Có lỗi khi bốc câu hỏi từ ma trận');
     } finally {
       setIsGenerating(false);
     }
@@ -287,20 +283,19 @@ export const MatrixImportModal: React.FC<MatrixImportModalProps> = ({
       });
 
       // Lọc bỏ những câu đã nằm trong danh sách hiện tại
-      const currentIds = new Set(previewQuestions.map((q) => q.id));
-      const availableCandidates = candidates.filter((q) => !currentIds.has(q.id));
+      const currentIds = new Set(previewQuestions.map(q => q.id));
+      const availableCandidates = candidates.filter(q => !currentIds.has(q.id));
 
       if (availableCandidates.length > 0) {
         // Bốc ngẫu nhiên 1 câu tương đương
-        const replacement = availableCandidates[Math.floor(Math.random() * availableCandidates.length)]!;
+        const replacement =
+          availableCandidates[Math.floor(Math.random() * availableCandidates.length)]!;
         const updated = [...previewQuestions];
         updated[index] = replacement;
         setPreviewQuestions(updated);
         setSwapMessage(`Đã đổi thành công Câu ${index + 1} sang một câu hỏi tương đương khác!`);
       } else {
-        setSwapMessage(
-          `Kho không còn câu hỏi nào khác ở "${currentQ.lesson}" với mức độ này.`,
-        );
+        setSwapMessage(`Kho không còn câu hỏi nào khác ở "${currentQ.lesson}" với mức độ này.`);
       }
     } catch (err) {
       console.error('Lỗi khi đổi câu hỏi tương đương:', err);
@@ -318,7 +313,7 @@ export const MatrixImportModal: React.FC<MatrixImportModalProps> = ({
     setErrorMessage(null);
 
     try {
-      const snapshotQuestions = previewQuestions.map((bq) => {
+      const snapshotQuestions = previewQuestions.map(bq => {
         let content: Record<string, unknown> = {};
         let answer: Record<string, unknown> = {};
         try {
@@ -350,9 +345,7 @@ export const MatrixImportModal: React.FC<MatrixImportModalProps> = ({
       onSuccess(newSet.id);
       onClose();
     } catch (err: unknown) {
-      setErrorMessage(
-        err instanceof Error ? err.message : 'Có lỗi khi lưu bộ đề thi',
-      );
+      setErrorMessage(err instanceof Error ? err.message : 'Có lỗi khi lưu bộ đề thi');
     } finally {
       setIsGenerating(false);
     }
@@ -410,7 +403,7 @@ export const MatrixImportModal: React.FC<MatrixImportModalProps> = ({
                   type="text"
                   required
                   value={title}
-                  onChange={(e) => setTitle(e.target.value)}
+                  onChange={e => setTitle(e.target.value)}
                   placeholder="VD: Kiểm tra 1 tiết Đại số 12 - Ma trận chuẩn"
                   className="w-full text-xs font-semibold px-3 py-2 rounded-xl bg-white dark:bg-zinc-800 border border-zinc-300 dark:border-zinc-700 focus:outline-none focus:ring-2 focus:ring-purple-500 min-h-[40px]"
                 />
@@ -422,13 +415,13 @@ export const MatrixImportModal: React.FC<MatrixImportModalProps> = ({
                 </label>
                 <select
                   value={grade}
-                  onChange={(e) => {
+                  onChange={e => {
                     setGrade(Number(e.target.value));
                     setSelectedLessons([]);
                   }}
                   className="w-full text-xs font-bold px-2.5 py-2 rounded-xl bg-white dark:bg-zinc-800 border border-zinc-300 dark:border-zinc-700 min-h-[40px] cursor-pointer"
                 >
-                  {GRADES.map((g) => (
+                  {GRADES.map(g => (
                     <option key={g} value={g}>
                       Khối {g}
                     </option>
@@ -442,13 +435,13 @@ export const MatrixImportModal: React.FC<MatrixImportModalProps> = ({
                 </label>
                 <select
                   value={subject}
-                  onChange={(e) => {
+                  onChange={e => {
                     setSubject(e.target.value);
                     setSelectedLessons([]);
                   }}
                   className="w-full text-xs font-bold px-2.5 py-2 rounded-xl bg-white dark:bg-zinc-800 border border-zinc-300 dark:border-zinc-700 min-h-[40px] cursor-pointer"
                 >
-                  {COMMON_SUBJECTS.map((s) => (
+                  {COMMON_SUBJECTS.map(s => (
                     <option key={s} value={s}>
                       {s}
                     </option>
@@ -475,27 +468,26 @@ export const MatrixImportModal: React.FC<MatrixImportModalProps> = ({
                   </div>
                 ) : tree.length === 0 ? (
                   <div className="py-4 text-center text-xs text-zinc-400">
-                    Kho ngân hàng chưa có câu hỏi nào cho {subject} Khối {grade}. Hãy thêm câu hỏi hoặc nhập từ Word trước!
+                    Kho ngân hàng chưa có câu hỏi nào cho {subject} Khối {grade}. Hãy thêm câu hỏi
+                    hoặc nhập từ Word trước!
                   </div>
                 ) : (
-                  tree.map((chapterNode) => (
+                  tree.map(chapterNode => (
                     <div key={chapterNode.chapter} className="space-y-1">
                       <div className="text-[11px] font-bold text-zinc-500 dark:text-zinc-400 uppercase tracking-wide">
                         {chapterNode.chapter}
                       </div>
                       <div className="flex flex-wrap gap-1.5 pl-2">
-                        {chapterNode.lessons.map((les) => {
+                        {chapterNode.lessons.map(les => {
                           const isSelected = selectedLessons.some(
-                            (l) => l.chapter === chapterNode.chapter && l.lesson === les.lesson,
+                            l => l.chapter === chapterNode.chapter && l.lesson === les.lesson
                           );
 
                           return (
                             <button
                               key={les.lesson}
                               type="button"
-                              onClick={() =>
-                                handleToggleLesson(chapterNode.chapter, les.lesson)
-                              }
+                              onClick={() => handleToggleLesson(chapterNode.chapter, les.lesson)}
                               className={`inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-xs font-medium transition-all cursor-pointer ${
                                 isSelected
                                   ? 'bg-purple-600 text-white font-semibold shadow-xs'
@@ -545,7 +537,7 @@ export const MatrixImportModal: React.FC<MatrixImportModalProps> = ({
                     <thead>
                       <tr className="bg-zinc-100/80 dark:bg-zinc-800/80 text-zinc-700 dark:text-zinc-300 border-b border-zinc-200 dark:border-zinc-700 font-bold">
                         <th className="p-3 min-w-[200px]">Bài học / Chương</th>
-                        {levels.map((diff) => {
+                        {levels.map(diff => {
                           const info = getDifficultyBadgeInfo(diff);
                           return (
                             <th key={diff} className="p-3 text-center min-w-[130px]">
@@ -561,7 +553,7 @@ export const MatrixImportModal: React.FC<MatrixImportModalProps> = ({
                       </tr>
                     </thead>
                     <tbody className="divide-y divide-zinc-100 dark:divide-zinc-800 bg-white dark:bg-zinc-900">
-                      {selectedLessons.map((item) => {
+                      {selectedLessons.map(item => {
                         const counts = countsMap[item.lesson] || {
                           nb: 0,
                           th: 0,
@@ -590,7 +582,7 @@ export const MatrixImportModal: React.FC<MatrixImportModalProps> = ({
                               </div>
                             </td>
 
-                            {levels.map((diff) => {
+                            {levels.map(diff => {
                               const val = counts[diff];
                               const avail = available[diff];
                               const isOver = val > avail;
@@ -603,7 +595,7 @@ export const MatrixImportModal: React.FC<MatrixImportModalProps> = ({
                                       min="0"
                                       max={avail}
                                       value={val === 0 ? '' : val}
-                                      onChange={(e) =>
+                                      onChange={e =>
                                         handleUpdateCount(item.lesson, diff, e.target.value)
                                       }
                                       placeholder="0"
@@ -617,9 +609,7 @@ export const MatrixImportModal: React.FC<MatrixImportModalProps> = ({
                                     />
                                     <span
                                       className={`text-[10px] mt-1 font-semibold ${
-                                        isOver
-                                          ? 'text-rose-600 font-bold'
-                                          : 'text-zinc-400'
+                                        isOver ? 'text-rose-600 font-bold' : 'text-zinc-400'
                                       }`}
                                     >
                                       {isOver ? `Kho có ${avail}!` : `Có sẵn: ${avail}`}
@@ -656,12 +646,9 @@ export const MatrixImportModal: React.FC<MatrixImportModalProps> = ({
                             Tỷ lệ phân bổ ma trận
                           </div>
                         </td>
-                        {levels.map((diff) => {
+                        {levels.map(diff => {
                           const sum = totals[diff];
-                          const pct =
-                            totals.total > 0
-                              ? Math.round((sum / totals.total) * 100)
-                              : 0;
+                          const pct = totals.total > 0 ? Math.round((sum / totals.total) * 100) : 0;
                           const info = getDifficultyBadgeInfo(diff);
 
                           return (
@@ -692,7 +679,7 @@ export const MatrixImportModal: React.FC<MatrixImportModalProps> = ({
                 <input
                   type="checkbox"
                   checked={shuffleQuestions}
-                  onChange={(e) => setShuffleQuestions(e.target.checked)}
+                  onChange={e => setShuffleQuestions(e.target.checked)}
                   className="w-4 h-4 rounded text-purple-600 focus:ring-purple-500 cursor-pointer"
                 />
                 <span>🔀 Tự động xáo trộn thứ tự các câu hỏi</span>
@@ -702,7 +689,7 @@ export const MatrixImportModal: React.FC<MatrixImportModalProps> = ({
                 <input
                   type="checkbox"
                   checked={shuffleOptions}
-                  onChange={(e) => setShuffleOptions(e.target.checked)}
+                  onChange={e => setShuffleOptions(e.target.checked)}
                   className="w-4 h-4 rounded text-purple-600 focus:ring-purple-500 cursor-pointer"
                 />
                 <span>🔀 Tự động đảo thứ tự các phương án lựa chọn (A, B, C, D)</span>
@@ -816,9 +803,7 @@ export const MatrixImportModal: React.FC<MatrixImportModalProps> = ({
                           {q.lesson}
                         </span>
 
-                        <span className="text-xs font-semibold text-zinc-500">
-                          {q.points} điểm
-                        </span>
+                        <span className="text-xs font-semibold text-zinc-500">{q.points} điểm</span>
                       </div>
 
                       {/* NÚT ĐỔI CÂU TƯƠNG ĐƯƠNG */}

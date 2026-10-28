@@ -42,11 +42,41 @@ describe('Table-Driven Grading Tests (Task 2.1)', () => {
       expectedRatio: number;
       expectedIsCorrect: boolean;
     }> = [
-      { desc: 'Chọn đúng đáp án B (index 1)', selected: 1, expectedPoints: 10, expectedRatio: 1.0, expectedIsCorrect: true },
-      { desc: 'Chọn sai đáp án A (index 0)', selected: 0, expectedPoints: 0, expectedRatio: 0.0, expectedIsCorrect: false },
-      { desc: 'Chọn sai đáp án C (index 2)', selected: 2, expectedPoints: 0, expectedRatio: 0.0, expectedIsCorrect: false },
-      { desc: 'Chọn sai đáp án D (index 3)', selected: 3, expectedPoints: 0, expectedRatio: 0.0, expectedIsCorrect: false },
-      { desc: 'Bỏ trống không chọn (null)', selected: null, expectedPoints: 0, expectedRatio: 0.0, expectedIsCorrect: false },
+      {
+        desc: 'Chọn đúng đáp án B (index 1)',
+        selected: 1,
+        expectedPoints: 10,
+        expectedRatio: 1.0,
+        expectedIsCorrect: true,
+      },
+      {
+        desc: 'Chọn sai đáp án A (index 0)',
+        selected: 0,
+        expectedPoints: 0,
+        expectedRatio: 0.0,
+        expectedIsCorrect: false,
+      },
+      {
+        desc: 'Chọn sai đáp án C (index 2)',
+        selected: 2,
+        expectedPoints: 0,
+        expectedRatio: 0.0,
+        expectedIsCorrect: false,
+      },
+      {
+        desc: 'Chọn sai đáp án D (index 3)',
+        selected: 3,
+        expectedPoints: 0,
+        expectedRatio: 0.0,
+        expectedIsCorrect: false,
+      },
+      {
+        desc: 'Bỏ trống không chọn (null)',
+        selected: null,
+        expectedPoints: 0,
+        expectedRatio: 0.0,
+        expectedIsCorrect: false,
+      },
     ];
 
     mcqCases.forEach(({ desc, selected, expectedPoints, expectedRatio, expectedIsCorrect }) => {
@@ -98,11 +128,41 @@ describe('Table-Driven Grading Tests (Task 2.1)', () => {
       expectedPoints: number;
       expectedIsCorrect: boolean;
     }> = [
-      { desc: 'Đúng: chọn true cho câu true', question: tfQuestionTrue, selected: true, expectedPoints: 8, expectedIsCorrect: true },
-      { desc: 'Sai: chọn false cho câu true', question: tfQuestionTrue, selected: false, expectedPoints: 0, expectedIsCorrect: false },
-      { desc: 'Đúng: chọn false cho câu false', question: tfQuestionFalse, selected: false, expectedPoints: 8, expectedIsCorrect: true },
-      { desc: 'Sai: chọn true cho câu false', question: tfQuestionFalse, selected: true, expectedPoints: 0, expectedIsCorrect: false },
-      { desc: 'Bỏ trống (null)', question: tfQuestionTrue, selected: null, expectedPoints: 0, expectedIsCorrect: false },
+      {
+        desc: 'Đúng: chọn true cho câu true',
+        question: tfQuestionTrue,
+        selected: true,
+        expectedPoints: 8,
+        expectedIsCorrect: true,
+      },
+      {
+        desc: 'Sai: chọn false cho câu true',
+        question: tfQuestionTrue,
+        selected: false,
+        expectedPoints: 0,
+        expectedIsCorrect: false,
+      },
+      {
+        desc: 'Đúng: chọn false cho câu false',
+        question: tfQuestionFalse,
+        selected: false,
+        expectedPoints: 8,
+        expectedIsCorrect: true,
+      },
+      {
+        desc: 'Sai: chọn true cho câu false',
+        question: tfQuestionFalse,
+        selected: true,
+        expectedPoints: 0,
+        expectedIsCorrect: false,
+      },
+      {
+        desc: 'Bỏ trống (null)',
+        question: tfQuestionTrue,
+        selected: null,
+        expectedPoints: 0,
+        expectedIsCorrect: false,
+      },
     ];
 
     tfCases.forEach(({ desc, question, selected, expectedPoints, expectedIsCorrect }) => {
@@ -285,32 +345,97 @@ describe('Table-Driven Grading Tests (Task 2.1)', () => {
       expectedIsCorrect: boolean;
       expectedMatchedBy: 'text' | 'none';
     }> = [
-      { desc: 'Khớp chính xác (Hà Nội)', question: shortTextQuestion, text: 'Hà Nội', expectedPoints: 10, expectedIsCorrect: true, expectedMatchedBy: 'text' },
-      { desc: 'Khớp không dấu trong accepted (Ha Noi)', question: shortTextQuestion, text: 'Ha Noi', expectedPoints: 10, expectedIsCorrect: true, expectedMatchedBy: 'text' },
-      { desc: 'Khớp chữ thường khi không phân biệt hoa thường (hà nội)', question: shortTextQuestion, text: 'hà nội', expectedPoints: 10, expectedIsCorrect: true, expectedMatchedBy: 'text' },
-      { desc: 'Tự động cắt khoảng trắng thừa (  Hà Nội  )', question: shortTextQuestion, text: '  Hà Nội  ', expectedPoints: 10, expectedIsCorrect: true, expectedMatchedBy: 'text' },
-      { desc: 'Sai nội dung (Đà Nẵng)', question: shortTextQuestion, text: 'Đà Nẵng', expectedPoints: 0, expectedIsCorrect: false, expectedMatchedBy: 'none' },
-      { desc: 'Phân biệt hoa thường: viết hoa đúng (Hà Nội)', question: shortTextCaseSensitive, text: 'Hà Nội', expectedPoints: 10, expectedIsCorrect: true, expectedMatchedBy: 'text' },
-      { desc: 'Phân biệt hoa thường: viết thường sai (hà nội)', question: shortTextCaseSensitive, text: 'hà nội', expectedPoints: 0, expectedIsCorrect: false, expectedMatchedBy: 'none' },
-      { desc: 'Chuỗi rỗng', question: shortTextQuestion, text: '', expectedPoints: 0, expectedIsCorrect: false, expectedMatchedBy: 'none' },
-      { desc: 'Chỉ có khoảng trắng', question: shortTextQuestion, text: '   ', expectedPoints: 0, expectedIsCorrect: false, expectedMatchedBy: 'none' },
+      {
+        desc: 'Khớp chính xác (Hà Nội)',
+        question: shortTextQuestion,
+        text: 'Hà Nội',
+        expectedPoints: 10,
+        expectedIsCorrect: true,
+        expectedMatchedBy: 'text',
+      },
+      {
+        desc: 'Khớp không dấu trong accepted (Ha Noi)',
+        question: shortTextQuestion,
+        text: 'Ha Noi',
+        expectedPoints: 10,
+        expectedIsCorrect: true,
+        expectedMatchedBy: 'text',
+      },
+      {
+        desc: 'Khớp chữ thường khi không phân biệt hoa thường (hà nội)',
+        question: shortTextQuestion,
+        text: 'hà nội',
+        expectedPoints: 10,
+        expectedIsCorrect: true,
+        expectedMatchedBy: 'text',
+      },
+      {
+        desc: 'Tự động cắt khoảng trắng thừa (  Hà Nội  )',
+        question: shortTextQuestion,
+        text: '  Hà Nội  ',
+        expectedPoints: 10,
+        expectedIsCorrect: true,
+        expectedMatchedBy: 'text',
+      },
+      {
+        desc: 'Sai nội dung (Đà Nẵng)',
+        question: shortTextQuestion,
+        text: 'Đà Nẵng',
+        expectedPoints: 0,
+        expectedIsCorrect: false,
+        expectedMatchedBy: 'none',
+      },
+      {
+        desc: 'Phân biệt hoa thường: viết hoa đúng (Hà Nội)',
+        question: shortTextCaseSensitive,
+        text: 'Hà Nội',
+        expectedPoints: 10,
+        expectedIsCorrect: true,
+        expectedMatchedBy: 'text',
+      },
+      {
+        desc: 'Phân biệt hoa thường: viết thường sai (hà nội)',
+        question: shortTextCaseSensitive,
+        text: 'hà nội',
+        expectedPoints: 0,
+        expectedIsCorrect: false,
+        expectedMatchedBy: 'none',
+      },
+      {
+        desc: 'Chuỗi rỗng',
+        question: shortTextQuestion,
+        text: '',
+        expectedPoints: 0,
+        expectedIsCorrect: false,
+        expectedMatchedBy: 'none',
+      },
+      {
+        desc: 'Chỉ có khoảng trắng',
+        question: shortTextQuestion,
+        text: '   ',
+        expectedPoints: 0,
+        expectedIsCorrect: false,
+        expectedMatchedBy: 'none',
+      },
     ];
 
-    textCases.forEach(({ desc, question, text, expectedPoints, expectedIsCorrect, expectedMatchedBy }) => {
-      it(`SHORT Text: ${desc}`, () => {
-        const answer: ShortAnswer = {
-          type: 'short',
-          questionId: question.id,
-          text,
-        };
-        const result = gradeShort(question, answer);
-        expect(result.pointsEarned).toBe(expectedPoints);
-        expect(result.isCorrect).toBe(expectedIsCorrect);
-        if (result.details.type === 'short') {
-          expect(result.details.matchedBy).toBe(expectedMatchedBy);
-        }
-      });
-    });
+    textCases.forEach(
+      ({ desc, question, text, expectedPoints, expectedIsCorrect, expectedMatchedBy }) => {
+        it(`SHORT Text: ${desc}`, () => {
+          const answer: ShortAnswer = {
+            type: 'short',
+            questionId: question.id,
+            text,
+          };
+          const result = gradeShort(question, answer);
+          expect(result.pointsEarned).toBe(expectedPoints);
+          expect(result.isCorrect).toBe(expectedIsCorrect);
+          if (result.details.type === 'short') {
+            expect(result.details.matchedBy).toBe(expectedMatchedBy);
+          }
+        });
+      }
+    );
 
     // 4.2 Numeric matching with tolerance
     const shortNumericQuestion: ShortQuestion = {
@@ -332,15 +457,69 @@ describe('Table-Driven Grading Tests (Task 2.1)', () => {
       expectedIsCorrect: boolean;
       expectedMatchedBy: 'numeric' | 'text' | 'none';
     }> = [
-      { desc: 'Khớp số chính xác (15)', text: '15', expectedPoints: 10, expectedIsCorrect: true, expectedMatchedBy: 'numeric' },
-      { desc: 'Khớp số thập phân (15.0)', text: '15.0', expectedPoints: 10, expectedIsCorrect: true, expectedMatchedBy: 'numeric' },
-      { desc: 'Khớp số có dấu phẩy kiểu Việt Nam (15,05)', text: '15,05', expectedPoints: 10, expectedIsCorrect: true, expectedMatchedBy: 'numeric' },
-      { desc: 'Trong dung sai (14.95)', text: '14.95', expectedPoints: 10, expectedIsCorrect: true, expectedMatchedBy: 'numeric' },
-      { desc: 'Ở đúng biên trên dung sai (15.10)', text: '15.10', expectedPoints: 10, expectedIsCorrect: true, expectedMatchedBy: 'numeric' },
-      { desc: 'Ở đúng biên dưới dung sai (14.90)', text: '14.90', expectedPoints: 10, expectedIsCorrect: true, expectedMatchedBy: 'numeric' },
-      { desc: 'Vượt dung sai phía trên (15.15)', text: '15.15', expectedPoints: 0, expectedIsCorrect: false, expectedMatchedBy: 'none' },
-      { desc: 'Vượt dung sai phía dưới (14.85)', text: '14.85', expectedPoints: 0, expectedIsCorrect: false, expectedMatchedBy: 'none' },
-      { desc: 'Ký tự chữ không phải số', text: 'không biết', expectedPoints: 0, expectedIsCorrect: false, expectedMatchedBy: 'none' },
+      {
+        desc: 'Khớp số chính xác (15)',
+        text: '15',
+        expectedPoints: 10,
+        expectedIsCorrect: true,
+        expectedMatchedBy: 'numeric',
+      },
+      {
+        desc: 'Khớp số thập phân (15.0)',
+        text: '15.0',
+        expectedPoints: 10,
+        expectedIsCorrect: true,
+        expectedMatchedBy: 'numeric',
+      },
+      {
+        desc: 'Khớp số có dấu phẩy kiểu Việt Nam (15,05)',
+        text: '15,05',
+        expectedPoints: 10,
+        expectedIsCorrect: true,
+        expectedMatchedBy: 'numeric',
+      },
+      {
+        desc: 'Trong dung sai (14.95)',
+        text: '14.95',
+        expectedPoints: 10,
+        expectedIsCorrect: true,
+        expectedMatchedBy: 'numeric',
+      },
+      {
+        desc: 'Ở đúng biên trên dung sai (15.10)',
+        text: '15.10',
+        expectedPoints: 10,
+        expectedIsCorrect: true,
+        expectedMatchedBy: 'numeric',
+      },
+      {
+        desc: 'Ở đúng biên dưới dung sai (14.90)',
+        text: '14.90',
+        expectedPoints: 10,
+        expectedIsCorrect: true,
+        expectedMatchedBy: 'numeric',
+      },
+      {
+        desc: 'Vượt dung sai phía trên (15.15)',
+        text: '15.15',
+        expectedPoints: 0,
+        expectedIsCorrect: false,
+        expectedMatchedBy: 'none',
+      },
+      {
+        desc: 'Vượt dung sai phía dưới (14.85)',
+        text: '14.85',
+        expectedPoints: 0,
+        expectedIsCorrect: false,
+        expectedMatchedBy: 'none',
+      },
+      {
+        desc: 'Ký tự chữ không phải số',
+        text: 'không biết',
+        expectedPoints: 0,
+        expectedIsCorrect: false,
+        expectedMatchedBy: 'none',
+      },
     ];
 
     numericCases.forEach(({ desc, text, expectedPoints, expectedIsCorrect, expectedMatchedBy }) => {
@@ -369,7 +548,12 @@ describe('Table-Driven Grading Tests (Task 2.1)', () => {
         id: 'q_uni_1',
         type: 'mcq4',
         stem: { text: 'Stem', images: [] },
-        options: [{ text: '1', images: [] }, { text: '2', images: [] }, { text: '3', images: [] }, { text: '4', images: [] }],
+        options: [
+          { text: '1', images: [] },
+          { text: '2', images: [] },
+          { text: '3', images: [] },
+          { text: '4', images: [] },
+        ],
         correct: 0,
         points: 10,
       };
@@ -387,7 +571,11 @@ describe('Table-Driven Grading Tests (Task 2.1)', () => {
         points: 10,
       };
       // Gửi type khác (mcq4 thay vì tf)
-      const resMismatchType = gradeQuestion(qTf, { type: 'mcq4', questionId: 'q_uni_2', selected: 0 });
+      const resMismatchType = gradeQuestion(qTf, {
+        type: 'mcq4',
+        questionId: 'q_uni_2',
+        selected: 0,
+      });
       expect(resMismatchType.isCorrect).toBe(false);
       expect(resMismatchType.pointsEarned).toBe(0);
 

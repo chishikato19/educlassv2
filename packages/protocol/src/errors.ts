@@ -92,8 +92,7 @@ export const ERROR_MESSAGES_VI: Record<ErrorCode, string> = {
   STUDENT_ALREADY_EXISTS: 'Học sinh với mã này đã tồn tại trong lớp.',
   TEACHER_ALREADY_HAS_ACTIVE_SESSION:
     'Thầy/cô đang có một phiên học khác đang mở. Vui lòng đóng phiên cũ trước khi mở phiên mới.',
-  ROSTER_REQUIRED_FOR_ROSTER_MODE:
-    'Chế độ bắt buộc chọn tên yêu cầu phải chọn một lớp học.',
+  ROSTER_REQUIRED_FOR_ROSTER_MODE: 'Chế độ bắt buộc chọn tên yêu cầu phải chọn một lớp học.',
   PARTICIPANT_NOT_FOUND: 'Không tìm thấy người tham gia phiên học tương ứng.',
   QUESTION_SET_NOT_FOUND: 'Không tìm thấy bộ câu hỏi tương ứng.',
   CHAT_LOCKED: 'Thầy/cô đã tạm khóa tính năng trò chuyện trong phiên học.',

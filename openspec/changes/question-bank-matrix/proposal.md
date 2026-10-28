@@ -3,11 +3,12 @@
 ## 1. Bối cảnh & Vấn đề (Context & Motivation)
 
 Hiện tại trong EduClass v2:
+
 - Câu hỏi chỉ tồn tại gắn liền bên trong từng "Bộ đề" đơn lẻ (`question_sets` 1-N `questions`). Nếu giáo viên muốn sử dụng lại câu hỏi cho đề khác, họ phải sao chép hoặc nhập lại từ đầu.
 - **Thực tế giảng dạy phổ thông tại Việt Nam:**
   - Giáo viên xây dựng và tích lũy câu hỏi theo **phân phối chương trình môn học**: Khối lớp $\rightarrow$ Môn học $\rightarrow$ Chương / Chuyên đề $\rightarrow$ Bài học cụ thể.
   - Chuẩn khảo thí của Bộ GD&ĐT quy định 4 mức độ nhận thức cố định: **Nhận biết (NB)**, **Thông hiểu (TH)**, **Vận dụng (VD)**, **Vận dụng cao (VDC)**.
-  - Khi ra đề kiểm tra (15 phút, 1 tiết, giữa kỳ, học kỳ) hoặc tổ chức ôn tập đầu giờ, giáo viên luôn lập **Ma trận đề thi**: Ví dụ: *Bài 1 lấy 3 câu TH, 2 câu NB; Bài 2 lấy 2 câu NB, 1 câu VD...*
+  - Khi ra đề kiểm tra (15 phút, 1 tiết, giữa kỳ, học kỳ) hoặc tổ chức ôn tập đầu giờ, giáo viên luôn lập **Ma trận đề thi**: Ví dụ: _Bài 1 lấy 3 câu TH, 2 câu NB; Bài 2 lấy 2 câu NB, 1 câu VD..._
 - **Hạn chế hiện tại:**
   1. Thiếu một **Ngân hàng câu hỏi tập trung (Item Bank)** để lưu trữ, gắn nhãn bài học và phân loại 4 mức độ nhận thức độc lập với các bộ đề thi.
   2. Không có công cụ **Ma trận đề thi** để giáo viên trích xuất hoặc sinh đề ngẫu nhiên từ ngân hàng theo số lượng câu định sẵn của từng bài và mức độ.

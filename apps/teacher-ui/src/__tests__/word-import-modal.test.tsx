@@ -39,7 +39,7 @@ describe('WordImportModal UI Component (apps/teacher-ui)', () => {
         onDownloadTemplate={handleDownloadTemplate}
         onParseDocx={vi.fn()}
         onSaveQuestions={vi.fn()}
-      />,
+      />
     );
 
     expect(screen.getByText(/Nhập đề thi từ file Word \(\.docx\)/i)).toBeDefined();
@@ -76,7 +76,7 @@ describe('WordImportModal UI Component (apps/teacher-ui)', () => {
         onDownloadTemplate={vi.fn()}
         onParseDocx={vi.fn()}
         onSaveQuestions={handleSave}
-      />,
+      />
     );
 
     // Kiểm tra thống kê

@@ -37,7 +37,7 @@ describe('TeacherApiClient - Bank & Matrix APIs (Task 3.1)', () => {
         headers: expect.objectContaining({
           Authorization: 'Bearer mock_teacher_token',
         }),
-      }),
+      })
     );
 
     fetchSpy.mockRestore();
@@ -76,14 +76,15 @@ describe('TeacherApiClient - Bank & Matrix APIs (Task 3.1)', () => {
     expect(res).toEqual(mockQuestions);
     expect(fetchSpy).toHaveBeenCalledWith(
       '/api/bank/questions?grade=12&subject=To%C3%A1n&chapter=Ch%C6%B0%C6%A1ng+1&difficulty=nb',
-      expect.anything(),
+      expect.anything()
     );
 
     fetchSpy.mockRestore();
   });
 
   it('calls createBankQuestion and createBatchBankQuestions', async () => {
-    const fetchSpy = vi.spyOn(globalThis, 'fetch')
+    const fetchSpy = vi
+      .spyOn(globalThis, 'fetch')
       .mockResolvedValueOnce({
         ok: true,
         json: async () => ({ id: 'bq_created' }),
@@ -125,7 +126,8 @@ describe('TeacherApiClient - Bank & Matrix APIs (Task 3.1)', () => {
   });
 
   it('calls updateBankQuestion and deleteBankQuestion', async () => {
-    const fetchSpy = vi.spyOn(globalThis, 'fetch')
+    const fetchSpy = vi
+      .spyOn(globalThis, 'fetch')
       .mockResolvedValueOnce({
         ok: true,
         json: async () => ({ id: 'bq_1', points: 20 }),
@@ -145,7 +147,8 @@ describe('TeacherApiClient - Bank & Matrix APIs (Task 3.1)', () => {
   });
 
   it('calls getMatrixStats and generateSetFromMatrix', async () => {
-    const fetchSpy = vi.spyOn(globalThis, 'fetch')
+    const fetchSpy = vi
+      .spyOn(globalThis, 'fetch')
       .mockResolvedValueOnce({
         ok: true,
         json: async () => ({

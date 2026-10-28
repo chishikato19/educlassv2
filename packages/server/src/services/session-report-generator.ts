@@ -55,7 +55,7 @@ export function generateSessionAnalytics(
     titlesAwarded = [],
   } = params;
 
-  const teamMap = new Map(teams.map((t) => [t.id, t.name]));
+  const teamMap = new Map(teams.map(t => [t.id, t.name]));
 
   // 1. Gom điểm thưởng EXP của từng người tham gia trong phiên
   const expByParticipant = new Map<string, number>();
@@ -104,7 +104,7 @@ export function generateSessionAnalytics(
   }
 
   // 3. Tính toán Bảng điểm chi tiết (Scoreboard)
-  const rawScoreboard: Array<Omit<SessionStudentScoreItem, 'rank'>> = participants.map((p) => {
+  const rawScoreboard: Array<Omit<SessionStudentScoreItem, 'rank'>> = participants.map(p => {
     const totals = totalsByParticipant.get(p.id) ?? {
       score: 0,
       correctCount: 0,
@@ -213,14 +213,10 @@ export function generateSessionAnalytics(
     }
   }
 
-  const difficultQuestions: SessionDifficultQuestionItem[] = Array.from(
-    questionStatsMap.values()
-  )
-    .map((stat) => {
+  const difficultQuestions: SessionDifficultQuestionItem[] = Array.from(questionStatsMap.values())
+    .map(stat => {
       const errorRate =
-        stat.totalAttempts > 0
-          ? Math.round((stat.incorrectCount / stat.totalAttempts) * 100)
-          : 0;
+        stat.totalAttempts > 0 ? Math.round((stat.incorrectCount / stat.totalAttempts) * 100) : 0;
       return {
         questionId: stat.questionId,
         activityId: stat.activityId,
@@ -252,14 +248,10 @@ export function generateSessionAnalytics(
   const totalAccuracySum = scoreboard.reduce((sum, item) => sum + item.accuracy, 0);
 
   const averageScore =
-    totalParticipantsWithScore > 0
-      ? Math.round(totalScoreSum / totalParticipantsWithScore)
-      : 0;
+    totalParticipantsWithScore > 0 ? Math.round(totalScoreSum / totalParticipantsWithScore) : 0;
 
   const averageAccuracy =
-    totalParticipantsWithScore > 0
-      ? Math.round(totalAccuracySum / totalParticipantsWithScore)
-      : 0;
+    totalParticipantsWithScore > 0 ? Math.round(totalAccuracySum / totalParticipantsWithScore) : 0;
 
   const summary: SessionReportSummary = {
     totalQuestions: totalQuestionsInSession,
@@ -269,7 +261,7 @@ export function generateSessionAnalytics(
   };
 
   // 6. Tính toán Khung Game hóa & Tổng kết toàn lớp cho GV (Task 5.4)
-  const topPodium = scoreboard.slice(0, 3).map((item) => ({
+  const topPodium = scoreboard.slice(0, 3).map(item => ({
     rank: item.rank,
     participantId: item.participantId,
     displayName: item.displayName,
@@ -281,9 +273,9 @@ export function generateSessionAnalytics(
     avatar: item.avatar,
   }));
 
-  const accountCount = participants.filter((p) => p.identityLevel === 'account').length;
-  const rosterCount = participants.filter((p) => p.identityLevel === 'roster').length;
-  const guestCount = participants.filter((p) => p.identityLevel === 'guest').length;
+  const accountCount = participants.filter(p => p.identityLevel === 'account').length;
+  const rosterCount = participants.filter(p => p.identityLevel === 'roster').length;
+  const guestCount = participants.filter(p => p.identityLevel === 'guest').length;
 
   let persistedExpTotal = 0;
   let unpersistedExpTotal = 0;
@@ -295,11 +287,11 @@ export function generateSessionAnalytics(
     }
   }
 
-  const participantStudentIdMap = new Map(participants.map((p) => [p.id, p.studentId]));
+  const participantStudentIdMap = new Map(participants.map(p => [p.id, p.studentId]));
 
   const rosterNeedingPin = scoreboard
-    .filter((item) => item.identityLevel === 'roster' && item.expEarned > 0)
-    .map((item) => ({
+    .filter(item => item.identityLevel === 'roster' && item.expEarned > 0)
+    .map(item => ({
       studentId: participantStudentIdMap.get(item.participantId) ?? null,
       displayName: item.displayName,
       expEarned: item.expEarned,

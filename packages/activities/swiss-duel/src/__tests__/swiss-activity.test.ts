@@ -1,14 +1,46 @@
 import { describe, expect, it, vi } from 'vitest';
 import type { ActivityContext } from '@educlass/core';
-import { SwissDuelConfigSchema, type SwissDuelConfig, type SwissDuelState } from '../swiss-schemas.js';
+import {
+  SwissDuelConfigSchema,
+  type SwissDuelConfig,
+  type SwissDuelState,
+} from '../swiss-schemas.js';
 import { SwissDuelActivity } from '../swiss-activity.js';
 
 describe('SwissDuelActivity Lifecycle', () => {
   const mockQuestions = [
-    { id: 'q1', stem: 'Câu hỏi 1?', options: ['A', 'B', 'C', 'D'], correctAnswer: 0, timeLimit: 30, type: 'mcq4' as const },
-    { id: 'q2', stem: 'Câu hỏi 2?', options: ['A', 'B', 'C', 'D'], correctAnswer: 1, timeLimit: 30, type: 'mcq4' as const },
-    { id: 'q3', stem: 'Câu hỏi 3?', options: ['A', 'B', 'C', 'D'], correctAnswer: 2, timeLimit: 30, type: 'mcq4' as const },
-    { id: 'q4', stem: 'Câu hỏi 4?', options: ['A', 'B', 'C', 'D'], correctAnswer: 3, timeLimit: 30, type: 'mcq4' as const },
+    {
+      id: 'q1',
+      stem: 'Câu hỏi 1?',
+      options: ['A', 'B', 'C', 'D'],
+      correctAnswer: 0,
+      timeLimit: 30,
+      type: 'mcq4' as const,
+    },
+    {
+      id: 'q2',
+      stem: 'Câu hỏi 2?',
+      options: ['A', 'B', 'C', 'D'],
+      correctAnswer: 1,
+      timeLimit: 30,
+      type: 'mcq4' as const,
+    },
+    {
+      id: 'q3',
+      stem: 'Câu hỏi 3?',
+      options: ['A', 'B', 'C', 'D'],
+      correctAnswer: 2,
+      timeLimit: 30,
+      type: 'mcq4' as const,
+    },
+    {
+      id: 'q4',
+      stem: 'Câu hỏi 4?',
+      options: ['A', 'B', 'C', 'D'],
+      correctAnswer: 3,
+      timeLimit: 30,
+      type: 'mcq4' as const,
+    },
   ];
 
   const mockConfig: SwissDuelConfig = {

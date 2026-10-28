@@ -102,7 +102,7 @@ export const TeacherLoginScreen: React.FC<TeacherLoginScreenProps> = ({ onLoginS
           </div>
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-5">
-            {teachers.map((t) => {
+            {teachers.map(t => {
               const colorClass = getAvatarColor(t.displayName || t.username);
               return (
                 <div
@@ -145,9 +145,7 @@ export const TeacherLoginScreen: React.FC<TeacherLoginScreenProps> = ({ onLoginS
               <h4 className="text-base font-bold text-gray-700 group-hover:text-blue-600">
                 Thêm giáo viên mới
               </h4>
-              <p className="text-xs text-gray-400 mt-1">
-                Tạo tài khoản riêng trên máy này
-              </p>
+              <p className="text-xs text-gray-400 mt-1">Tạo tài khoản riêng trên máy này</p>
             </div>
           </div>
         )}
@@ -162,9 +160,7 @@ export const TeacherLoginScreen: React.FC<TeacherLoginScreenProps> = ({ onLoginS
         >
           <span>🔑</span> Đăng nhập Quản trị viên (Admin)
         </button>
-        <span className="text-gray-400">
-          EduClass v2 — Hệ thống Dạy học & Tương tác lớp học
-        </span>
+        <span className="text-gray-400">EduClass v2 — Hệ thống Dạy học & Tương tác lớp học</span>
       </div>
 
       {/* Modals */}
@@ -175,7 +171,7 @@ export const TeacherLoginScreen: React.FC<TeacherLoginScreenProps> = ({ onLoginS
           setIsPinModalOpen(false);
           setSelectedTeacher(null);
         }}
-        onSuccess={(user) => {
+        onSuccess={user => {
           setIsPinModalOpen(false);
           onLoginSuccess(user);
         }}
@@ -190,15 +186,13 @@ export const TeacherLoginScreen: React.FC<TeacherLoginScreenProps> = ({ onLoginS
       <AdminLoginModal
         isOpen={isAdminModalOpen}
         onClose={() => setIsAdminModalOpen(false)}
-        onSuccess={(user) => {
+        onSuccess={user => {
           setIsAdminModalOpen(false);
           onLoginSuccess(user);
         }}
       />
 
-      {toastMessage && (
-        <Toast message={toastMessage} onClose={() => setToastMessage(null)} />
-      )}
+      {toastMessage && <Toast message={toastMessage} onClose={() => setToastMessage(null)} />}
     </div>
   );
 };

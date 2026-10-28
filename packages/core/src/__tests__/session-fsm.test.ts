@@ -137,9 +137,7 @@ describe('Session FSM - State Transition Table (Task 1.4)', () => {
             expect(result.state.status).toBe(expectedNextStatus);
           }
         } else {
-          expect(() => transitionSession(currentState, event)).toThrowError(
-            SessionTransitionError
-          );
+          expect(() => transitionSession(currentState, event)).toThrowError(SessionTransitionError);
 
           const result = tryTransitionSession(currentState, event);
           expect(result.success).toBe(false);

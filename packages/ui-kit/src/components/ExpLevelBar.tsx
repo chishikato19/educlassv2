@@ -80,7 +80,10 @@ export const ExpLevelBar: React.FC<ExpLevelBarProps> = ({
       {/* Cụm thanh tiến độ và nhãn */}
       <div className="flex-1 min-w-[80px]">
         {showExpLabel && (
-          <div className="flex justify-between items-center mb-1 text-xs font-semibold" style={{ fontSize, color: UI_COLORS.textMuted }}>
+          <div
+            className="flex justify-between items-center mb-1 text-xs font-semibold"
+            style={{ fontSize, color: UI_COLORS.textMuted }}
+          >
             <span>Cấp {level}</span>
             <span>
               {typeof currentExp === 'number' && typeof maxExp === 'number'

@@ -25,6 +25,7 @@ export const factionDuelPlugin: ActivityHostPlugin = {
   id: 'faction-duel',
   name: 'Đại Chiến Xanh Đỏ (thử nghiệm)',
   icon: '⚔️',
-  description: 'Đại chiến chia 2 phe Xanh - Đỏ cân bằng theo Elo, cơ chế 15s chọn đối thủ và tính điểm trọng số lật kèo',
+  description:
+    'Đại chiến chia 2 phe Xanh - Đỏ cân bằng theo Elo, cơ chế 15s chọn đối thủ và tính điểm trọng số lật kèo',
   component: FactionDuelHostComponent,
 };

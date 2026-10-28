@@ -95,7 +95,7 @@ export const RegisterTeacherModal: React.FC<RegisterTeacherModalProps> = ({
           </label>
           <Input
             value={username}
-            onChange={(e) => {
+            onChange={e => {
               setUsername(e.target.value);
               setErrorMsg(null);
             }}
@@ -109,7 +109,7 @@ export const RegisterTeacherModal: React.FC<RegisterTeacherModalProps> = ({
           </label>
           <Input
             value={subject}
-            onChange={(e) => setSubject(e.target.value)}
+            onChange={e => setSubject(e.target.value)}
             placeholder="VD: Toán học, Vật lý, Ngữ văn, Tin học..."
           />
         </div>
@@ -118,7 +118,8 @@ export const RegisterTeacherModal: React.FC<RegisterTeacherModalProps> = ({
         <div className="p-3 bg-blue-50 rounded-xl border border-blue-200 text-xs text-blue-800 flex items-start gap-2">
           <span className="text-base">ℹ️</span>
           <div>
-            Mã PIN khởi tạo mặc định sẽ là <strong>1234</strong>. Thầy/Cô có thể đổi mã PIN cá nhân bất cứ lúc nào trong phần Cài đặt sau khi đăng nhập.
+            Mã PIN khởi tạo mặc định sẽ là <strong>1234</strong>. Thầy/Cô có thể đổi mã PIN cá nhân
+            bất cứ lúc nào trong phần Cài đặt sau khi đăng nhập.
           </div>
         </div>
 

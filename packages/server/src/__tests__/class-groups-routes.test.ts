@@ -20,30 +20,44 @@ describe('Class Groups REST API & Randomize Flow (Phases 1-2 & Phase 6 Verificat
         method: 'POST',
         url: '/api/admin/users',
         headers: { authorization: `Bearer ${adminToken}` },
-        payload: { username: 'gv_group_1', password: 'password123', displayName: 'Thầy Hùng', role: 'teacher' },
+        payload: {
+          username: 'gv_group_1',
+          password: 'password123',
+          displayName: 'Thầy Hùng',
+          role: 'teacher',
+        },
       });
 
       await app.inject({
         method: 'POST',
         url: '/api/admin/users',
         headers: { authorization: `Bearer ${adminToken}` },
-        payload: { username: 'gv_group_2', password: 'password123', displayName: 'Cô Lan', role: 'teacher' },
+        payload: {
+          username: 'gv_group_2',
+          password: 'password123',
+          displayName: 'Cô Lan',
+          role: 'teacher',
+        },
       });
 
       const token1 = JSON.parse(
-        (await app.inject({
-          method: 'POST',
-          url: '/api/auth/login',
-          payload: { username: 'gv_group_1', password: 'password123' },
-        })).body
+        (
+          await app.inject({
+            method: 'POST',
+            url: '/api/auth/login',
+            payload: { username: 'gv_group_1', password: 'password123' },
+          })
+        ).body
       ).token;
 
       const token2 = JSON.parse(
-        (await app.inject({
-          method: 'POST',
-          url: '/api/auth/login',
-          payload: { username: 'gv_group_2', password: 'password123' },
-        })).body
+        (
+          await app.inject({
+            method: 'POST',
+            url: '/api/auth/login',
+            payload: { username: 'gv_group_2', password: 'password123' },
+          })
+        ).body
       ).token;
 
       // 2. Thầy Hùng tạo lớp học 11A1
@@ -142,7 +156,9 @@ describe('Class Groups REST API & Randomize Flow (Phases 1-2 & Phase 6 Verificat
         url: `/api/classes/${classId}/groups`,
         headers: { authorization: `Bearer ${token1}` },
       });
-      const g2 = JSON.parse(updatedGroupsRes.body).groups.find((g: { id: string }) => g.id === randomizedGroups[1].id);
+      const g2 = JSON.parse(updatedGroupsRes.body).groups.find(
+        (g: { id: string }) => g.id === randomizedGroups[1].id
+      );
       expect(g2.members.some((m: { id: string }) => m.id === firstMemberId)).toBe(true);
 
       // 9. Bảo vệ quyền sở hữu (Cross-teacher guard): Cô Lan không được thao tác lớp của Thầy Hùng

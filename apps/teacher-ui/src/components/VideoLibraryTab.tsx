@@ -45,7 +45,14 @@ export const VideoLibraryTab: React.FC<VideoLibraryTabProps> = ({ onShowToast })
       const cats = await api.getVideoCategories();
       setCategories(cats);
     } catch {
-      setCategories(['Khởi động', 'Bài giảng', 'Khoa học', 'Toán học', 'Tiếng Anh', 'Kỹ năng sống']);
+      setCategories([
+        'Khởi động',
+        'Bài giảng',
+        'Khoa học',
+        'Toán học',
+        'Tiếng Anh',
+        'Kỹ năng sống',
+      ]);
     }
   }, []);
 
@@ -149,7 +156,12 @@ export const VideoLibraryTab: React.FC<VideoLibraryTabProps> = ({ onShowToast })
       await loadCategories();
       await loadVideos();
     } catch (err: unknown) {
-      const msg = err instanceof Error ? err.message : (editingVideo ? 'Lỗi khi cập nhật video' : 'Lỗi khi thêm video');
+      const msg =
+        err instanceof Error
+          ? err.message
+          : editingVideo
+            ? 'Lỗi khi cập nhật video'
+            : 'Lỗi khi thêm video';
       onShowToast(msg);
     } finally {
       setIsSaving(false);
@@ -196,7 +208,8 @@ export const VideoLibraryTab: React.FC<VideoLibraryTabProps> = ({ onShowToast })
             <h1 className="text-2xl font-bold text-slate-800">Kho Video Học Liệu & Khởi Động</h1>
           </div>
           <p className="text-sm text-slate-500 mt-1">
-            Lưu trữ liên kết video YouTube dùng khởi động tiết học hoặc kho học liệu. Phát trực tiếp không quảng cáo theo dõi.
+            Lưu trữ liên kết video YouTube dùng khởi động tiết học hoặc kho học liệu. Phát trực tiếp
+            không quảng cáo theo dõi.
           </p>
         </div>
         <div className="flex items-center gap-2">
@@ -225,7 +238,7 @@ export const VideoLibraryTab: React.FC<VideoLibraryTabProps> = ({ onShowToast })
           >
             Tất cả ({videos.length})
           </button>
-          {categories.map((cat) => (
+          {categories.map(cat => (
             <button
               key={cat}
               type="button"
@@ -245,7 +258,7 @@ export const VideoLibraryTab: React.FC<VideoLibraryTabProps> = ({ onShowToast })
         <div className="w-full lg:w-72 shrink-0">
           <Input
             value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
+            onChange={e => setSearchTerm(e.target.value)}
             placeholder="🔍 Tìm kiếm video..."
             className="w-full"
           />
@@ -275,7 +288,7 @@ export const VideoLibraryTab: React.FC<VideoLibraryTabProps> = ({ onShowToast })
         </div>
       ) : (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-          {videos.map((v) => {
+          {videos.map(v => {
             const thumbUrl = getYouTubeThumbnailUrl(v.youtubeId);
             return (
               <Card
@@ -284,7 +297,10 @@ export const VideoLibraryTab: React.FC<VideoLibraryTabProps> = ({ onShowToast })
               >
                 <div>
                   {/* Thumbnail Container */}
-                  <div className="relative aspect-video w-full bg-slate-900 overflow-hidden cursor-pointer" onClick={() => setPlayingVideo(v)}>
+                  <div
+                    className="relative aspect-video w-full bg-slate-900 overflow-hidden cursor-pointer"
+                    onClick={() => setPlayingVideo(v)}
+                  >
                     <img
                       src={thumbUrl}
                       alt={v.title}
@@ -315,7 +331,10 @@ export const VideoLibraryTab: React.FC<VideoLibraryTabProps> = ({ onShowToast })
                       {v.title}
                     </h3>
                     {v.description && (
-                      <p className="text-xs text-slate-500 line-clamp-2 mt-1.5" title={v.description}>
+                      <p
+                        className="text-xs text-slate-500 line-clamp-2 mt-1.5"
+                        title={v.description}
+                      >
                         {v.description}
                       </p>
                     )}
@@ -420,14 +439,14 @@ export const VideoLibraryTab: React.FC<VideoLibraryTabProps> = ({ onShowToast })
           onClose={() => !isSaving && setIsEditModalOpen(false)}
           title={editingVideo ? '✏️ Chỉnh Sửa Video' : '➕ Thêm Video YouTube Mới'}
         >
-          <form onSubmit={(e) => void handleSaveVideo(e)} className="space-y-4 w-full box-border">
+          <form onSubmit={e => void handleSaveVideo(e)} className="space-y-4 w-full box-border">
             <div>
               <label className="block text-sm font-semibold text-slate-700 mb-1">
                 Đường dẫn YouTube (URL hoặc ID) <span className="text-red-500">*</span>
               </label>
               <Input
                 value={formUrl}
-                onChange={(e) => setFormUrl(e.target.value)}
+                onChange={e => setFormUrl(e.target.value)}
                 placeholder="https://www.youtube.com/watch?v=... hoặc youtu.be/..."
                 required
                 className="w-full"
@@ -447,9 +466,14 @@ export const VideoLibraryTab: React.FC<VideoLibraryTabProps> = ({ onShowToast })
                 />
                 <div className="text-xs text-slate-600">
                   <div className="font-semibold text-emerald-600 flex items-center gap-1">
-                    ✓ Đã nhận diện ID: <code className="font-mono bg-white px-1 py-0.5 rounded border border-slate-200">{previewYoutubeId}</code>
+                    ✓ Đã nhận diện ID:{' '}
+                    <code className="font-mono bg-white px-1 py-0.5 rounded border border-slate-200">
+                      {previewYoutubeId}
+                    </code>
                   </div>
-                  <div className="text-slate-400 mt-0.5">Sẽ phát qua chế độ bảo vệ quyền riêng tư không quảng cáo.</div>
+                  <div className="text-slate-400 mt-0.5">
+                    Sẽ phát qua chế độ bảo vệ quyền riêng tư không quảng cáo.
+                  </div>
                 </div>
               </div>
             )}
@@ -460,7 +484,7 @@ export const VideoLibraryTab: React.FC<VideoLibraryTabProps> = ({ onShowToast })
               </label>
               <Input
                 value={formTitle}
-                onChange={(e) => setFormTitle(e.target.value)}
+                onChange={e => setFormTitle(e.target.value)}
                 placeholder="VD: Khởi động vận động vui nhộn..."
                 required
                 className="w-full"
@@ -473,10 +497,10 @@ export const VideoLibraryTab: React.FC<VideoLibraryTabProps> = ({ onShowToast })
               </label>
               <select
                 value={formCategory}
-                onChange={(e) => setFormCategory(e.target.value)}
+                onChange={e => setFormCategory(e.target.value)}
                 className="w-full rounded-xl border border-slate-300 bg-white px-3.5 py-2 text-sm text-slate-800 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-100"
               >
-                {categories.map((c) => (
+                {categories.map(c => (
                   <option key={c} value={c}>
                     {c}
                   </option>
@@ -488,7 +512,7 @@ export const VideoLibraryTab: React.FC<VideoLibraryTabProps> = ({ onShowToast })
                 <div className="mt-2">
                   <Input
                     value={formCustomCategory}
-                    onChange={(e) => setFormCustomCategory(e.target.value)}
+                    onChange={e => setFormCustomCategory(e.target.value)}
                     placeholder="Nhập tên danh mục mới..."
                     required
                     className="w-full"
@@ -503,7 +527,7 @@ export const VideoLibraryTab: React.FC<VideoLibraryTabProps> = ({ onShowToast })
               </label>
               <textarea
                 value={formDescription}
-                onChange={(e) => setFormDescription(e.target.value)}
+                onChange={e => setFormDescription(e.target.value)}
                 placeholder="Ghi chú nội dung video, đối tượng hoặc thời điểm sử dụng..."
                 rows={3}
                 className="w-full rounded-xl border border-slate-300 bg-white px-3.5 py-2 text-sm text-slate-800 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-100"

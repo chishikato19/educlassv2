@@ -79,7 +79,7 @@ export const TouchDrawingCanvas: React.FC<TouchDrawingCanvasProps> = ({
     const canvas = canvasRef.current;
     if (!canvas) return;
     const dataUrl = canvas.toDataURL('image/png');
-    setHistory((prev) => [...prev.slice(-15), dataUrl]); // Giữ tối đa 15 bước gần nhất
+    setHistory(prev => [...prev.slice(-15), dataUrl]); // Giữ tối đa 15 bước gần nhất
     setHasDrawn(true);
     onChange(dataUrl);
   };
@@ -227,14 +227,16 @@ export const TouchDrawingCanvas: React.FC<TouchDrawingCanvasProps> = ({
         {/* Bộ chọn Màu sắc (khi dùng Bút) */}
         {tool === 'pen' && (
           <div className="flex items-center gap-1.5 bg-white p-1 rounded-xl border border-slate-200">
-            {COLORS.map((c) => (
+            {COLORS.map(c => (
               <button
                 key={c.value}
                 type="button"
                 onClick={() => setColor(c.value)}
                 style={{ backgroundColor: c.value }}
                 className={`min-h-[44px] min-w-[44px] w-9 h-9 rounded-full border-2 transition transform ${
-                  color === c.value ? 'scale-110 border-blue-500 shadow-md ring-2 ring-blue-200' : 'border-white'
+                  color === c.value
+                    ? 'scale-110 border-blue-500 shadow-md ring-2 ring-blue-200'
+                    : 'border-white'
                 }`}
                 aria-label={`Chọn màu ${c.label}`}
               />
@@ -244,7 +246,7 @@ export const TouchDrawingCanvas: React.FC<TouchDrawingCanvasProps> = ({
 
         {/* Bộ chọn Cỡ nét: 3px, 6px, 12px */}
         <div className="flex items-center gap-1 bg-white p-1 rounded-xl border border-slate-200">
-          {[3, 6, 12].map((size) => (
+          {[3, 6, 12].map(size => (
             <button
               key={size}
               type="button"
@@ -294,17 +296,17 @@ export const TouchDrawingCanvas: React.FC<TouchDrawingCanvasProps> = ({
       >
         <canvas
           ref={canvasRef}
-          onMouseDown={(e) => startDrawing(e.clientX, e.clientY)}
-          onMouseMove={(e) => drawMove(e.clientX, e.clientY)}
+          onMouseDown={e => startDrawing(e.clientX, e.clientY)}
+          onMouseMove={e => drawMove(e.clientX, e.clientY)}
           onMouseUp={stopDrawing}
           onMouseLeave={stopDrawing}
-          onTouchStart={(e) => {
+          onTouchStart={e => {
             if (e.touches.length === 1) {
               const touch = e.touches[0]!;
               startDrawing(touch.clientX, touch.clientY);
             }
           }}
-          onTouchMove={(e) => {
+          onTouchMove={e => {
             if (e.touches.length === 1) {
               const touch = e.touches[0]!;
               drawMove(touch.clientX, touch.clientY);
@@ -318,7 +320,9 @@ export const TouchDrawingCanvas: React.FC<TouchDrawingCanvasProps> = ({
         {!hasDrawn && (
           <div className="absolute inset-0 pointer-events-none flex flex-col items-center justify-center text-slate-300">
             <span className="text-3xl mb-1">✍️</span>
-            <span className="text-xs font-medium">Vẽ tay trực tiếp bằng ngón tay hoặc bút Stylus tại đây</span>
+            <span className="text-xs font-medium">
+              Vẽ tay trực tiếp bằng ngón tay hoặc bút Stylus tại đây
+            </span>
           </div>
         )}
       </div>

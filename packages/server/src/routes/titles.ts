@@ -14,10 +14,7 @@ export interface TitlesRoutesOptions {
   studentRepo: StudentRepository;
 }
 
-export const titlesRoutes: FastifyPluginAsync<TitlesRoutesOptions> = async (
-  fastify,
-  options
-) => {
+export const titlesRoutes: FastifyPluginAsync<TitlesRoutesOptions> = async (fastify, options) => {
   const { titleRepo, studentRepo } = options;
 
   /**
@@ -28,7 +25,7 @@ export const titlesRoutes: FastifyPluginAsync<TitlesRoutesOptions> = async (
     await titleRepo.seedDefaultTitles();
     const all = await titleRepo.listAllTitles();
 
-    const dtos: TitleDto[] = all.map((t) => {
+    const dtos: TitleDto[] = all.map(t => {
       let rule = { conditions: [] };
       try {
         rule = JSON.parse(t.ruleJson);
@@ -93,7 +90,7 @@ export const titlesRoutes: FastifyPluginAsync<TitlesRoutesOptions> = async (
         }
       }
 
-      const titlesDto: TitleDto[] = awarded.map((t) => {
+      const titlesDto: TitleDto[] = awarded.map(t => {
         let rule = { conditions: [] };
         try {
           rule = JSON.parse(t.ruleJson);
@@ -121,7 +118,6 @@ export const titlesRoutes: FastifyPluginAsync<TitlesRoutesOptions> = async (
       });
     }
   );
-
 
   /**
    * POST /api/students/:studentId/titles/evaluate

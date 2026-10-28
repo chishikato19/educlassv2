@@ -34,7 +34,8 @@ export const AssignmentTeacherPanel: React.FC<AssignmentTeacherPanelProps> = ({
 
   const submittedCount = submissionsList.length;
   const effectiveTotal = Math.max(totalParticipants, submittedCount);
-  const completionRate = effectiveTotal > 0 ? Math.round((submittedCount / effectiveTotal) * 100) : 0;
+  const completionRate =
+    effectiveTotal > 0 ? Math.round((submittedCount / effectiveTotal) * 100) : 0;
 
   const totalBytes = useMemo(() => {
     return submissionsList.reduce((acc, curr) => acc + (curr.fileSize || 0), 0);
@@ -157,7 +158,9 @@ export const AssignmentTeacherPanel: React.FC<AssignmentTeacherPanelProps> = ({
         <div>
           <div className="flex items-center gap-2 mb-1">
             <span className="text-2xl">📁</span>
-            <h2 className="text-xl font-bold text-gray-800">{state.title || 'Thu - phát bài tập'}</h2>
+            <h2 className="text-xl font-bold text-gray-800">
+              {state.title || 'Thu - phát bài tập'}
+            </h2>
             <span
               className={`px-2.5 py-0.5 rounded-full text-xs font-semibold ${
                 state.isLocked ? 'bg-amber-100 text-amber-800' : 'bg-emerald-100 text-emerald-800'
@@ -172,7 +175,9 @@ export const AssignmentTeacherPanel: React.FC<AssignmentTeacherPanelProps> = ({
           {state.targetDirectory && (
             <div className="flex items-center gap-2 mt-2 text-xs text-gray-600 bg-gray-50 px-2.5 py-1 rounded-md border border-gray-200 max-w-fit">
               <span className="font-semibold text-gray-700">📂 Thư mục lưu:</span>
-              <span className="font-mono text-gray-800 truncate max-w-md">{state.targetDirectory}</span>
+              <span className="font-mono text-gray-800 truncate max-w-md">
+                {state.targetDirectory}
+              </span>
               <button
                 type="button"
                 onClick={handleOpenFolder}
@@ -229,14 +234,18 @@ export const AssignmentTeacherPanel: React.FC<AssignmentTeacherPanelProps> = ({
         <div className="bg-white p-4 rounded-xl border border-gray-200 shadow-xs">
           <p className="text-xs text-gray-500 font-medium">Tổng dung lượng thu</p>
           <div className="flex items-baseline gap-1 mt-1">
-            <span className="text-2xl font-black text-purple-600">{formatFileSize(totalBytes)}</span>
+            <span className="text-2xl font-black text-purple-600">
+              {formatFileSize(totalBytes)}
+            </span>
           </div>
         </div>
 
         <div className="bg-white p-4 rounded-xl border border-gray-200 shadow-xs">
           <p className="text-xs text-gray-500 font-medium">Tài liệu đã phát</p>
           <div className="flex items-baseline gap-1 mt-1">
-            <span className="text-2xl font-black text-amber-600">{state.materials?.length || 0}</span>
+            <span className="text-2xl font-black text-amber-600">
+              {state.materials?.length || 0}
+            </span>
             <span className="text-xs text-gray-400">tệp</span>
           </div>
         </div>
@@ -256,7 +265,12 @@ export const AssignmentTeacherPanel: React.FC<AssignmentTeacherPanelProps> = ({
           </div>
 
           <label className="min-h-[38px] px-3.5 py-1.5 bg-blue-50 text-blue-700 hover:bg-blue-100 border border-blue-200 rounded-lg text-xs font-bold flex items-center gap-1.5 transition-colors cursor-pointer shadow-xs">
-            <span>➕</span> {isUploadingMaterial ? 'Đang tải lên...' : state.materials && state.materials.length > 0 ? 'Phát thêm tài liệu' : 'Phát tài liệu cho học sinh'}
+            <span>➕</span>{' '}
+            {isUploadingMaterial
+              ? 'Đang tải lên...'
+              : state.materials && state.materials.length > 0
+                ? 'Phát thêm tài liệu'
+                : 'Phát tài liệu cho học sinh'}
             <input
               type="file"
               onChange={handleUploadMaterialFile}
@@ -318,11 +332,13 @@ export const AssignmentTeacherPanel: React.FC<AssignmentTeacherPanelProps> = ({
                 Chưa có tài liệu nào được phát cho học sinh
               </p>
               <p className="text-[11px] text-gray-500 mt-0.5">
-                Bấm nút bên dưới để chọn file đề bài, hình ảnh hoặc tài liệu mẫu gửi ngay xuống màn hình tất cả học sinh.
+                Bấm nút bên dưới để chọn file đề bài, hình ảnh hoặc tài liệu mẫu gửi ngay xuống màn
+                hình tất cả học sinh.
               </p>
             </div>
             <label className="min-h-[40px] px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-xs font-bold inline-flex items-center gap-1.5 cursor-pointer shadow-xs transition">
-              <span>➕</span> {isUploadingMaterial ? 'Đang tải lên...' : 'Chọn tệp phát cho học sinh'}
+              <span>➕</span>{' '}
+              {isUploadingMaterial ? 'Đang tải lên...' : 'Chọn tệp phát cho học sinh'}
               <input
                 type="file"
                 onChange={handleUploadMaterialFile}
@@ -356,7 +372,9 @@ export const AssignmentTeacherPanel: React.FC<AssignmentTeacherPanelProps> = ({
                 type="button"
                 onClick={() => setFilterStatus('submitted')}
                 className={`px-2.5 py-1 rounded-md font-medium transition-colors cursor-pointer ${
-                  filterStatus === 'submitted' ? 'bg-white text-gray-800 shadow-xs' : 'text-gray-500'
+                  filterStatus === 'submitted'
+                    ? 'bg-white text-gray-800 shadow-xs'
+                    : 'text-gray-500'
                 }`}
               >
                 Đã nộp ({submittedCount})
@@ -380,8 +398,12 @@ export const AssignmentTeacherPanel: React.FC<AssignmentTeacherPanelProps> = ({
           <div className="flex items-center gap-2">
             <span className="text-base">💡</span>
             <span>
-              <strong>Cách xem trước bài làm:</strong> Bấm trực tiếp vào <strong>Tên tệp</strong> hoặc nút{' '}
-              <span className="bg-blue-600 text-white px-2 py-0.5 rounded font-bold">👁️ Xem trước</span> ở cột Thao tác để xem ngay nội dung Word, Excel, PowerPoint, PDF, Ảnh.
+              <strong>Cách xem trước bài làm:</strong> Bấm trực tiếp vào <strong>Tên tệp</strong>{' '}
+              hoặc nút{' '}
+              <span className="bg-blue-600 text-white px-2 py-0.5 rounded font-bold">
+                👁️ Xem trước
+              </span>{' '}
+              ở cột Thao tác để xem ngay nội dung Word, Excel, PowerPoint, PDF, Ảnh.
             </span>
           </div>
           {state.targetDirectory && (
@@ -425,7 +447,10 @@ export const AssignmentTeacherPanel: React.FC<AssignmentTeacherPanelProps> = ({
                         {sub.status === 'late' ? 'Nộp trễ' : 'Đã nộp'}
                       </span>
                     </td>
-                    <td className="py-2.5 px-4 font-mono text-gray-700 truncate max-w-xs" title={sub.fileName}>
+                    <td
+                      className="py-2.5 px-4 font-mono text-gray-700 truncate max-w-xs"
+                      title={sub.fileName}
+                    >
                       <button
                         type="button"
                         onClick={() => {
@@ -485,7 +510,9 @@ export const AssignmentTeacherPanel: React.FC<AssignmentTeacherPanelProps> = ({
               ) : (
                 <tr>
                   <td colSpan={7} className="py-12 text-center text-gray-400 italic">
-                    {searchQuery ? 'Không tìm thấy học sinh nào phù hợp.' : 'Chưa có học sinh nào nộp bài.'}
+                    {searchQuery
+                      ? 'Không tìm thấy học sinh nào phù hợp.'
+                      : 'Chưa có học sinh nào nộp bài.'}
                   </td>
                 </tr>
               )}

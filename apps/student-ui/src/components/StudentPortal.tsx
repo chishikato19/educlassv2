@@ -44,13 +44,21 @@ export interface StudentPortalProps {
   onJoinSuccess?: ((data: StudentJoinResponse) => void) | undefined;
   onSessionClosed?: (() => void) | undefined;
   onRewardReceived?: ((reward: StudentRewardEvent) => void) | undefined;
-  onSendChatMessage?: ((payload: { content: string; toParticipantId?: string | null }) => Promise<void> | void) | undefined;
+  onSendChatMessage?:
+    | ((payload: { content: string; toParticipantId?: string | null }) => Promise<void> | void)
+    | undefined;
   onRequestHandRaise?: ((reason?: string) => Promise<void> | void) | undefined;
   customRosterFetcher?: ((code: string) => Promise<SessionRosterResponse>) | undefined;
   customJoinHandler?: ((req: StudentJoinRequest) => Promise<StudentJoinResponse>) | undefined;
   customResumeHandler?: ((token: string) => Promise<StudentJoinResponse>) | undefined;
-  customSummaryFetcher?: ((sessionId: string, participantId: string) => Promise<StudentSessionSummaryItem>) | undefined;
-  customWsListener?: ((onClosed: (reason?: string) => void, onReward?: (reward: StudentRewardEvent) => void) => () => void) | undefined;
+  customSummaryFetcher?:
+    ((sessionId: string, participantId: string) => Promise<StudentSessionSummaryItem>) | undefined;
+  customWsListener?:
+    | ((
+        onClosed: (reason?: string) => void,
+        onReward?: (reward: StudentRewardEvent) => void
+      ) => () => void)
+    | undefined;
 }
 
 type Step = 'code' | 'identity' | 'pin_team' | 'joined' | 'session_closed';
@@ -102,7 +110,9 @@ export const StudentPortal: React.FC<StudentPortalProps> = ({
 
   // Kết quả sau khi vào lớp
   const [joinResult, setJoinResult] = useState<StudentJoinResponse | null>(null);
-  const [lastParticipant, setLastParticipant] = useState<StudentJoinResponse['participant'] | null>(null);
+  const [lastParticipant, setLastParticipant] = useState<StudentJoinResponse['participant'] | null>(
+    null
+  );
 
   // Thông báo thưởng EXP realtime & Lịch sử nhận thưởng (Task 1.9 & Task 5.3)
   const [rewardNotification, setRewardNotification] = useState<StudentRewardEvent | null>(null);
@@ -180,7 +190,7 @@ export const StudentPortal: React.FC<StudentPortalProps> = ({
         text: payload.content,
         ts: Date.now(),
       };
-      setInternalChatMessages((prev) => [...prev, newMsg]);
+      setInternalChatMessages(prev => [...prev, newMsg]);
     }
   };
 
@@ -196,10 +206,12 @@ export const StudentPortal: React.FC<StudentPortalProps> = ({
         fromParticipantName: joinResult?.participant.displayName ?? 'Học sinh',
         toParticipantId: null,
         kind: 'hand_raise',
-        text: reason ? `Đã giơ tay xin trợ giúp: ${reason}` : 'Đã giơ tay xin trợ giúp từ giáo viên',
+        text: reason
+          ? `Đã giơ tay xin trợ giúp: ${reason}`
+          : 'Đã giơ tay xin trợ giúp từ giáo viên',
         ts: Date.now(),
       };
-      setInternalChatMessages((prev) => [...prev, handMsg]);
+      setInternalChatMessages(prev => [...prev, handMsg]);
     }
   };
 
@@ -281,11 +293,13 @@ export const StudentPortal: React.FC<StudentPortalProps> = ({
 
       if (s?.id && p?.id) {
         if (customSummaryFetcher) {
-          void customSummaryFetcher(s.id, p.id).then((sum) => setSessionSummary(sum)).catch(() => {});
+          void customSummaryFetcher(s.id, p.id)
+            .then(sum => setSessionSummary(sum))
+            .catch(() => {});
         } else if (apiBaseUrl) {
           void fetch(`${apiBaseUrl}/api/sessions/${s.id}/student-summary/${p.id}`)
-            .then((res) => res.json())
-            .then((json) => {
+            .then(res => res.json())
+            .then(json => {
               if (json && json.summary) {
                 setSessionSummary(json.summary);
               }
@@ -301,7 +315,7 @@ export const StudentPortal: React.FC<StudentPortalProps> = ({
 
     const handleReward = (reward: StudentRewardEvent) => {
       setRewardNotification(reward);
-      setRewardsHistory((prev) => [...prev, reward]);
+      setRewardsHistory(prev => [...prev, reward]);
       if (onRewardReceived) {
         onRewardReceived(reward);
       }
@@ -415,16 +429,18 @@ export const StudentPortal: React.FC<StudentPortalProps> = ({
     setErrorMsg(null);
 
     if (rosterData?.allowPairing) {
-      const isAlreadySelected = selectedStudents.some((s) => s.id === student.id);
+      const isAlreadySelected = selectedStudents.some(s => s.id === student.id);
       if (isAlreadySelected) {
-        setSelectedStudents((prev) => prev.filter((s) => s.id !== student.id));
+        setSelectedStudents(prev => prev.filter(s => s.id !== student.id));
       } else {
         const maxLimit = rosterData.maxStudentsPerDevice ?? 2;
         if (selectedStudents.length >= maxLimit) {
-          setErrorMsg(`Máy này chỉ được ghép tối đa ${maxLimit} bạn. Bạn có thể bỏ bớt bạn đã chọn trước đó.`);
+          setErrorMsg(
+            `Máy này chỉ được ghép tối đa ${maxLimit} bạn. Bạn có thể bỏ bớt bạn đã chọn trước đó.`
+          );
           return;
         }
-        setSelectedStudents((prev) => [...prev, student]);
+        setSelectedStudents(prev => [...prev, student]);
       }
       return;
     }
@@ -446,7 +462,7 @@ export const StudentPortal: React.FC<StudentPortalProps> = ({
   }
 
   function handleRemoveSelectedStudent(studentId: string) {
-    setSelectedStudents((prev) => prev.filter((s) => s.id !== studentId));
+    setSelectedStudents(prev => prev.filter(s => s.id !== studentId));
   }
 
   function handleProceedPairing() {
@@ -457,7 +473,7 @@ export const StudentPortal: React.FC<StudentPortalProps> = ({
     setErrorMsg(null);
     setIsGuestMode(false);
 
-    const hasAnyPin = selectedStudents.some((s) => s.hasPin);
+    const hasAnyPin = selectedStudents.some(s => s.hasPin);
     if (hasAnyPin || rosterData?.allowTeams) {
       setStep('pin_team');
     } else {
@@ -469,7 +485,7 @@ export const StudentPortal: React.FC<StudentPortalProps> = ({
       } else {
         void submitJoin({
           joinCode,
-          studentIds: selectedStudents.map((s) => s.id),
+          studentIds: selectedStudents.map(s => s.id),
         });
       }
     }
@@ -547,7 +563,7 @@ export const StudentPortal: React.FC<StudentPortalProps> = ({
     }
 
     if (selectedStudents.length > 1) {
-      const pinRequiredStudents = selectedStudents.filter((s) => s.hasPin);
+      const pinRequiredStudents = selectedStudents.filter(s => s.hasPin);
       for (const s of pinRequiredStudents) {
         if (!pins[s.id]?.trim()) {
           setErrorMsg(`Vui lòng nhập mã PIN cho bạn ${s.fullName}.`);
@@ -557,7 +573,7 @@ export const StudentPortal: React.FC<StudentPortalProps> = ({
 
       const payload: StudentJoinRequest = {
         joinCode,
-        studentIds: selectedStudents.map((s) => s.id),
+        studentIds: selectedStudents.map(s => s.id),
         ...(pinRequiredStudents.length > 0 ? { pins } : {}),
         ...(teamName.trim() ? { teamName: teamName.trim() } : {}),
       };
@@ -600,20 +616,26 @@ export const StudentPortal: React.FC<StudentPortalProps> = ({
     sessionCode: joinResult?.session.joinCode || joinCode || '123456',
     participantId: joinResult?.participant.id || lastParticipant?.id || 'part_me',
     studentId: joinResult?.participant.studentId || lastParticipant?.studentId || null,
-    displayName: joinResult?.participant.displayName || lastParticipant?.displayName || nickname || 'Học sinh',
-    identityLevel: (joinResult?.participant.identityLevel || lastParticipant?.identityLevel || (isGuestMode ? 'guest' : 'roster')) as 'roster' | 'account' | 'guest',
+    displayName:
+      joinResult?.participant.displayName || lastParticipant?.displayName || nickname || 'Học sinh',
+    identityLevel: (joinResult?.participant.identityLevel ||
+      lastParticipant?.identityLevel ||
+      (isGuestMode ? 'guest' : 'roster')) as 'roster' | 'account' | 'guest',
     teamName: joinResult?.participant.teamName || lastParticipant?.teamName || teamName || null,
     totalExpEarned: rewardsHistory.reduce((acc, r) => acc + (r.exp || 0), 0),
-    persistedExp: (joinResult?.participant.identityLevel || lastParticipant?.identityLevel) === 'account',
+    persistedExp:
+      (joinResult?.participant.identityLevel || lastParticipant?.identityLevel) === 'account',
     currentLevel:
-      rewardsHistory.length > 0 && typeof rewardsHistory[rewardsHistory.length - 1]?.newLevel === 'number'
+      rewardsHistory.length > 0 &&
+      typeof rewardsHistory[rewardsHistory.length - 1]?.newLevel === 'number'
         ? (rewardsHistory[rewardsHistory.length - 1]!.newLevel as number)
         : 1,
     totalAccumulatedExp:
-      rewardsHistory.length > 0 && typeof rewardsHistory[rewardsHistory.length - 1]?.newTotalExp === 'number'
+      rewardsHistory.length > 0 &&
+      typeof rewardsHistory[rewardsHistory.length - 1]?.newTotalExp === 'number'
         ? (rewardsHistory[rewardsHistory.length - 1]!.newTotalExp as number)
         : 0,
-    leveledUp: rewardsHistory.some((r) => Boolean(r.leveledUp)),
+    leveledUp: rewardsHistory.some(r => Boolean(r.leveledUp)),
     expBreakdown: rewardsHistory.map((r, i) => ({
       exp: r.exp,
       reason: r.reason || 'Điểm thưởng trong lớp',
@@ -621,7 +643,10 @@ export const StudentPortal: React.FC<StudentPortalProps> = ({
     })),
     newTitlesAwarded: [],
     avatar: undefined,
-    reminderPinLogin: (joinResult?.participant.identityLevel || lastParticipant?.identityLevel || (isGuestMode ? 'guest' : 'roster')) !== 'account',
+    reminderPinLogin:
+      (joinResult?.participant.identityLevel ||
+        lastParticipant?.identityLevel ||
+        (isGuestMode ? 'guest' : 'roster')) !== 'account',
   };
 
   const containerStyle: React.CSSProperties = {
@@ -650,13 +675,16 @@ export const StudentPortal: React.FC<StudentPortalProps> = ({
             </div>
           )}
 
-          <form onSubmit={handleCodeSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+          <form
+            onSubmit={handleCodeSubmit}
+            style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}
+          >
             <Input
               label="Mã vào lớp (6 số)"
               placeholder="VD: 123456"
               maxLength={6}
               value={joinCode}
-              onChange={(e) => setJoinCode(e.target.value.replace(/\D/g, ''))}
+              onChange={e => setJoinCode(e.target.value.replace(/\D/g, ''))}
               inputMode="numeric"
               autoFocus
               data-testid="input-join-code"
@@ -686,7 +714,11 @@ export const StudentPortal: React.FC<StudentPortalProps> = ({
                 type="warning"
                 message={errorMsg}
                 actionText={errorMsg.includes('Báo thầy/cô') ? 'Báo GV' : undefined}
-                onAction={errorMsg.includes('Báo thầy/cô') ? () => setShowTeacherReportModal(true) : undefined}
+                onAction={
+                  errorMsg.includes('Báo thầy/cô')
+                    ? () => setShowTeacherReportModal(true)
+                    : undefined
+                }
               />
             </div>
           )}
@@ -760,7 +792,8 @@ export const StudentPortal: React.FC<StudentPortalProps> = ({
                 >
                   <span>👥</span>
                   <span>
-                    Phiên học cho phép <strong>{rosterData.maxStudentsPerDevice ?? 2} bạn</strong> ngồi chung máy. Hãy chọn tên các bạn ngồi cùng.
+                    Phiên học cho phép <strong>{rosterData.maxStudentsPerDevice ?? 2} bạn</strong>{' '}
+                    ngồi chung máy. Hãy chọn tên các bạn ngồi cùng.
                   </span>
                 </div>
               )}
@@ -778,9 +811,16 @@ export const StudentPortal: React.FC<StudentPortalProps> = ({
                   }}
                   data-testid="selected-chips-tray"
                 >
-                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                  <div
+                    style={{
+                      display: 'flex',
+                      justifyContent: 'space-between',
+                      alignItems: 'center',
+                    }}
+                  >
                     <span style={{ fontSize: '13px', fontWeight: 700, color: '#1E40AF' }}>
-                      Đã chọn ({selectedStudents.length}/{rosterData.maxStudentsPerDevice ?? 2} bạn):
+                      Đã chọn ({selectedStudents.length}/{rosterData.maxStudentsPerDevice ?? 2}{' '}
+                      bạn):
                     </span>
                     <button
                       type="button"
@@ -800,7 +840,7 @@ export const StudentPortal: React.FC<StudentPortalProps> = ({
                   </div>
 
                   <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px' }}>
-                    {selectedStudents.map((s) => (
+                    {selectedStudents.map(s => (
                       <span
                         key={s.id}
                         style={{
@@ -846,7 +886,7 @@ export const StudentPortal: React.FC<StudentPortalProps> = ({
                     data-testid="btn-proceed-pairing"
                     style={{ marginTop: '4px' }}
                   >
-                    {`Vào lớp cho ${selectedStudents.length} bạn (${selectedStudents.map((s) => s.fullName).join(' & ')}) →`}
+                    {`Vào lớp cho ${selectedStudents.length} bạn (${selectedStudents.map(s => s.fullName).join(' & ')}) →`}
                   </Button>
                 </div>
               )}
@@ -872,11 +912,11 @@ export const StudentPortal: React.FC<StudentPortalProps> = ({
                     Lớp chưa có học sinh nào.
                   </div>
                 ) : (
-                  rosterData.students.map((student) => {
+                  rosterData.students.map(student => {
                     const isTaken = student.isTaken;
                     const isCompleted = Boolean(student.isCompletedExam);
                     const isDisabled = isTaken || isCompleted;
-                    const isSelected = selectedStudents.some((s) => s.id === student.id);
+                    const isSelected = selectedStudents.some(s => s.id === student.id);
 
                     let bg: string = '#FFFFFF';
                     let borderColor: string = UI_COLORS.border;
@@ -916,7 +956,7 @@ export const StudentPortal: React.FC<StudentPortalProps> = ({
                           fontWeight: 600,
                           textAlign: 'left',
                           transition: 'all 150ms ease',
-                          opacity: isTaken ? 0.6 : (isCompleted ? 0.85 : 1),
+                          opacity: isTaken ? 0.6 : isCompleted ? 0.85 : 1,
                         }}
                         data-testid={`student-item-${student.id}`}
                       >
@@ -942,7 +982,9 @@ export const StudentPortal: React.FC<StudentPortalProps> = ({
                             ✓ Đã hoàn thành
                           </span>
                         ) : isTaken ? (
-                          <span style={{ fontSize: '12px', color: UI_COLORS.error, fontWeight: 500 }}>
+                          <span
+                            style={{ fontSize: '12px', color: UI_COLORS.error, fontWeight: 500 }}
+                          >
                             Đang dùng
                           </span>
                         ) : isSelected ? (
@@ -960,7 +1002,9 @@ export const StudentPortal: React.FC<StudentPortalProps> = ({
                             ✓ Đã chọn
                           </span>
                         ) : rosterData.allowPairing ? (
-                          <span style={{ fontSize: '14px', color: UI_COLORS.primary }}>+ Ghép bạn</span>
+                          <span style={{ fontSize: '14px', color: UI_COLORS.primary }}>
+                            + Ghép bạn
+                          </span>
                         ) : (
                           <span style={{ fontSize: '14px', color: UI_COLORS.primary }}>Chọn →</span>
                         )}
@@ -973,16 +1017,25 @@ export const StudentPortal: React.FC<StudentPortalProps> = ({
           )}
 
           {isGuestMode && (
-            <form onSubmit={handleGuestSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+            <form
+              onSubmit={handleGuestSubmit}
+              style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}
+            >
               <Input
                 label="Họ và tên hoặc biệt danh của bạn"
                 placeholder="VD: Minh Khang"
                 value={nickname}
-                onChange={(e) => setNickname(e.target.value)}
+                onChange={e => setNickname(e.target.value)}
                 autoFocus
                 data-testid="input-guest-name"
               />
-              <Button type="submit" variant="primary" fullWidth loading={loading} data-testid="btn-submit-guest">
+              <Button
+                type="submit"
+                variant="primary"
+                fullWidth
+                loading={loading}
+                data-testid="btn-submit-guest"
+              >
                 Tiếp tục
               </Button>
             </form>
@@ -1016,7 +1069,7 @@ export const StudentPortal: React.FC<StudentPortalProps> = ({
           title="Xác nhận & Vào lớp"
           subtitle={
             selectedStudents.length > 1
-              ? `Ghép ${selectedStudents.length} bạn: ${selectedStudents.map((s) => s.fullName).join(' & ')}`
+              ? `Ghép ${selectedStudents.length} bạn: ${selectedStudents.map(s => s.fullName).join(' & ')}`
               : `Học sinh: ${selectedStudents[0]?.fullName || selectedStudent?.fullName || nickname}`
           }
         >
@@ -1026,47 +1079,48 @@ export const StudentPortal: React.FC<StudentPortalProps> = ({
             </div>
           )}
 
-          <form onSubmit={handlePinTeamSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-            {selectedStudents.length > 1 ? (
-              selectedStudents
-                .filter((s) => s.hasPin)
-                .map((s) => (
+          <form
+            onSubmit={handlePinTeamSubmit}
+            style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}
+          >
+            {selectedStudents.length > 1
+              ? selectedStudents
+                  .filter(s => s.hasPin)
+                  .map(s => (
+                    <Input
+                      key={s.id}
+                      type="password"
+                      label={`Mã PIN của ${s.fullName} (4-6 số)`}
+                      placeholder="••••"
+                      maxLength={6}
+                      value={pins[s.id] || ''}
+                      onChange={e => {
+                        const val = e.target.value;
+                        setPins(prev => ({ ...prev, [s.id]: val }));
+                      }}
+                      autoFocus={selectedStudents.filter(s => s.hasPin)[0]?.id === s.id}
+                      data-testid={`input-pin-${s.id}`}
+                    />
+                  ))
+              : (selectedStudents[0]?.hasPin || selectedStudent?.hasPin) && (
                   <Input
-                    key={s.id}
                     type="password"
-                    label={`Mã PIN của ${s.fullName} (4-6 số)`}
+                    label="Mã PIN của bạn (4-6 số)"
                     placeholder="••••"
                     maxLength={6}
-                    value={pins[s.id] || ''}
-                    onChange={(e) => {
-                      const val = e.target.value;
-                      setPins((prev) => ({ ...prev, [s.id]: val }));
-                    }}
-                    autoFocus={selectedStudents.filter((s) => s.hasPin)[0]?.id === s.id}
-                    data-testid={`input-pin-${s.id}`}
+                    value={pin}
+                    onChange={e => setPin(e.target.value)}
+                    autoFocus
+                    data-testid="input-pin"
                   />
-                ))
-            ) : (
-              (selectedStudents[0]?.hasPin || selectedStudent?.hasPin) && (
-                <Input
-                  type="password"
-                  label="Mã PIN của bạn (4-6 số)"
-                  placeholder="••••"
-                  maxLength={6}
-                  value={pin}
-                  onChange={(e) => setPin(e.target.value)}
-                  autoFocus
-                  data-testid="input-pin"
-                />
-              )
-            )}
+                )}
 
             {rosterData?.allowTeams && (
               <Input
                 label="Tên đội / nhóm (2–3 học sinh)"
                 placeholder="VD: Nhóm 1, Siêu Nhân..."
                 value={teamName}
-                onChange={(e) => setTeamName(e.target.value)}
+                onChange={e => setTeamName(e.target.value)}
                 helperText="Nếu bạn làm việc theo nhóm, hãy nhập cùng tên nhóm với bạn mình."
                 data-testid="input-team-name"
               />
@@ -1106,10 +1160,10 @@ export const StudentPortal: React.FC<StudentPortalProps> = ({
           title="🎉 Chào mừng bạn vào lớp!"
           subtitle={`Phòng học #${joinResult.session.joinCode}`}
         >
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '16px', textAlign: 'center' }}>
-            {avatarToast && (
-              <Banner type="success" message={avatarToast} />
-            )}
+          <div
+            style={{ display: 'flex', flexDirection: 'column', gap: '16px', textAlign: 'center' }}
+          >
+            {avatarToast && <Banner type="success" message={avatarToast} />}
 
             <div
               style={{
@@ -1129,7 +1183,9 @@ export const StudentPortal: React.FC<StudentPortalProps> = ({
                 <div style={{ fontSize: '20px', fontWeight: 700, color: UI_COLORS.text }}>
                   {joinResult.participant.displayName}
                 </div>
-                {Boolean(joinResult.participant.studentIds && joinResult.participant.studentIds.length > 1) && (
+                {Boolean(
+                  joinResult.participant.studentIds && joinResult.participant.studentIds.length > 1
+                ) && (
                   <div
                     style={{
                       marginTop: '6px',
@@ -1150,8 +1206,10 @@ export const StudentPortal: React.FC<StudentPortalProps> = ({
                   </div>
                 )}
                 <div style={{ fontSize: '14px', color: UI_COLORS.textMuted, marginTop: '2px' }}>
-                  {joinResult.participant.identityLevel === 'account' && '⭐ Học sinh có tài khoản (Được lưu EXP)'}
-                  {joinResult.participant.identityLevel === 'roster' && '📋 Học sinh trong danh sách (Không lưu EXP)'}
+                  {joinResult.participant.identityLevel === 'account' &&
+                    '⭐ Học sinh có tài khoản (Được lưu EXP)'}
+                  {joinResult.participant.identityLevel === 'roster' &&
+                    '📋 Học sinh trong danh sách (Không lưu EXP)'}
                   {joinResult.participant.identityLevel === 'guest' && '👤 Khách tự do'}
                 </div>
                 {joinResult.participant.teamName && (
@@ -1186,10 +1244,19 @@ export const StudentPortal: React.FC<StudentPortalProps> = ({
                 }}
                 data-testid="reward-notification-banner"
               >
-                <div style={{ fontSize: '16px', fontWeight: 700, display: 'flex', alignItems: 'center', gap: '6px' }}>
+                <div
+                  style={{
+                    fontSize: '16px',
+                    fontWeight: 700,
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '6px',
+                  }}
+                >
                   <span>🎁</span>
                   <span>
-                    {joinResult.participant.studentIds && joinResult.participant.studentIds.length > 1
+                    {joinResult.participant.studentIds &&
+                    joinResult.participant.studentIds.length > 1
                       ? `Thưởng +${rewardNotification.exp} EXP cho cả nhóm (${joinResult.participant.displayName})!`
                       : `Bạn vừa được thưởng +${rewardNotification.exp} EXP!`}
                   </span>
@@ -1199,13 +1266,16 @@ export const StudentPortal: React.FC<StudentPortalProps> = ({
                 </div>
                 <div style={{ fontSize: '13px', fontWeight: 600 }}>
                   {rewardNotification.persisted ? (
-                    joinResult.participant.studentIds && joinResult.participant.studentIds.length > 1 ? (
+                    joinResult.participant.studentIds &&
+                    joinResult.participant.studentIds.length > 1 ? (
                       <span style={{ color: UI_COLORS.success }}>
-                        🚀 Cả {joinResult.participant.studentIds.length} bạn đều được lưu EXP vĩnh viễn vào tài khoản cá nhân!
+                        🚀 Cả {joinResult.participant.studentIds.length} bạn đều được lưu EXP vĩnh
+                        viễn vào tài khoản cá nhân!
                       </span>
                     ) : rewardNotification.leveledUp ? (
                       <span style={{ color: UI_COLORS.success }}>
-                        🚀 Lên Level {rewardNotification.newLevel}! (Tổng: {rewardNotification.newTotalExp} EXP)
+                        🚀 Lên Level {rewardNotification.newLevel}! (Tổng:{' '}
+                        {rewardNotification.newTotalExp} EXP)
                       </span>
                     ) : (
                       <span>Tổng tích lũy: {rewardNotification.newTotalExp} EXP</span>
@@ -1341,14 +1411,19 @@ export const StudentPortal: React.FC<StudentPortalProps> = ({
         onClose={() => setShowChatModal(false)}
         title="💬 Trò chuyện & ✋ Xin giúp"
       >
-        <div style={{ height: '480px', display: 'flex', flexDirection: 'column' }} data-testid="student-chat-modal">
+        <div
+          style={{ height: '480px', display: 'flex', flexDirection: 'column' }}
+          data-testid="student-chat-modal"
+        >
           <ChatBox
             role="student"
             currentParticipantId={joinResult?.participant.id}
             currentUserName={joinResult?.participant.displayName}
             messages={messages}
             chatLocked={locked}
-            onSendMessage={(content, toPartId) => void handleSendChat({ content, toParticipantId: toPartId ?? null })}
+            onSendMessage={(content, toPartId) =>
+              void handleSendChat({ content, toParticipantId: toPartId ?? null })
+            }
             onHandRaise={handleRequestHandRaise}
           />
         </div>

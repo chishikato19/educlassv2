@@ -11,7 +11,11 @@ import {
   UpdateQuestionSetRequestSchema,
   type EduclassPackage,
 } from '@educlass/protocol';
-import { QuestionSchema, parseWordDocx, generateStandardExamTemplateDocx } from '@educlass/question-kit';
+import {
+  QuestionSchema,
+  parseWordDocx,
+  generateStandardExamTemplateDocx,
+} from '@educlass/question-kit';
 import type { AuthService } from '../auth/auth-service.js';
 import { createOwnerGuard } from '../auth/owner-guard.js';
 import { createAuthenticateHook } from '../auth/plugin.js';
@@ -80,7 +84,7 @@ function extractHashesFromObject(obj: unknown, hashes: Set<string>): void {
  * Trích xuất toàn bộ các mã hash SHA-256 của ảnh từ danh sách câu hỏi trong database
  */
 function extractAssetHashesFromQuestions(
-  rawQuestions: Array<{ contentJson: string; answerJson: string }>,
+  rawQuestions: Array<{ contentJson: string; answerJson: string }>
 ): string[] {
   const hashes = new Set<string>();
   const hexRegex = /[a-f0-9]{64}/gi;
@@ -110,7 +114,7 @@ async function cleanupOrphanAssets(
   hashes: string[],
   questionSetRepo: QuestionSetRepository,
   assetRepo: AssetRepository,
-  assetsDir: string,
+  assetsDir: string
 ): Promise<string[]> {
   const cleaned: string[] = [];
   for (const hash of hashes) {
@@ -158,7 +162,7 @@ async function cleanupOrphanAssets(
 async function processInlineBase64Images(
   rawQuestions: unknown[],
   assetsDir: string,
-  assetRepo: AssetRepository,
+  assetRepo: AssetRepository
 ): Promise<unknown[]> {
   const saveBase64 = async (dataUrl: string): Promise<string | null> => {
     const match = dataUrl.match(/^data:([a-zA-Z0-9/+-]+);base64,(.+)$/);
@@ -326,16 +330,18 @@ function transformQuestionsForDb(rawQuestions: unknown[]): Array<{
   return result;
 }
 
-function restoreQuestionsFromDb(rawQuestions: Array<{
-  id: string;
-  setId?: string;
-  orderIndex?: number;
-  type: string;
-  contentJson: string;
-  answerJson: string;
-  points: number;
-}>): unknown[] {
-  return rawQuestions.map((q) => {
+function restoreQuestionsFromDb(
+  rawQuestions: Array<{
+    id: string;
+    setId?: string;
+    orderIndex?: number;
+    type: string;
+    contentJson: string;
+    answerJson: string;
+    points: number;
+  }>
+): unknown[] {
+  return rawQuestions.map(q => {
     let content: Record<string, unknown> = {};
     let answer: Record<string, unknown> = {};
     try {
@@ -361,7 +367,7 @@ function restoreQuestionsFromDb(rawQuestions: Array<{
 
 export const questionSetsRoutes: FastifyPluginAsync<QuestionSetsRoutesOptions> = async (
   fastify,
-  options,
+  options
 ) => {
   const { authService, questionSetRepo, assetRepo } = options;
   const authenticate = createAuthenticateHook(authService);
@@ -371,7 +377,7 @@ export const questionSetsRoutes: FastifyPluginAsync<QuestionSetsRoutesOptions> =
     fs.mkdirSync(assetsDir, { recursive: true });
   }
 
-  const questionSetOwnerGuard = createOwnerGuard(authService, async (request) => {
+  const questionSetOwnerGuard = createOwnerGuard(authService, async request => {
     const { id } = request.params as { id: string };
     return questionSetRepo.findById(id);
   });
@@ -431,7 +437,7 @@ export const questionSetsRoutes: FastifyPluginAsync<QuestionSetsRoutesOptions> =
         error: formatProtocolError(
           'INVALID_PAYLOAD',
           parseResult.error.errors[0]?.message ?? 'Dữ liệu tạo bộ đề không hợp lệ',
-          parseResult.error.format(),
+          parseResult.error.format()
         ),
       });
     }
@@ -441,13 +447,11 @@ export const questionSetsRoutes: FastifyPluginAsync<QuestionSetsRoutesOptions> =
       rawQuestions = (await processInlineBase64Images(
         rawQuestions,
         assetsDir,
-        assetRepo,
+        assetRepo
       )) as typeof rawQuestions;
     }
 
-    const questionsToInsert = rawQuestions
-      ? transformQuestionsForDb(rawQuestions)
-      : undefined;
+    const questionsToInsert = rawQuestions ? transformQuestionsForDb(rawQuestions) : undefined;
 
     const createPayload: Parameters<typeof questionSetRepo.create>[0] = {
       ownerId: request.user!.id,
@@ -471,90 +475,94 @@ export const questionSetsRoutes: FastifyPluginAsync<QuestionSetsRoutesOptions> =
    * POST /api/question-sets/import
    * Nhập bộ câu hỏi từ file .educlass
    */
-  fastify.post('/api/question-sets/import', { preHandler: authenticate }, async (request, reply) => {
-    const parseResult = EduclassPackageSchema.safeParse(request.body);
-    if (!parseResult.success) {
-      return reply.status(400).send({
-        error: formatProtocolError(
-          'INVALID_PAYLOAD',
-          parseResult.error.errors[0]?.message ?? 'Gói file .educlass không hợp lệ',
-          parseResult.error.format(),
-        ),
-      });
-    }
+  fastify.post(
+    '/api/question-sets/import',
+    { preHandler: authenticate },
+    async (request, reply) => {
+      const parseResult = EduclassPackageSchema.safeParse(request.body);
+      if (!parseResult.success) {
+        return reply.status(400).send({
+          error: formatProtocolError(
+            'INVALID_PAYLOAD',
+            parseResult.error.errors[0]?.message ?? 'Gói file .educlass không hợp lệ',
+            parseResult.error.format()
+          ),
+        });
+      }
 
-    const pkg = parseResult.data;
+      const pkg = parseResult.data;
 
-    // 1. Nhập và lưu trữ các assets đính kèm vào kho CAS
-    if (pkg.assets && pkg.assets.length > 0) {
-      for (const asset of pkg.assets) {
-        try {
-          const buffer = Buffer.from(asset.base64, 'base64');
-          const computedHash = createHash('sha256').update(buffer).digest('hex');
-          const ext = getExtensionForMime(asset.mime);
-          const fileName = `${computedHash}.${ext}`;
-          const filePath = path.join(assetsDir, fileName);
+      // 1. Nhập và lưu trữ các assets đính kèm vào kho CAS
+      if (pkg.assets && pkg.assets.length > 0) {
+        for (const asset of pkg.assets) {
+          try {
+            const buffer = Buffer.from(asset.base64, 'base64');
+            const computedHash = createHash('sha256').update(buffer).digest('hex');
+            const ext = getExtensionForMime(asset.mime);
+            const fileName = `${computedHash}.${ext}`;
+            const filePath = path.join(assetsDir, fileName);
 
-          if (!fs.existsSync(filePath)) {
-            fs.writeFileSync(filePath, buffer);
+            if (!fs.existsSync(filePath)) {
+              fs.writeFileSync(filePath, buffer);
+            }
+
+            await assetRepo.findOrCreate({
+              sha256: computedHash,
+              mime: asset.mime,
+              path: filePath,
+              size: buffer.length,
+            });
+          } catch {
+            // Bỏ qua lỗi asset đơn lẻ để đảm bảo import không gãy hoàn toàn
           }
-
-          await assetRepo.findOrCreate({
-            sha256: computedHash,
-            mime: asset.mime,
-            path: filePath,
-            size: buffer.length,
-          });
-        } catch {
-          // Bỏ qua lỗi asset đơn lẻ để đảm bảo import không gãy hoàn toàn
         }
       }
+
+      // 2. Chuyển đổi và tạo bộ đề mới
+      const questionsToInsert = pkg.questions.map(q => {
+        const type = (q['type'] as 'mcq4' | 'tf' | 'tf_group' | 'short') ?? 'mcq4';
+        const points = typeof q['points'] === 'number' ? q['points'] : 10;
+
+        // Tách content và answer
+        const {
+          id: _id,
+          type: _type,
+          points: _points,
+          correct,
+          accepted,
+          scale,
+          explanation,
+          ...contentRest
+        } = q;
+
+        const answerObj: Record<string, unknown> = {};
+        if (correct !== undefined) answerObj['correct'] = correct;
+        if (accepted !== undefined) answerObj['accepted'] = accepted;
+        if (scale !== undefined) answerObj['scale'] = scale;
+        if (explanation !== undefined) answerObj['explanation'] = explanation;
+
+        return {
+          type,
+          contentJson: JSON.stringify(contentRest),
+          answerJson: JSON.stringify(answerObj),
+          points,
+        };
+      });
+
+      const newSet = await questionSetRepo.create({
+        ownerId: request.user!.id,
+        title: pkg.questionSet.title,
+        subject: pkg.questionSet.subject,
+        grade: pkg.questionSet.grade,
+        tags: pkg.questionSet.tags,
+        questions: questionsToInsert,
+      });
+
+      return reply.status(201).send({
+        questionSet: newSet,
+      });
     }
-
-    // 2. Chuyển đổi và tạo bộ đề mới
-    const questionsToInsert = pkg.questions.map((q) => {
-      const type = (q['type'] as 'mcq4' | 'tf' | 'tf_group' | 'short') ?? 'mcq4';
-      const points = typeof q['points'] === 'number' ? q['points'] : 10;
-
-      // Tách content và answer
-      const {
-        id: _id,
-        type: _type,
-        points: _points,
-        correct,
-        accepted,
-        scale,
-        explanation,
-        ...contentRest
-      } = q;
-
-      const answerObj: Record<string, unknown> = {};
-      if (correct !== undefined) answerObj['correct'] = correct;
-      if (accepted !== undefined) answerObj['accepted'] = accepted;
-      if (scale !== undefined) answerObj['scale'] = scale;
-      if (explanation !== undefined) answerObj['explanation'] = explanation;
-
-      return {
-        type,
-        contentJson: JSON.stringify(contentRest),
-        answerJson: JSON.stringify(answerObj),
-        points,
-      };
-    });
-
-    const newSet = await questionSetRepo.create({
-      ownerId: request.user!.id,
-      title: pkg.questionSet.title,
-      subject: pkg.questionSet.subject,
-      grade: pkg.questionSet.grade,
-      tags: pkg.questionSet.tags,
-      questions: questionsToInsert,
-    });
-
-    return reply.status(201).send({
-      questionSet: newSet,
-    });
-  });
+  );
 
   /**
    * GET /api/question-sets/:id
@@ -579,7 +587,7 @@ export const questionSetsRoutes: FastifyPluginAsync<QuestionSetsRoutesOptions> =
         },
         questions: restored,
       });
-    },
+    }
   );
 
   /**
@@ -597,7 +605,7 @@ export const questionSetsRoutes: FastifyPluginAsync<QuestionSetsRoutesOptions> =
           error: formatProtocolError(
             'INVALID_PAYLOAD',
             parseResult.error.errors[0]?.message ?? 'Dữ liệu cập nhật bộ đề không hợp lệ',
-            parseResult.error.format(),
+            parseResult.error.format()
           ),
         });
       }
@@ -611,7 +619,7 @@ export const questionSetsRoutes: FastifyPluginAsync<QuestionSetsRoutesOptions> =
         const processedQuestions = (await processInlineBase64Images(
           parseResult.data.questions,
           assetsDir,
-          assetRepo,
+          assetRepo
         )) as Array<Record<string, unknown>>;
 
         const questionsToUpdate = transformQuestionsForDb(processedQuestions);
@@ -627,7 +635,7 @@ export const questionSetsRoutes: FastifyPluginAsync<QuestionSetsRoutesOptions> =
       return reply.status(200).send({
         questionSet: updated,
       });
-    },
+    }
   );
 
   /**
@@ -654,7 +662,7 @@ export const questionSetsRoutes: FastifyPluginAsync<QuestionSetsRoutesOptions> =
       const rawQuestions = (await processInlineBase64Images(
         body.questions,
         assetsDir,
-        assetRepo,
+        assetRepo
       )) as unknown[];
 
       const questionsToUpdate = [];
@@ -669,7 +677,7 @@ export const questionSetsRoutes: FastifyPluginAsync<QuestionSetsRoutesOptions> =
             error: formatProtocolError(
               'INVALID_PAYLOAD',
               `Câu hỏi không đúng định dạng: ${parsed.error.errors[0]?.message}`,
-              parsed.error.format(),
+              parsed.error.format()
             ),
           });
         }
@@ -709,32 +717,36 @@ export const questionSetsRoutes: FastifyPluginAsync<QuestionSetsRoutesOptions> =
       return reply.status(200).send({
         questions: result,
       });
-    },
+    }
   );
 
   /**
    * POST /api/question-sets/:id/clone
    * Nhân bản bộ câu hỏi cho giáo viên đang đăng nhập
    */
-  fastify.post('/api/question-sets/:id/clone', { preHandler: authenticate }, async (request, reply) => {
-    const { id } = request.params as { id: string };
-    const body = (request.body as { title?: string }) ?? {};
+  fastify.post(
+    '/api/question-sets/:id/clone',
+    { preHandler: authenticate },
+    async (request, reply) => {
+      const { id } = request.params as { id: string };
+      const body = (request.body as { title?: string }) ?? {};
 
-    const original = await questionSetRepo.findById(id);
-    if (!original) {
-      return reply.status(404).send({
-        error: formatProtocolError('QUESTION_SET_NOT_FOUND', 'Không tìm thấy bộ đề để nhân bản'),
+      const original = await questionSetRepo.findById(id);
+      if (!original) {
+        return reply.status(404).send({
+          error: formatProtocolError('QUESTION_SET_NOT_FOUND', 'Không tìm thấy bộ đề để nhân bản'),
+        });
+      }
+
+      const cloned = await questionSetRepo.clone(id, request.user!.id, {
+        newTitle: body.title,
+      });
+
+      return reply.status(201).send({
+        questionSet: cloned,
       });
     }
-
-    const cloned = await questionSetRepo.clone(id, request.user!.id, {
-      newTitle: body.title,
-    });
-
-    return reply.status(201).send({
-      questionSet: cloned,
-    });
-  });
+  );
 
   /**
    * GET /api/question-sets/:id/export
@@ -753,7 +765,7 @@ export const questionSetsRoutes: FastifyPluginAsync<QuestionSetsRoutesOptions> =
       }
 
       const hashes = new Set<string>();
-      const restoredQuestions = set.questions.map((q) => {
+      const restoredQuestions = set.questions.map(q => {
         let content = {};
         let answer = {};
         try {
@@ -784,9 +796,10 @@ export const questionSetsRoutes: FastifyPluginAsync<QuestionSetsRoutesOptions> =
       for (const hash of hashes) {
         const assetRec = await assetRepo.findBySha256(hash);
         if (assetRec) {
-          const filePath = assetRec.path && fs.existsSync(assetRec.path)
-            ? assetRec.path
-            : path.join(assetsDir, `${hash}.${getExtensionForMime(assetRec.mime)}`);
+          const filePath =
+            assetRec.path && fs.existsSync(assetRec.path)
+              ? assetRec.path
+              : path.join(assetsDir, `${hash}.${getExtensionForMime(assetRec.mime)}`);
           if (fs.existsSync(filePath)) {
             const buf = fs.readFileSync(filePath);
             assetsList.push({
@@ -814,12 +827,12 @@ export const questionSetsRoutes: FastifyPluginAsync<QuestionSetsRoutesOptions> =
 
       reply.header(
         'Content-Disposition',
-        `attachment; filename="${encodeURIComponent(set.title)}.educlass"`,
+        `attachment; filename="${encodeURIComponent(set.title)}.educlass"`
       );
       reply.header('Content-Type', 'application/json');
 
       return reply.status(200).send(educlassPackage);
-    },
+    }
   );
 
   /**
@@ -827,7 +840,10 @@ export const questionSetsRoutes: FastifyPluginAsync<QuestionSetsRoutesOptions> =
    * Tải về tập tin Word mẫu chuẩn để giáo viên soạn đề
    */
   fastify.get('/api/question-sets/templates/word', async (_request, reply) => {
-    const fixturePath = path.resolve(process.cwd(), 'tests/fixtures/word-samples/de-thi-mau-educlass.docx');
+    const fixturePath = path.resolve(
+      process.cwd(),
+      'tests/fixtures/word-samples/de-thi-mau-educlass.docx'
+    );
     let buffer: Buffer;
 
     if (fs.existsSync(fixturePath)) {
@@ -838,7 +854,7 @@ export const questionSetsRoutes: FastifyPluginAsync<QuestionSetsRoutesOptions> =
 
     reply.header(
       'Content-Type',
-      'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+      'application/vnd.openxmlformats-officedocument.wordprocessingml.document'
     );
     reply.header('Content-Disposition', 'attachment; filename="de-thi-mau-educlass.docx"');
     return reply.status(200).send(buffer);
@@ -848,60 +864,64 @@ export const questionSetsRoutes: FastifyPluginAsync<QuestionSetsRoutesOptions> =
    * POST /api/question-sets/import-word
    * Phân tích tập tin Word (.docx) và trích xuất câu hỏi, công thức toán LaTeX, hình ảnh CAS
    */
-  fastify.post('/api/question-sets/import-word', { preHandler: authenticate }, async (request, reply) => {
-    const body = request.body as { base64?: string };
-    if (!body || !body.base64 || typeof body.base64 !== 'string') {
-      return reply.status(400).send({
-        error: formatProtocolError('INVALID_PAYLOAD', 'Dữ liệu tập tin Word base64 không hợp lệ'),
-      });
-    }
-
-    try {
-      const buffer = Buffer.from(body.base64, 'base64');
-      const parseResult = await parseWordDocx(buffer);
-
-      // Lưu trữ các assets ảnh trích xuất được vào kho CAS nếu có
-      for (const asset of parseResult.assets) {
-        try {
-          const imgBuf = Buffer.from(asset.base64, 'base64');
-          const ext = getExtensionForMime(asset.mime);
-          const fileName = `${asset.sha256}.${ext}`;
-          const filePath = path.join(assetsDir, fileName);
-
-          if (!fs.existsSync(filePath)) {
-            fs.writeFileSync(filePath, imgBuf);
-          }
-
-          await assetRepo.findOrCreate({
-            sha256: asset.sha256,
-            mime: asset.mime,
-            path: filePath,
-            size: imgBuf.length,
-          });
-        } catch {
-          // Bỏ qua lỗi asset đơn lẻ
-        }
+  fastify.post(
+    '/api/question-sets/import-word',
+    { preHandler: authenticate },
+    async (request, reply) => {
+      const body = request.body as { base64?: string };
+      if (!body || !body.base64 || typeof body.base64 !== 'string') {
+        return reply.status(400).send({
+          error: formatProtocolError('INVALID_PAYLOAD', 'Dữ liệu tập tin Word base64 không hợp lệ'),
+        });
       }
 
-      return reply.status(200).send({
-        questions: parseResult.questions,
-        warnings: parseResult.warnings,
-        totalDetected: parseResult.totalDetected,
-        successCount: parseResult.successCount,
-        assets: parseResult.assets.map((a) => ({
-          sha256: a.sha256,
-          mime: a.mime,
-        })),
-      });
-    } catch (err: unknown) {
-      return reply.status(400).send({
-        error: formatProtocolError(
-          'INVALID_PAYLOAD',
-          `Không thể phân tích file Word: ${err instanceof Error ? err.message : 'Định dạng file lỗi'}`,
-        ),
-      });
+      try {
+        const buffer = Buffer.from(body.base64, 'base64');
+        const parseResult = await parseWordDocx(buffer);
+
+        // Lưu trữ các assets ảnh trích xuất được vào kho CAS nếu có
+        for (const asset of parseResult.assets) {
+          try {
+            const imgBuf = Buffer.from(asset.base64, 'base64');
+            const ext = getExtensionForMime(asset.mime);
+            const fileName = `${asset.sha256}.${ext}`;
+            const filePath = path.join(assetsDir, fileName);
+
+            if (!fs.existsSync(filePath)) {
+              fs.writeFileSync(filePath, imgBuf);
+            }
+
+            await assetRepo.findOrCreate({
+              sha256: asset.sha256,
+              mime: asset.mime,
+              path: filePath,
+              size: imgBuf.length,
+            });
+          } catch {
+            // Bỏ qua lỗi asset đơn lẻ
+          }
+        }
+
+        return reply.status(200).send({
+          questions: parseResult.questions,
+          warnings: parseResult.warnings,
+          totalDetected: parseResult.totalDetected,
+          successCount: parseResult.successCount,
+          assets: parseResult.assets.map(a => ({
+            sha256: a.sha256,
+            mime: a.mime,
+          })),
+        });
+      } catch (err: unknown) {
+        return reply.status(400).send({
+          error: formatProtocolError(
+            'INVALID_PAYLOAD',
+            `Không thể phân tích file Word: ${err instanceof Error ? err.message : 'Định dạng file lỗi'}`
+          ),
+        });
+      }
     }
-  });
+  );
 
   /**
    * DELETE /api/question-sets/:id
@@ -930,12 +950,7 @@ export const questionSetsRoutes: FastifyPluginAsync<QuestionSetsRoutesOptions> =
       // 4. Dọn dẹp các hình ảnh thuộc đề này nếu không còn bộ đề nào khác dùng chung
       let cleanedAssets: string[] = [];
       if (success && hashes.length > 0) {
-        cleanedAssets = await cleanupOrphanAssets(
-          hashes,
-          questionSetRepo,
-          assetRepo,
-          assetsDir,
-        );
+        cleanedAssets = await cleanupOrphanAssets(hashes, questionSetRepo, assetRepo, assetsDir);
       }
 
       return reply.status(200).send({
@@ -943,7 +958,6 @@ export const questionSetsRoutes: FastifyPluginAsync<QuestionSetsRoutesOptions> =
         cleanedAssetsCount: cleanedAssets.length,
         cleanedAssets,
       });
-    },
+    }
   );
 };
-

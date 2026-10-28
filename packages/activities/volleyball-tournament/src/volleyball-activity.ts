@@ -40,7 +40,10 @@ function stripAnswerKeys(questions: VolleyballQuestion[]): VolleyballQuestion[] 
   }));
 }
 
-function getQuestionsForRound(allQuestions: VolleyballQuestion[], roundIndex: number): VolleyballQuestion[] {
+function getQuestionsForRound(
+  allQuestions: VolleyballQuestion[],
+  roundIndex: number
+): VolleyballQuestion[] {
   if (allQuestions.length === 0) return [];
   const startIndex = (roundIndex * 2) % allQuestions.length;
   const q1 = allQuestions[startIndex]!;
@@ -131,7 +134,8 @@ export const VolleyballTournamentActivity: ActivityDefinition<
   name: 'Giải Đấu Bóng Chuyền (thử nghiệm)',
   version: 1,
   icon: '🏐',
-  description: 'Thi đấu vòng bảng sau đó bắt cặp xếp hạng 4 Cúp theo thể thức bóng chuyền học đường',
+  description:
+    'Thi đấu vòng bảng sau đó bắt cặp xếp hạng 4 Cúp theo thể thức bóng chuyền học đường',
   capabilities: ['screen'],
   rewardTriggers: [
     'match_win',
@@ -222,7 +226,9 @@ export const VolleyballTournamentActivity: ActivityDefinition<
 
         // Ở lượt 1 vòng bảng: Tự động phân bảng lại khi có học sinh vào và chưa ai hoàn thành
         const isRound1 = st.currentRound === 1 && st.currentStage === 'pools';
-        const noOneFinishedYet = st.activeMatchups.length === 0 || st.activeMatchups.every(m => !m.player1Answered && !m.player2Answered);
+        const noOneFinishedYet =
+          st.activeMatchups.length === 0 ||
+          st.activeMatchups.every(m => !m.player1Answered && !m.player2Answered);
         const participantCount = Object.keys(st.participants).length;
 
         if (isRound1 && noOneFinishedYet && participantCount >= 2) {
@@ -251,8 +257,10 @@ export const VolleyballTournamentActivity: ActivityDefinition<
             p.currentTable = null;
           }
           for (const m of round1Matchups) {
-            if (st.participants[m.player1Id]) st.participants[m.player1Id]!.currentTable = m.tableNumber;
-            if (st.participants[m.player2Id]) st.participants[m.player2Id]!.currentTable = m.tableNumber;
+            if (st.participants[m.player1Id])
+              st.participants[m.player1Id]!.currentTable = m.tableNumber;
+            if (st.participants[m.player2Id])
+              st.participants[m.player2Id]!.currentTable = m.tableNumber;
           }
         }
       }
@@ -269,7 +277,11 @@ export const VolleyballTournamentActivity: ActivityDefinition<
         m => m.player1Id === participantId || m.player2Id === participantId
       );
       if (!matchup) {
-        return { ok: false, reason: 'Bạn không có trận đấu trong lượt này', code: 'NO_ACTIVE_MATCHUP' };
+        return {
+          ok: false,
+          reason: 'Bạn không có trận đấu trong lượt này',
+          code: 'NO_ACTIVE_MATCHUP',
+        };
       }
 
       const isPlayer1 = matchup.player1Id === participantId;
@@ -327,8 +339,10 @@ export const VolleyballTournamentActivity: ActivityDefinition<
               p.currentTable = null;
             }
             for (const m of nextMatchups) {
-              if (st.participants[m.player1Id]) st.participants[m.player1Id]!.currentTable = m.tableNumber;
-              if (st.participants[m.player2Id]) st.participants[m.player2Id]!.currentTable = m.tableNumber;
+              if (st.participants[m.player1Id])
+                st.participants[m.player1Id]!.currentTable = m.tableNumber;
+              if (st.participants[m.player2Id])
+                st.participants[m.player2Id]!.currentTable = m.tableNumber;
             }
 
             st.currentRound = nextRound;
@@ -354,8 +368,10 @@ export const VolleyballTournamentActivity: ActivityDefinition<
               p.currentTable = null;
             }
             for (const m of finalMatchups) {
-              if (st.participants[m.player1Id]) st.participants[m.player1Id]!.currentTable = m.tableNumber;
-              if (st.participants[m.player2Id]) st.participants[m.player2Id]!.currentTable = m.tableNumber;
+              if (st.participants[m.player1Id])
+                st.participants[m.player1Id]!.currentTable = m.tableNumber;
+              if (st.participants[m.player2Id])
+                st.participants[m.player2Id]!.currentTable = m.tableNumber;
             }
 
             st.currentRound = 5;
@@ -367,7 +383,11 @@ export const VolleyballTournamentActivity: ActivityDefinition<
             // Kết thúc lượt 5 -> FINISHED
             st.status = 'finished';
             st.countdownEndsAt = null;
-            st.finalStandings = calculateFinalStandings(st.brackets, st.activeMatchups, st.participants);
+            st.finalStandings = calculateFinalStandings(
+              st.brackets,
+              st.activeMatchups,
+              st.participants
+            );
 
             // Trao thưởng EXP theo chuẩn D8
             const d1 = st.finalStandings.find(s => s.tier === 'diamond' && s.rank === 1);
@@ -403,8 +423,10 @@ export const VolleyballTournamentActivity: ActivityDefinition<
           p.currentTable = null;
         }
         for (const m of semiMatchups) {
-          if (st.participants[m.player1Id]) st.participants[m.player1Id]!.currentTable = m.tableNumber;
-          if (st.participants[m.player2Id]) st.participants[m.player2Id]!.currentTable = m.tableNumber;
+          if (st.participants[m.player1Id])
+            st.participants[m.player1Id]!.currentTable = m.tableNumber;
+          if (st.participants[m.player2Id])
+            st.participants[m.player2Id]!.currentTable = m.tableNumber;
         }
 
         const semiQuestions = getQuestionsForRound(rawQuestions, 3);
@@ -415,7 +437,11 @@ export const VolleyballTournamentActivity: ActivityDefinition<
       } else if (data.type === 'force_finish') {
         st.status = 'finished';
         st.countdownEndsAt = null;
-        st.finalStandings = calculateFinalStandings(st.brackets, st.activeMatchups, st.participants);
+        st.finalStandings = calculateFinalStandings(
+          st.brackets,
+          st.activeMatchups,
+          st.participants
+        );
       }
 
       return st;

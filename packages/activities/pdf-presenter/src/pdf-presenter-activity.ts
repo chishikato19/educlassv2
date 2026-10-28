@@ -138,7 +138,7 @@ export const PdfPresenterActivity: ActivityDefinition<
         case 'update_gap': {
           return {
             ...st,
-            gaps: st.gaps.map((g) =>
+            gaps: st.gaps.map(g =>
               g.id === intent.gapId
                 ? {
                     ...g,
@@ -153,7 +153,7 @@ export const PdfPresenterActivity: ActivityDefinition<
         case 'remove_gap': {
           return {
             ...st,
-            gaps: st.gaps.filter((g) => g.id !== intent.gapId),
+            gaps: st.gaps.filter(g => g.id !== intent.gapId),
           };
         }
 
@@ -189,7 +189,7 @@ export const PdfPresenterActivity: ActivityDefinition<
         case 'clear_page_strokes': {
           return {
             ...st,
-            strokes: st.strokes.filter((s) => s.pageNumber !== intent.pageNumber),
+            strokes: st.strokes.filter(s => s.pageNumber !== intent.pageNumber),
           };
         }
 
@@ -197,7 +197,7 @@ export const PdfPresenterActivity: ActivityDefinition<
           const idSet = new Set(intent.strokeIds);
           return {
             ...st,
-            strokes: st.strokes.filter((s) => !idSet.has(s.id)),
+            strokes: st.strokes.filter(s => !idSet.has(s.id)),
           };
         }
 

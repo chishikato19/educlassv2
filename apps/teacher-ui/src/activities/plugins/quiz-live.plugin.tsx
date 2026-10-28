@@ -25,6 +25,7 @@ export const quizLivePlugin: ActivityHostPlugin = {
   id: 'quiz-live',
   name: 'Quiz Live (Kahoot & Quizizz)',
   icon: '🎮',
-  description: 'Trò chơi trắc nghiệm trực tiếp dạng Kahoot hoặc Quizizz với âm thanh và bảng xếp hạng',
+  description:
+    'Trò chơi trắc nghiệm trực tiếp dạng Kahoot hoặc Quizizz với âm thanh và bảng xếp hạng',
   component: QuizLiveHostComponent,
 };

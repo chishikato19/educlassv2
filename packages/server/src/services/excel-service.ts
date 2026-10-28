@@ -232,12 +232,18 @@ export class ExcelService {
             return isCorrect ? 'Đúng' : 'Sai';
           }
 
-          const rawAns = studentAnswers[qId] ?? studentAnswers[`q_${qIdx + 1}`] ?? studentAnswers[`q${qIdx + 1}`];
+          const rawAns =
+            studentAnswers[qId] ??
+            studentAnswers[`q_${qIdx + 1}`] ??
+            studentAnswers[`q${qIdx + 1}`];
           if (rawAns !== undefined && rawAns !== null && rawAns !== '') {
             let choiceStr = String(rawAns);
             if (typeof rawAns === 'number' && rawAns >= 0 && rawAns < 4) {
               choiceStr = ['A', 'B', 'C', 'D'][rawAns] || String(rawAns);
-            } else if (typeof rawAns === 'object' && 'selected' in (rawAns as Record<string, unknown>)) {
+            } else if (
+              typeof rawAns === 'object' &&
+              'selected' in (rawAns as Record<string, unknown>)
+            ) {
               const sel = Number((rawAns as Record<string, unknown>)['selected']);
               choiceStr = ['A', 'B', 'C', 'D'][sel] || String(sel);
             }
@@ -289,23 +295,27 @@ export class ExcelService {
       ];
     });
 
-    const wsGradebook = XLSX.utils.aoa_to_sheet([...summaryHeaderRows, studentHeaders, ...studentRows]);
+    const wsGradebook = XLSX.utils.aoa_to_sheet([
+      ...summaryHeaderRows,
+      studentHeaders,
+      ...studentRows,
+    ]);
 
     // Thiết lập độ rộng cột chuẩn mực, chống tràn và cắt cụt chữ
     wsGradebook['!cols'] = [
-      { wch: 6 },   // STT
-      { wch: 14 },  // Mã học sinh
-      { wch: 24 },  // Họ và tên
-      { wch: 12 },  // Lớp
-      { wch: 16 },  // Trạng thái
-      { wch: 10 },  // Ca thi
-      { wch: 10 },  // Điểm số
-      { wch: 12 },  // Thang điểm
-      { wch: 14 },  // Tỉ lệ đúng (%)
-      { wch: 14 },  // Số câu đúng
-      { wch: 14 },  // Tổng số câu
-      { wch: 18 },  // Thời gian làm bài
-      { wch: 22 },  // Thời điểm nộp bài
+      { wch: 6 }, // STT
+      { wch: 14 }, // Mã học sinh
+      { wch: 24 }, // Họ và tên
+      { wch: 12 }, // Lớp
+      { wch: 16 }, // Trạng thái
+      { wch: 10 }, // Ca thi
+      { wch: 10 }, // Điểm số
+      { wch: 12 }, // Thang điểm
+      { wch: 14 }, // Tỉ lệ đúng (%)
+      { wch: 14 }, // Số câu đúng
+      { wch: 14 }, // Tổng số câu
+      { wch: 18 }, // Thời gian làm bài
+      { wch: 22 }, // Thời điểm nộp bài
       ...questions.map(() => ({ wch: 18 })), // Cột phương án câu hỏi
     ];
 
@@ -341,12 +351,7 @@ export class ExcelService {
       ],
     ];
     const wsGrades = XLSX.utils.aoa_to_sheet([gradeHeaders, ...gradeRows]);
-    wsGrades['!cols'] = [
-      { wch: 20 },
-      { wch: 16 },
-      { wch: 12 },
-      { wch: 14 },
-    ];
+    wsGrades['!cols'] = [{ wch: 20 }, { wch: 16 }, { wch: 12 }, { wch: 14 }];
     XLSX.utils.book_append_sheet(workbook, wsGrades, 'Phổ điểm');
 
     // 3. Sheet Phân tích câu hỏi
@@ -366,13 +371,7 @@ export class ExcelService {
         q.totalAnswered,
       ]);
       const wsQuestions = XLSX.utils.aoa_to_sheet([qHeaders, ...qRows]);
-      wsQuestions['!cols'] = [
-        { wch: 10 },
-        { wch: 18 },
-        { wch: 16 },
-        { wch: 22 },
-        { wch: 20 },
-      ];
+      wsQuestions['!cols'] = [{ wch: 10 }, { wch: 18 }, { wch: 16 }, { wch: 22 }, { wch: 20 }];
       XLSX.utils.book_append_sheet(workbook, wsQuestions, 'Phân tích câu hỏi');
     }
 
@@ -423,13 +422,7 @@ export class ExcelService {
       r.feedbackComments?.join('; ') ?? '',
     ]);
 
-    const worksheet = XLSX.utils.aoa_to_sheet([
-      headerTitle,
-      subTitle,
-      [],
-      tableHeaders,
-      ...rows,
-    ]);
+    const worksheet = XLSX.utils.aoa_to_sheet([headerTitle, subTitle, [], tableHeaders, ...rows]);
 
     worksheet['!cols'] = [
       { wch: 10 },
@@ -481,4 +474,3 @@ export interface ExamExportInput {
   questions?: Array<Record<string, unknown>>;
   stats: ExamStats;
 }
-

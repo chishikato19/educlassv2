@@ -30,10 +30,34 @@ export interface ProjectorViewProps {
 
 // 4 Màu Kahoot chuẩn và ký hiệu hình khối theo PLAN 7.1
 const KAHOOT_THEMES = [
-  { bg: 'bg-[#FF6B6B]', hover: 'hover:bg-[#E55A5A]', text: 'text-white', shape: '▲', label: 'Tam giác (Đỏ)' },
-  { bg: 'bg-[#4F8CFF]', hover: 'hover:bg-[#3B75E6]', text: 'text-white', shape: '◆', label: 'Hình thoi (Xanh)' },
-  { bg: 'bg-[#FFB020]', hover: 'hover:bg-[#E69E1C]', text: 'text-white', shape: '●', label: 'Hình tròn (Vàng)' },
-  { bg: 'bg-[#2ECC8F]', hover: 'hover:bg-[#25B57A]', text: 'text-white', shape: '■', label: 'Hình vuông (Xanh lá)' },
+  {
+    bg: 'bg-[#FF6B6B]',
+    hover: 'hover:bg-[#E55A5A]',
+    text: 'text-white',
+    shape: '▲',
+    label: 'Tam giác (Đỏ)',
+  },
+  {
+    bg: 'bg-[#4F8CFF]',
+    hover: 'hover:bg-[#3B75E6]',
+    text: 'text-white',
+    shape: '◆',
+    label: 'Hình thoi (Xanh)',
+  },
+  {
+    bg: 'bg-[#FFB020]',
+    hover: 'hover:bg-[#E69E1C]',
+    text: 'text-white',
+    shape: '●',
+    label: 'Hình tròn (Vàng)',
+  },
+  {
+    bg: 'bg-[#2ECC8F]',
+    hover: 'hover:bg-[#25B57A]',
+    text: 'text-white',
+    shape: '■',
+    label: 'Hình vuông (Xanh lá)',
+  },
 ];
 
 /**
@@ -103,10 +127,10 @@ export const PersonalNotificationBar: React.FC<{
         notification.type === 'reflected'
           ? 'bg-gradient-to-r from-purple-900 via-indigo-900 to-purple-950 text-purple-100 border-2 border-purple-400 shadow-[0_0_15px_rgba(168,85,247,0.4)]'
           : notification.type === 'attack'
-          ? 'bg-gradient-to-r from-rose-900 via-red-900 to-rose-950 text-rose-100 border-2 border-rose-400 shadow-[0_0_15px_rgba(244,63,94,0.4)]'
-          : notification.type === 'defense'
-          ? 'bg-gradient-to-r from-emerald-900 via-teal-900 to-emerald-950 text-emerald-100 border-2 border-emerald-400 shadow-[0_0_15px_rgba(16,185,129,0.4)]'
-          : 'bg-gradient-to-r from-blue-900 via-indigo-900 to-blue-950 text-blue-100 border-2 border-blue-400 shadow-[0_0_15px_rgba(59,130,246,0.4)]'
+            ? 'bg-gradient-to-r from-rose-900 via-red-900 to-rose-950 text-rose-100 border-2 border-rose-400 shadow-[0_0_15px_rgba(244,63,94,0.4)]'
+            : notification.type === 'defense'
+              ? 'bg-gradient-to-r from-emerald-900 via-teal-900 to-emerald-950 text-emerald-100 border-2 border-emerald-400 shadow-[0_0_15px_rgba(16,185,129,0.4)]'
+              : 'bg-gradient-to-r from-blue-900 via-indigo-900 to-blue-950 text-blue-100 border-2 border-blue-400 shadow-[0_0_15px_rgba(59,130,246,0.4)]'
       }`}
       role="alert"
     >
@@ -115,10 +139,10 @@ export const PersonalNotificationBar: React.FC<{
           {notification.type === 'reflected'
             ? '🪞'
             : notification.type === 'attack'
-            ? '⚔️'
-            : notification.type === 'defense'
-            ? '🛡️'
-            : '🎁'}
+              ? '⚔️'
+              : notification.type === 'defense'
+                ? '🛡️'
+                : '🎁'}
         </span>
         <p className="text-xs sm:text-sm font-black truncate leading-tight">
           {notification.message}
@@ -162,9 +186,8 @@ export const QuizLiveStudentView: React.FC<StudentViewProps> = ({
   const [dismissedFeedbackIndex, setDismissedFeedbackIndex] = useState<number | null>(null);
 
   const myProgress = state.participants[participantId];
-  const qIndex = state.mode === 'kahoot'
-    ? state.currentQuestionIndex
-    : (myProgress ? myProgress.currentIndex : 0);
+  const qIndex =
+    state.mode === 'kahoot' ? state.currentQuestionIndex : myProgress ? myProgress.currentIndex : 0;
 
   const currentQ = state.questions[qIndex];
   const alreadyAnswered = myProgress ? Boolean(myProgress.answers[String(qIndex)]) : false;
@@ -262,14 +285,16 @@ export const QuizLiveStudentView: React.FC<StudentViewProps> = ({
                   let badge = null;
 
                   if (isThisCorrect) {
-                    cardStyle = 'border-2 border-emerald-500 bg-emerald-50 text-emerald-950 font-bold shadow-sm';
+                    cardStyle =
+                      'border-2 border-emerald-500 bg-emerald-50 text-emerald-950 font-bold shadow-sm';
                     badge = (
                       <span className="px-2.5 py-1 rounded-lg text-xs font-black bg-emerald-600 text-white shrink-0">
                         ✔ ĐÁP ÁN ĐÚNG
                       </span>
                     );
                   } else if (isThisSelected) {
-                    cardStyle = 'border-2 border-rose-400 bg-rose-50 text-rose-950 font-bold shadow-sm';
+                    cardStyle =
+                      'border-2 border-rose-400 bg-rose-50 text-rose-950 font-bold shadow-sm';
                     badge = (
                       <span className="px-2.5 py-1 rounded-lg text-xs font-black bg-rose-600 text-white shrink-0">
                         ✖ BẠN ĐÃ CHỌN
@@ -304,11 +329,10 @@ export const QuizLiveStudentView: React.FC<StudentViewProps> = ({
                 <div className="flex justify-between items-center">
                   <span className="text-gray-500">Bạn đã chọn:</span>
                   <span
-                    className={`font-black ${
-                      isCorrect ? 'text-emerald-700' : 'text-rose-700'
-                    }`}
+                    className={`font-black ${isCorrect ? 'text-emerald-700' : 'text-rose-700'}`}
                   >
-                    {lastAnswer.selectedAnswer === true || String(lastAnswer.selectedAnswer).toLowerCase() === 'true'
+                    {lastAnswer.selectedAnswer === true ||
+                    String(lastAnswer.selectedAnswer).toLowerCase() === 'true'
                       ? 'Đúng'
                       : 'Sai'}
                   </span>
@@ -316,7 +340,8 @@ export const QuizLiveStudentView: React.FC<StudentViewProps> = ({
                 <div className="flex justify-between items-center pt-1 border-t border-gray-100">
                   <span className="text-gray-500">Đáp án chính xác:</span>
                   <span className="font-black text-emerald-700">
-                    {lastAnswer.correctAnswer === true || String(lastAnswer.correctAnswer).toLowerCase() === 'true'
+                    {lastAnswer.correctAnswer === true ||
+                    String(lastAnswer.correctAnswer).toLowerCase() === 'true'
                       ? 'Đúng'
                       : 'Sai'}
                   </span>
@@ -329,11 +354,7 @@ export const QuizLiveStudentView: React.FC<StudentViewProps> = ({
               <div className="bg-white rounded-xl p-3 border border-gray-200 text-xs sm:text-sm space-y-1.5">
                 <div>
                   <span className="text-gray-500 block text-[11px]">Câu trả lời của bạn:</span>
-                  <span
-                    className={`font-bold ${
-                      isCorrect ? 'text-emerald-700' : 'text-rose-700'
-                    }`}
-                  >
+                  <span className={`font-bold ${isCorrect ? 'text-emerald-700' : 'text-rose-700'}`}>
                     {String(lastAnswer.selectedAnswer ?? '') || '(Trống)'}
                   </span>
                 </div>
@@ -356,11 +377,16 @@ export const QuizLiveStudentView: React.FC<StudentViewProps> = ({
                 </span>
                 <div className="space-y-1.5">
                   {feedbackQ.items.map((it, idx) => {
-                    const itText = typeof it.text === 'object' && it.text ? it.text.text : String(it.text || '');
+                    const itText =
+                      typeof it.text === 'object' && it.text ? it.text.text : String(it.text || '');
                     const letter = ['a', 'b', 'c', 'd'][idx] || `${idx + 1}`;
-                    const cList = Array.isArray(lastAnswer.correctAnswer) ? lastAnswer.correctAnswer : [];
+                    const cList = Array.isArray(lastAnswer.correctAnswer)
+                      ? lastAnswer.correctAnswer
+                      : [];
                     const expected = Boolean(cList[idx]);
-                    const sList = Array.isArray(lastAnswer.selectedAnswer) ? lastAnswer.selectedAnswer : [];
+                    const sList = Array.isArray(lastAnswer.selectedAnswer)
+                      ? lastAnswer.selectedAnswer
+                      : [];
                     const sVal = sList[idx];
                     const isItemCorrect = sVal === expected;
 
@@ -368,16 +394,21 @@ export const QuizLiveStudentView: React.FC<StudentViewProps> = ({
                       <div
                         key={idx}
                         className={`p-2 rounded-lg border flex flex-col gap-1 ${
-                          isItemCorrect ? 'bg-emerald-50/60 border-emerald-200' : 'bg-rose-50/60 border-rose-200'
+                          isItemCorrect
+                            ? 'bg-emerald-50/60 border-emerald-200'
+                            : 'bg-rose-50/60 border-rose-200'
                         }`}
                       >
                         <div className="flex justify-between items-start gap-2">
                           <span className="font-bold text-gray-800 leading-snug">
-                            <strong className="text-blue-600">{letter})</strong> {renderLatexInText(itText)}
+                            <strong className="text-blue-600">{letter})</strong>{' '}
+                            {renderLatexInText(itText)}
                           </span>
                           <span
                             className={`text-[11px] font-black px-1.5 py-0.5 rounded ${
-                              isItemCorrect ? 'bg-emerald-200 text-emerald-800' : 'bg-rose-200 text-rose-800'
+                              isItemCorrect
+                                ? 'bg-emerald-200 text-emerald-800'
+                                : 'bg-rose-200 text-rose-800'
                             }`}
                           >
                             {isItemCorrect ? '✓ Khớp' : '✗ Sai'}
@@ -385,11 +416,22 @@ export const QuizLiveStudentView: React.FC<StudentViewProps> = ({
                         </div>
                         <div className="flex gap-3 text-[11px] font-semibold text-gray-600">
                           <span>
-                            Đáp án: <strong className={expected ? 'text-emerald-700' : 'text-rose-700'}>{expected ? 'ĐÚNG' : 'SAI'}</strong>
+                            Đáp án:{' '}
+                            <strong className={expected ? 'text-emerald-700' : 'text-rose-700'}>
+                              {expected ? 'ĐÚNG' : 'SAI'}
+                            </strong>
                           </span>
                           <span>
                             Bạn chọn:{' '}
-                            <strong className={sVal === true ? 'text-emerald-700' : sVal === false ? 'text-rose-700' : 'text-gray-400'}>
+                            <strong
+                              className={
+                                sVal === true
+                                  ? 'text-emerald-700'
+                                  : sVal === false
+                                    ? 'text-rose-700'
+                                    : 'text-gray-400'
+                              }
+                            >
                               {sVal === true ? 'ĐÚNG' : sVal === false ? 'SAI' : 'Trống'}
                             </strong>
                           </span>
@@ -464,18 +506,20 @@ export const QuizLiveStudentView: React.FC<StudentViewProps> = ({
             </div>
           </div>
           <p className="text-sm text-gray-500">Chúc mừng bạn đã hoàn thành xuất sắc!</p>
-          {state.mode === 'quizizz' && Boolean(state.allowReplay) && state.status !== 'finished' && (
-            <button
-              type="button"
-              onClick={() => {
-                setDismissedFeedbackIndex(null);
-                onSendIntent({ type: 'restart_quiz' });
-              }}
-              className="w-full mt-2 min-h-[48px] px-4 py-3 rounded-2xl font-black text-sm sm:text-base text-white bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 shadow-md active:scale-95 transition flex items-center justify-center gap-2 cursor-pointer"
-            >
-              <span>🔄 Chơi lại lần nữa</span>
-            </button>
-          )}
+          {state.mode === 'quizizz' &&
+            Boolean(state.allowReplay) &&
+            state.status !== 'finished' && (
+              <button
+                type="button"
+                onClick={() => {
+                  setDismissedFeedbackIndex(null);
+                  onSendIntent({ type: 'restart_quiz' });
+                }}
+                className="w-full mt-2 min-h-[48px] px-4 py-3 rounded-2xl font-black text-sm sm:text-base text-white bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 shadow-md active:scale-95 transition flex items-center justify-center gap-2 cursor-pointer"
+              >
+                <span>🔄 Chơi lại lần nữa</span>
+              </button>
+            )}
         </div>
         <PersonalNotificationBar
           notification={myProgress?.personalNotification}
@@ -512,7 +556,9 @@ export const QuizLiveStudentView: React.FC<StudentViewProps> = ({
               <p className="text-sm text-rose-700">Hãy cố gắng ở câu tiếp theo nhé!</p>
             </div>
           )}
-          <p className="text-sm text-gray-500 animate-pulse">Chờ thầy cô chuyển sang câu tiếp theo...</p>
+          <p className="text-sm text-gray-500 animate-pulse">
+            Chờ thầy cô chuyển sang câu tiếp theo...
+          </p>
         </div>
         <PersonalNotificationBar
           notification={myProgress?.personalNotification}
@@ -733,7 +779,9 @@ export const QuizLiveStudentView: React.FC<StudentViewProps> = ({
             />
             <button
               onClick={() => handleSelectOption(shortAnswerInput)}
-              disabled={disabled || alreadyAnswered || freezeCheck.frozen || !shortAnswerInput.trim()}
+              disabled={
+                disabled || alreadyAnswered || freezeCheck.frozen || !shortAnswerInput.trim()
+              }
               className="w-full h-12 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold text-base shadow-md disabled:opacity-50"
             >
               Nộp câu trả lời
@@ -748,14 +796,19 @@ export const QuizLiveStudentView: React.FC<StudentViewProps> = ({
             </span>
             <div className="space-y-2.5">
               {currentQ.items.map((it, idx) => {
-                const itText = typeof it.text === 'object' && it.text ? it.text.text : String(it.text || '');
+                const itText =
+                  typeof it.text === 'object' && it.text ? it.text.text : String(it.text || '');
                 const letter = ['a', 'b', 'c', 'd'][idx] || `${idx + 1}`;
                 const chosen = tfGroupSelected[idx];
 
                 return (
-                  <div key={idx} className="bg-white border-2 border-gray-200 rounded-xl p-3 flex flex-col gap-2">
+                  <div
+                    key={idx}
+                    className="bg-white border-2 border-gray-200 rounded-xl p-3 flex flex-col gap-2"
+                  >
                     <div className="text-sm sm:text-base font-bold text-gray-800">
-                      <strong className="text-blue-600 mr-1">{letter})</strong> {renderLatexInText(itText)}
+                      <strong className="text-blue-600 mr-1">{letter})</strong>{' '}
+                      {renderLatexInText(itText)}
                     </div>
                     <div className="grid grid-cols-2 gap-2">
                       <button
@@ -827,7 +880,11 @@ export const QuizLiveStudentView: React.FC<StudentViewProps> = ({
                     }`}
                     title={item ? `${item.name}: ${item.description}` : 'Ô trống'}
                   >
-                    {item ? <span>{item.icon}</span> : <span className="text-xs opacity-40">+</span>}
+                    {item ? (
+                      <span>{item.icon}</span>
+                    ) : (
+                      <span className="text-xs opacity-40">+</span>
+                    )}
                   </div>
                 );
               })}
@@ -885,13 +942,10 @@ export const QuizLiveTeacherPanel: React.FC<TeacherPanelProps> = ({
     totalClassAnswered += Object.keys(p.answers || {}).length;
   });
   const totalClassWrong = Math.max(0, totalClassAnswered - totalClassCorrect);
-  const overallAccuracy = totalClassAnswered > 0
-    ? Math.round((totalClassCorrect / totalClassAnswered) * 100)
-    : 0;
+  const overallAccuracy =
+    totalClassAnswered > 0 ? Math.round((totalClassCorrect / totalClassAnswered) * 100) : 0;
 
-  const displayedLeaderboard = showOnlyTop5
-    ? state.leaderboard.slice(0, 5)
-    : state.leaderboard;
+  const displayedLeaderboard = showOnlyTop5 ? state.leaderboard.slice(0, 5) : state.leaderboard;
 
   // Màn hình kết thúc hoàn chỉnh dành cho Giáo viên
   if (state.status === 'finished') {
@@ -905,7 +959,8 @@ export const QuizLiveTeacherPanel: React.FC<TeacherPanelProps> = ({
           <span className="text-5xl block animate-bounce">🏆</span>
           <h2 className="text-2xl font-black text-gray-800">BÀI QUIZ ĐÃ KẾT THÚC THÀNH CÔNG!</h2>
           <p className="text-sm text-gray-500">
-            {state.title} • Tổng cộng {state.totalQuestions} câu hỏi • {totalParticipants} học sinh tham gia
+            {state.title} • Tổng cộng {state.totalQuestions} câu hỏi • {totalParticipants} học sinh
+            tham gia
           </p>
         </div>
 
@@ -958,7 +1013,10 @@ export const QuizLiveTeacherPanel: React.FC<TeacherPanelProps> = ({
           <h4 className="font-bold text-sm text-gray-700">Bảng kết quả toàn bộ học sinh:</h4>
           <div className="divide-y divide-gray-100 max-h-56 overflow-y-auto border rounded-xl">
             {state.leaderboard.map(item => (
-              <div key={item.participantId} className="p-3 flex justify-between items-center text-sm">
+              <div
+                key={item.participantId}
+                className="p-3 flex justify-between items-center text-sm"
+              >
                 <div className="flex items-center gap-3">
                   <span className="w-6 h-6 rounded-full bg-gray-100 flex items-center justify-center font-bold text-xs">
                     #{item.rank}
@@ -966,7 +1024,9 @@ export const QuizLiveTeacherPanel: React.FC<TeacherPanelProps> = ({
                   <span className="font-semibold text-gray-800">{item.displayName}</span>
                 </div>
                 <div className="flex items-center gap-3 text-xs">
-                  <span className="text-emerald-600 font-bold">✔ {item.correctCount}/{state.totalQuestions}</span>
+                  <span className="text-emerald-600 font-bold">
+                    ✔ {item.correctCount}/{state.totalQuestions}
+                  </span>
                   <span className="text-blue-600 font-black text-sm">{item.score} đ</span>
                 </div>
               </div>
@@ -1127,9 +1187,7 @@ export const QuizLiveTeacherPanel: React.FC<TeacherPanelProps> = ({
                 type="button"
                 onClick={() => setQuizizzTab('questions')}
                 className={`pb-3 font-extrabold text-sm sm:text-base transition cursor-pointer relative ${
-                  quizizzTab === 'questions'
-                    ? 'text-white'
-                    : 'text-slate-400 hover:text-slate-200'
+                  quizizzTab === 'questions' ? 'text-white' : 'text-slate-400 hover:text-slate-200'
                 }`}
               >
                 <span>Questions</span>
@@ -1147,7 +1205,9 @@ export const QuizLiveTeacherPanel: React.FC<TeacherPanelProps> = ({
               <div className="flex items-center justify-between text-xs text-slate-300 font-semibold px-2 shrink-0">
                 <span className="flex items-center gap-1.5 text-slate-200 font-bold">
                   <span className="text-base">👥</span>
-                  <span>{totalParticipants} participants ({completedCount} hoàn thành)</span>
+                  <span>
+                    {totalParticipants} participants ({completedCount} hoàn thành)
+                  </span>
                 </span>
 
                 <label className="flex items-center gap-2 cursor-pointer hover:text-white transition font-medium">
@@ -1155,7 +1215,7 @@ export const QuizLiveTeacherPanel: React.FC<TeacherPanelProps> = ({
                   <input
                     type="checkbox"
                     checked={showOnlyTop5}
-                    onChange={(e) => setShowOnlyTop5(e.target.checked)}
+                    onChange={e => setShowOnlyTop5(e.target.checked)}
                     className="w-4 h-4 rounded accent-indigo-500 cursor-pointer"
                   />
                 </label>
@@ -1178,7 +1238,7 @@ export const QuizLiveTeacherPanel: React.FC<TeacherPanelProps> = ({
                     <span>Chưa có học sinh nào nộp câu trả lời.</span>
                   </div>
                 ) : (
-                  displayedLeaderboard.map((entry) => {
+                  displayedLeaderboard.map(entry => {
                     const prog = state.participants[entry.participantId];
                     const answeredCount = Object.keys(prog?.answers || {}).length;
                     const correct = prog?.correctCount ?? 0;
@@ -1188,7 +1248,8 @@ export const QuizLiveTeacherPanel: React.FC<TeacherPanelProps> = ({
                     // Tỉ lệ % cho thanh bar đúng / sai
                     const correctPercent = Math.min(100, (correct / totalQ) * 100);
                     const wrongPercent = Math.min(100 - correctPercent, (wrong / totalQ) * 100);
-                    const studentAcc = answeredCount > 0 ? Math.round((correct / answeredCount) * 100) : 0;
+                    const studentAcc =
+                      answeredCount > 0 ? Math.round((correct / answeredCount) * 100) : 0;
 
                     const avatarColor = getAvatarColor(entry.participantId);
                     const avatarIcon = getAvatarIcon(entry.participantId);
@@ -1204,7 +1265,9 @@ export const QuizLiveTeacherPanel: React.FC<TeacherPanelProps> = ({
                         </span>
 
                         {/* Cột 2: Avatar ngộ nghĩnh */}
-                        <div className={`w-10 h-10 rounded-full bg-gradient-to-tr ${avatarColor} flex items-center justify-center text-lg shadow-md ring-2 ring-white/20 shrink-0`}>
+                        <div
+                          className={`w-10 h-10 rounded-full bg-gradient-to-tr ${avatarColor} flex items-center justify-center text-lg shadow-md ring-2 ring-white/20 shrink-0`}
+                        >
                           <span>{avatarIcon}</span>
                         </div>
 
@@ -1216,16 +1279,33 @@ export const QuizLiveTeacherPanel: React.FC<TeacherPanelProps> = ({
                             </span>
                             {/* Badges vật phẩm đang kích hoạt */}
                             {entry.activeReflectShield && (
-                              <span title="Đang bật Khiên Phản Đòn (45s)" className="text-sm shrink-0 animate-pulse">🪞</span>
+                              <span
+                                title="Đang bật Khiên Phản Đòn (45s)"
+                                className="text-sm shrink-0 animate-pulse"
+                              >
+                                🪞
+                              </span>
                             )}
                             {entry.activeShield && (
-                              <span title="Đang bật Khiên Hộ Thể (45s)" className="text-sm shrink-0">🛡️</span>
+                              <span
+                                title="Đang bật Khiên Hộ Thể (45s)"
+                                className="text-sm shrink-0"
+                              >
+                                🛡️
+                              </span>
                             )}
                             {entry.isFrozen && (
-                              <span title="Đang bị Đóng Băng" className="text-sm shrink-0 animate-bounce">❄️</span>
+                              <span
+                                title="Đang bị Đóng Băng"
+                                className="text-sm shrink-0 animate-bounce"
+                              >
+                                ❄️
+                              </span>
                             )}
                             {entry.isDoublePoints && (
-                              <span title="Đang bật x2 Điểm" className="text-sm shrink-0">⚡</span>
+                              <span title="Đang bật x2 Điểm" className="text-sm shrink-0">
+                                ⚡
+                              </span>
                             )}
                           </div>
                           <span className="text-[11px] text-slate-400 font-medium">
@@ -1264,9 +1344,7 @@ export const QuizLiveTeacherPanel: React.FC<TeacherPanelProps> = ({
 
                         {/* Cột 5: Điểm số */}
                         <div className="w-24 text-right shrink-0">
-                          <span className="font-black text-white text-base">
-                            {entry.score}
-                          </span>
+                          <span className="font-black text-white text-base">{entry.score}</span>
                         </div>
                       </div>
                     );
@@ -1284,7 +1362,7 @@ export const QuizLiveTeacherPanel: React.FC<TeacherPanelProps> = ({
                 {state.questions.map((q, idx) => {
                   let qCorrectCount = 0;
                   let qTotalAnswers = 0;
-                  participantList.forEach((p) => {
+                  participantList.forEach(p => {
                     const ans = p.answers[String(idx)];
                     if (ans) {
                       qTotalAnswers++;
@@ -1292,7 +1370,8 @@ export const QuizLiveTeacherPanel: React.FC<TeacherPanelProps> = ({
                     }
                   });
                   const qWrongCount = Math.max(0, qTotalAnswers - qCorrectCount);
-                  const qAccuracy = qTotalAnswers > 0 ? Math.round((qCorrectCount / qTotalAnswers) * 100) : 0;
+                  const qAccuracy =
+                    qTotalAnswers > 0 ? Math.round((qCorrectCount / qTotalAnswers) * 100) : 0;
 
                   return (
                     <div
@@ -1322,10 +1401,7 @@ export const QuizLiveTeacherPanel: React.FC<TeacherPanelProps> = ({
                           <span className="text-rose-400">✖ {qWrongCount} sai</span>
                         </div>
                         <div className="h-3 bg-slate-800 rounded-full overflow-hidden flex shadow-inner">
-                          <div
-                            className="bg-[#2ECC8F] h-full"
-                            style={{ width: `${qAccuracy}%` }}
-                          />
+                          <div className="bg-[#2ECC8F] h-full" style={{ width: `${qAccuracy}%` }} />
                           <div
                             className="bg-[#FF5252] h-full"
                             style={{ width: `${100 - qAccuracy}%` }}
@@ -1353,9 +1429,7 @@ export const QuizLiveTeacherPanel: React.FC<TeacherPanelProps> = ({
             <span className="inline-block px-2.5 py-0.5 rounded-full text-xs font-bold uppercase tracking-wider bg-blue-100 text-blue-800">
               Kahoot (Nhịp GV)
             </span>
-            <span className="text-xs text-gray-400">
-              {totalParticipants} học sinh
-            </span>
+            <span className="text-xs text-gray-400">{totalParticipants} học sinh</span>
           </div>
           <h2 className="text-lg md:text-xl font-bold text-gray-800">{state.title}</h2>
         </div>
@@ -1399,8 +1473,14 @@ export const QuizLiveTeacherPanel: React.FC<TeacherPanelProps> = ({
               onClick={() => onSendIntent({ type: 'next_question' })}
               className="px-5 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white font-extrabold rounded-xl text-sm shadow-md transition-all cursor-pointer flex items-center gap-2"
             >
-              <span>{state.currentQuestionIndex + 1 < state.totalQuestions ? 'Tiếp theo: Câu hỏi tiếp theo' : 'Tiếp theo: Xem Kết Quả Chung Cuộc'}</span>
-              <span className="text-base">{state.currentQuestionIndex + 1 < state.totalQuestions ? '➡' : '🏁'}</span>
+              <span>
+                {state.currentQuestionIndex + 1 < state.totalQuestions
+                  ? 'Tiếp theo: Câu hỏi tiếp theo'
+                  : 'Tiếp theo: Xem Kết Quả Chung Cuộc'}
+              </span>
+              <span className="text-base">
+                {state.currentQuestionIndex + 1 < state.totalQuestions ? '➡' : '🏁'}
+              </span>
             </button>
           )}
 
@@ -1450,13 +1530,17 @@ export const QuizLiveTeacherPanel: React.FC<TeacherPanelProps> = ({
               {currentQ.options.map((opt, idx) => {
                 const count = stats?.optionCounts[String(idx)] ?? 0;
                 const theme = KAHOOT_THEMES[idx % KAHOOT_THEMES.length]!;
-                const isCorrect = state.currentCorrectAnswer !== undefined && Number(state.currentCorrectAnswer) === idx;
+                const isCorrect =
+                  state.currentCorrectAnswer !== undefined &&
+                  Number(state.currentCorrectAnswer) === idx;
 
                 return (
                   <div
                     key={idx}
                     className={`p-4 md:p-6 rounded-2xl md:rounded-3xl flex items-center justify-between shadow-lg transition-all h-full ${theme.bg} text-white ${
-                      isCorrect ? 'ring-4 ring-amber-300 scale-[1.01] shadow-2xl' : 'hover:opacity-95'
+                      isCorrect
+                        ? 'ring-4 ring-amber-300 scale-[1.01] shadow-2xl'
+                        : 'hover:opacity-95'
                     }`}
                   >
                     <div className="flex items-center gap-3 md:gap-4 flex-1 overflow-hidden">
@@ -1512,7 +1596,8 @@ export const QuizLiveTeacherPanel: React.FC<TeacherPanelProps> = ({
                 <span>🏆</span> BẢNG XẾP HẠNG TẠM THỜI
               </h3>
               <p className="text-sm text-gray-500 mt-1">
-                Xếp hạng sau câu hỏi {state.currentQuestionIndex + 1}/{state.totalQuestions} • Tổng số {state.leaderboard.length} học sinh
+                Xếp hạng sau câu hỏi {state.currentQuestionIndex + 1}/{state.totalQuestions} • Tổng
+                số {state.leaderboard.length} học sinh
               </p>
             </div>
             <button
@@ -1520,8 +1605,14 @@ export const QuizLiveTeacherPanel: React.FC<TeacherPanelProps> = ({
               onClick={() => onSendIntent({ type: 'next_question' })}
               className="px-6 py-3 bg-emerald-600 hover:bg-emerald-700 text-white font-black text-base rounded-xl shadow-md flex items-center gap-2 cursor-pointer transition-all hover:scale-105 active:scale-95"
             >
-              <span>{state.currentQuestionIndex + 1 < state.totalQuestions ? 'Tiếp theo: Câu hỏi tiếp theo' : 'Tiếp theo: Tổng Kết & Trao Giải'}</span>
-              <span className="text-lg">{state.currentQuestionIndex + 1 < state.totalQuestions ? '➡' : '🏁'}</span>
+              <span>
+                {state.currentQuestionIndex + 1 < state.totalQuestions
+                  ? 'Tiếp theo: Câu hỏi tiếp theo'
+                  : 'Tiếp theo: Tổng Kết & Trao Giải'}
+              </span>
+              <span className="text-lg">
+                {state.currentQuestionIndex + 1 < state.totalQuestions ? '➡' : '🏁'}
+              </span>
             </button>
           </div>
 
@@ -1535,7 +1626,9 @@ export const QuizLiveTeacherPanel: React.FC<TeacherPanelProps> = ({
                 <strong className="text-base text-gray-800 mt-0.5 truncate max-w-full">
                   {state.leaderboard[1]?.displayName ?? '—'}
                 </strong>
-                <span className="text-sm font-black text-blue-600">{state.leaderboard[1]?.score ?? 0} đ</span>
+                <span className="text-sm font-black text-blue-600">
+                  {state.leaderboard[1]?.score ?? 0} đ
+                </span>
               </div>
               {/* Hạng 1 */}
               <div className="p-4 bg-amber-50 border-2 border-amber-300 rounded-2xl flex flex-col items-center scale-105 shadow-md">
@@ -1544,7 +1637,9 @@ export const QuizLiveTeacherPanel: React.FC<TeacherPanelProps> = ({
                 <strong className="text-lg text-gray-900 mt-0.5 truncate max-w-full">
                   {state.leaderboard[0]?.displayName ?? '—'}
                 </strong>
-                <span className="text-base font-black text-amber-600">{state.leaderboard[0]?.score ?? 0} đ</span>
+                <span className="text-base font-black text-amber-600">
+                  {state.leaderboard[0]?.score ?? 0} đ
+                </span>
               </div>
               {/* Hạng 3 */}
               <div className="p-4 bg-amber-50/50 border border-amber-200 rounded-2xl flex flex-col items-center">
@@ -1553,7 +1648,9 @@ export const QuizLiveTeacherPanel: React.FC<TeacherPanelProps> = ({
                 <strong className="text-base text-gray-800 mt-0.5 truncate max-w-full">
                   {state.leaderboard[2]?.displayName ?? '—'}
                 </strong>
-                <span className="text-sm font-black text-blue-600">{state.leaderboard[2]?.score ?? 0} đ</span>
+                <span className="text-sm font-black text-blue-600">
+                  {state.leaderboard[2]?.score ?? 0} đ
+                </span>
               </div>
             </div>
           )}
@@ -1561,26 +1658,39 @@ export const QuizLiveTeacherPanel: React.FC<TeacherPanelProps> = ({
           {/* Toàn bộ danh sách lớp */}
           <div className="divide-y divide-gray-100 max-h-80 overflow-y-auto border rounded-2xl">
             {state.leaderboard.map(entry => (
-              <div key={entry.participantId} className="p-3.5 flex items-center justify-between text-sm hover:bg-slate-50 transition-colors">
+              <div
+                key={entry.participantId}
+                className="p-3.5 flex items-center justify-between text-sm hover:bg-slate-50 transition-colors"
+              >
                 <div className="flex items-center gap-3">
-                  <span className={`w-8 h-8 rounded-full flex items-center justify-center font-black text-xs ${
-                    entry.rank === 1 ? 'bg-amber-400 text-white' :
-                    entry.rank === 2 ? 'bg-slate-300 text-slate-800' :
-                    entry.rank === 3 ? 'bg-amber-600 text-white' : 'bg-gray-100 text-gray-700'
-                  }`}>
+                  <span
+                    className={`w-8 h-8 rounded-full flex items-center justify-center font-black text-xs ${
+                      entry.rank === 1
+                        ? 'bg-amber-400 text-white'
+                        : entry.rank === 2
+                          ? 'bg-slate-300 text-slate-800'
+                          : entry.rank === 3
+                            ? 'bg-amber-600 text-white'
+                            : 'bg-gray-100 text-gray-700'
+                    }`}
+                  >
                     #{entry.rank}
                   </span>
                   <span className="font-bold text-gray-800 text-base">{entry.displayName}</span>
                 </div>
                 <div className="flex items-center gap-4 text-sm font-semibold">
                   <span className="text-amber-600">🔥 {entry.currentStreak}</span>
-                  <span className="text-emerald-600 font-bold">✔ {entry.correctCount}/{state.currentQuestionIndex + 1}</span>
+                  <span className="text-emerald-600 font-bold">
+                    ✔ {entry.correctCount}/{state.currentQuestionIndex + 1}
+                  </span>
                   <span className="text-blue-600 font-black text-base">{entry.score} đ</span>
                 </div>
               </div>
             ))}
             {state.leaderboard.length === 0 && (
-              <p className="text-sm text-gray-400 py-6 text-center">Chưa có học sinh nào nộp câu trả lời</p>
+              <p className="text-sm text-gray-400 py-6 text-center">
+                Chưa có học sinh nào nộp câu trả lời
+              </p>
             )}
           </div>
 
@@ -1591,8 +1701,14 @@ export const QuizLiveTeacherPanel: React.FC<TeacherPanelProps> = ({
               onClick={() => onSendIntent({ type: 'next_question' })}
               className="px-8 py-3.5 bg-emerald-600 hover:bg-emerald-700 text-white font-black text-lg rounded-2xl shadow-xl flex items-center gap-3 transition-all hover:scale-105 active:scale-95 cursor-pointer"
             >
-              <span>{state.currentQuestionIndex + 1 < state.totalQuestions ? 'Tiếp theo: Câu hỏi tiếp theo' : 'Tiếp theo: Tổng Kết & Trao Giải'}</span>
-              <span className="text-2xl">{state.currentQuestionIndex + 1 < state.totalQuestions ? '➡' : '🏁'}</span>
+              <span>
+                {state.currentQuestionIndex + 1 < state.totalQuestions
+                  ? 'Tiếp theo: Câu hỏi tiếp theo'
+                  : 'Tiếp theo: Tổng Kết & Trao Giải'}
+              </span>
+              <span className="text-2xl">
+                {state.currentQuestionIndex + 1 < state.totalQuestions ? '➡' : '🏁'}
+              </span>
             </button>
           </div>
         </div>
@@ -1672,9 +1788,17 @@ export const QuizLiveProjectorView: React.FC<ProjectorViewProps> = ({ state }) =
                 </span>
                 <span className="font-bold text-gray-100">{entry.displayName}</span>
                 <div className="flex items-center gap-1.5">
-                  {entry.activeReflectShield && <span title="Khiên Phản Đòn (45s)" className="animate-pulse">🪞</span>}
+                  {entry.activeReflectShield && (
+                    <span title="Khiên Phản Đòn (45s)" className="animate-pulse">
+                      🪞
+                    </span>
+                  )}
                   {entry.activeShield && <span title="Khiên Hộ Thể (45s)">🛡️</span>}
-                  {entry.isFrozen && <span title="Bị Đóng Băng" className="animate-bounce">❄️</span>}
+                  {entry.isFrozen && (
+                    <span title="Bị Đóng Băng" className="animate-bounce">
+                      ❄️
+                    </span>
+                  )}
                   {entry.isDoublePoints && <span title="x2 Điểm">⚡</span>}
                 </div>
               </div>
@@ -1728,7 +1852,8 @@ export const QuizLiveProjectorView: React.FC<ProjectorViewProps> = ({ state }) =
           {currentQ.options.map((opt, idx) => {
             const theme = KAHOOT_THEMES[idx % KAHOOT_THEMES.length]!;
             const count = stats?.optionCounts[String(idx)] ?? 0;
-            const isCorrect = state.status === 'question_review' && Number(state.currentCorrectAnswer) === idx;
+            const isCorrect =
+              state.status === 'question_review' && Number(state.currentCorrectAnswer) === idx;
 
             return (
               <div

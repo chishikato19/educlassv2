@@ -262,11 +262,16 @@ describe('Question Sets Routes (Task 2.3)', () => {
         headers: { authorization: `Bearer ${token1}` },
       });
       expect(templateRes.statusCode).toBe(200);
-      expect(templateRes.headers['content-type']).toContain('application/vnd.openxmlformats-officedocument.wordprocessingml.document');
+      expect(templateRes.headers['content-type']).toContain(
+        'application/vnd.openxmlformats-officedocument.wordprocessingml.document'
+      );
       expect(templateRes.rawPayload.length).toBeGreaterThan(100);
 
       // 13. Nhập đề từ file Word (POST /api/question-sets/import-word)
-      const fixturePath = path.resolve(process.cwd(), 'tests/fixtures/word-samples/sample-1-math-mcq.docx');
+      const fixturePath = path.resolve(
+        process.cwd(),
+        'tests/fixtures/word-samples/sample-1-math-mcq.docx'
+      );
       let docxBase64: string;
       if (fs.existsSync(fixturePath)) {
         docxBase64 = fs.readFileSync(fixturePath).toString('base64');
@@ -306,4 +311,3 @@ describe('Question Sets Routes (Task 2.3)', () => {
     }
   });
 });
-

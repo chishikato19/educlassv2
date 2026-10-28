@@ -16,14 +16,8 @@ import {
   type ExamState,
   type ParticipantExamStatus,
 } from './exam-schemas.js';
-import {
-  generateStudentExamVariant,
-  unmapStudentAnswer,
-} from './exam-shuffler.js';
-import {
-  calculateQuestionAnalysis,
-  computeExamResults,
-} from './exam-analytics.js';
+import { generateStudentExamVariant, unmapStudentAnswer } from './exam-shuffler.js';
+import { calculateQuestionAnalysis, computeExamResults } from './exam-analytics.js';
 
 interface ActiveExamData {
   questions: Question[];
@@ -60,13 +54,14 @@ export function generateParticipantReviewData(
     const mappedAnswer = unmapStudentAnswer(origQ, studentRawAnswer, optionOrder);
     const grade = gradeQuestion(origQ, mappedAnswer);
 
-    let renderedOptions: Array<{ index: number; label: string; text: string }> | undefined = undefined;
+    let renderedOptions: Array<{ index: number; label: string; text: string }> | undefined =
+      undefined;
     let studentChoiceLabel: string | null = null;
     let correctChoiceLabel: string | null = null;
 
     if (origQ.type === 'mcq4' && Array.isArray(origQ.options)) {
       if (optionOrder && optionOrder.length === 4) {
-        renderedOptions = [0, 1, 2, 3].map((pos) => {
+        renderedOptions = [0, 1, 2, 3].map(pos => {
           const origIndex = optionOrder[pos]!;
           return {
             index: pos,
@@ -76,7 +71,11 @@ export function generateParticipantReviewData(
         });
         if (typeof studentRawAnswer === 'number' && studentRawAnswer >= 0 && studentRawAnswer < 4) {
           studentChoiceLabel = baseLabels[studentRawAnswer] ?? `${studentRawAnswer + 1}`;
-        } else if (typeof studentRawAnswer === 'object' && studentRawAnswer !== null && 'selected' in studentRawAnswer) {
+        } else if (
+          typeof studentRawAnswer === 'object' &&
+          studentRawAnswer !== null &&
+          'selected' in studentRawAnswer
+        ) {
           const sel = Number((studentRawAnswer as { selected: unknown }).selected);
           if (sel >= 0 && sel < 4) {
             studentChoiceLabel = baseLabels[sel] ?? `${sel + 1}`;
@@ -100,7 +99,9 @@ export function generateParticipantReviewData(
     }
 
     const stemImages =
-      origQ.stem && typeof origQ.stem === 'object' && Array.isArray((origQ.stem as Record<string, unknown>)['images'])
+      origQ.stem &&
+      typeof origQ.stem === 'object' &&
+      Array.isArray((origQ.stem as Record<string, unknown>)['images'])
         ? ((origQ.stem as Record<string, unknown>)['images'] as string[])
         : [];
 
@@ -116,23 +117,27 @@ export function generateParticipantReviewData(
       options: renderedOptions,
       studentAnswer: studentRawAnswer,
       studentChoiceLabel,
-      correctAnswer: origQ.type === 'mcq4' ? correctChoiceLabel : (origQ.type === 'tf' ? origQ.correct : (origQ.type === 'short' ? origQ.accepted : (origQ as Record<string, unknown>)['correctAnswer'])),
+      correctAnswer:
+        origQ.type === 'mcq4'
+          ? correctChoiceLabel
+          : origQ.type === 'tf'
+            ? origQ.correct
+            : origQ.type === 'short'
+              ? origQ.accepted
+              : (origQ as Record<string, unknown>)['correctAnswer'],
       correctChoiceLabel,
       explanation: origQ.explanation ? richTextToString(origQ.explanation) : undefined,
     };
   });
 }
 
-export const ExamActivity: ActivityDefinition<
-  ExamConfig,
-  ExamState,
-  ExamResult
-> = {
+export const ExamActivity: ActivityDefinition<ExamConfig, ExamState, ExamResult> = {
   id: 'exam',
   name: 'Kỳ thi',
   version: 1,
   icon: '📝',
-  description: 'Tổ chức kỳ thi trực tiếp: xáo câu/đáp án theo từng HS, đồng hồ đếm ngược, mật khẩu thi',
+  description:
+    'Tổ chức kỳ thi trực tiếp: xáo câu/đáp án theo từng HS, đồng hồ đếm ngược, mật khẩu thi',
   capabilities: ['screen', 'files'],
   rewardTriggers: ['exam_finish', 'exam_high_score', 'exam_perfect'],
   configSchema: ExamConfigSchema,
@@ -171,11 +176,7 @@ export const ExamActivity: ActivityDefinition<
       };
     },
 
-    onTeacherIntent(
-      ctx: ActivityContext,
-      st: ExamState,
-      intent: unknown
-    ): ExamState {
+    onTeacherIntent(ctx: ActivityContext, st: ExamState, intent: unknown): ExamState {
       const teacherSchema = z.discriminatedUnion('type', [
         z.object({ type: z.literal('open_exam') }),
         z.object({ type: z.literal('close_exam') }),
@@ -214,7 +215,7 @@ export const ExamActivity: ActivityDefinition<
             const pStarted = p.startedAt ?? startedAt;
             const pExpires =
               p.individualExpiresAt ??
-              (pStarted + st.durationMinutes * 60 * 1000 + (p.extendedMinutes ?? 0) * 60 * 1000);
+              pStarted + st.durationMinutes * 60 * 1000 + (p.extendedMinutes ?? 0) * 60 * 1000;
             updatedParticipants[pid] = {
               ...p,
               startedAt: pStarted,
@@ -237,7 +238,11 @@ export const ExamActivity: ActivityDefinition<
 
           const updatedParticipants: Record<string, ParticipantExamStatus> = {};
           for (const [pid, p] of Object.entries(st.participants)) {
-            const revData = p.reviewData ?? (originalQuestions.length > 0 ? generateParticipantReviewData(originalQuestions, p) : undefined);
+            const revData =
+              p.reviewData ??
+              (originalQuestions.length > 0
+                ? generateParticipantReviewData(originalQuestions, p)
+                : undefined);
             updatedParticipants[pid] = {
               ...p,
               reviewData: revData,
@@ -245,7 +250,10 @@ export const ExamActivity: ActivityDefinition<
           }
 
           const results = computeExamResults(originalQuestions, updatedParticipants);
-          const questionAnalysis = calculateQuestionAnalysis(originalQuestions, updatedParticipants);
+          const questionAnalysis = calculateQuestionAnalysis(
+            originalQuestions,
+            updatedParticipants
+          );
 
           return {
             ...st,
@@ -425,7 +433,9 @@ export const ExamActivity: ActivityDefinition<
         incomingDisplayName ||
         (baseParticipant && !baseParticipant.displayName.startsWith('Thí sinh ')
           ? baseParticipant.displayName
-          : incomingDisplayName || baseParticipant?.displayName || `Thí sinh ${participantId.slice(0, 4)}`);
+          : incomingDisplayName ||
+            baseParticipant?.displayName ||
+            `Thí sinh ${participantId.slice(0, 4)}`);
 
       const existingParticipant: ParticipantExamStatus = baseParticipant
         ? { ...baseParticipant, displayName: participantDisplayName }
@@ -485,7 +495,10 @@ export const ExamActivity: ActivityDefinition<
               : (existingParticipant.startedAt ?? null);
           const studentExpiresAt =
             studentStartedAt !== null
-              ? (existingParticipant.individualExpiresAt ?? (studentStartedAt + st.durationMinutes * 60 * 1000 + (existingParticipant.extendedMinutes ?? 0) * 60 * 1000))
+              ? (existingParticipant.individualExpiresAt ??
+                studentStartedAt +
+                  st.durationMinutes * 60 * 1000 +
+                  (existingParticipant.extendedMinutes ?? 0) * 60 * 1000)
               : null;
 
           const updated: ParticipantExamStatus = {
@@ -537,7 +550,10 @@ export const ExamActivity: ActivityDefinition<
               : (existingParticipant.startedAt ?? null);
           const studentExpiresAt =
             studentStartedAt !== null
-              ? (existingParticipant.individualExpiresAt ?? (studentStartedAt + st.durationMinutes * 60 * 1000 + (existingParticipant.extendedMinutes ?? 0) * 60 * 1000))
+              ? (existingParticipant.individualExpiresAt ??
+                studentStartedAt +
+                  st.durationMinutes * 60 * 1000 +
+                  (existingParticipant.extendedMinutes ?? 0) * 60 * 1000)
               : null;
 
           const updated: ParticipantExamStatus = {
@@ -571,7 +587,10 @@ export const ExamActivity: ActivityDefinition<
 
           const studentStartedAt = existingParticipant.startedAt ?? now;
           const effectiveExpiresAt =
-            existingParticipant.individualExpiresAt ?? (studentStartedAt + st.durationMinutes * 60 * 1000 + (existingParticipant.extendedMinutes ?? 0) * 60 * 1000);
+            existingParticipant.individualExpiresAt ??
+            studentStartedAt +
+              st.durationMinutes * 60 * 1000 +
+              (existingParticipant.extendedMinutes ?? 0) * 60 * 1000;
           if (effectiveExpiresAt && now > effectiveExpiresAt) {
             return {
               ok: false,
@@ -596,13 +615,10 @@ export const ExamActivity: ActivityDefinition<
 
           const answeredCount = Object.keys(updatedAnswers).length;
           const progressPercent =
-            st.totalQuestions > 0
-              ? Math.round((answeredCount / st.totalQuestions) * 100)
-              : 0;
+            st.totalQuestions > 0 ? Math.round((answeredCount / st.totalQuestions) * 100) : 0;
 
           const qIdx = existingParticipant.questionOrder.indexOf(questionId);
-          const currentQuestionIndex =
-            qIdx >= 0 ? qIdx : existingParticipant.currentQuestionIndex;
+          const currentQuestionIndex = qIdx >= 0 ? qIdx : existingParticipant.currentQuestionIndex;
 
           const updated: ParticipantExamStatus = {
             ...existingParticipant,
@@ -641,9 +657,7 @@ export const ExamActivity: ActivityDefinition<
 
           if (parsed.data.currentQuestionId) {
             currentQuestionId = parsed.data.currentQuestionId;
-            const qIdx = existingParticipant.questionOrder.indexOf(
-              parsed.data.currentQuestionId
-            );
+            const qIdx = existingParticipant.questionOrder.indexOf(parsed.data.currentQuestionId);
             if (qIdx >= 0) {
               currentQuestionIndex = qIdx;
             }

@@ -33,13 +33,16 @@ interface UpdateModalProps {
   currentVersion: string;
 }
 
-export const UpdateModal: React.FC<UpdateModalProps> = ({
-  isOpen,
-  onClose,
-  currentVersion,
-}) => {
+export const UpdateModal: React.FC<UpdateModalProps> = ({ isOpen, onClose, currentVersion }) => {
   const [status, setStatus] = useState<
-    'idle' | 'checking' | 'up-to-date' | 'available' | 'downloading' | 'downloaded' | 'error' | 'not-desktop'
+    | 'idle'
+    | 'checking'
+    | 'up-to-date'
+    | 'available'
+    | 'downloading'
+    | 'downloaded'
+    | 'error'
+    | 'not-desktop'
   >('idle');
   const [latestVersion, setLatestVersion] = useState<string>('');
   const [releaseNotes, setReleaseNotes] = useState<string | null>(null);
@@ -100,13 +103,13 @@ export const UpdateModal: React.FC<UpdateModalProps> = ({
     let cleanupDownloaded: (() => void) | undefined;
 
     if (typeof api.onUpdateDownloadProgress === 'function') {
-      cleanupProgress = api.onUpdateDownloadProgress((progress) => {
+      cleanupProgress = api.onUpdateDownloadProgress(progress => {
         setDownloadPercent(progress.percent);
       });
     }
 
     if (typeof api.onUpdateDownloaded === 'function') {
-      cleanupDownloaded = api.onUpdateDownloaded((info) => {
+      cleanupDownloaded = api.onUpdateDownloaded(info => {
         setStatus('downloaded');
         if (info.version) setLatestVersion(info.version);
       });
@@ -148,7 +151,9 @@ export const UpdateModal: React.FC<UpdateModalProps> = ({
         {status === 'checking' && (
           <div style={{ textAlign: 'center', padding: '24px 0' }}>
             <div style={{ fontSize: '36px', marginBottom: '12px' }}>🔄</div>
-            <div style={{ fontSize: '16px', fontWeight: 700, color: '#1E293B', marginBottom: '6px' }}>
+            <div
+              style={{ fontSize: '16px', fontWeight: 700, color: '#1E293B', marginBottom: '6px' }}
+            >
               Đang kiểm tra phiên bản mới từ GitHub...
             </div>
             <div style={{ fontSize: '13px', color: '#64748B' }}>
@@ -160,7 +165,9 @@ export const UpdateModal: React.FC<UpdateModalProps> = ({
         {status === 'up-to-date' && (
           <div style={{ textAlign: 'center', padding: '20px 0' }}>
             <div style={{ fontSize: '40px', marginBottom: '12px' }}>🎉</div>
-            <div style={{ fontSize: '17px', fontWeight: 800, color: '#0F172A', marginBottom: '6px' }}>
+            <div
+              style={{ fontSize: '17px', fontWeight: 800, color: '#0F172A', marginBottom: '6px' }}
+            >
               Bạn đang sử dụng phiên bản mới nhất!
             </div>
             <div style={{ fontSize: '14px', color: '#475569', marginBottom: '16px' }}>
@@ -204,7 +211,14 @@ export const UpdateModal: React.FC<UpdateModalProps> = ({
 
             {releaseNotes && (
               <div style={{ marginBottom: '16px' }}>
-                <div style={{ fontSize: '13px', fontWeight: 700, color: '#334155', marginBottom: '6px' }}>
+                <div
+                  style={{
+                    fontSize: '13px',
+                    fontWeight: 700,
+                    color: '#334155',
+                    marginBottom: '6px',
+                  }}
+                >
                   Điểm mới trong phiên bản này:
                 </div>
                 <div
@@ -226,7 +240,8 @@ export const UpdateModal: React.FC<UpdateModalProps> = ({
             )}
 
             <div style={{ fontSize: '13px', color: '#64748B', marginBottom: '20px' }}>
-              💡 Gói cập nhật vi sai chỉ tải các phần thay đổi (~5–15MB) mà không ảnh hưởng tới dữ liệu lớp học hiện có.
+              💡 Gói cập nhật vi sai chỉ tải các phần thay đổi (~5–15MB) mà không ảnh hưởng tới dữ
+              liệu lớp học hiện có.
             </div>
 
             <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '10px' }}>
@@ -247,7 +262,9 @@ export const UpdateModal: React.FC<UpdateModalProps> = ({
         {status === 'downloading' && (
           <div style={{ textAlign: 'center', padding: '16px 0' }}>
             <div style={{ fontSize: '32px', marginBottom: '12px' }}>📦</div>
-            <div style={{ fontSize: '16px', fontWeight: 800, color: '#1E293B', marginBottom: '6px' }}>
+            <div
+              style={{ fontSize: '16px', fontWeight: 800, color: '#1E293B', marginBottom: '6px' }}
+            >
               Đang tải bản cập nhật v{latestVersion}...
             </div>
             <div style={{ fontSize: '13px', color: '#64748B', marginBottom: '20px' }}>
@@ -283,11 +300,14 @@ export const UpdateModal: React.FC<UpdateModalProps> = ({
         {status === 'downloaded' && (
           <div style={{ textAlign: 'center', padding: '16px 0' }}>
             <div style={{ fontSize: '40px', marginBottom: '12px' }}>✨</div>
-            <div style={{ fontSize: '17px', fontWeight: 800, color: '#0F172A', marginBottom: '6px' }}>
+            <div
+              style={{ fontSize: '17px', fontWeight: 800, color: '#0F172A', marginBottom: '6px' }}
+            >
               Đã tải xong bản cập nhật v{latestVersion}!
             </div>
             <div style={{ fontSize: '13px', color: '#475569', marginBottom: '20px' }}>
-              Bạn có thể khởi động lại ngay bây giờ để áp dụng bản mới (chỉ mất ~10 giây), hoặc để app tự cập nhật khi bạn kết thúc buổi dạy.
+              Bạn có thể khởi động lại ngay bây giờ để áp dụng bản mới (chỉ mất ~10 giây), hoặc để
+              app tự cập nhật khi bạn kết thúc buổi dạy.
             </div>
 
             <div style={{ display: 'flex', justifyContent: 'center', gap: '12px' }}>
@@ -308,7 +328,9 @@ export const UpdateModal: React.FC<UpdateModalProps> = ({
         {status === 'error' && (
           <div style={{ textAlign: 'center', padding: '16px 0' }}>
             <div style={{ fontSize: '36px', marginBottom: '12px' }}>⚠️</div>
-            <div style={{ fontSize: '16px', fontWeight: 800, color: '#DC2626', marginBottom: '6px' }}>
+            <div
+              style={{ fontSize: '16px', fontWeight: 800, color: '#DC2626', marginBottom: '6px' }}
+            >
               Không thể kiểm tra hoặc tải bản cập nhật
             </div>
             <div
@@ -340,11 +362,14 @@ export const UpdateModal: React.FC<UpdateModalProps> = ({
         {status === 'not-desktop' && (
           <div style={{ textAlign: 'center', padding: '16px 0' }}>
             <div style={{ fontSize: '36px', marginBottom: '12px' }}>🌐</div>
-            <div style={{ fontSize: '16px', fontWeight: 700, color: '#1E293B', marginBottom: '8px' }}>
+            <div
+              style={{ fontSize: '16px', fontWeight: 700, color: '#1E293B', marginBottom: '8px' }}
+            >
               Đang mở trên trình duyệt web
             </div>
             <div style={{ fontSize: '13px', color: '#64748B', marginBottom: '20px' }}>
-              Tính năng tự động cập nhật được tích hợp trực tiếp trên ứng dụng <strong>EduClass v2 Desktop</strong> cho giáo viên.
+              Tính năng tự động cập nhật được tích hợp trực tiếp trên ứng dụng{' '}
+              <strong>EduClass v2 Desktop</strong> cho giáo viên.
             </div>
             <Button variant="secondary" onClick={onClose}>
               Đã hiểu

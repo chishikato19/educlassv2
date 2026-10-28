@@ -65,9 +65,7 @@ export const SpeedRaceView: React.FC<SpeedRaceViewProps> = ({
             />
           </div>
 
-          <div className="text-xs font-bold text-slate-400">
-            Gói {state.totalQuestions} câu hỏi
-          </div>
+          <div className="text-xs font-bold text-slate-400">Gói {state.totalQuestions} câu hỏi</div>
         </div>
 
         {/* Thanh Giằng Co Tỉ Số */}
@@ -133,9 +131,7 @@ export const SpeedRaceView: React.FC<SpeedRaceViewProps> = ({
             <div>
               <div className="flex items-center gap-2">
                 <span className="w-3.5 h-3.5 rounded-full bg-blue-500 shadow-md shadow-blue-500/50" />
-                <h3 className="font-extrabold text-lg text-blue-300">
-                  {bluePlayer.teamName}
-                </h3>
+                <h3 className="font-extrabold text-lg text-blue-300">{bluePlayer.teamName}</h3>
                 {bluePlayer.streak > 1 && (
                   <span className="px-2 py-0.5 rounded-full bg-amber-500/20 text-amber-300 text-xs font-bold border border-amber-500/30">
                     🔥 x{bluePlayer.streak}
@@ -143,7 +139,9 @@ export const SpeedRaceView: React.FC<SpeedRaceViewProps> = ({
                 )}
               </div>
               <p className="text-xs text-slate-400 mt-1">
-                Tiến độ: <span className="font-bold text-blue-300">{bluePlayer.currentQuestionIndex}</span> / {state.totalQuestions} câu
+                Tiến độ:{' '}
+                <span className="font-bold text-blue-300">{bluePlayer.currentQuestionIndex}</span> /{' '}
+                {state.totalQuestions} câu
               </p>
             </div>
             <div className="text-3xl font-black font-mono text-blue-400">
@@ -176,9 +174,7 @@ export const SpeedRaceView: React.FC<SpeedRaceViewProps> = ({
                 <span className="text-xs font-bold text-blue-400 uppercase tracking-wider block mb-1">
                   Câu {bluePlayer.currentQuestionIndex + 1}
                 </span>
-                <p className="text-lg font-bold text-white leading-relaxed">
-                  {blueQ.stem}
-                </p>
+                <p className="text-lg font-bold text-white leading-relaxed">{blueQ.stem}</p>
                 {blueQ.image && (
                   <img
                     src={blueQ.image}
@@ -255,9 +251,7 @@ export const SpeedRaceView: React.FC<SpeedRaceViewProps> = ({
             <div>
               <div className="flex items-center gap-2">
                 <span className="w-3.5 h-3.5 rounded-full bg-red-500 shadow-md shadow-red-500/50" />
-                <h3 className="font-extrabold text-lg text-red-300">
-                  {redPlayer.teamName}
-                </h3>
+                <h3 className="font-extrabold text-lg text-red-300">{redPlayer.teamName}</h3>
                 {redPlayer.streak > 1 && (
                   <span className="px-2 py-0.5 rounded-full bg-amber-500/20 text-amber-300 text-xs font-bold border border-amber-500/30">
                     🔥 x{redPlayer.streak}
@@ -265,7 +259,9 @@ export const SpeedRaceView: React.FC<SpeedRaceViewProps> = ({
                 )}
               </div>
               <p className="text-xs text-slate-400 mt-1">
-                Tiến độ: <span className="font-bold text-red-300">{redPlayer.currentQuestionIndex}</span> / {state.totalQuestions} câu
+                Tiến độ:{' '}
+                <span className="font-bold text-red-300">{redPlayer.currentQuestionIndex}</span> /{' '}
+                {state.totalQuestions} câu
               </p>
             </div>
             <div className="text-3xl font-black font-mono text-red-400">
@@ -298,9 +294,7 @@ export const SpeedRaceView: React.FC<SpeedRaceViewProps> = ({
                 <span className="text-xs font-bold text-red-400 uppercase tracking-wider block mb-1">
                   Câu {redPlayer.currentQuestionIndex + 1}
                 </span>
-                <p className="text-lg font-bold text-white leading-relaxed">
-                  {redQ.stem}
-                </p>
+                <p className="text-lg font-bold text-white leading-relaxed">{redQ.stem}</p>
                 {redQ.image && (
                   <img
                     src={redQ.image}

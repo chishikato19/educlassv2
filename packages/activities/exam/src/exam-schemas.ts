@@ -1,8 +1,5 @@
 import { z } from 'zod';
-import {
-  QuestionPublicSchema,
-  QuestionSchema,
-} from '@educlass/question-kit';
+import { QuestionPublicSchema, QuestionSchema } from '@educlass/question-kit';
 
 /**
  * Cấu hình khi giáo viên khởi tạo Kỳ thi (Task 4.1)

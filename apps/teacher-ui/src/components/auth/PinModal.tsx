@@ -10,12 +10,7 @@ export interface PinModalProps {
   onSuccess: (user: UserDto) => void;
 }
 
-export const PinModal: React.FC<PinModalProps> = ({
-  teacher,
-  isOpen,
-  onClose,
-  onSuccess,
-}) => {
+export const PinModal: React.FC<PinModalProps> = ({ teacher, isOpen, onClose, onSuccess }) => {
   const [pin, setPin] = useState<string>('');
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(false);
@@ -44,9 +39,11 @@ export const PinModal: React.FC<PinModalProps> = ({
         onSuccess(res.user);
       } catch (err: unknown) {
         const message = err instanceof Error ? err.message : 'Mã PIN không chính xác';
-        setErrorMsg(message.includes('Mật khẩu') || message.includes('CREDENTIALS') 
-          ? 'Mã PIN không đúng (Mặc định: 1234).' 
-          : message);
+        setErrorMsg(
+          message.includes('Mật khẩu') || message.includes('CREDENTIALS')
+            ? 'Mã PIN không đúng (Mặc định: 1234).'
+            : message
+        );
         setPin('');
       } finally {
         setIsLoading(false);
@@ -71,7 +68,7 @@ export const PinModal: React.FC<PinModalProps> = ({
 
   const handleDelete = useCallback(() => {
     if (pin.length > 0 && !isLoading) {
-      setPin((prev) => prev.slice(0, -1));
+      setPin(prev => prev.slice(0, -1));
       setErrorMsg(null);
     }
   }, [pin, isLoading]);
@@ -142,7 +139,8 @@ export const PinModal: React.FC<PinModalProps> = ({
               <span className="text-xl">⚠️</span> Đặt lại mã PIN về mặc định?
             </div>
             <p className="text-sm text-gray-600 mb-4">
-              Mã PIN của tài khoản <strong>{teacher.displayName}</strong> sẽ được đặt lại về <strong>1234</strong>.
+              Mã PIN của tài khoản <strong>{teacher.displayName}</strong> sẽ được đặt lại về{' '}
+              <strong>1234</strong>.
             </p>
             <div className="flex gap-2">
               <Button
@@ -167,7 +165,7 @@ export const PinModal: React.FC<PinModalProps> = ({
           <>
             {/* Hiển thị các chấm PIN */}
             <div className="flex gap-3 my-6 justify-center">
-              {[0, 1, 2, 3].map((index) => {
+              {[0, 1, 2, 3].map(index => {
                 const isFilled = index < pin.length;
                 return (
                   <div
@@ -198,7 +196,7 @@ export const PinModal: React.FC<PinModalProps> = ({
 
             {/* Bàn phím số cảm ứng (Numpad) */}
             <div className="grid grid-cols-3 gap-2.5 w-64 max-w-full mb-3">
-              {['1', '2', '3', '4', '5', '6', '7', '8', '9'].map((digit) => (
+              {['1', '2', '3', '4', '5', '6', '7', '8', '9'].map(digit => (
                 <button
                   key={digit}
                   type="button"

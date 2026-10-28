@@ -53,9 +53,9 @@ describe('ClassRepository', () => {
       // Lọc theo ownerId của GV A
       const classesOfA = await classRepo.list({ ownerId: teacherA.id });
       expect(classesOfA).toHaveLength(2);
-      expect(classesOfA.map((c) => c.name)).toContain('10A1');
-      expect(classesOfA.map((c) => c.name)).toContain('10A2');
-      expect(classesOfA.map((c) => c.name)).not.toContain('11B1');
+      expect(classesOfA.map(c => c.name)).toContain('10A1');
+      expect(classesOfA.map(c => c.name)).toContain('10A2');
+      expect(classesOfA.map(c => c.name)).not.toContain('11B1');
 
       // Lọc theo ownerId của GV B
       const classesOfB = await classRepo.list({ ownerId: teacherB.id });

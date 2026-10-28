@@ -44,20 +44,20 @@ export const LogoutWarningModal: React.FC<LogoutWarningModalProps> = ({
         <div className="p-4 bg-amber-50 rounded-2xl border border-amber-200 flex items-start gap-3">
           <span className="text-3xl">⚠️</span>
           <div>
-            <h4 className="font-bold text-amber-900 text-base">
-              Tiết dạy vẫn đang hoạt động!
-            </h4>
+            <h4 className="font-bold text-amber-900 text-base">Tiết dạy vẫn đang hoạt động!</h4>
             <p className="text-sm text-gray-700 mt-1">
-              Lớp:{' '}
-              <strong>{classNameTitle || 'Tiết dạy tự do'}</strong>
+              Lớp: <strong>{classNameTitle || 'Tiết dạy tự do'}</strong>
               {joinCode && (
                 <>
-                  {' '}— Mã vào lớp: <strong className="tracking-wider text-blue-600 font-mono">{joinCode}</strong>
+                  {' '}
+                  — Mã vào lớp:{' '}
+                  <strong className="tracking-wider text-blue-600 font-mono">{joinCode}</strong>
                 </>
               )}
             </p>
             <p className="text-xs text-gray-500 mt-1">
-              Học sinh vẫn đang kết nối trong phòng học. Thầy/Cô muốn xử lý phiên học này như thế nào trước khi đăng xuất?
+              Học sinh vẫn đang kết nối trong phòng học. Thầy/Cô muốn xử lý phiên học này như thế
+              nào trước khi đăng xuất?
             </p>
           </div>
         </div>

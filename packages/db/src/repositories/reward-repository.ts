@@ -12,7 +12,6 @@ import {
 export type RewardLogInsert = typeof rewardLog.$inferInsert;
 export type RewardLogSelect = typeof rewardLog.$inferSelect;
 
-
 export interface StudentRewardUpdate {
   studentId: string;
   exp: number;
@@ -96,7 +95,7 @@ export class RewardRepository {
       id: logId,
     };
 
-    this.db.transaction((tx) => {
+    this.db.transaction(tx => {
       tx.insert(rewardLog).values(logPayload).run();
       if (data.studentUpdate) {
         tx.update(students)
@@ -173,7 +172,7 @@ export class RewardRepository {
       enabled?: boolean | undefined;
     }>
   ): Promise<RewardRuleSelect[]> {
-    this.db.transaction((tx) => {
+    this.db.transaction(tx => {
       // 1. Xóa các quy tắc cũ của giáo viên này
       tx.delete(rewardRules).where(eq(rewardRules.ownerId, teacherId)).run();
 
@@ -218,7 +217,7 @@ export class RewardRepository {
       return existing;
     }
 
-    this.db.transaction((tx) => {
+    this.db.transaction(tx => {
       for (const d of defaults) {
         const payload: RewardRuleInsert = {
           id: generateId(),
@@ -262,4 +261,3 @@ export class RewardRepository {
     return { sessionExp, activityExp };
   }
 }
-

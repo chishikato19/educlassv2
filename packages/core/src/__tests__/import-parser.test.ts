@@ -71,9 +71,7 @@ describe('Students Import Parser & Preview (packages/core)', () => {
         { fullName: 'Lê Văn Cường', code: 'HS099' }, // Đã có sẵn trong lớp -> warning
       ];
 
-      const existingStudents = [
-        { fullName: 'Lê Văn Cường', code: 'HS099' },
-      ];
+      const existingStudents = [{ fullName: 'Lê Văn Cường', code: 'HS099' }];
 
       const preview = validateAndPreviewStudents(rows, existingStudents);
 

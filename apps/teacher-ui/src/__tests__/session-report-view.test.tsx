@@ -125,7 +125,9 @@ describe('SessionReportView Component (Task 3.4)', () => {
     expect(screen.getByText('Thủ đô của nước Úc là thành phố nào?')).toBeDefined();
     expect(screen.getByTestId('error-rate-q-5').textContent).toContain('67%');
     expect(
-      screen.getByText('⚠️ Khuyến nghị: Giáo viên nên giảng lại hoặc cho cả lớp ôn tập kiến thức này.')
+      screen.getByText(
+        '⚠️ Khuyến nghị: Giáo viên nên giảng lại hoặc cho cả lớp ôn tập kiến thức này.'
+      )
     ).toBeDefined();
   });
 
@@ -230,4 +232,3 @@ describe('SessionReportView Component (Task 3.4)', () => {
     expect(screen.queryByTestId('projector-overlay')).toBeNull();
   });
 });
-

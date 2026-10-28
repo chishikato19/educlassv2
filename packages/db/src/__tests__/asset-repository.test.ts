@@ -23,9 +23,7 @@ describe('AssetRepository', () => {
     });
 
     expect(asset.id).toBeDefined();
-    expect(asset.sha256).toBe(
-      'e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855',
-    );
+    expect(asset.sha256).toBe('e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855');
     expect(asset.mime).toBe('image/png');
     expect(asset.size).toBe(1024);
 

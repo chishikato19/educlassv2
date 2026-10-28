@@ -92,7 +92,8 @@ export const RichTextEditor: React.FC<RichTextEditorProps> = ({
     });
   };
 
-  const hasMath = value.text.includes('$') || value.text.includes('\\(') || value.text.includes('\\[');
+  const hasMath =
+    value.text.includes('$') || value.text.includes('\\(') || value.text.includes('\\[');
 
   return (
     <div
@@ -115,7 +116,7 @@ export const RichTextEditor: React.FC<RichTextEditorProps> = ({
         data-testid={`input-${testIdPrefix}-text`}
         value={value.text}
         rows={minRows}
-        onChange={(e) => onChange({ ...value, text: e.target.value })}
+        onChange={e => onChange({ ...value, text: e.target.value })}
         onPaste={handlePaste}
         placeholder={placeholder}
         className="w-full px-3 py-2 border border-gray-200 rounded-md focus:outline-none focus:ring-2 focus:ring-primary text-gray-900 text-sm"
@@ -131,7 +132,8 @@ export const RichTextEditor: React.FC<RichTextEditorProps> = ({
             data-testid={`preview-${testIdPrefix}-katex`}
             className="text-sm text-gray-800 break-words rich-content"
             dangerouslySetInnerHTML={{
-              __html: renderLatexInText(value.text) || '<span class="text-gray-400 italic">Rỗng</span>',
+              __html:
+                renderLatexInText(value.text) || '<span class="text-gray-400 italic">Rỗng</span>',
             }}
           />
         </div>
@@ -147,7 +149,7 @@ export const RichTextEditor: React.FC<RichTextEditorProps> = ({
             ref={fileInputRef}
             style={{ display: 'none' }}
             data-testid={`file-input-${testIdPrefix}`}
-            onChange={async (e) => {
+            onChange={async e => {
               if (e.target.files && e.target.files.length > 0) {
                 const files = Array.from(e.target.files);
                 await handleAddImageFiles(files);

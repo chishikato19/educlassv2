@@ -25,6 +25,7 @@ export const volleyballTournamentPlugin: ActivityHostPlugin = {
   id: 'volleyball-tournament',
   name: 'Đấu Bóng Chuyền (thử nghiệm)',
   icon: '🏐',
-  description: 'Thi đấu vòng bảng và bắt cặp xếp hạng 4 Cúp phân tầng theo thể thức bóng chuyền chuyên nghiệp',
+  description:
+    'Thi đấu vòng bảng và bắt cặp xếp hạng 4 Cúp phân tầng theo thể thức bóng chuyền chuyên nghiệp',
   component: VolleyballTournamentHostComponent,
 };

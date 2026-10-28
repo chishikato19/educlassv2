@@ -91,7 +91,7 @@ export const ActivityHostWindow: React.FC = () => {
       );
     };
 
-    ws.onmessage = (event) => {
+    ws.onmessage = event => {
       try {
         const envelope = JSON.parse(event.data);
         const type = envelope.type;
@@ -110,7 +110,7 @@ export const ActivityHostWindow: React.FC = () => {
             return;
           }
           const nextState = payload?.state ?? payload;
-          setActiveRun((prev) => {
+          setActiveRun(prev => {
             if (prev) {
               if (targetRunId && prev.runId !== targetRunId) return prev;
               return { ...prev, state: nextState };
@@ -159,7 +159,7 @@ export const ActivityHostWindow: React.FC = () => {
       try {
         const res = await api.sendTeacherIntent(sessionId, activeRun.runId, intent);
         if (res && res.state) {
-          setActiveRun((prev) => (prev ? { ...prev, state: res.state } : null));
+          setActiveRun(prev => (prev ? { ...prev, state: res.state } : null));
         }
       } catch (err: unknown) {
         console.error('Lỗi khi gửi lệnh điều khiển:', err);
@@ -182,9 +182,15 @@ export const ActivityHostWindow: React.FC = () => {
   // 5. Quản lý toàn màn hình (F11 / Fullscreen)
   const toggleFullscreen = () => {
     if (!document.fullscreenElement) {
-      document.documentElement.requestFullscreen().then(() => setIsFullscreen(true)).catch(() => {});
+      document.documentElement
+        .requestFullscreen()
+        .then(() => setIsFullscreen(true))
+        .catch(() => {});
     } else {
-      document.exitFullscreen().then(() => setIsFullscreen(false)).catch(() => {});
+      document
+        .exitFullscreen()
+        .then(() => setIsFullscreen(false))
+        .catch(() => {});
     }
   };
 
@@ -213,10 +219,16 @@ export const ActivityHostWindow: React.FC = () => {
   const isFactionDuelActivity = activeRun?.activityId === 'faction-duel';
 
   const isFullScreenActivity =
-    activeRun?.activityId === 'object-camera' || isQuizizzActivity || isSwissDuelActivity || isFactionDuelActivity;
+    activeRun?.activityId === 'object-camera' ||
+    isQuizizzActivity ||
+    isSwissDuelActivity ||
+    isFactionDuelActivity;
 
   const isDarkActivity =
-    activeRun?.activityId === 'object-camera' || isQuizizzActivity || isSwissDuelActivity || isFactionDuelActivity;
+    activeRun?.activityId === 'object-camera' ||
+    isQuizizzActivity ||
+    isSwissDuelActivity ||
+    isFactionDuelActivity;
 
   return (
     <div
@@ -224,8 +236,8 @@ export const ActivityHostWindow: React.FC = () => {
         isSwissDuelActivity
           ? 'bg-[#150c06] text-[#f4ecd8]'
           : isDarkActivity
-          ? 'bg-[#0a0718] text-slate-100'
-          : 'bg-slate-100 text-slate-800'
+            ? 'bg-[#0a0718] text-slate-100'
+            : 'bg-slate-100 text-slate-800'
       }`}
     >
       {/* 1. Thanh Header Điều Khiển Cửa Sổ */}
@@ -251,7 +263,9 @@ export const ActivityHostWindow: React.FC = () => {
                 Cửa sổ Độc lập
               </span>
             </h1>
-            <div className={`text-[10px] md:text-[11px] flex items-center gap-2 ${isSwissDuelActivity ? 'text-amber-200/70' : 'text-slate-400'}`}>
+            <div
+              className={`text-[10px] md:text-[11px] flex items-center gap-2 ${isSwissDuelActivity ? 'text-amber-200/70' : 'text-slate-400'}`}
+            >
               <span
                 className={`w-2 h-2 rounded-full inline-block ${
                   isConnected ? 'bg-emerald-400 animate-pulse' : 'bg-rose-400'
@@ -293,12 +307,18 @@ export const ActivityHostWindow: React.FC = () => {
       {/* 2. Thân hiển thị nội dung tiện ích */}
       {(() => {
         return (
-          <main className={`flex-1 flex flex-col min-h-0 ${isFullScreenActivity ? 'p-0 overflow-hidden' : 'p-4 md:p-6 overflow-y-auto'}`}>
+          <main
+            className={`flex-1 flex flex-col min-h-0 ${isFullScreenActivity ? 'p-0 overflow-hidden' : 'p-4 md:p-6 overflow-y-auto'}`}
+          >
             {isLoading ? (
               <div className="flex-1 flex flex-col items-center justify-center text-center p-8">
                 <div className="w-12 h-12 border-4 border-blue-600 border-t-transparent rounded-full animate-spin mb-4" />
-                <h2 className="text-base font-bold text-slate-700">Đang khởi tạo cửa sổ hoạt động...</h2>
-                <p className="text-xs text-slate-500 mt-1">Đang kết nối dữ liệu phiên học với máy chủ</p>
+                <h2 className="text-base font-bold text-slate-700">
+                  Đang khởi tạo cửa sổ hoạt động...
+                </h2>
+                <p className="text-xs text-slate-500 mt-1">
+                  Đang kết nối dữ liệu phiên học với máy chủ
+                </p>
               </div>
             ) : errorMsg ? (
               <div className="flex-1 flex flex-col items-center justify-center text-center p-8">
@@ -326,7 +346,8 @@ export const ActivityHostWindow: React.FC = () => {
                 <span className="text-6xl mb-3">🏁</span>
                 <h2 className="text-xl font-black text-slate-800">Hoạt động đã kết thúc!</h2>
                 <p className="text-sm text-slate-500 mt-2 max-w-md">
-                  Toàn bộ kết quả và điểm thưởng EXP đã được ghi nhận tự động vào báo cáo tiết học trên máy chủ.
+                  Toàn bộ kết quả và điểm thưởng EXP đã được ghi nhận tự động vào báo cáo tiết học
+                  trên máy chủ.
                 </p>
                 <div className="mt-6 flex gap-3">
                   <button
@@ -339,9 +360,11 @@ export const ActivityHostWindow: React.FC = () => {
                 </div>
               </div>
             ) : PluginComponent ? (
-              <div className={`flex-1 w-full flex flex-col min-h-0 ${isFullScreenActivity ? 'h-full' : 'max-w-7xl mx-auto'}`}>
+              <div
+                className={`flex-1 w-full flex flex-col min-h-0 ${isFullScreenActivity ? 'h-full' : 'max-w-7xl mx-auto'}`}
+              >
                 <ErrorBoundary
-                  fallback={(error) => (
+                  fallback={error => (
                     <div className="flex-1 flex flex-col items-center justify-center text-center p-8 bg-white rounded-2xl border border-rose-200 shadow-sm my-auto">
                       <span className="text-5xl mb-3">⚠️</span>
                       <h2 className="text-lg font-bold text-rose-600">

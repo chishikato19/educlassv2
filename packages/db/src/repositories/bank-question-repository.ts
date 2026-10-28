@@ -46,7 +46,7 @@ export class BankQuestionRepository {
       id?: string | undefined;
       createdAt?: number | undefined;
       updatedAt?: number | undefined;
-    },
+    }
   ): Promise<BankQuestionSelect> {
     const now = Date.now();
     const id = data.id ?? generateId();
@@ -76,11 +76,11 @@ export class BankQuestionRepository {
         createdAt?: number | undefined;
         updatedAt?: number | undefined;
       }
-    >,
+    >
   ): Promise<number> {
     if (items.length === 0) return 0;
     const now = Date.now();
-    const payloads: BankQuestionInsert[] = items.map((item) => ({
+    const payloads: BankQuestionInsert[] = items.map(item => ({
       ...item,
       id: item.id ?? generateId(),
       points: item.points ?? 10,
@@ -96,11 +96,7 @@ export class BankQuestionRepository {
    * Tìm câu hỏi theo ID
    */
   async findById(id: string): Promise<BankQuestionSelect | null> {
-    const res = await this.db
-      .select()
-      .from(bankQuestions)
-      .where(eq(bankQuestions.id, id))
-      .limit(1);
+    const res = await this.db.select().from(bankQuestions).where(eq(bankQuestions.id, id)).limit(1);
     return res[0] ?? null;
   }
 
@@ -109,7 +105,7 @@ export class BankQuestionRepository {
    */
   async update(
     id: string,
-    data: Partial<Omit<BankQuestionInsert, 'id' | 'createdAt' | 'updatedAt'>>,
+    data: Partial<Omit<BankQuestionInsert, 'id' | 'createdAt' | 'updatedAt'>>
   ): Promise<BankQuestionSelect | null> {
     const existing = await this.findById(id);
     if (!existing) return null;
@@ -119,10 +115,7 @@ export class BankQuestionRepository {
       updatedAt: Date.now(),
     };
 
-    await this.db
-      .update(bankQuestions)
-      .set(updatePayload)
-      .where(eq(bankQuestions.id, id));
+    await this.db.update(bankQuestions).set(updatePayload).where(eq(bankQuestions.id, id));
 
     return this.findById(id);
   }
@@ -131,9 +124,7 @@ export class BankQuestionRepository {
    * Xóa một câu hỏi theo ID
    */
   async delete(id: string): Promise<boolean> {
-    const res = await this.db
-      .delete(bankQuestions)
-      .where(eq(bankQuestions.id, id));
+    const res = await this.db.delete(bankQuestions).where(eq(bankQuestions.id, id));
     return (res.changes ?? 0) > 0;
   }
 
@@ -142,9 +133,7 @@ export class BankQuestionRepository {
    */
   async deleteMany(ids: string[]): Promise<number> {
     if (ids.length === 0) return 0;
-    const res = await this.db
-      .delete(bankQuestions)
-      .where(inArray(bankQuestions.id, ids));
+    const res = await this.db.delete(bankQuestions).where(inArray(bankQuestions.id, ids));
     return res.changes ?? 0;
   }
 
@@ -178,17 +167,11 @@ export class BankQuestionRepository {
     if (filter?.search?.trim()) {
       const term = `%${filter.search.trim()}%`;
       conditions.push(
-        or(
-          like(bankQuestions.contentJson, term),
-          like(bankQuestions.answerJson, term),
-        ),
+        or(like(bankQuestions.contentJson, term), like(bankQuestions.answerJson, term))
       );
     }
 
-    let query = this.db
-      .select()
-      .from(bankQuestions)
-      .orderBy(desc(bankQuestions.createdAt));
+    let query = this.db.select().from(bankQuestions).orderBy(desc(bankQuestions.createdAt));
 
     if (conditions.length > 0) {
       query = query.where(and(...conditions)) as typeof query;
@@ -209,7 +192,7 @@ export class BankQuestionRepository {
   async getCurriculumTree(
     ownerId: string,
     grade: number,
-    subject: string,
+    subject: string
   ): Promise<BankCurriculumTreeResult[]> {
     const rows = await this.db
       .select({
@@ -223,14 +206,10 @@ export class BankQuestionRepository {
         and(
           eq(bankQuestions.ownerId, ownerId),
           eq(bankQuestions.grade, grade),
-          eq(bankQuestions.subject, subject),
-        ),
+          eq(bankQuestions.subject, subject)
+        )
       )
-      .groupBy(
-        bankQuestions.chapter,
-        bankQuestions.lesson,
-        bankQuestions.difficulty,
-      );
+      .groupBy(bankQuestions.chapter, bankQuestions.lesson, bankQuestions.difficulty);
 
     // Gom nhóm theo Chapter -> Lesson
     const chapterMap = new Map<
@@ -289,7 +268,7 @@ export class BankQuestionRepository {
     ownerId: string,
     grade: number,
     subject: string,
-    lessons?: string[],
+    lessons?: string[]
   ): Promise<
     Record<
       string,
@@ -320,11 +299,7 @@ export class BankQuestionRepository {
       })
       .from(bankQuestions)
       .where(and(...conditions))
-      .groupBy(
-        bankQuestions.chapter,
-        bankQuestions.lesson,
-        bankQuestions.difficulty,
-      );
+      .groupBy(bankQuestions.chapter, bankQuestions.lesson, bankQuestions.difficulty);
 
     const stats: Record<
       string,
@@ -365,7 +340,7 @@ export class BankQuestionRepository {
     ownerId: string,
     lesson: string,
     difficulty: BankQuestionSelect['difficulty'],
-    limit: number,
+    limit: number
   ): Promise<BankQuestionSelect[]> {
     if (limit <= 0) return [];
     return this.db
@@ -375,8 +350,8 @@ export class BankQuestionRepository {
         and(
           eq(bankQuestions.ownerId, ownerId),
           eq(bankQuestions.lesson, lesson),
-          eq(bankQuestions.difficulty, difficulty),
-        ),
+          eq(bankQuestions.difficulty, difficulty)
+        )
       )
       .orderBy(sql`RANDOM()`)
       .limit(limit);
@@ -390,12 +365,7 @@ export class BankQuestionRepository {
     const res = await this.db
       .select({ id: bankQuestions.id })
       .from(bankQuestions)
-      .where(
-        or(
-          like(bankQuestions.contentJson, term),
-          like(bankQuestions.answerJson, term),
-        ),
-      )
+      .where(or(like(bankQuestions.contentJson, term), like(bankQuestions.answerJson, term)))
       .limit(1);
     return res.length > 0;
   }

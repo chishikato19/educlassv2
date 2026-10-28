@@ -1,11 +1,7 @@
 import React from 'react';
 import type { RandomPickerModeProps } from '../types.js';
 
-export const CardFlipMode: React.FC<RandomPickerModeProps> = ({
-  isPicking,
-  cards,
-  onFlipCard,
-}) => {
+export const CardFlipMode: React.FC<RandomPickerModeProps> = ({ isPicking, cards, onFlipCard }) => {
   return (
     <div className="w-full flex flex-col items-center justify-center py-6 select-none">
       {/* Container 5 thẻ bài */}
@@ -23,7 +19,9 @@ export const CardFlipMode: React.FC<RandomPickerModeProps> = ({
                 }
               }}
               className={`relative w-36 h-56 sm:w-44 sm:h-64 cursor-pointer perspective-1000 transition-transform duration-300 ${
-                !isFlipped && !isPicking ? 'hover:-translate-y-2 hover:scale-105 active:scale-95' : ''
+                !isFlipped && !isPicking
+                  ? 'hover:-translate-y-2 hover:scale-105 active:scale-95'
+                  : ''
               } ${isPicking ? 'animate-pulse' : ''}`}
               style={{ perspective: '1000px' }}
               role="button"

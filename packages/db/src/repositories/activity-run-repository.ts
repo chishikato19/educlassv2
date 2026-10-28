@@ -55,11 +55,7 @@ export class ActivityRunRepository {
    * Tìm lượt chạy theo ID
    */
   async findRunById(id: string): Promise<ActivityRunSelect | null> {
-    const [run] = await this.db
-      .select()
-      .from(activityRuns)
-      .where(eq(activityRuns.id, id))
-      .limit(1);
+    const [run] = await this.db.select().from(activityRuns).where(eq(activityRuns.id, id)).limit(1);
 
     return run ?? null;
   }
@@ -138,9 +134,6 @@ export class ActivityRunRepository {
    * Lấy danh sách kết quả của một lượt chạy
    */
   async findResultsByRunId(runId: string): Promise<ActivityResultSelect[]> {
-    return this.db
-      .select()
-      .from(activityResults)
-      .where(eq(activityResults.runId, runId));
+    return this.db.select().from(activityResults).where(eq(activityResults.runId, runId));
   }
 }

@@ -72,10 +72,10 @@ export const ChatBox: React.FC<ChatBoxProps> = ({
   const isSelfHandRaised =
     role === 'student' &&
     currentParticipantId &&
-    activeHandRaises.some((h) => h.participantId === currentParticipantId);
+    activeHandRaises.some(h => h.participantId === currentParticipantId);
 
   // Lọc tin nhắn theo Tab
-  const filteredMessages = messages.filter((msg) => {
+  const filteredMessages = messages.filter(msg => {
     if (activeTab === 'public') {
       return msg.toParticipantId === null || msg.toParticipantId === undefined;
     }
@@ -186,7 +186,7 @@ export const ChatBox: React.FC<ChatBoxProps> = ({
             <div className="flex items-center gap-1.5">
               <select
                 value={chatMode ?? (chatLocked ? 'locked' : 'open')}
-                onChange={(e) => {
+                onChange={e => {
                   const newMode = e.target.value as 'locked' | 'teacher_only' | 'open';
                   if (onChangeChatMode) {
                     onChangeChatMode(newMode);
@@ -256,7 +256,7 @@ export const ChatBox: React.FC<ChatBoxProps> = ({
               <span>Hiện không có bạn nào cần hỗ trợ.</span>
             </div>
           ) : (
-            activeHandRaises.map((item) => (
+            activeHandRaises.map(item => (
               <div
                 key={item.participantId}
                 className="flex items-center justify-between p-3 bg-white border border-amber-200 rounded-xl shadow-xs"
@@ -276,10 +276,7 @@ export const ChatBox: React.FC<ChatBoxProps> = ({
                   </div>
                 </div>
 
-                <Button
-                  variant="primary"
-                  onClick={() => onResolveHandRaise?.(item.participantId)}
-                >
+                <Button variant="primary" onClick={() => onResolveHandRaise?.(item.participantId)}>
                   Đã hỗ trợ xong
                 </Button>
               </div>
@@ -298,7 +295,7 @@ export const ChatBox: React.FC<ChatBoxProps> = ({
               </span>
             </div>
           ) : (
-            filteredMessages.map((msg) => {
+            filteredMessages.map(msg => {
               const isOwn =
                 role === 'teacher'
                   ? msg.fromTeacher
@@ -322,9 +319,7 @@ export const ChatBox: React.FC<ChatBoxProps> = ({
                       <span>{isOwn ? currentUserName : msg.fromParticipantName}</span>
                     )}
                     {msg.toParticipantId && (
-                      <span className="text-[10px] text-amber-600 font-semibold">
-                        [Riêng]
-                      </span>
+                      <span className="text-[10px] text-amber-600 font-semibold">[Riêng]</span>
                     )}
                   </div>
 
@@ -334,8 +329,8 @@ export const ChatBox: React.FC<ChatBoxProps> = ({
                       isHandRaise
                         ? 'bg-amber-100 border border-amber-300 text-amber-950 rounded-tl-sm'
                         : isOwn
-                        ? 'bg-blue-600 text-white rounded-tr-sm'
-                        : 'bg-white border border-slate-200 text-slate-800 rounded-tl-sm'
+                          ? 'bg-blue-600 text-white rounded-tr-sm'
+                          : 'bg-white border border-slate-200 text-slate-800 rounded-tl-sm'
                     }`}
                   >
                     {msg.text}
@@ -365,16 +360,16 @@ export const ChatBox: React.FC<ChatBoxProps> = ({
           <input
             type="text"
             value={inputText}
-            onChange={(e) => setInputText(e.target.value)}
+            onChange={e => setInputText(e.target.value)}
             disabled={role === 'student' && chatLocked && activeTab === 'public'}
             placeholder={
               role === 'student' && chatLocked && activeTab === 'public'
                 ? 'Trò chuyện đang bị khóa...'
                 : activeTab === 'private'
-                ? role === 'student'
-                  ? 'Gửi tin nhắn riêng tới Thầy/Cô...'
-                  : 'Gửi tin nhắn riêng...'
-                : 'Nhập tin nhắn...'
+                  ? role === 'student'
+                    ? 'Gửi tin nhắn riêng tới Thầy/Cô...'
+                    : 'Gửi tin nhắn riêng...'
+                  : 'Nhập tin nhắn...'
             }
             className="flex-1 min-h-[48px] px-3.5 py-2 text-sm bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50 disabled:bg-slate-100"
           />
@@ -383,8 +378,7 @@ export const ChatBox: React.FC<ChatBoxProps> = ({
             type="submit"
             variant="primary"
             disabled={
-              !inputText.trim() ||
-              (role === 'student' && chatLocked && activeTab === 'public')
+              !inputText.trim() || (role === 'student' && chatLocked && activeTab === 'public')
             }
             className="min-h-[48px] px-4 font-semibold shrink-0 cursor-pointer"
           >
@@ -407,28 +401,23 @@ export const ChatBox: React.FC<ChatBoxProps> = ({
             </div>
 
             <p className="text-xs text-slate-600">
-              Thầy/cô sẽ nhận được thông báo ngay lập tức. Em có thể nhập thêm lý do bên dưới (không bắt buộc):
+              Thầy/cô sẽ nhận được thông báo ngay lập tức. Em có thể nhập thêm lý do bên dưới (không
+              bắt buộc):
             </p>
 
             <input
               type="text"
               value={handRaiseMsg}
-              onChange={(e) => setHandRaiseMsg(e.target.value)}
+              onChange={e => setHandRaiseMsg(e.target.value)}
               placeholder="Vd: Em không nghe rõ âm thanh, câu hỏi bị lỗi..."
               className="min-h-[48px] px-3 py-2 text-sm border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-amber-500"
             />
 
             <div className="flex items-center justify-end gap-2 pt-2 border-t border-slate-100">
-              <Button
-                variant="secondary"
-                onClick={() => setShowHandRaiseModal(false)}
-              >
+              <Button variant="secondary" onClick={() => setShowHandRaiseModal(false)}>
                 Hủy
               </Button>
-              <Button
-                variant="primary"
-                onClick={handleConfirmHandRaise}
-              >
+              <Button variant="primary" onClick={handleConfirmHandRaise}>
                 Xác nhận giơ tay
               </Button>
             </div>

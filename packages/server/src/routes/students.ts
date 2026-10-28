@@ -60,7 +60,7 @@ export const studentsRoutes: FastifyPluginAsync<StudentsRoutesOptions> = async (
   const { authService, classRepo, studentRepo, passwordHasher, excelService } = options;
 
   // Guard bảo vệ: Chỉ chủ sở hữu của lớp học (hoặc Admin) mới được thao tác học sinh của lớp đó
-  const classOwnerGuard = createOwnerGuard(authService, async (request) => {
+  const classOwnerGuard = createOwnerGuard(authService, async request => {
     const { classId } = request.params as { classId: string };
     return classRepo.findById(classId);
   });
@@ -302,11 +302,9 @@ export const studentsRoutes: FastifyPluginAsync<StudentsRoutesOptions> = async (
 
       const { students: importList, skipDuplicates } = parseResult.data;
       const existing = await studentRepo.listByClassId(classId);
-      const existingNames = new Set(existing.map((s) => s.fullName.toLowerCase().trim()));
+      const existingNames = new Set(existing.map(s => s.fullName.toLowerCase().trim()));
       const existingCodes = new Set(
-        existing
-          .map((s) => s.code?.toLowerCase().trim())
-          .filter((c): c is string => Boolean(c))
+        existing.map(s => s.code?.toLowerCase().trim()).filter((c): c is string => Boolean(c))
       );
 
       const toInsert: Array<{

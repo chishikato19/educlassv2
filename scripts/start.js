@@ -24,7 +24,7 @@ function getLanIp() {
     }
   }
   const preferred = candidates.find(
-    (ip) => ip.startsWith('192.168.') || ip.startsWith('10.') || ip.startsWith('172.')
+    ip => ip.startsWith('192.168.') || ip.startsWith('10.') || ip.startsWith('172.')
   );
   return preferred || candidates[0] || '127.0.0.1';
 }
@@ -103,7 +103,7 @@ async function main() {
   process.on('SIGTERM', shutdown);
 }
 
-main().catch((err) => {
+main().catch(err => {
   console.error('\n❌ Không thể khởi động máy chủ:', err);
   process.exit(1);
 });

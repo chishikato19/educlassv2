@@ -1,5 +1,10 @@
 import React, { useState } from 'react';
-import { type Question, type QuestionPublic, renderLatexInText, resolveAssetUrl } from '@educlass/question-kit';
+import {
+  type Question,
+  type QuestionPublic,
+  renderLatexInText,
+  resolveAssetUrl,
+} from '@educlass/question-kit';
 import type { ExamResult, ExamState, ParticipantExamStatus } from './exam-schemas.js';
 import {
   calculateQuestionAnalysis,
@@ -42,7 +47,8 @@ export const ExamTeacherPanel: React.FC<ExamTeacherPanelProps> = ({
   const [filterTab, setFilterTab] = useState<'all' | 'in_progress' | 'submitted' | 'alerts'>('all');
   const [searchName, setSearchName] = useState('');
   const [currentTime, setCurrentTime] = useState(() => Date.now());
-  const [selectedStudentForReview, setSelectedStudentForReview] = useState<ParticipantExamStatus | null>(null);
+  const [selectedStudentForReview, setSelectedStudentForReview] =
+    useState<ParticipantExamStatus | null>(null);
 
   const doSend = sendIntent || onSendIntent || (() => {});
   const doEnd = onEnd || onEndActivity;
@@ -190,15 +196,15 @@ export const ExamTeacherPanel: React.FC<ExamTeacherPanelProps> = ({
                 state?.status === 'in_progress'
                   ? 'bg-emerald-100 text-emerald-800 ring-1 ring-emerald-300'
                   : state?.status === 'closed'
-                  ? 'bg-slate-100 text-slate-600 ring-1 ring-slate-300'
-                  : 'bg-amber-100 text-amber-800 ring-1 ring-amber-300'
+                    ? 'bg-slate-100 text-slate-600 ring-1 ring-slate-300'
+                    : 'bg-amber-100 text-amber-800 ring-1 ring-amber-300'
               }`}
             >
               {state?.status === 'in_progress'
                 ? 'Đang làm bài'
                 : state?.status === 'closed'
-                ? 'Đã kết thúc'
-                : 'Chờ bắt đầu'}
+                  ? 'Đã kết thúc'
+                  : 'Chờ bắt đầu'}
             </span>
             {state?.batchIndex && (
               <span className="px-2.5 py-1 rounded-full text-xs font-black bg-indigo-50 text-indigo-700 border border-indigo-200">
@@ -207,7 +213,8 @@ export const ExamTeacherPanel: React.FC<ExamTeacherPanelProps> = ({
             )}
           </div>
           <p className="text-sm text-slate-600 mt-2.5 leading-relaxed">
-            Thời lượng: <strong>{state?.durationMinutes} phút</strong> · Tổng số câu: <strong>{state?.totalQuestions}</strong>
+            Thời lượng: <strong>{state?.durationMinutes} phút</strong> · Tổng số câu:{' '}
+            <strong>{state?.totalQuestions}</strong>
             {state?.hasPassword && ' · Có mật khẩu bảo vệ'}
             {state?.shuffleQuestions && ' · Xáo câu hỏi'}
             {state?.shuffleOptions && ' · Xáo đáp án'}
@@ -287,7 +294,7 @@ export const ExamTeacherPanel: React.FC<ExamTeacherPanelProps> = ({
                   if (
                     window.confirm(
                       `🏁 Thầy/Cô có chắc chắn muốn kết thúc Ca ${batchNum} của tiết học này không?\n\n` +
-                      `Hệ thống sẽ tự động thu bài của toàn bộ thí sinh, lưu kết quả an toàn vào sổ điểm và chuyển sang trạng thái chờ Ca ${batchNum + 1} ở tiết sau.`
+                        `Hệ thống sẽ tự động thu bài của toàn bộ thí sinh, lưu kết quả an toàn vào sổ điểm và chuyển sang trạng thái chờ Ca ${batchNum + 1} ở tiết sau.`
                     )
                   ) {
                     handleCloseExam();
@@ -357,8 +364,8 @@ export const ExamTeacherPanel: React.FC<ExamTeacherPanelProps> = ({
                   if (
                     window.confirm(
                       `⚠️ Ca ${batchNum} của kỳ thi đang diễn ra!\n\n` +
-                      `Thầy/Cô có chắc chắn muốn kết thúc ca thi này và trở về bàn làm việc không?\n\n` +
-                      `Toàn bộ bài nộp của học sinh sẽ được thu và lưu an toàn vào hệ thống.`
+                        `Thầy/Cô có chắc chắn muốn kết thúc ca thi này và trở về bàn làm việc không?\n\n` +
+                        `Toàn bộ bài nộp của học sinh sẽ được thu và lưu an toàn vào hệ thống.`
                     )
                   ) {
                     handleCloseExam();
@@ -387,7 +394,11 @@ export const ExamTeacherPanel: React.FC<ExamTeacherPanelProps> = ({
               className="transition hover:bg-black shadow-sm"
             >
               <span>⏹️</span>
-              <span>{state?.status === 'closed' ? 'Trở về bàn làm việc' : `Kết thúc Ca ${state?.batchIndex ?? 1} & Trở về`}</span>
+              <span>
+                {state?.status === 'closed'
+                  ? 'Trở về bàn làm việc'
+                  : `Kết thúc Ca ${state?.batchIndex ?? 1} & Trở về`}
+              </span>
             </button>
           )}
         </div>
@@ -517,9 +528,16 @@ export const ExamTeacherPanel: React.FC<ExamTeacherPanelProps> = ({
             ) : (
               filteredParticipants.map(p => {
                 const answersCount = p.answeredCount ?? Object.keys(p.answers || {}).length;
-                const percent = p.progressPercent ?? (state.totalQuestions > 0 ? Math.round((answersCount / state.totalQuestions) * 100) : 0);
-                const isIdle = !p.isSubmitted && p.lastActiveAt ? (currentTime - p.lastActiveAt >= 120000) : false;
-                const idleMinutes = p.lastActiveAt ? Math.floor((currentTime - p.lastActiveAt) / 60000) : 0;
+                const percent =
+                  p.progressPercent ??
+                  (state.totalQuestions > 0
+                    ? Math.round((answersCount / state.totalQuestions) * 100)
+                    : 0);
+                const isIdle =
+                  !p.isSubmitted && p.lastActiveAt ? currentTime - p.lastActiveAt >= 120000 : false;
+                const idleMinutes = p.lastActiveAt
+                  ? Math.floor((currentTime - p.lastActiveAt) / 60000)
+                  : 0;
 
                 return (
                   <div
@@ -528,14 +546,16 @@ export const ExamTeacherPanel: React.FC<ExamTeacherPanelProps> = ({
                       p.isFocusLost
                         ? 'bg-rose-50/70 border-rose-300'
                         : isIdle
-                        ? 'bg-amber-50/60 border-amber-300'
-                        : 'bg-white border-slate-200 hover:border-slate-300'
+                          ? 'bg-amber-50/60 border-amber-300'
+                          : 'bg-white border-slate-200 hover:border-slate-300'
                     }`}
                   >
                     {/* Cột 1: Thông tin học sinh */}
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-2.5 flex-wrap">
-                        <span className="font-bold text-slate-900 text-sm tracking-tight">{p.displayName}</span>
+                        <span className="font-bold text-slate-900 text-sm tracking-tight">
+                          {p.displayName}
+                        </span>
                         {p.isSubmitted ? (
                           <span className="px-2.5 py-1 rounded-md text-xs font-bold bg-emerald-100 text-emerald-800 ring-1 ring-emerald-300">
                             ✓ Đã nộp bài
@@ -568,7 +588,13 @@ export const ExamTeacherPanel: React.FC<ExamTeacherPanelProps> = ({
                         </span>
                         <span className="text-slate-300">|</span>
                         <div className="flex items-center gap-2">
-                          <span>Tiến độ: <strong className="text-slate-800 font-bold">{answersCount}/{state.totalQuestions}</strong> ({percent}%)</span>
+                          <span>
+                            Tiến độ:{' '}
+                            <strong className="text-slate-800 font-bold">
+                              {answersCount}/{state.totalQuestions}
+                            </strong>{' '}
+                            ({percent}%)
+                          </span>
                           <div className="w-16 h-2 bg-slate-100 rounded-full overflow-hidden border border-slate-200">
                             <div
                               className="h-full bg-blue-600 rounded-full transition-all duration-300"
@@ -655,7 +681,9 @@ export const ExamTeacherPanel: React.FC<ExamTeacherPanelProps> = ({
               <div className="text-xs text-blue-600 font-semibold mt-0.5">Điểm trung bình</div>
             </div>
             <div className="p-3.5 bg-emerald-50/60 rounded-xl border border-emerald-200/70 text-center">
-              <div className="text-2xl font-black text-emerald-800">{overviewReport.highestScore}</div>
+              <div className="text-2xl font-black text-emerald-800">
+                {overviewReport.highestScore}
+              </div>
               <div className="text-xs text-emerald-600 font-semibold mt-0.5">Điểm cao nhất</div>
             </div>
             <div className="p-3.5 bg-rose-50/60 rounded-xl border border-rose-200/70 text-center">
@@ -786,9 +814,7 @@ export const ExamTeacherPanel: React.FC<ExamTeacherPanelProps> = ({
 
             <div className="divide-y divide-slate-100 max-h-80 overflow-y-auto">
               {effectiveResults.length === 0 ? (
-                <div className="p-6 text-center text-xs text-slate-400">
-                  Chưa có kết quả thi.
-                </div>
+                <div className="p-6 text-center text-xs text-slate-400">Chưa có kết quả thi.</div>
               ) : (
                 effectiveResults.map((res, idx) => (
                   <div
@@ -804,7 +830,10 @@ export const ExamTeacherPanel: React.FC<ExamTeacherPanelProps> = ({
 
                     <div className="flex items-center gap-3">
                       <span className="text-slate-500">
-                        Đúng: <strong>{res.correctCount}/{res.totalQuestions}</strong>
+                        Đúng:{' '}
+                        <strong>
+                          {res.correctCount}/{res.totalQuestions}
+                        </strong>
                       </span>
                       <span className="text-sm font-black text-blue-600">
                         {res.score}/{res.maxScore}
@@ -844,21 +873,41 @@ export const ExamTeacherPanel: React.FC<ExamTeacherPanelProps> = ({
                   <h3 className="font-bold text-slate-800 text-base">
                     Chi tiết bài làm: {selectedStudentForReview.displayName}
                   </h3>
-                  <span className={`px-2 py-0.5 rounded text-[11px] font-bold ${
-                    selectedStudentForReview.isSubmitted
-                      ? 'bg-emerald-100 text-emerald-800'
-                      : 'bg-blue-100 text-blue-800'
-                  }`}>
+                  <span
+                    className={`px-2 py-0.5 rounded text-[11px] font-bold ${
+                      selectedStudentForReview.isSubmitted
+                        ? 'bg-emerald-100 text-emerald-800'
+                        : 'bg-blue-100 text-blue-800'
+                    }`}
+                  >
                     {selectedStudentForReview.isSubmitted ? 'Đã nộp bài' : 'Đang làm bài'}
                   </span>
                 </div>
                 <div className="text-xs text-slate-500 mt-1 flex items-center gap-3">
-                  <span>Tiến độ: <strong>{selectedStudentForReview.answeredCount ?? Object.keys(selectedStudentForReview.answers || {}).length}/{state.totalQuestions}</strong> câu</span>
+                  <span>
+                    Tiến độ:{' '}
+                    <strong>
+                      {selectedStudentForReview.answeredCount ??
+                        Object.keys(selectedStudentForReview.answers || {}).length}
+                      /{state.totalQuestions}
+                    </strong>{' '}
+                    câu
+                  </span>
                   {selectedStudentForReview.result && (
-                    <span>Điểm: <strong className="text-blue-600">{selectedStudentForReview.result.score}/{selectedStudentForReview.result.maxScore}</strong> ({selectedStudentForReview.result.percentage}%)</span>
+                    <span>
+                      Điểm:{' '}
+                      <strong className="text-blue-600">
+                        {selectedStudentForReview.result.score}/
+                        {selectedStudentForReview.result.maxScore}
+                      </strong>{' '}
+                      ({selectedStudentForReview.result.percentage}%)
+                    </span>
                   )}
                   {selectedStudentForReview.submittedAt && (
-                    <span>Nộp lúc: {new Date(selectedStudentForReview.submittedAt).toLocaleTimeString('vi-VN')}</span>
+                    <span>
+                      Nộp lúc:{' '}
+                      {new Date(selectedStudentForReview.submittedAt).toLocaleTimeString('vi-VN')}
+                    </span>
                   )}
                 </div>
               </div>
@@ -873,233 +922,304 @@ export const ExamTeacherPanel: React.FC<ExamTeacherPanelProps> = ({
 
             {/* Danh sách câu hỏi */}
             <div className="p-4 overflow-y-auto space-y-4 flex-1">
-              {selectedStudentForReview.reviewData && selectedStudentForReview.reviewData.length > 0 ? (
-                // Nếu server đã sinh reviewData
-                selectedStudentForReview.reviewData.map((revItem, idx: number) => {
-                  const rev = revItem as Record<string, unknown>;
-                  return (
-                  <div
-                    key={String(rev['questionId'] || idx)}
-                    className={`p-4 rounded-xl border shadow-xs ${
-                      rev['isCorrect']
-                        ? 'bg-emerald-50/50 border-emerald-300'
-                        : rev['studentAnswer'] !== undefined && rev['studentAnswer'] !== null && rev['studentAnswer'] !== ''
-                        ? 'bg-rose-50/50 border-rose-300'
-                        : 'bg-slate-50 border-slate-200'
-                    }`}
-                  >
-                    <div className="flex items-center justify-between text-xs font-bold mb-2">
-                      <span className="text-slate-800 font-extrabold">Câu {String(rev['order'] || idx + 1)} ({String(rev['points'] || 1)} điểm)</span>
-                      <span className={`px-2.5 py-0.5 rounded-full text-[11px] font-bold ${
-                        rev['isCorrect']
-                          ? 'bg-emerald-100 text-emerald-800'
-                          : rev['studentAnswer'] !== undefined && rev['studentAnswer'] !== null && rev['studentAnswer'] !== ''
-                          ? 'bg-rose-100 text-rose-800'
-                          : 'bg-slate-200 text-slate-600'
-                      }`}>
-                        {rev['isCorrect'] ? '✓ Đúng' : (rev['studentAnswer'] !== undefined && rev['studentAnswer'] !== null && rev['studentAnswer'] !== '' ? '✗ Sai' : '⚪ Chưa làm')}
-                      </span>
-                    </div>
-
-                    {/* Nội dung câu hỏi hỗ trợ KaTeX */}
-                    <div
-                      className="text-sm font-semibold text-slate-900 mb-2 leading-relaxed"
-                      dangerouslySetInnerHTML={{ __html: renderLatexInText(String(rev['stemText'] || '')) }}
-                    />
-
-                    {/* Hình ảnh đính kèm nếu có */}
-                    {Array.isArray(rev['stemImages']) && (rev['stemImages'] as string[]).length > 0 && (
-                      <div className="flex flex-wrap gap-2 my-2.5">
-                        {(rev['stemImages'] as string[]).map((imgUrl: string, imgIdx: number) => (
-                          <img
-                            key={imgIdx}
-                            src={resolveAssetUrl(imgUrl)}
-                            alt="Hình ảnh câu hỏi"
-                            className="max-h-56 max-w-full rounded-xl border border-slate-200 object-contain shadow-xs bg-white"
-                          />
-                        ))}
-                      </div>
-                    )}
-
-                    {/* Các lựa chọn nếu là trắc nghiệm */}
-                    {Boolean(rev['options']) && Array.isArray(rev['options']) && (
-                      <div className="space-y-1.5 mb-2.5">
-                        {(rev['options'] as Array<Record<string, unknown>>).map((opt) => {
-                          const isStudentPick = rev['studentChoiceLabel'] === opt['label'] || rev['studentAnswer'] === opt['index'];
-                          const isCorrectOpt = rev['correctChoiceLabel'] === opt['label'];
-                          return (
-                            <div
-                              key={String(opt['index'])}
-                              className={`p-2.5 rounded-lg text-xs flex items-center gap-2.5 border transition ${
-                                isCorrectOpt
-                                  ? 'bg-emerald-100/80 border-emerald-400 font-bold text-emerald-950 shadow-xs'
-                                  : isStudentPick
-                                  ? 'bg-rose-100/80 border-rose-400 font-bold text-rose-950 shadow-xs'
-                                  : 'bg-white border-slate-200 text-slate-700'
-                              }`}
-                            >
-                              <span className="w-5 h-5 rounded-full flex items-center justify-center bg-slate-200/90 font-bold text-[11px] shrink-0">
-                                {String(opt['label'] || '')}
-                              </span>
-                              <span
-                                className="flex-1 leading-relaxed"
-                                dangerouslySetInnerHTML={{ __html: renderLatexInText(String(opt['text'] || '')) }}
-                              />
-                              {isCorrectOpt && <span className="text-emerald-700 text-xs font-extrabold shrink-0">✓ Đáp án đúng</span>}
-                              {isStudentPick && !isCorrectOpt && <span className="text-rose-700 text-xs font-extrabold shrink-0">✗ Đã chọn</span>}
-                            </div>
-                          );
-                        })}
-                      </div>
-                    )}
-
-                    {/* Nếu không có options (câu đúng/sai hoặc câu ngắn) */}
-                    {(!rev['options'] || !Array.isArray(rev['options'])) && (
-                      <div className="text-xs space-y-1.5 bg-white p-3 rounded-lg border border-slate-200">
-                        <div>HS đã chọn: <strong>{String(rev['studentAnswer'] ?? 'Chưa làm')}</strong></div>
-                        <div className="text-emerald-700 font-semibold">Đáp án đúng: <strong>{String(rev['correctAnswer'] ?? '—')}</strong></div>
-                      </div>
-                    )}
-
-                    {Boolean(rev['explanation']) && (
-                      <div
-                        className="mt-2 text-xs text-slate-700 bg-amber-50 p-2.5 rounded-lg border border-amber-200 leading-relaxed"
-                        dangerouslySetInnerHTML={{ __html: '💡 <strong>Giải thích:</strong> ' + renderLatexInText(String(rev['explanation'])) }}
-                      />
-                    )}
-                  </div>
-                );
-              })
-              ) : (
-                (() => {
-                  const studentQOrder = selectedStudentForReview.questionOrder ?? [];
-                  const publicList = state.publicQuestions || [];
-                  const orderedPublic = (() => {
-                    if (!studentQOrder || studentQOrder.length === 0) return publicList;
-                    const map = new Map(publicList.map(item => [item.id, item]));
-                    const res: typeof publicList = [];
-                    for (const qId of studentQOrder) {
-                      const found = map.get(qId);
-                      if (found) res.push(found);
-                    }
-                    for (const item of publicList) {
-                      if (!res.some(r => r.id === item.id)) res.push(item);
-                    }
-                    return res;
-                  })();
-
-                  return orderedPublic.map((qItem, idx: number) => {
-                    const q = qItem as unknown as Record<string, unknown>;
-                    const qId = String(q['id'] || '');
-                    const studentRawAnswer = selectedStudentForReview.answers?.[qId];
-                    const hasAnswered = studentRawAnswer !== undefined && studentRawAnswer !== null && studentRawAnswer !== '';
-                    const stemText = typeof q['stem'] === 'object' && q['stem'] ? (String((q['stem'] as Record<string, unknown>)['text'] || '')) : String(q['stem'] || '');
-                    const stemObj = q['stem'] as Record<string, unknown> | undefined;
-                    const qImages = (stemObj && Array.isArray(stemObj['images']))
-                      ? (stemObj['images'] as string[])
-                      : (Array.isArray(q['images']) ? (q['images'] as string[]) : []);
-
+              {selectedStudentForReview.reviewData && selectedStudentForReview.reviewData.length > 0
+                ? // Nếu server đã sinh reviewData
+                  selectedStudentForReview.reviewData.map((revItem, idx: number) => {
+                    const rev = revItem as Record<string, unknown>;
                     return (
-                      <div key={qId} className="p-4 rounded-xl border border-slate-200 bg-slate-50 shadow-xs">
+                      <div
+                        key={String(rev['questionId'] || idx)}
+                        className={`p-4 rounded-xl border shadow-xs ${
+                          rev['isCorrect']
+                            ? 'bg-emerald-50/50 border-emerald-300'
+                            : rev['studentAnswer'] !== undefined &&
+                                rev['studentAnswer'] !== null &&
+                                rev['studentAnswer'] !== ''
+                              ? 'bg-rose-50/50 border-rose-300'
+                              : 'bg-slate-50 border-slate-200'
+                        }`}
+                      >
                         <div className="flex items-center justify-between text-xs font-bold mb-2">
-                          <span className="text-slate-800 font-extrabold">Câu {idx + 1} ({String(q['points'] || 1)} điểm)</span>
-                          <span className={`px-2.5 py-0.5 rounded-full text-[11px] font-bold ${hasAnswered ? 'bg-blue-100 text-blue-800' : 'bg-slate-200 text-slate-600'}`}>
-                            {hasAnswered ? 'Đã trả lời' : 'Chưa làm'}
+                          <span className="text-slate-800 font-extrabold">
+                            Câu {String(rev['order'] || idx + 1)} ({String(rev['points'] || 1)}{' '}
+                            điểm)
+                          </span>
+                          <span
+                            className={`px-2.5 py-0.5 rounded-full text-[11px] font-bold ${
+                              rev['isCorrect']
+                                ? 'bg-emerald-100 text-emerald-800'
+                                : rev['studentAnswer'] !== undefined &&
+                                    rev['studentAnswer'] !== null &&
+                                    rev['studentAnswer'] !== ''
+                                  ? 'bg-rose-100 text-rose-800'
+                                  : 'bg-slate-200 text-slate-600'
+                            }`}
+                          >
+                            {rev['isCorrect']
+                              ? '✓ Đúng'
+                              : rev['studentAnswer'] !== undefined &&
+                                  rev['studentAnswer'] !== null &&
+                                  rev['studentAnswer'] !== ''
+                                ? '✗ Sai'
+                                : '⚪ Chưa làm'}
                           </span>
                         </div>
 
-                        {/* Nội dung câu hỏi KaTeX */}
+                        {/* Nội dung câu hỏi hỗ trợ KaTeX */}
                         <div
                           className="text-sm font-semibold text-slate-900 mb-2 leading-relaxed"
-                          dangerouslySetInnerHTML={{ __html: renderLatexInText(stemText) }}
+                          dangerouslySetInnerHTML={{
+                            __html: renderLatexInText(String(rev['stemText'] || '')),
+                          }}
                         />
 
                         {/* Hình ảnh đính kèm nếu có */}
-                        {qImages.length > 0 && (
-                          <div className="flex flex-wrap gap-2 my-2.5">
-                            {qImages.map((imgUrl: string, imgIdx: number) => (
-                              <img
-                                key={imgIdx}
-                                src={resolveAssetUrl(imgUrl)}
-                                alt="Hình ảnh câu hỏi"
-                                className="max-h-56 max-w-full rounded-xl border border-slate-200 object-contain shadow-xs bg-white"
-                              />
-                            ))}
+                        {Array.isArray(rev['stemImages']) &&
+                          (rev['stemImages'] as string[]).length > 0 && (
+                            <div className="flex flex-wrap gap-2 my-2.5">
+                              {(rev['stemImages'] as string[]).map(
+                                (imgUrl: string, imgIdx: number) => (
+                                  <img
+                                    key={imgIdx}
+                                    src={resolveAssetUrl(imgUrl)}
+                                    alt="Hình ảnh câu hỏi"
+                                    className="max-h-56 max-w-full rounded-xl border border-slate-200 object-contain shadow-xs bg-white"
+                                  />
+                                )
+                              )}
+                            </div>
+                          )}
+
+                        {/* Các lựa chọn nếu là trắc nghiệm */}
+                        {Boolean(rev['options']) && Array.isArray(rev['options']) && (
+                          <div className="space-y-1.5 mb-2.5">
+                            {(rev['options'] as Array<Record<string, unknown>>).map(opt => {
+                              const isStudentPick =
+                                rev['studentChoiceLabel'] === opt['label'] ||
+                                rev['studentAnswer'] === opt['index'];
+                              const isCorrectOpt = rev['correctChoiceLabel'] === opt['label'];
+                              return (
+                                <div
+                                  key={String(opt['index'])}
+                                  className={`p-2.5 rounded-lg text-xs flex items-center gap-2.5 border transition ${
+                                    isCorrectOpt
+                                      ? 'bg-emerald-100/80 border-emerald-400 font-bold text-emerald-950 shadow-xs'
+                                      : isStudentPick
+                                        ? 'bg-rose-100/80 border-rose-400 font-bold text-rose-950 shadow-xs'
+                                        : 'bg-white border-slate-200 text-slate-700'
+                                  }`}
+                                >
+                                  <span className="w-5 h-5 rounded-full flex items-center justify-center bg-slate-200/90 font-bold text-[11px] shrink-0">
+                                    {String(opt['label'] || '')}
+                                  </span>
+                                  <span
+                                    className="flex-1 leading-relaxed"
+                                    dangerouslySetInnerHTML={{
+                                      __html: renderLatexInText(String(opt['text'] || '')),
+                                    }}
+                                  />
+                                  {isCorrectOpt && (
+                                    <span className="text-emerald-700 text-xs font-extrabold shrink-0">
+                                      ✓ Đáp án đúng
+                                    </span>
+                                  )}
+                                  {isStudentPick && !isCorrectOpt && (
+                                    <span className="text-rose-700 text-xs font-extrabold shrink-0">
+                                      ✗ Đã chọn
+                                    </span>
+                                  )}
+                                </div>
+                              );
+                            })}
                           </div>
                         )}
 
-                        {/* Các lựa chọn của câu hỏi */}
-                        {q['type'] === 'mcq4' && Array.isArray(q['options']) && (() => {
-                          const optionOrder = selectedStudentForReview.optionOrders?.[qId];
-                          const baseOpts = q['options'] as Array<unknown>;
-                          const optsToRender = (optionOrder && optionOrder.length === 4)
-                            ? optionOrder.map(origIdx => baseOpts[origIdx]!)
-                            : baseOpts;
-
-                          return (
-                            <div className="space-y-1.5 mb-2.5">
-                              {optsToRender.map((opt, oIdx: number) => {
-                                const optText = typeof opt === 'object' && opt ? String((opt as Record<string, unknown>)['text'] || '') : String(opt);
-                                const optImgs = typeof opt === 'object' && opt && Array.isArray((opt as Record<string, unknown>)['images'])
-                                  ? ((opt as Record<string, unknown>)['images'] as string[])
-                                  : [];
-                                const isPicked = hasAnswered && Number(studentRawAnswer) === oIdx;
-                                const letter = ['A', 'B', 'C', 'D'][oIdx] || String(oIdx + 1);
-                                return (
-                                  <div
-                                    key={oIdx}
-                                    className={`p-2.5 rounded-lg text-xs flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 border ${
-                                      isPicked
-                                        ? 'bg-blue-50 border-blue-300 font-bold text-blue-900'
-                                        : 'bg-white border-slate-200 text-slate-700'
-                                    }`}
-                                  >
-                                    <div className="flex items-center gap-2.5 flex-1 min-w-0">
-                                      <span className="w-5 h-5 rounded-full flex items-center justify-center bg-slate-200/90 font-bold text-[11px] shrink-0">
-                                        {letter}
-                                      </span>
-                                      {optText && (
-                                        <span
-                                          className="flex-1 leading-relaxed"
-                                          dangerouslySetInnerHTML={{ __html: renderLatexInText(optText) }}
-                                        />
-                                      )}
-                                    </div>
-                                    {optImgs.length > 0 && (
-                                      <div className="flex flex-wrap gap-2 ml-7 sm:ml-0">
-                                        {optImgs.map((iUrl, iIdx) => (
-                                          <img
-                                            key={iIdx}
-                                            src={resolveAssetUrl(iUrl)}
-                                            alt={`Ảnh phương án ${letter}`}
-                                            className="max-h-28 rounded-lg border border-slate-200 object-contain bg-white"
-                                          />
-                                        ))}
-                                      </div>
-                                    )}
-                                    {isPicked && <span className="text-blue-700 text-xs font-extrabold shrink-0">✓ Đã chọn</span>}
-                                  </div>
-                                );
-                              })}
+                        {/* Nếu không có options (câu đúng/sai hoặc câu ngắn) */}
+                        {(!rev['options'] || !Array.isArray(rev['options'])) && (
+                          <div className="text-xs space-y-1.5 bg-white p-3 rounded-lg border border-slate-200">
+                            <div>
+                              HS đã chọn:{' '}
+                              <strong>{String(rev['studentAnswer'] ?? 'Chưa làm')}</strong>
                             </div>
-                          );
-                        })()}
+                            <div className="text-emerald-700 font-semibold">
+                              Đáp án đúng: <strong>{String(rev['correctAnswer'] ?? '—')}</strong>
+                            </div>
+                          </div>
+                        )}
 
-                        <div className="text-xs bg-white p-2.5 rounded-lg border border-slate-200">
-                          <span>Câu trả lời của HS: </span>
-                          <strong className="text-blue-700">
-                            {hasAnswered
-                              ? (q['type'] === 'mcq4'
-                                  ? `Lựa chọn (${['A', 'B', 'C', 'D'][Number(studentRawAnswer)] || studentRawAnswer})`
-                                  : String(studentRawAnswer))
-                              : 'Chưa làm'}
-                          </strong>
-                        </div>
+                        {Boolean(rev['explanation']) && (
+                          <div
+                            className="mt-2 text-xs text-slate-700 bg-amber-50 p-2.5 rounded-lg border border-amber-200 leading-relaxed"
+                            dangerouslySetInnerHTML={{
+                              __html:
+                                '💡 <strong>Giải thích:</strong> ' +
+                                renderLatexInText(String(rev['explanation'])),
+                            }}
+                          />
+                        )}
                       </div>
                     );
-                  });
-                })()
-              )}
+                  })
+                : (() => {
+                    const studentQOrder = selectedStudentForReview.questionOrder ?? [];
+                    const publicList = state.publicQuestions || [];
+                    const orderedPublic = (() => {
+                      if (!studentQOrder || studentQOrder.length === 0) return publicList;
+                      const map = new Map(publicList.map(item => [item.id, item]));
+                      const res: typeof publicList = [];
+                      for (const qId of studentQOrder) {
+                        const found = map.get(qId);
+                        if (found) res.push(found);
+                      }
+                      for (const item of publicList) {
+                        if (!res.some(r => r.id === item.id)) res.push(item);
+                      }
+                      return res;
+                    })();
+
+                    return orderedPublic.map((qItem, idx: number) => {
+                      const q = qItem as unknown as Record<string, unknown>;
+                      const qId = String(q['id'] || '');
+                      const studentRawAnswer = selectedStudentForReview.answers?.[qId];
+                      const hasAnswered =
+                        studentRawAnswer !== undefined &&
+                        studentRawAnswer !== null &&
+                        studentRawAnswer !== '';
+                      const stemText =
+                        typeof q['stem'] === 'object' && q['stem']
+                          ? String((q['stem'] as Record<string, unknown>)['text'] || '')
+                          : String(q['stem'] || '');
+                      const stemObj = q['stem'] as Record<string, unknown> | undefined;
+                      const qImages =
+                        stemObj && Array.isArray(stemObj['images'])
+                          ? (stemObj['images'] as string[])
+                          : Array.isArray(q['images'])
+                            ? (q['images'] as string[])
+                            : [];
+
+                      return (
+                        <div
+                          key={qId}
+                          className="p-4 rounded-xl border border-slate-200 bg-slate-50 shadow-xs"
+                        >
+                          <div className="flex items-center justify-between text-xs font-bold mb-2">
+                            <span className="text-slate-800 font-extrabold">
+                              Câu {idx + 1} ({String(q['points'] || 1)} điểm)
+                            </span>
+                            <span
+                              className={`px-2.5 py-0.5 rounded-full text-[11px] font-bold ${hasAnswered ? 'bg-blue-100 text-blue-800' : 'bg-slate-200 text-slate-600'}`}
+                            >
+                              {hasAnswered ? 'Đã trả lời' : 'Chưa làm'}
+                            </span>
+                          </div>
+
+                          {/* Nội dung câu hỏi KaTeX */}
+                          <div
+                            className="text-sm font-semibold text-slate-900 mb-2 leading-relaxed"
+                            dangerouslySetInnerHTML={{ __html: renderLatexInText(stemText) }}
+                          />
+
+                          {/* Hình ảnh đính kèm nếu có */}
+                          {qImages.length > 0 && (
+                            <div className="flex flex-wrap gap-2 my-2.5">
+                              {qImages.map((imgUrl: string, imgIdx: number) => (
+                                <img
+                                  key={imgIdx}
+                                  src={resolveAssetUrl(imgUrl)}
+                                  alt="Hình ảnh câu hỏi"
+                                  className="max-h-56 max-w-full rounded-xl border border-slate-200 object-contain shadow-xs bg-white"
+                                />
+                              ))}
+                            </div>
+                          )}
+
+                          {/* Các lựa chọn của câu hỏi */}
+                          {q['type'] === 'mcq4' &&
+                            Array.isArray(q['options']) &&
+                            (() => {
+                              const optionOrder = selectedStudentForReview.optionOrders?.[qId];
+                              const baseOpts = q['options'] as Array<unknown>;
+                              const optsToRender =
+                                optionOrder && optionOrder.length === 4
+                                  ? optionOrder.map(origIdx => baseOpts[origIdx]!)
+                                  : baseOpts;
+
+                              return (
+                                <div className="space-y-1.5 mb-2.5">
+                                  {optsToRender.map((opt, oIdx: number) => {
+                                    const optText =
+                                      typeof opt === 'object' && opt
+                                        ? String((opt as Record<string, unknown>)['text'] || '')
+                                        : String(opt);
+                                    const optImgs =
+                                      typeof opt === 'object' &&
+                                      opt &&
+                                      Array.isArray((opt as Record<string, unknown>)['images'])
+                                        ? ((opt as Record<string, unknown>)['images'] as string[])
+                                        : [];
+                                    const isPicked =
+                                      hasAnswered && Number(studentRawAnswer) === oIdx;
+                                    const letter = ['A', 'B', 'C', 'D'][oIdx] || String(oIdx + 1);
+                                    return (
+                                      <div
+                                        key={oIdx}
+                                        className={`p-2.5 rounded-lg text-xs flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 border ${
+                                          isPicked
+                                            ? 'bg-blue-50 border-blue-300 font-bold text-blue-900'
+                                            : 'bg-white border-slate-200 text-slate-700'
+                                        }`}
+                                      >
+                                        <div className="flex items-center gap-2.5 flex-1 min-w-0">
+                                          <span className="w-5 h-5 rounded-full flex items-center justify-center bg-slate-200/90 font-bold text-[11px] shrink-0">
+                                            {letter}
+                                          </span>
+                                          {optText && (
+                                            <span
+                                              className="flex-1 leading-relaxed"
+                                              dangerouslySetInnerHTML={{
+                                                __html: renderLatexInText(optText),
+                                              }}
+                                            />
+                                          )}
+                                        </div>
+                                        {optImgs.length > 0 && (
+                                          <div className="flex flex-wrap gap-2 ml-7 sm:ml-0">
+                                            {optImgs.map((iUrl, iIdx) => (
+                                              <img
+                                                key={iIdx}
+                                                src={resolveAssetUrl(iUrl)}
+                                                alt={`Ảnh phương án ${letter}`}
+                                                className="max-h-28 rounded-lg border border-slate-200 object-contain bg-white"
+                                              />
+                                            ))}
+                                          </div>
+                                        )}
+                                        {isPicked && (
+                                          <span className="text-blue-700 text-xs font-extrabold shrink-0">
+                                            ✓ Đã chọn
+                                          </span>
+                                        )}
+                                      </div>
+                                    );
+                                  })}
+                                </div>
+                              );
+                            })()}
+
+                          <div className="text-xs bg-white p-2.5 rounded-lg border border-slate-200">
+                            <span>Câu trả lời của HS: </span>
+                            <strong className="text-blue-700">
+                              {hasAnswered
+                                ? q['type'] === 'mcq4'
+                                  ? `Lựa chọn (${['A', 'B', 'C', 'D'][Number(studentRawAnswer)] || studentRawAnswer})`
+                                  : String(studentRawAnswer)
+                                : 'Chưa làm'}
+                            </strong>
+                          </div>
+                        </div>
+                      );
+                    });
+                  })()}
             </div>
 
             {/* Footer Modal */}
@@ -1240,7 +1360,11 @@ export const ExamStudentView: React.FC<ExamStudentViewProps> = ({
 
   // Chế độ Thi An Toàn (Exam Kiosk Mode) trên EduClass Desktop Client
   React.useEffect(() => {
-    const desktopBridge = (window as unknown as { educlassStudent?: { lockKioskMode?: () => void; unlockKioskMode?: () => void } }).educlassStudent;
+    const desktopBridge = (
+      window as unknown as {
+        educlassStudent?: { lockKioskMode?: () => void; unlockKioskMode?: () => void };
+      }
+    ).educlassStudent;
     if (!desktopBridge) return;
 
     if (state?.status === 'in_progress' && !isSubmitted) {
@@ -1322,9 +1446,12 @@ export const ExamStudentView: React.FC<ExamStudentViewProps> = ({
         <div className="w-16 h-16 rounded-2xl bg-blue-50 text-blue-600 flex items-center justify-center text-3xl mb-4 shadow-sm">
           🔒
         </div>
-        <h3 className="text-xl font-bold text-slate-800 mb-1">{state?.title || 'Kỳ thi có mật khẩu'}</h3>
+        <h3 className="text-xl font-bold text-slate-800 mb-1">
+          {state?.title || 'Kỳ thi có mật khẩu'}
+        </h3>
         <p className="text-sm text-slate-500 mb-6">
-          Kỳ thi này được bảo vệ bằng mật khẩu. Vui lòng nhập mật khẩu do giáo viên cung cấp để mở đề thi.
+          Kỳ thi này được bảo vệ bằng mật khẩu. Vui lòng nhập mật khẩu do giáo viên cung cấp để mở
+          đề thi.
         </p>
 
         <form onSubmit={handleUnlock} className="w-full flex flex-col gap-3">
@@ -1364,13 +1491,16 @@ export const ExamStudentView: React.FC<ExamStudentViewProps> = ({
           <span className="text-blue-700 font-bold">{displayName}</span>
         </div>
         <p className="text-sm text-slate-500 mb-4">
-          Bài thi của bạn đã được hệ thống lưu lại an toàn. Bạn đã trả lời {answeredCount}/{state?.totalQuestions} câu hỏi.
+          Bài thi của bạn đã được hệ thống lưu lại an toàn. Bạn đã trả lời {answeredCount}/
+          {state?.totalQuestions} câu hỏi.
         </p>
 
         {/* Khối hiển thị Điểm thi */}
         {res && allowScore && (
           <div className="w-full bg-blue-50/60 border-2 border-blue-200 rounded-2xl p-4 mb-4 shadow-xs text-center">
-            <div className="text-xs font-bold text-slate-500 uppercase tracking-wider mb-1">Kết quả bài thi</div>
+            <div className="text-xs font-bold text-slate-500 uppercase tracking-wider mb-1">
+              Kết quả bài thi
+            </div>
             <div className="text-sm font-extrabold text-blue-900 mb-2">Thí sinh: {displayName}</div>
             <div className="text-3xl font-black text-blue-600 mb-1">
               {res.score} / {res.maxScore ?? 10}đ
@@ -1429,7 +1559,9 @@ export const ExamStudentView: React.FC<ExamStudentViewProps> = ({
         {/* Khối hiển thị Điểm thi */}
         {res && allowScore && (
           <div className="w-full bg-blue-50/60 border-2 border-blue-200 rounded-2xl p-4 mb-4 shadow-xs text-center">
-            <div className="text-xs font-bold text-slate-500 uppercase tracking-wider mb-1">Kết quả bài thi</div>
+            <div className="text-xs font-bold text-slate-500 uppercase tracking-wider mb-1">
+              Kết quả bài thi
+            </div>
             <div className="text-sm font-extrabold text-blue-900 mb-2">Thí sinh: {displayName}</div>
             <div className="text-3xl font-black text-blue-600 mb-1">
               {res.score} / {res.maxScore ?? 10}đ
@@ -1466,12 +1598,11 @@ export const ExamStudentView: React.FC<ExamStudentViewProps> = ({
   })();
 
   const totalQuestions = orderedQuestions.length;
-  const answeredCount = orderedQuestions.filter(q =>
-    isQuestionAnswered(q, answers[q.id])
-  ).length;
+  const answeredCount = orderedQuestions.filter(q => isQuestionAnswered(q, answers[q.id])).length;
   const unansweredCount = Math.max(0, totalQuestions - answeredCount);
   const bookmarkedCount = Object.values(bookmarkedQuestions).filter(Boolean).length;
-  const progressPercent = totalQuestions > 0 ? Math.round((answeredCount / totalQuestions) * 100) : 0;
+  const progressPercent =
+    totalQuestions > 0 ? Math.round((answeredCount / totalQuestions) * 100) : 0;
 
   // Xử lý lưu đáp án tức thì (Tự lưu từng lần chọn)
   const handleSaveAnswer = (questionId: string, answer: unknown) => {
@@ -1519,7 +1650,8 @@ export const ExamStudentView: React.FC<ExamStudentViewProps> = ({
           <div className="flex items-center gap-1.5 mx-auto">
             <span>⚠️</span>
             <span>
-              Cảnh báo: Bạn vừa rời khỏi màn hình làm bài thi! Hành vi này đã được ghi nhận trên hệ thống giám sát.
+              Cảnh báo: Bạn vừa rời khỏi màn hình làm bài thi! Hành vi này đã được ghi nhận trên hệ
+              thống giám sát.
             </span>
           </div>
           <button
@@ -1567,8 +1699,8 @@ export const ExamStudentView: React.FC<ExamStudentViewProps> = ({
               remainingSeconds <= 60
                 ? 'bg-rose-50 text-rose-600 border-rose-300 animate-pulse'
                 : remainingSeconds <= 300
-                ? 'bg-amber-50 text-amber-700 border-amber-300'
-                : 'bg-blue-50 text-blue-700 border-blue-200'
+                  ? 'bg-amber-50 text-amber-700 border-amber-300'
+                  : 'bg-blue-50 text-blue-700 border-blue-200'
             }`}
           >
             <span>⏱</span>
@@ -1606,13 +1738,16 @@ export const ExamStudentView: React.FC<ExamStudentViewProps> = ({
             </h3>
             <div className="flex items-center gap-3 text-xs text-slate-500">
               <span className="flex items-center gap-1">
-                <span className="w-3 h-3 rounded-full bg-blue-600 inline-block" /> Đã làm ({answeredCount})
+                <span className="w-3 h-3 rounded-full bg-blue-600 inline-block" /> Đã làm (
+                {answeredCount})
               </span>
               <span className="flex items-center gap-1">
-                <span className="w-3 h-3 rounded-full bg-amber-400 inline-block" /> Đánh dấu ({bookmarkedCount})
+                <span className="w-3 h-3 rounded-full bg-amber-400 inline-block" /> Đánh dấu (
+                {bookmarkedCount})
               </span>
               <span className="flex items-center gap-1">
-                <span className="w-3 h-3 rounded-full bg-slate-200 inline-block" /> Chưa làm ({unansweredCount})
+                <span className="w-3 h-3 rounded-full bg-slate-200 inline-block" /> Chưa làm (
+                {unansweredCount})
               </span>
             </div>
           </div>
@@ -1630,8 +1765,8 @@ export const ExamStudentView: React.FC<ExamStudentViewProps> = ({
                     isBookmarked
                       ? 'bg-amber-400 text-amber-950 border-2 border-amber-500 ring-2 ring-amber-100'
                       : isAnswered
-                      ? 'bg-blue-600 text-white border border-blue-700'
-                      : 'bg-slate-100 text-slate-700 hover:bg-slate-200 border border-slate-200'
+                        ? 'bg-blue-600 text-white border border-blue-700'
+                        : 'bg-slate-100 text-slate-700 hover:bg-slate-200 border border-slate-200'
                   }`}
                 >
                   {idx + 1}
@@ -1718,7 +1853,10 @@ export const ExamStudentView: React.FC<ExamStudentViewProps> = ({
 
                       return optionsToRender.map((opt, optIdx) => {
                         const optText = typeof opt === 'string' ? opt : opt.text;
-                        const optImgs = typeof opt === 'object' && opt && Array.isArray(opt.images) ? opt.images : [];
+                        const optImgs =
+                          typeof opt === 'object' && opt && Array.isArray(opt.images)
+                            ? opt.images
+                            : [];
                         const isSelected = currentAns === optIdx;
 
                         return (
@@ -1741,7 +1879,9 @@ export const ExamStudentView: React.FC<ExamStudentViewProps> = ({
                               >
                                 {labels[optIdx]}
                               </span>
-                              {optText && <span className="text-base leading-normal">{optText}</span>}
+                              {optText && (
+                                <span className="text-base leading-normal">{optText}</span>
+                              )}
                             </div>
                             {optImgs.length > 0 && (
                               <div className="flex flex-wrap gap-2 ml-11 sm:ml-0">
@@ -1793,7 +1933,10 @@ export const ExamStudentView: React.FC<ExamStudentViewProps> = ({
                   <div className="flex flex-col gap-3 pt-1">
                     {q.items.map((it, itemIdx) => {
                       const itemText = typeof it.text === 'string' ? it.text : it.text.text;
-                      const itemImgs = typeof it.text === 'object' && it.text && Array.isArray(it.text.images) ? it.text.images : [];
+                      const itemImgs =
+                        typeof it.text === 'object' && it.text && Array.isArray(it.text.images)
+                          ? it.text.images
+                          : [];
                       const groupAnswers = Array.isArray(currentAns)
                         ? (currentAns as Array<boolean | null>)
                         : [null, null, null, null];
@@ -1876,7 +2019,9 @@ export const ExamStudentView: React.FC<ExamStudentViewProps> = ({
                     </div>
                     {q.leftItems.map((left, lIdx) => {
                       const leftText =
-                        typeof left.text === 'object' && left.text ? left.text.text : String(left.text);
+                        typeof left.text === 'object' && left.text
+                          ? left.text.text
+                          : String(left.text);
                       const currentPairs =
                         typeof currentAns === 'object' && currentAns !== null
                           ? 'pairs' in currentAns
@@ -2045,7 +2190,10 @@ export const ExamStudentView: React.FC<ExamStudentViewProps> = ({
             {unansweredCount > 0 && (
               <div className="p-3 bg-rose-50 border border-rose-200 rounded-xl text-rose-700 text-xs font-semibold flex items-center gap-2">
                 <span>⚠️</span>
-                <span>Bạn vẫn còn {unansweredCount} câu hỏi chưa trả lời! Vui lòng hoàn thành tất cả các câu trước khi nộp bài.</span>
+                <span>
+                  Bạn vẫn còn {unansweredCount} câu hỏi chưa trả lời! Vui lòng hoàn thành tất cả các
+                  câu trước khi nộp bài.
+                </span>
               </div>
             )}
 
@@ -2104,8 +2252,8 @@ export const ExamStudentView: React.FC<ExamStudentViewProps> = ({
                       isBookmarked
                         ? 'bg-amber-400 text-amber-950 border-2 border-amber-500'
                         : isAnswered
-                        ? 'bg-blue-600 text-white'
-                        : 'bg-slate-100 text-slate-700 border border-slate-200'
+                          ? 'bg-blue-600 text-white'
+                          : 'bg-slate-100 text-slate-700 border border-slate-200'
                     }`}
                   >
                     {idx + 1}

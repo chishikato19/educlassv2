@@ -89,11 +89,7 @@ describe('Swiss Pairing Algorithm (Đấu Cờ Thụy Sỹ)', () => {
       low3: createMockParticipant('low3', 'Em', 0, 1), // Đã nhận bye 1 lần
     };
 
-    const { byePlayerId, updatedParticipants } = generateSwissPairings(
-      participants,
-      false,
-      2
-    );
+    const { byePlayerId, updatedParticipants } = generateSwissPairings(participants, false, 2);
 
     // Suất bye vẫn phải chọn được 1 bạn trong nhóm cuối và tăng byeCount lên 2
     expect(byePlayerId).not.toBeNull();
@@ -137,8 +133,12 @@ describe('Swiss Pairing Algorithm (Đấu Cờ Thụy Sỹ)', () => {
 
     // Không được có trận p1 gặp p2 hoặc p3 gặp p4
     for (const m of matchups) {
-      const isP1P2 = (m.player1Id === 'p1' && m.player2Id === 'p2') || (m.player1Id === 'p2' && m.player2Id === 'p1');
-      const isP3P4 = (m.player1Id === 'p3' && m.player2Id === 'p4') || (m.player1Id === 'p4' && m.player2Id === 'p3');
+      const isP1P2 =
+        (m.player1Id === 'p1' && m.player2Id === 'p2') ||
+        (m.player1Id === 'p2' && m.player2Id === 'p1');
+      const isP3P4 =
+        (m.player1Id === 'p3' && m.player2Id === 'p4') ||
+        (m.player1Id === 'p4' && m.player2Id === 'p3');
       expect(isP1P2).toBe(false);
       expect(isP3P4).toBe(false);
     }

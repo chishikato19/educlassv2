@@ -1,5 +1,5 @@
 import React, { useId, useState } from 'react';
-import { resolveAssetUrl, type Question } from '@educlass/question-kit';
+import { renderLatexInText, resolveAssetUrl, type Question } from '@educlass/question-kit';
 import { api } from '../api/client.js';
 
 export interface WordImportWarning {
@@ -36,9 +36,7 @@ export const WordImportModal: React.FC<WordImportModalProps> = ({
   initialParsedResult,
   onSaveQuestions,
 }) => {
-  const [parsedData, setParsedData] = useState<WordParsedData | null>(
-    initialParsedResult ?? null,
-  );
+  const [parsedData, setParsedData] = useState<WordParsedData | null>(initialParsedResult ?? null);
   const [isLoading, setIsLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [isDragOver, setIsDragOver] = useState(false);
@@ -68,7 +66,7 @@ export const WordImportModal: React.FC<WordImportModalProps> = ({
         // Fallback môi trường Node / Vitest
         file
           .arrayBuffer()
-          .then((buf) => {
+          .then(buf => {
             if (typeof Buffer !== 'undefined') {
               resolve(Buffer.from(buf).toString('base64'));
             } else {
@@ -164,7 +162,7 @@ export const WordImportModal: React.FC<WordImportModalProps> = ({
   const handleUpdateTfGroupItemCorrect = (
     qIndex: number,
     itemIndex: number,
-    newCorrect: boolean,
+    newCorrect: boolean
   ) => {
     if (!parsedData) return;
     const updated = [...parsedData.questions];
@@ -204,8 +202,8 @@ export const WordImportModal: React.FC<WordImportModalProps> = ({
 
     const tagsArray = setTags
       .split(',')
-      .map((t) => t.trim())
-      .filter((t) => t.length > 0);
+      .map(t => t.trim())
+      .filter(t => t.length > 0);
 
     try {
       await onSaveQuestions({
@@ -229,11 +227,11 @@ export const WordImportModal: React.FC<WordImportModalProps> = ({
       return;
     }
     fetch('/api/question-sets/templates/word')
-      .then((res) => {
+      .then(res => {
         if (!res.ok) throw new Error('Không thể tải file mẫu');
         return res.blob();
       })
-      .then((blob) => {
+      .then(blob => {
         const url = window.URL.createObjectURL(blob);
         const a = document.createElement('a');
         a.href = url;
@@ -263,7 +261,7 @@ export const WordImportModal: React.FC<WordImportModalProps> = ({
         boxSizing: 'border-box',
         overflowY: 'auto',
       }}
-      onClick={(e) => {
+      onClick={e => {
         if (e.target === e.currentTarget) onClose();
       }}
     >
@@ -321,7 +319,16 @@ export const WordImportModal: React.FC<WordImportModalProps> = ({
         </div>
 
         {/* Nội dung cuộn */}
-        <div style={{ padding: '24px', overflowY: 'auto', flex: 1, display: 'flex', flexDirection: 'column', gap: '20px' }}>
+        <div
+          style={{
+            padding: '24px',
+            overflowY: 'auto',
+            flex: 1,
+            display: 'flex',
+            flexDirection: 'column',
+            gap: '20px',
+          }}
+        >
           {errorMessage && (
             <div
               style={{
@@ -372,21 +379,59 @@ export const WordImportModal: React.FC<WordImportModalProps> = ({
                       gap: '4px',
                     }}
                   >
-                    <li>Câu hỏi bắt đầu bằng: <code>Câu 1:</code>, <code>Câu 2.</code>, <code>Question 1:</code>...</li>
                     <li>
-                      <strong>Trắc nghiệm 4 lựa chọn (A, B, C, D):</strong> Đánh dấu đáp án đúng bằng một trong các cách:
+                      Câu hỏi bắt đầu bằng: <code>Câu 1:</code>, <code>Câu 2.</code>,{' '}
+                      <code>Question 1:</code>...
+                    </li>
+                    <li>
+                      <strong>Trắc nghiệm 4 lựa chọn (A, B, C, D):</strong> Đánh dấu đáp án đúng
+                      bằng một trong các cách:
                       <ul style={{ paddingLeft: '16px', margin: '2px 0', listStyleType: 'circle' }}>
-                        <li>Gạch chân đáp án đúng: <code><u>A.</u></code> hoặc <code><u>Nội dung</u></code></li>
-                        <li>Đánh dấu sao đằng trước: <code>*B.</code> hoặc <code>* B.</code></li>
-                        <li>Bôi đậm phương án đúng: <code><b>C.</b></code></li>
-                        <li>Bôi màu / Highlight phương án đúng bằng công cụ bút nhớ dòng trong Word</li>
-                        <li>Kèm dòng <code>Đáp án: D</code> ở cuối câu hỏi</li>
+                        <li>
+                          Gạch chân đáp án đúng:{' '}
+                          <code>
+                            <u>A.</u>
+                          </code>{' '}
+                          hoặc{' '}
+                          <code>
+                            <u>Nội dung</u>
+                          </code>
+                        </li>
+                        <li>
+                          Đánh dấu sao đằng trước: <code>*B.</code> hoặc <code>* B.</code>
+                        </li>
+                        <li>
+                          Bôi đậm phương án đúng:{' '}
+                          <code>
+                            <b>C.</b>
+                          </code>
+                        </li>
+                        <li>
+                          Bôi màu / Highlight phương án đúng bằng công cụ bút nhớ dòng trong Word
+                        </li>
+                        <li>
+                          Kèm dòng <code>Đáp án: D</code> ở cuối câu hỏi
+                        </li>
                       </ul>
                     </li>
-                    <li><strong>Đúng/Sai theo nhóm (4 ý a, b, c, d chuẩn BGD 2025):</strong> các ý <code>a)</code>, <code>b)</code>, <code>c)</code>, <code>d)</code> kèm nhãn <code>[Đúng]</code> hoặc <code>[Sai]</code> (hoặc <code>(Đ)</code>, <code>(S)</code>).</li>
-                    <li><strong>Đúng/Sai đơn lẻ:</strong> câu phát biểu kèm dòng <code>Đáp án: Đúng</code> hoặc <code>Đáp án: Sai</code>.</li>
-                    <li><strong>Trả lời ngắn:</strong> câu hỏi kèm dòng <code>Đáp án: [kết quả số hoặc chữ]</code>.</li>
-                    <li><strong>Hình ảnh &amp; Công thức:</strong> Hỗ trợ chèn hình ảnh minh họa trực tiếp ở câu hỏi và đáp án; hỗ trợ công thức toán học Word (OMML/Equation).</li>
+                    <li>
+                      <strong>Đúng/Sai theo nhóm (4 ý a, b, c, d chuẩn BGD 2025):</strong> các ý{' '}
+                      <code>a)</code>, <code>b)</code>, <code>c)</code>, <code>d)</code> kèm nhãn{' '}
+                      <code>[Đúng]</code> hoặc <code>[Sai]</code> (hoặc <code>(Đ)</code>,{' '}
+                      <code>(S)</code>).
+                    </li>
+                    <li>
+                      <strong>Đúng/Sai đơn lẻ:</strong> câu phát biểu kèm dòng{' '}
+                      <code>Đáp án: Đúng</code> hoặc <code>Đáp án: Sai</code>.
+                    </li>
+                    <li>
+                      <strong>Trả lời ngắn:</strong> câu hỏi kèm dòng{' '}
+                      <code>Đáp án: [kết quả số hoặc chữ]</code>.
+                    </li>
+                    <li>
+                      <strong>Hình ảnh &amp; Công thức:</strong> Hỗ trợ chèn hình ảnh minh họa trực
+                      tiếp ở câu hỏi và đáp án; hỗ trợ công thức toán học Word (OMML/Equation).
+                    </li>
                   </ul>
                 </div>
                 <button
@@ -464,7 +509,8 @@ export const WordImportModal: React.FC<WordImportModalProps> = ({
             <div className="py-16 text-center space-y-3">
               <div className="animate-spin inline-block w-10 h-10 border-4 border-blue-600 border-t-transparent rounded-full" />
               <p className="text-gray-700 font-medium">
-                Đang đọc tài liệu Word, chuyển đổi công thức toán OMML sang LaTeX và trích xuất hình ảnh...
+                Đang đọc tài liệu Word, chuyển đổi công thức toán OMML sang LaTeX và trích xuất hình
+                ảnh...
               </p>
             </div>
           )}
@@ -476,11 +522,13 @@ export const WordImportModal: React.FC<WordImportModalProps> = ({
               <div className="flex flex-wrap items-center justify-between gap-3 p-4 bg-gray-50 rounded-lg border border-gray-200">
                 <div className="space-y-1">
                   <div className="flex items-center gap-2">
-                    <span className="font-bold text-gray-800">
-                      Kết quả phân tích:
-                    </span>
+                    <span className="font-bold text-gray-800">Kết quả phân tích:</span>
                     <span className="px-2.5 py-0.5 rounded-full text-xs font-semibold bg-green-100 text-green-800">
-                      Hợp lệ: {parsedData.successCount}/{parsedData.totalDetected} câu ({Math.round((parsedData.successCount / (parsedData.totalDetected || 1)) * 100)}%)
+                      Hợp lệ: {parsedData.successCount}/{parsedData.totalDetected} câu (
+                      {Math.round(
+                        (parsedData.successCount / (parsedData.totalDetected || 1)) * 100
+                      )}
+                      %)
                     </span>
                     {parsedData.warnings.length > 0 && (
                       <span className="px-2.5 py-0.5 rounded-full text-xs font-semibold bg-amber-100 text-amber-800">
@@ -489,7 +537,8 @@ export const WordImportModal: React.FC<WordImportModalProps> = ({
                     )}
                   </div>
                   <p className="text-xs text-gray-500">
-                    Thầy/cô có thể kiểm tra và sửa nhanh đáp án trực tiếp bên dưới trước khi bấm lưu.
+                    Thầy/cô có thể kiểm tra và sửa nhanh đáp án trực tiếp bên dưới trước khi bấm
+                    lưu.
                   </p>
                 </div>
 
@@ -530,7 +579,7 @@ export const WordImportModal: React.FC<WordImportModalProps> = ({
                       type="text"
                       required
                       value={setTitle}
-                      onChange={(e) => setSetTitle(e.target.value)}
+                      onChange={e => setSetTitle(e.target.value)}
                       data-testid="input-word-set-title"
                       className="w-full min-h-[44px] px-3 py-2 border rounded-md text-sm"
                     />
@@ -538,22 +587,26 @@ export const WordImportModal: React.FC<WordImportModalProps> = ({
 
                   <div className="grid grid-cols-2 gap-2">
                     <div>
-                      <label className="block text-xs font-medium text-gray-700 mb-1">Môn học</label>
+                      <label className="block text-xs font-medium text-gray-700 mb-1">
+                        Môn học
+                      </label>
                       <input
                         type="text"
                         value={setSubject}
-                        onChange={(e) => setSetSubject(e.target.value)}
+                        onChange={e => setSetSubject(e.target.value)}
                         className="w-full min-h-[44px] px-3 py-2 border rounded-md text-sm"
                       />
                     </div>
                     <div>
-                      <label className="block text-xs font-medium text-gray-700 mb-1">Khối lớp</label>
+                      <label className="block text-xs font-medium text-gray-700 mb-1">
+                        Khối lớp
+                      </label>
                       <select
                         value={setGrade}
-                        onChange={(e) => setSetGrade(Number(e.target.value))}
+                        onChange={e => setSetGrade(Number(e.target.value))}
                         className="w-full min-h-[44px] px-3 py-2 border rounded-md text-sm bg-white"
                       >
-                        {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12].map((g) => (
+                        {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12].map(g => (
                           <option key={g} value={g}>
                             Lớp {g}
                           </option>
@@ -564,11 +617,13 @@ export const WordImportModal: React.FC<WordImportModalProps> = ({
                 </div>
 
                 <div>
-                  <label className="block text-xs font-medium text-gray-700 mb-1">Thẻ phân loại</label>
+                  <label className="block text-xs font-medium text-gray-700 mb-1">
+                    Thẻ phân loại
+                  </label>
                   <input
                     type="text"
                     value={setTags}
-                    onChange={(e) => setSetTags(e.target.value)}
+                    onChange={e => setSetTags(e.target.value)}
                     className="w-full min-h-[44px] px-3 py-2 border rounded-md text-sm"
                   />
                 </div>
@@ -587,9 +642,7 @@ export const WordImportModal: React.FC<WordImportModalProps> = ({
                   >
                     <div className="flex items-start justify-between gap-2 border-b pb-2">
                       <div className="flex items-center gap-2">
-                        <span className="font-bold text-sm text-blue-800">
-                          Câu {qIndex + 1}
-                        </span>
+                        <span className="font-bold text-sm text-blue-800">Câu {qIndex + 1}</span>
                         <span className="px-2 py-0.5 rounded text-xs bg-gray-100 text-gray-700">
                           {q.type === 'mcq4'
                             ? 'Trắc nghiệm 4 lựa chọn'
@@ -612,9 +665,12 @@ export const WordImportModal: React.FC<WordImportModalProps> = ({
                     </div>
 
                     {/* Nội dung câu dẫn */}
-                    <div className="text-sm text-gray-800 whitespace-pre-line font-medium">
-                      {q.stem.text}
-                    </div>
+                    <div
+                      className="text-sm text-gray-800 leading-relaxed font-medium overflow-x-auto"
+                      dangerouslySetInnerHTML={{
+                        __html: renderLatexInText(q.stem.text),
+                      }}
+                    />
 
                     {/* Hình ảnh đính kèm câu hỏi dẫn nếu có */}
                     {q.stem.images && q.stem.images.length > 0 && (
@@ -633,9 +689,7 @@ export const WordImportModal: React.FC<WordImportModalProps> = ({
                     {/* Câu hỏi MCQ4: chọn đáp án đúng */}
                     {q.type === 'mcq4' && (
                       <div className="space-y-2 pt-2">
-                        <p className="text-xs font-semibold text-gray-500">
-                          Chọn đáp án đúng:
-                        </p>
+                        <p className="text-xs font-semibold text-gray-500">Chọn đáp án đúng:</p>
                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
                           {q.options.map((opt, optIndex) => (
                             <label
@@ -659,7 +713,14 @@ export const WordImportModal: React.FC<WordImportModalProps> = ({
                                   <span className="font-bold">
                                     {String.fromCharCode(65 + optIndex)}.
                                   </span>
-                                  {opt.text && <span>{opt.text}</span>}
+                                  {opt.text && (
+                                    <span
+                                      className="overflow-x-auto"
+                                      dangerouslySetInnerHTML={{
+                                        __html: renderLatexInText(opt.text),
+                                      }}
+                                    />
+                                  )}
                                 </div>
                                 {opt.images && opt.images.length > 0 && (
                                   <div className="flex flex-wrap gap-2 mt-1.5 ml-4">
@@ -696,7 +757,12 @@ export const WordImportModal: React.FC<WordImportModalProps> = ({
                                 <span className="font-bold mr-1">
                                   {String.fromCharCode(97 + itemIndex)})
                                 </span>
-                                <span>{item.text.text}</span>
+                                <span
+                                  className="overflow-x-auto"
+                                  dangerouslySetInnerHTML={{
+                                    __html: renderLatexInText(item.text.text),
+                                  }}
+                                />
                                 {item.text.images && item.text.images.length > 0 && (
                                   <div className="flex flex-wrap gap-2 mt-1.5 ml-4">
                                     {item.text.images.map((img, imgIdx) => (

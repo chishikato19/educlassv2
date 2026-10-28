@@ -84,7 +84,10 @@ export class TeacherApiClient {
     }
   }
 
-  async login(username = 'admin', password = 'admin123'): Promise<{ token: string; user: UserDto }> {
+  async login(
+    username = 'admin',
+    password = 'admin123'
+  ): Promise<{ token: string; user: UserDto }> {
     const res = await this.request<{ token: string; user: UserDto }>('/auth/login', {
       method: 'POST',
       body: JSON.stringify({ username, password }),
@@ -154,7 +157,7 @@ export class TeacherApiClient {
   private async request<T>(
     endpoint: string,
     options: RequestInit = {},
-    _isRetry = false,
+    _isRetry = false
   ): Promise<T> {
     if (!this.token && !endpoint.startsWith('/auth/')) {
       await this.ensureAuthenticated();
@@ -241,7 +244,9 @@ export class TeacherApiClient {
   // Students
   async getStudents(classId: string): Promise<StudentDto[]> {
     try {
-      const res = await this.request<{ students?: StudentDto[] } | StudentDto[]>(`/classes/${classId}/students`);
+      const res = await this.request<{ students?: StudentDto[] } | StudentDto[]>(
+        `/classes/${classId}/students`
+      );
       if (Array.isArray(res)) return res;
       if (res && Array.isArray(res.students)) return res.students;
       return [];
@@ -299,27 +304,32 @@ export class TeacherApiClient {
   // Question sets
   async getQuestionSets(): Promise<QuestionSetItem[]> {
     try {
-      const res = await this.request<{ questionSets?: Array<{
-        id: string;
-        ownerId: string;
-        title: string;
-        subject: string;
-        grade: number;
-        tags: string[];
-        questionCount?: number;
-        questions?: unknown[];
-        updatedAt: number;
-      }> } | Array<{
-        id: string;
-        ownerId: string;
-        title: string;
-        subject: string;
-        grade: number;
-        tags: string[];
-        questionCount?: number;
-        questions?: unknown[];
-        updatedAt: number;
-      }>>('/question-sets');
+      const res = await this.request<
+        | {
+            questionSets?: Array<{
+              id: string;
+              ownerId: string;
+              title: string;
+              subject: string;
+              grade: number;
+              tags: string[];
+              questionCount?: number;
+              questions?: unknown[];
+              updatedAt: number;
+            }>;
+          }
+        | Array<{
+            id: string;
+            ownerId: string;
+            title: string;
+            subject: string;
+            grade: number;
+            tags: string[];
+            questionCount?: number;
+            questions?: unknown[];
+            updatedAt: number;
+          }>
+      >('/question-sets');
 
       const raw = Array.isArray(res) ? res : (res?.questionSets ?? []);
 
@@ -345,10 +355,13 @@ export class TeacherApiClient {
     tags: string[];
     questions?: unknown[];
   }): Promise<{ id: string }> {
-    const res = await this.request<{ questionSet?: { id: string }; id?: string }>('/question-sets', {
-      method: 'POST',
-      body: JSON.stringify(data),
-    });
+    const res = await this.request<{ questionSet?: { id: string }; id?: string }>(
+      '/question-sets',
+      {
+        method: 'POST',
+        body: JSON.stringify(data),
+      }
+    );
     return { id: res.questionSet?.id ?? res.id ?? '' };
   }
 
@@ -373,7 +386,13 @@ export class TeacherApiClient {
 
   async updateQuestionSet(
     id: string,
-    data: { title?: string; subject?: string; grade?: number; tags?: string[]; questions?: unknown[] }
+    data: {
+      title?: string;
+      subject?: string;
+      grade?: number;
+      tags?: string[];
+      questions?: unknown[];
+    }
   ): Promise<void> {
     return this.request<void>(`/question-sets/${id}`, {
       method: 'PUT',
@@ -415,7 +434,9 @@ export class TeacherApiClient {
   // Sessions
   async getActiveSession(): Promise<SessionDetailResponse | null> {
     try {
-      const res = await this.request<SessionDetailResponse | { session?: unknown }>('/sessions/active');
+      const res = await this.request<SessionDetailResponse | { session?: unknown }>(
+        '/sessions/active'
+      );
       if (!res) return null;
 
       // 1. Trường hợp chuẩn: { session: { id, joinCode, ... }, className, joinUrl, qrDataUrl }
@@ -435,20 +456,20 @@ export class TeacherApiClient {
         typeof res.session === 'object' &&
         'session' in (res.session as Record<string, unknown>)
       ) {
-        return (res.session as unknown) as SessionDetailResponse;
+        return res.session as unknown as SessionDetailResponse;
       }
 
       // 3. Trường hợp server trả về SessionDto phẳng: { id, joinCode, status, ... }
       if ('joinCode' in (res as Record<string, unknown>)) {
         return {
-          session: (res as unknown) as SessionDetailResponse['session'],
-          className: ((res as unknown) as { className?: string }).className ?? null,
-          joinUrl: ((res as unknown) as { joinUrl?: string }).joinUrl,
-          qrDataUrl: ((res as unknown) as { qrDataUrl?: string }).qrDataUrl,
+          session: res as unknown as SessionDetailResponse['session'],
+          className: (res as unknown as { className?: string }).className ?? null,
+          joinUrl: (res as unknown as { joinUrl?: string }).joinUrl,
+          qrDataUrl: (res as unknown as { qrDataUrl?: string }).qrDataUrl,
         };
       }
 
-      return (res as unknown) as SessionDetailResponse;
+      return res as unknown as SessionDetailResponse;
     } catch {
       return null;
     }
@@ -462,13 +483,12 @@ export class TeacherApiClient {
   }
 
   async closeSession(sessionId: string): Promise<SessionReportDto> {
-    const res = await this.request<{ session?: SessionDto; report?: SessionReportDto } | SessionReportDto>(
-      `/sessions/${sessionId}/close`,
-      {
-        method: 'POST',
-        body: JSON.stringify({ reason: 'Giáo viên kết thúc tiết học' }),
-      }
-    );
+    const res = await this.request<
+      { session?: SessionDto; report?: SessionReportDto } | SessionReportDto
+    >(`/sessions/${sessionId}/close`, {
+      method: 'POST',
+      body: JSON.stringify({ reason: 'Giáo viên kết thúc tiết học' }),
+    });
     if (res && typeof res === 'object' && 'report' in res && res.report) {
       return res.report;
     }
@@ -501,7 +521,9 @@ export class TeacherApiClient {
 
   async getActiveQuizSummary(sessionId: string): Promise<QuizSummaryReport | null> {
     try {
-      const res = await this.request<{ summary: QuizSummaryReport | null }>(`/sessions/${sessionId}/quiz-summary`);
+      const res = await this.request<{ summary: QuizSummaryReport | null }>(
+        `/sessions/${sessionId}/quiz-summary`
+      );
       return res.summary;
     } catch {
       return null;
@@ -510,7 +532,9 @@ export class TeacherApiClient {
 
   async getQuizRuns(sessionId: string): Promise<QuizSummaryReport[]> {
     try {
-      const res = await this.request<{ runs: QuizSummaryReport[] }>(`/sessions/${sessionId}/quiz-runs`);
+      const res = await this.request<{ runs: QuizSummaryReport[] }>(
+        `/sessions/${sessionId}/quiz-runs`
+      );
       return res.runs || [];
     } catch {
       return [];
@@ -519,9 +543,12 @@ export class TeacherApiClient {
 
   async getParticipants(sessionId: string): Promise<ParticipantDto[]> {
     try {
-      const res = await this.request<{
-        participants?: ParticipantDto[];
-      } | ParticipantDto[]>(`/sessions/${sessionId}/participants`);
+      const res = await this.request<
+        | {
+            participants?: ParticipantDto[];
+          }
+        | ParticipantDto[]
+      >(`/sessions/${sessionId}/participants`);
       if (Array.isArray(res)) return res;
       if (res && Array.isArray(res.participants)) return res.participants;
       return [];
@@ -565,7 +592,9 @@ export class TeacherApiClient {
   // Activities
   async getActivities(): Promise<ActivityMeta[]> {
     try {
-      const res = await this.request<{ activities?: ActivityMeta[] } | ActivityMeta[]>('/activities');
+      const res = await this.request<{ activities?: ActivityMeta[] } | ActivityMeta[]>(
+        '/activities'
+      );
       if (Array.isArray(res)) return res;
       if (res && Array.isArray(res.activities)) return res.activities;
     } catch {
@@ -648,9 +677,10 @@ export class TeacherApiClient {
       if (options?.activityId) q.set('activityId', options.activityId);
       if (options?.runId) q.set('runId', options.runId);
       const queryStr = q.toString() ? `?${q.toString()}` : '';
-      return await this.request<{ run: { id: string; activityId: string; config?: unknown } | null; state: unknown }>(
-        `/sessions/${sessionId}/activities/current${queryStr}`
-      );
+      return await this.request<{
+        run: { id: string; activityId: string; config?: unknown } | null;
+        state: unknown;
+      }>(`/sessions/${sessionId}/activities/current${queryStr}`);
     } catch {
       return { run: null, state: null };
     }
@@ -661,10 +691,13 @@ export class TeacherApiClient {
   ): Promise<Array<{ runId: string; activityId: string; state: unknown; config?: unknown }>> {
     try {
       const res = await this.request<{
-        activeRuns: Array<{ run: { id: string; activityId: string; config?: unknown }; state: unknown }>;
+        activeRuns: Array<{
+          run: { id: string; activityId: string; config?: unknown };
+          state: unknown;
+        }>;
       }>(`/sessions/${sessionId}/activities/active`);
       if (res && Array.isArray(res.activeRuns)) {
-        return res.activeRuns.map((item) => ({
+        return res.activeRuns.map(item => ({
           runId: item.run.id,
           activityId: item.run.activityId,
           state: item.state,
@@ -698,10 +731,13 @@ export class TeacherApiClient {
         state: res.state,
       };
     } catch {
-      return this.request<{ runId: string; activityId: string; state: unknown }>('/activities/run', {
-        method: 'POST',
-        body: JSON.stringify({ sessionId, activityId, config }),
-      });
+      return this.request<{ runId: string; activityId: string; state: unknown }>(
+        '/activities/run',
+        {
+          method: 'POST',
+          body: JSON.stringify({ sessionId, activityId, config }),
+        }
+      );
     }
   }
 
@@ -753,13 +789,10 @@ export class TeacherApiClient {
 
     if (sessionId) {
       try {
-        return await this.request<{ results: unknown[] }>(
-          `/sessions/${sessionId}/activities/end`,
-          {
-            method: 'POST',
-            body: JSON.stringify({ runId }),
-          }
-        );
+        return await this.request<{ results: unknown[] }>(`/sessions/${sessionId}/activities/end`, {
+          method: 'POST',
+          body: JSON.stringify({ runId }),
+        });
       } catch {
         // Fallback
       }
@@ -888,7 +921,10 @@ export class TeacherApiClient {
 
   // --- KHO LƯU VIDEO HỌC LIỆU YOUTUBE ---
 
-  async getVideos(params?: { category?: string | undefined; search?: string | undefined }): Promise<VideoDto[]> {
+  async getVideos(params?: {
+    category?: string | undefined;
+    search?: string | undefined;
+  }): Promise<VideoDto[]> {
     const q = new URLSearchParams();
     if (params?.category && params.category !== 'all') {
       q.set('category', params.category);
@@ -931,7 +967,11 @@ export class TeacherApiClient {
 
   // --- QUẢN LÝ KỲ THI THEO CA & BÁO CÁO KỲ THI LÂU DÀI ---
 
-  async getExams(params?: { classId?: string | undefined; status?: string | undefined; folder?: string | undefined }): Promise<ExamListItemDto[]> {
+  async getExams(params?: {
+    classId?: string | undefined;
+    status?: string | undefined;
+    folder?: string | undefined;
+  }): Promise<ExamListItemDto[]> {
     const q = new URLSearchParams();
     if (params?.classId) {
       q.set('classId', params.classId);
@@ -1023,7 +1063,10 @@ export class TeacherApiClient {
     });
     if (!res.ok) {
       const err = await res.json().catch(() => ({}));
-      throw new Error((err as { error?: { message?: string } })?.error?.message || 'Không thể tải file báo cáo Excel');
+      throw new Error(
+        (err as { error?: { message?: string } })?.error?.message ||
+          'Không thể tải file báo cáo Excel'
+      );
     }
     const blob = await res.blob();
     const url = window.URL.createObjectURL(blob);
@@ -1050,7 +1093,10 @@ export class TeacherApiClient {
     });
     if (!res.ok) {
       const err = await res.json().catch(() => ({}));
-      throw new Error((err as { error?: { message?: string } })?.error?.message || 'Không thể tải file Excel phiên học');
+      throw new Error(
+        (err as { error?: { message?: string } })?.error?.message ||
+          'Không thể tải file Excel phiên học'
+      );
     }
     const blob = await res.blob();
     const url = window.URL.createObjectURL(blob);
@@ -1068,7 +1114,10 @@ export class TeacherApiClient {
   /**
    * Lấy cây phân cấp Khối -> Môn -> Chương -> Bài kèm số lượng câu hỏi
    */
-  async getBankTree(params?: { grade?: number; subject?: string }): Promise<BankCurriculumTreeNode[]> {
+  async getBankTree(params?: {
+    grade?: number;
+    subject?: string;
+  }): Promise<BankCurriculumTreeNode[]> {
     const q = new URLSearchParams();
     if (params?.grade !== undefined) q.set('grade', String(params.grade));
     if (params?.subject) q.set('subject', params.subject);
@@ -1127,7 +1176,7 @@ export class TeacherApiClient {
    * Tạo hàng loạt câu hỏi vào ngân hàng (sau khi phân tích Word)
    */
   async createBatchBankQuestions(
-    questions: CreateBankQuestionRequest[],
+    questions: CreateBankQuestionRequest[]
   ): Promise<{ success: boolean; count: number }> {
     return this.request<{ success: boolean; count: number }>('/bank/questions/batch', {
       method: 'POST',
@@ -1138,10 +1187,7 @@ export class TeacherApiClient {
   /**
    * Cập nhật câu hỏi ngân hàng
    */
-  async updateBankQuestion(
-    id: string,
-    data: UpdateBankQuestionRequest,
-  ): Promise<BankQuestionDto> {
+  async updateBankQuestion(id: string, data: UpdateBankQuestionRequest): Promise<BankQuestionDto> {
     return this.request<BankQuestionDto>(`/bank/questions/${id}`, {
       method: 'PUT',
       body: JSON.stringify(data),
@@ -1151,15 +1197,10 @@ export class TeacherApiClient {
   /**
    * Xóa câu hỏi ngân hàng và dọn ảnh mồ côi
    */
-  async deleteBankQuestion(
-    id: string,
-  ): Promise<{ success: boolean; cleanedAssetsCount: number }> {
-    return this.request<{ success: boolean; cleanedAssetsCount: number }>(
-      `/bank/questions/${id}`,
-      {
-        method: 'DELETE',
-      },
-    );
+  async deleteBankQuestion(id: string): Promise<{ success: boolean; cleanedAssetsCount: number }> {
+    return this.request<{ success: boolean; cleanedAssetsCount: number }>(`/bank/questions/${id}`, {
+      method: 'DELETE',
+    });
   }
 
   /**
@@ -1176,7 +1217,7 @@ export class TeacherApiClient {
    * Sinh bộ đề ngẫu nhiên từ ma trận câu hỏi và lưu vào kho đề thi
    */
   async generateSetFromMatrix(
-    data: MatrixGenerateRequest,
+    data: MatrixGenerateRequest
   ): Promise<{ success: boolean; setId: string; title: string; totalQuestions: number }> {
     return this.request<{
       success: boolean;
@@ -1193,14 +1234,14 @@ export class TeacherApiClient {
    * Bốc ngẫu nhiên câu hỏi theo ma trận để xem trước và đổi câu tương đương (Task 4.2)
    */
   async previewSetFromMatrix(
-    data: MatrixGenerateRequest,
+    data: MatrixGenerateRequest
   ): Promise<{ questions: BankQuestionDto[]; totalQuestions: number }> {
     return this.request<{ questions: BankQuestionDto[]; totalQuestions: number }>(
       '/bank/preview-set',
       {
         method: 'POST',
         body: JSON.stringify(data),
-      },
+      }
     );
   }
 
@@ -1216,7 +1257,7 @@ export class TeacherApiClient {
    */
   async createClassGroup(
     classId: string,
-    data: CreateClassGroupRequest,
+    data: CreateClassGroupRequest
   ): Promise<{ group: ClassGroupDto }> {
     return this.request<{ group: ClassGroupDto }>(`/classes/${classId}/groups`, {
       method: 'POST',
@@ -1229,7 +1270,7 @@ export class TeacherApiClient {
    */
   async updateClassGroup(
     groupId: string,
-    data: UpdateClassGroupRequest,
+    data: UpdateClassGroupRequest
   ): Promise<{ success: boolean; group: ClassGroupDto }> {
     return this.request<{ success: boolean; group: ClassGroupDto }>(`/groups/${groupId}`, {
       method: 'PATCH',
@@ -1242,7 +1283,7 @@ export class TeacherApiClient {
    */
   async randomizeClassGroups(
     classId: string,
-    data: RandomizeGroupsRequest,
+    data: RandomizeGroupsRequest
   ): Promise<ClassGroupOverviewResponse> {
     return this.request<ClassGroupOverviewResponse>(`/classes/${classId}/groups/randomize`, {
       method: 'POST',
@@ -1255,14 +1296,14 @@ export class TeacherApiClient {
    */
   async assignStudentGroup(
     studentId: string,
-    groupId: string | null,
+    groupId: string | null
   ): Promise<{ success: boolean; student: StudentDto | null }> {
     return this.request<{ success: boolean; student: StudentDto | null }>(
       `/students/${studentId}/group`,
       {
         method: 'PUT',
         body: JSON.stringify({ groupId }),
-      },
+      }
     );
   }
 
@@ -1271,14 +1312,14 @@ export class TeacherApiClient {
    */
   async assignGroupLeader(
     groupId: string,
-    studentId: string | null,
+    studentId: string | null
   ): Promise<{ success: boolean; group: ClassGroupDto | null }> {
     return this.request<{ success: boolean; group: ClassGroupDto | null }>(
       `/groups/${groupId}/leader`,
       {
         method: 'PUT',
         body: JSON.stringify({ studentId }),
-      },
+      }
     );
   }
 

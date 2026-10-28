@@ -11,11 +11,7 @@ import {
   popNextPowerUp,
   resolveAttackWithShield,
 } from '@educlass/core';
-import type {
-  ActivityReject,
-  ActiveEffect,
-  CombatEvent,
-} from '@educlass/protocol';
+import type { ActivityReject, ActiveEffect, CombatEvent } from '@educlass/protocol';
 import {
   type LeaderboardEntry,
   type ParticipantQuizProgress,
@@ -57,10 +53,7 @@ function toBooleanVal(val: unknown): boolean {
 /**
  * Kiểm tra xem đáp án học sinh gửi lên có chính xác không
  */
-export function checkAnswerCorrectness(
-  question: QuizQuestion,
-  studentAnswer: unknown
-): boolean {
+export function checkAnswerCorrectness(question: QuizQuestion, studentAnswer: unknown): boolean {
   if (studentAnswer === undefined || studentAnswer === null) {
     return false;
   }
@@ -103,9 +96,7 @@ export function checkAnswerCorrectness(
     case 'short': {
       const studentStr = String(studentAnswer).trim().toLowerCase();
       if (Array.isArray(question.correctAnswer)) {
-        return question.correctAnswer.some(
-          ans => String(ans).trim().toLowerCase() === studentStr
-        );
+        return question.correctAnswer.some(ans => String(ans).trim().toLowerCase() === studentStr);
       }
       return String(question.correctAnswer).trim().toLowerCase() === studentStr;
     }
@@ -116,9 +107,9 @@ export function checkAnswerCorrectness(
           : {};
       const studentPairs =
         typeof studentAnswer === 'object' && studentAnswer !== null
-          ? ('pairs' in studentAnswer
-              ? (studentAnswer as { pairs: Record<string, string | null> }).pairs
-              : (studentAnswer as Record<string, string | null>))
+          ? 'pairs' in studentAnswer
+            ? (studentAnswer as { pairs: Record<string, string | null> }).pairs
+            : (studentAnswer as Record<string, string | null>)
           : {};
       const leftKeys = Object.keys(correctPairs);
       if (leftKeys.length === 0) return false;
@@ -131,16 +122,20 @@ export function checkAnswerCorrectness(
           : {};
       const studentFilled =
         typeof studentAnswer === 'object' && studentAnswer !== null
-          ? ('filled' in studentAnswer
-              ? (studentAnswer as { filled: Record<string, string | null> }).filled
-              : (studentAnswer as Record<string, string | null>))
+          ? 'filled' in studentAnswer
+            ? (studentAnswer as { filled: Record<string, string | null> }).filled
+            : (studentAnswer as Record<string, string | null>)
           : {};
       const blankKeys = Object.keys(correctFilled);
       if (blankKeys.length === 0) return false;
       return blankKeys.every(
         k =>
-          String(studentFilled[k] || '').trim().toLowerCase() ===
-          String(correctFilled[k] || '').trim().toLowerCase()
+          String(studentFilled[k] || '')
+            .trim()
+            .toLowerCase() ===
+          String(correctFilled[k] || '')
+            .trim()
+            .toLowerCase()
       );
     }
     default:
@@ -191,11 +186,7 @@ function buildLeaderboard(
   return list;
 }
 
-export const QuizLiveActivity: ActivityDefinition<
-  QuizLiveConfig,
-  QuizLiveState,
-  QuizLiveResult
-> = {
+export const QuizLiveActivity: ActivityDefinition<QuizLiveConfig, QuizLiveState, QuizLiveResult> = {
   id: 'quiz-live',
   name: 'Quiz Live',
   version: 1,
@@ -472,7 +463,8 @@ export const QuizLiveActivity: ActivityDefinition<
           updatedSender.activeEffects = [...(updatedSender.activeEffects ?? []), reflectEffect];
           updatedSender.personalNotification = {
             id: `notif_${now}`,
-            message: '🪞 Đã kích hoạt [Khiên Phản Đòn] (45s)! Sẵn sàng dội ngược đòn đánh của đối thủ!',
+            message:
+              '🪞 Đã kích hoạt [Khiên Phản Đòn] (45s)! Sẵn sàng dội ngược đòn đánh của đối thủ!',
             type: 'defense',
             timestamp: now,
           };
@@ -590,7 +582,10 @@ export const QuizLiveActivity: ActivityDefinition<
             if (attackRes.reflected) {
               // 🪞 KHIÊN PHẢN ĐÒN DỘI NGƯỢC LẠI KẺ TẤN CÔNG!
               if (attackRes.attackerPenaltyEffect) {
-                updatedSender.activeEffects = [...(updatedSender.activeEffects ?? []), attackRes.attackerPenaltyEffect];
+                updatedSender.activeEffects = [
+                  ...(updatedSender.activeEffects ?? []),
+                  attackRes.attackerPenaltyEffect,
+                ];
               }
 
               if (item.type === 'drain') {
@@ -707,9 +702,8 @@ export const QuizLiveActivity: ActivityDefinition<
       }
 
       // Xác định chỉ số câu hỏi cần chấm
-      const qIndex = st.mode === 'kahoot'
-        ? st.currentQuestionIndex
-        : (parsed.data.questionIndex ?? 0);
+      const qIndex =
+        st.mode === 'kahoot' ? st.currentQuestionIndex : (parsed.data.questionIndex ?? 0);
 
       if (qIndex < 0 || qIndex >= rawQuestions.length) {
         return {
@@ -739,29 +733,36 @@ export const QuizLiveActivity: ActivityDefinition<
       const targetQuestionSanitized = st.questions[qIndex];
 
       // Lấy hoặc khởi tạo tiến trình của học sinh
-      const studentName = parsed.data.displayName || rawProgress?.displayName || `Học sinh ${participantId.slice(0, 4)}`;
+      const studentName =
+        parsed.data.displayName ||
+        rawProgress?.displayName ||
+        `Học sinh ${participantId.slice(0, 4)}`;
 
-      const existingProgress: ParticipantQuizProgress = rawProgress ? {
-        ...rawProgress,
-        displayName: (parsed.data.displayName && (!rawProgress.displayName || rawProgress.displayName.startsWith('Học sinh ')))
-          ? parsed.data.displayName
-          : rawProgress.displayName,
-      } : {
-        participantId,
-        displayName: studentName,
-        score: 0,
-        correctCount: 0,
-        currentStreak: 0,
-        maxStreak: 0,
-        currentIndex: 0,
-        isCompleted: false,
-        answers: {},
-        lastAnswer: null,
-        inventory: createEmptyInventory(st.powerUpCapacity ?? 2),
-        activeEffects: [],
-        personalNotification: null,
-        hiddenOptions: [],
-      };
+      const existingProgress: ParticipantQuizProgress = rawProgress
+        ? {
+            ...rawProgress,
+            displayName:
+              parsed.data.displayName &&
+              (!rawProgress.displayName || rawProgress.displayName.startsWith('Học sinh '))
+                ? parsed.data.displayName
+                : rawProgress.displayName,
+          }
+        : {
+            participantId,
+            displayName: studentName,
+            score: 0,
+            correctCount: 0,
+            currentStreak: 0,
+            maxStreak: 0,
+            currentIndex: 0,
+            isCompleted: false,
+            answers: {},
+            lastAnswer: null,
+            inventory: createEmptyInventory(st.powerUpCapacity ?? 2),
+            activeEffects: [],
+            personalNotification: null,
+            hiddenOptions: [],
+          };
 
       const qKey = String(qIndex);
       if (existingProgress.answers[qKey]) {
@@ -790,7 +791,11 @@ export const QuizLiveActivity: ActivityDefinition<
       });
 
       // Áp dụng bổ trợ điểm số (Sấm Sét x2)
-      const scoreMod = applyScoreModifiers(scoreData.pointsEarned, existingProgress.activeEffects ?? [], now);
+      const scoreMod = applyScoreModifiers(
+        scoreData.pointsEarned,
+        existingProgress.activeEffects ?? [],
+        now
+      );
       const finalPointsEarned = scoreMod.finalPoints;
       const remainingEffects = scoreMod.remainingEffects;
 
@@ -826,15 +831,18 @@ export const QuizLiveActivity: ActivityDefinition<
       const isNewQuestionAnswered = !existingProgress.answers[qKey];
       const totalAnswered = previousAnswerCount + (isNewQuestionAnswered ? 1 : 0);
 
-      const nextIndex = st.mode === 'quizizz'
-        ? totalAnswered
-        : qIndex + 1;
-      const isCompleted = st.mode === 'quizizz'
-        ? totalAnswered >= rawQuestions.length
-        : nextIndex >= rawQuestions.length;
+      const nextIndex = st.mode === 'quizizz' ? totalAnswered : qIndex + 1;
+      const isCompleted =
+        st.mode === 'quizizz'
+          ? totalAnswered >= rawQuestions.length
+          : nextIndex >= rawQuestions.length;
 
-      const returnCorrectAnswer = st.showCorrectAnswer ? currentTargetQuestion.correctAnswer : undefined;
-      const returnExplanation = st.showCorrectAnswer ? currentTargetQuestion.explanation : undefined;
+      const returnCorrectAnswer = st.showCorrectAnswer
+        ? currentTargetQuestion.correctAnswer
+        : undefined;
+      const returnExplanation = st.showCorrectAnswer
+        ? currentTargetQuestion.explanation
+        : undefined;
 
       const updatedProgress: ParticipantQuizProgress = {
         ...existingProgress,
@@ -855,7 +863,9 @@ export const QuizLiveActivity: ActivityDefinition<
             isCorrect,
             pointsEarned: finalPointsEarned,
             responseTimeMs,
-            ...(st.showCorrectAnswer ? { correctAnswer: returnCorrectAnswer, explanation: returnExplanation } : {}),
+            ...(st.showCorrectAnswer
+              ? { correctAnswer: returnCorrectAnswer, explanation: returnExplanation }
+              : {}),
           },
         },
         lastAnswer: {
@@ -864,7 +874,9 @@ export const QuizLiveActivity: ActivityDefinition<
           pointsEarned: finalPointsEarned,
           newStreak: isCorrect ? scoreData.newStreak : 0,
           selectedAnswer: parsed.data.answer,
-          ...(st.showCorrectAnswer ? { correctAnswer: returnCorrectAnswer, explanation: returnExplanation } : {}),
+          ...(st.showCorrectAnswer
+            ? { correctAnswer: returnCorrectAnswer, explanation: returnExplanation }
+            : {}),
         },
       };
 
@@ -880,11 +892,14 @@ export const QuizLiveActivity: ActivityDefinition<
         correctCount: 0,
       };
 
-      const optKey = currentTargetQuestion.type === 'mcq4'
-        ? String(toOptionIndex(parsed.data.answer))
-        : typeof parsed.data.answer === 'object'
-          ? (isCorrect ? 'correct' : 'wrong')
-          : String(parsed.data.answer);
+      const optKey =
+        currentTargetQuestion.type === 'mcq4'
+          ? String(toOptionIndex(parsed.data.answer))
+          : typeof parsed.data.answer === 'object'
+            ? isCorrect
+              ? 'correct'
+              : 'wrong'
+            : String(parsed.data.answer);
       const updatedStats = {
         totalResponses: currentStats.totalResponses + 1,
         optionCounts: {
@@ -904,11 +919,7 @@ export const QuizLiveActivity: ActivityDefinition<
       };
     },
 
-    onTeacherIntent(
-      ctx: ActivityContext,
-      st: QuizLiveState,
-      intent: unknown
-    ): QuizLiveState {
+    onTeacherIntent(ctx: ActivityContext, st: QuizLiveState, intent: unknown): QuizLiveState {
       const teacherSchema = z.discriminatedUnion('type', [
         z.object({ type: z.literal('next_question') }),
         z.object({ type: z.literal('show_review') }),
@@ -1009,9 +1020,8 @@ export const QuizLiveActivity: ActivityDefinition<
       activeRunQuestions.delete(ctx.runId);
 
       return leaderboard.map(item => {
-        const accuracy = totalQuestions > 0
-          ? Math.round((item.correctCount / totalQuestions) * 100)
-          : 0;
+        const accuracy =
+          totalQuestions > 0 ? Math.round((item.correctCount / totalQuestions) * 100) : 0;
 
         const participantProgress = st.participants[item.participantId];
 

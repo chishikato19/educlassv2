@@ -52,6 +52,8 @@ describe('Random Picker Protocol & Logic', () => {
 
   it('hỗ trợ chế độ random_mode và elimination_grid trong settings schema', () => {
     expect(RandomPickerSettingsSchema.parse({ mode: 'random_mode' }).mode).toBe('random_mode');
-    expect(RandomPickerSettingsSchema.parse({ mode: 'elimination_grid' }).mode).toBe('elimination_grid');
+    expect(RandomPickerSettingsSchema.parse({ mode: 'elimination_grid' }).mode).toBe(
+      'elimination_grid'
+    );
   });
 });

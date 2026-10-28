@@ -87,11 +87,20 @@ describe('Question Schemas & Sanitization (Task 2.1)', () => {
     const validTfGroup = {
       id: 'q_tfg_1',
       type: 'tf_group',
-      stem: { text: 'Cho hàm số $y = x^3 - 3x$. Xét tính đúng sai của các khẳng định sau:', images: [] },
+      stem: {
+        text: 'Cho hàm số $y = x^3 - 3x$. Xét tính đúng sai của các khẳng định sau:',
+        images: [],
+      },
       items: [
         { text: { text: 'a) Hàm số đồng biến trên $(1; +\\infty)$', images: [] }, correct: true },
-        { text: { text: 'b) Điểm cực đại của đồ thị hàm số là $(1; -2)$', images: [] }, correct: false },
-        { text: { text: 'c) Giá trị nhỏ nhất của hàm số trên $[0; 2]$ bằng $-2$', images: [] }, correct: true },
+        {
+          text: { text: 'b) Điểm cực đại của đồ thị hàm số là $(1; -2)$', images: [] },
+          correct: false,
+        },
+        {
+          text: { text: 'c) Giá trị nhỏ nhất của hàm số trên $[0; 2]$ bằng $-2$', images: [] },
+          correct: true,
+        },
         { text: { text: 'd) Đồ thị hàm số đi qua gốc tọa độ $O$', images: [] }, correct: true },
       ],
       points: 10,
@@ -103,9 +112,7 @@ describe('Question Schemas & Sanitization (Task 2.1)', () => {
     // Không đủ 4 items
     const invalidItems = {
       ...validTfGroup,
-      items: [
-        { text: { text: 'a', images: [] }, correct: true },
-      ],
+      items: [{ text: { text: 'a', images: [] }, correct: true }],
     };
     expect(TfGroupQuestionSchema.safeParse(invalidItems).success).toBe(false);
   });

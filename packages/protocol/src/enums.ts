@@ -61,12 +61,7 @@ export type RewardScope = z.infer<typeof RewardScopeSchema>;
 /**
  * Trạng thái kỳ thi lâu dài (hỗ trợ tổ chức theo ca)
  */
-export const ExamStatusSchema = z.enum([
-  'ready',
-  'in_progress',
-  'waiting_next_batch',
-  'finished',
-]);
+export const ExamStatusSchema = z.enum(['ready', 'in_progress', 'waiting_next_batch', 'finished']);
 export type ExamStatus = z.infer<typeof ExamStatusSchema>;
 
 /**
@@ -84,4 +79,3 @@ export type ExamRecordStatus = z.infer<typeof ExamRecordStatusSchema>;
  */
 export const DifficultyLevelSchema = z.enum(['nb', 'th', 'vd', 'vdc']);
 export type DifficultyLevel = z.infer<typeof DifficultyLevelSchema>;
-

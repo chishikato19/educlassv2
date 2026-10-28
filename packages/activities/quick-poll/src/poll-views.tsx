@@ -47,7 +47,9 @@ export const QuickPollStudentView: React.FC<QuickPollStudentViewProps> = ({
         <h3 className="text-xl font-bold text-gray-800">{state.question}</h3>
         <p className="text-xs text-gray-500">
           {state.allowMultiple ? 'Có thể chọn nhiều phương án' : 'Chọn 1 phương án duy nhất'}
-          {state.isLocked && <span className="text-red-500 font-semibold block mt-1">Đã khóa bình chọn</span>}
+          {state.isLocked && (
+            <span className="text-red-500 font-semibold block mt-1">Đã khóa bình chọn</span>
+          )}
         </p>
       </div>
 
@@ -110,7 +112,10 @@ export const QuickPollTeacherPanel: React.FC<QuickPollTeacherPanelProps> = ({
   });
 
   return (
-    <div className="p-6 bg-white rounded-2xl shadow border border-gray-100 space-y-6 max-w-2xl mx-auto" data-testid="quick-poll-teacher-panel">
+    <div
+      className="p-6 bg-white rounded-2xl shadow border border-gray-100 space-y-6 max-w-2xl mx-auto"
+      data-testid="quick-poll-teacher-panel"
+    >
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b pb-4">
         <div>
           <div className="flex items-center gap-2">

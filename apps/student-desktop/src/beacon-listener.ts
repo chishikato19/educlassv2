@@ -49,11 +49,11 @@ export class BeaconListener extends EventEmitter {
         const socket = dgram.createSocket({ type: 'udp4', reuseAddr: true });
         this.socket = socket;
 
-        socket.on('error', (err) => {
+        socket.on('error', err => {
           this.emit('error', err);
         });
 
-        socket.on('message', (msg) => {
+        socket.on('message', msg => {
           this.handleIncomingMessage(msg);
         });
 
@@ -107,7 +107,7 @@ export class BeaconListener extends EventEmitter {
    * Dừng lắng nghe và giải phóng socket UDP an toàn
    */
   public stop(): Promise<void> {
-    return new Promise((resolve) => {
+    return new Promise(resolve => {
       if (!this.socket) {
         this.listening = false;
         resolve();

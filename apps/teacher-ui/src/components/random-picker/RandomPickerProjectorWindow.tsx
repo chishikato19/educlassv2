@@ -170,9 +170,7 @@ export const RandomPickerProjectorWindow: React.FC = () => {
     setCards(initialCards);
 
     window.setTimeout(() => {
-      setCards((prev) =>
-        prev.map((c, i) => (i === targetIndex ? { ...c, isRevealed: true } : c))
-      );
+      setCards(prev => prev.map((c, i) => (i === targetIndex ? { ...c, isRevealed: true } : c)));
 
       setShowFireworks(true);
       if (settings.soundEnabled) {
@@ -213,7 +211,8 @@ export const RandomPickerProjectorWindow: React.FC = () => {
     }
   };
 
-  const CurrentModeComponent = PICKER_MODES[settings.mode]?.component || PICKER_MODES.card_flip.component;
+  const CurrentModeComponent =
+    PICKER_MODES[settings.mode]?.component || PICKER_MODES.card_flip.component;
 
   return (
     <div className="w-screen h-screen bg-gradient-to-br from-slate-950 via-indigo-950 to-slate-900 text-white flex flex-col justify-between p-6 select-none overflow-hidden relative">
@@ -268,7 +267,7 @@ export const RandomPickerProjectorWindow: React.FC = () => {
             setShowFireworks(true);
             setIsPicking(false);
           }}
-          onMarbleRaceComplete={(winnerStudent) => {
+          onMarbleRaceComplete={winnerStudent => {
             setSelectedStudent(winnerStudent);
             setShowFireworks(true);
             if (settings.soundEnabled) {
@@ -279,7 +278,7 @@ export const RandomPickerProjectorWindow: React.FC = () => {
               setIsPicking(false);
             }, 2200);
           }}
-          onDuckHuntComplete={(winnerStudent) => {
+          onDuckHuntComplete={winnerStudent => {
             setSelectedStudent(winnerStudent);
             setShowFireworks(true);
             if (settings.soundEnabled) {
@@ -328,17 +327,15 @@ export const RandomPickerProjectorWindow: React.FC = () => {
         <div>
           {queue.length > 0 ? (
             <span className="text-indigo-200 font-medium">
-              ⏳ Đang có {queue.length} bạn trên bảng làm bài: {queue.map((q) => q.student.name).join(', ')}
+              ⏳ Đang có {queue.length} bạn trên bảng làm bài:{' '}
+              {queue.map(q => q.student.name).join(', ')}
             </span>
           ) : (
             <span>EduClass v2 — Phần mềm tương tác lớp học offline</span>
           )}
         </div>
-        <div className="font-mono text-indigo-400">
-          Trạng thái: Đã kết nối với máy giáo viên
-        </div>
+        <div className="font-mono text-indigo-400">Trạng thái: Đã kết nối với máy giáo viên</div>
       </div>
     </div>
   );
 };
-

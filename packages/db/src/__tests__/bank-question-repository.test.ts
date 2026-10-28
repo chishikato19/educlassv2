@@ -34,7 +34,9 @@ describe('BankQuestionRepository (Task 1.2)', () => {
         lesson: 'Bài 1: Tính đơn điệu',
         difficulty: 'nb',
         type: 'mcq4',
-        contentJson: JSON.stringify({ stem: { text: 'Cho hàm số f(x)...', images: ['sha256_mock_asset_1'] } }),
+        contentJson: JSON.stringify({
+          stem: { text: 'Cho hàm số f(x)...', images: ['sha256_mock_asset_1'] },
+        }),
         answerJson: JSON.stringify({ correct: 0 }),
       });
       expect(q1.id).toBeDefined();
@@ -113,7 +115,7 @@ describe('BankQuestionRepository (Task 1.2)', () => {
       expect(tree[0]!.chapter).toBe('Chương 1: Ứng dụng đạo hàm');
       expect(tree[0]!.lessons.length).toBe(2);
 
-      const b1 = tree[0]!.lessons.find((l) => l.lesson === 'Bài 1: Tính đơn điệu');
+      const b1 = tree[0]!.lessons.find(l => l.lesson === 'Bài 1: Tính đơn điệu');
       expect(b1).toBeDefined();
       expect(b1?.totalQuestions).toBe(3);
       expect(b1?.countsByDifficulty.th).toBe(2);

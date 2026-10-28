@@ -29,12 +29,14 @@ export const CloneExamModal: React.FC<CloneExamModalProps> = ({
   useEffect(() => {
     if (isOpen && exam) {
       // Ưu tiên chọn lớp khác lớp gốc
-      const otherClass = classes.find((c) => c.id !== exam.classId) || classes[0];
+      const otherClass = classes.find(c => c.id !== exam.classId) || classes[0];
       const initialClassId = otherClass ? otherClass.id : exam.classId;
       setTargetClassId(initialClassId);
-      
-      const targetClassName = classes.find((c) => c.id === initialClassId)?.name;
-      setNewTitle(targetClassName ? `${exam.title} - ${targetClassName}` : `${exam.title} (Bản sao)`);
+
+      const targetClassName = classes.find(c => c.id === initialClassId)?.name;
+      setNewTitle(
+        targetClassName ? `${exam.title} - ${targetClassName}` : `${exam.title} (Bản sao)`
+      );
       setError('');
       setIsSubmitting(false);
     }
@@ -44,7 +46,7 @@ export const CloneExamModal: React.FC<CloneExamModalProps> = ({
   const handleClassChange = (selectedId: string) => {
     setTargetClassId(selectedId);
     if (exam) {
-      const cls = classes.find((c) => c.id === selectedId);
+      const cls = classes.find(c => c.id === selectedId);
       setNewTitle(cls ? `${exam.title} - ${cls.name}` : `${exam.title} (Bản sao)`);
     }
   };
@@ -67,7 +69,7 @@ export const CloneExamModal: React.FC<CloneExamModalProps> = ({
         targetClassId,
         newTitle: newTitle.trim(),
       });
-      const clsName = classes.find((c) => c.id === targetClassId)?.name || 'lớp mới';
+      const clsName = classes.find(c => c.id === targetClassId)?.name || 'lớp mới';
       onShowToast(`📋 Đã sao chép kỳ thi sang ${clsName} thành công!`);
       onSuccess();
       onClose();
@@ -101,7 +103,10 @@ export const CloneExamModal: React.FC<CloneExamModalProps> = ({
       }
       onClose={() => !isSubmitting && onClose()}
     >
-      <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '16px', padding: '4px 0' }}>
+      <form
+        onSubmit={handleSubmit}
+        style={{ display: 'flex', flexDirection: 'column', gap: '16px', padding: '4px 0' }}
+      >
         {/* Thông tin kỳ thi gốc */}
         <div
           style={{
@@ -113,25 +118,53 @@ export const CloneExamModal: React.FC<CloneExamModalProps> = ({
             lineHeight: 1.5,
           }}
         >
-          <div style={{ color: UI_COLORS.textMuted, fontSize: '12px', fontWeight: 600 }}>KỲ THI GỐC:</div>
-          <div style={{ fontWeight: 700, color: UI_COLORS.text, fontSize: '14px', marginTop: '2px' }}>
+          <div style={{ color: UI_COLORS.textMuted, fontSize: '12px', fontWeight: 600 }}>
+            KỲ THI GỐC:
+          </div>
+          <div
+            style={{ fontWeight: 700, color: UI_COLORS.text, fontSize: '14px', marginTop: '2px' }}
+          >
             {exam.title}
           </div>
-          <div style={{ display: 'flex', gap: '12px', marginTop: '6px', color: '#475569', fontSize: '12.5px' }}>
-            <span>🏫 Lớp: <strong>{exam.className || 'Chưa rõ'}</strong></span>
-            <span>⏱️ <strong>{exam.durationMinutes} phút</strong></span>
-            {exam.subject && <span>📖 Môn: <strong>{exam.subject}</strong></span>}
+          <div
+            style={{
+              display: 'flex',
+              gap: '12px',
+              marginTop: '6px',
+              color: '#475569',
+              fontSize: '12.5px',
+            }}
+          >
+            <span>
+              🏫 Lớp: <strong>{exam.className || 'Chưa rõ'}</strong>
+            </span>
+            <span>
+              ⏱️ <strong>{exam.durationMinutes} phút</strong>
+            </span>
+            {exam.subject && (
+              <span>
+                📖 Môn: <strong>{exam.subject}</strong>
+              </span>
+            )}
           </div>
         </div>
 
         {/* Chọn lớp nhận */}
         <div>
-          <label style={{ display: 'block', fontSize: '13px', fontWeight: 700, color: UI_COLORS.text, marginBottom: '6px' }}>
+          <label
+            style={{
+              display: 'block',
+              fontSize: '13px',
+              fontWeight: 700,
+              color: UI_COLORS.text,
+              marginBottom: '6px',
+            }}
+          >
             Lớp học nhận kỳ thi sao chép <span style={{ color: '#DC2626' }}>*</span>
           </label>
           <select
             value={targetClassId}
-            onChange={(e) => handleClassChange(e.target.value)}
+            onChange={e => handleClassChange(e.target.value)}
             disabled={isSubmitting}
             style={{
               width: '100%',
@@ -149,7 +182,7 @@ export const CloneExamModal: React.FC<CloneExamModalProps> = ({
             {classes.length === 0 ? (
               <option value="">Chưa có lớp học nào trong hệ thống</option>
             ) : (
-              classes.map((c) => (
+              classes.map(c => (
                 <option key={c.id} value={c.id}>
                   🏫 {c.name} {c.id === exam.classId ? '(Lớp hiện tại)' : ''}
                 </option>
@@ -160,13 +193,21 @@ export const CloneExamModal: React.FC<CloneExamModalProps> = ({
 
         {/* Tiêu đề kỳ thi mới */}
         <div>
-          <label style={{ display: 'block', fontSize: '13px', fontWeight: 700, color: UI_COLORS.text, marginBottom: '6px' }}>
+          <label
+            style={{
+              display: 'block',
+              fontSize: '13px',
+              fontWeight: 700,
+              color: UI_COLORS.text,
+              marginBottom: '6px',
+            }}
+          >
             Tiêu đề kỳ thi mới <span style={{ color: '#DC2626' }}>*</span>
           </label>
           <input
             type="text"
             value={newTitle}
-            onChange={(e) => {
+            onChange={e => {
               setNewTitle(e.target.value);
               if (error) setError('');
             }}
@@ -183,7 +224,9 @@ export const CloneExamModal: React.FC<CloneExamModalProps> = ({
             }}
           />
           {error && (
-            <span style={{ fontSize: '12px', color: '#DC2626', marginTop: '4px', display: 'block' }}>
+            <span
+              style={{ fontSize: '12px', color: '#DC2626', marginTop: '4px', display: 'block' }}
+            >
               {error}
             </span>
           )}
@@ -200,7 +243,9 @@ export const CloneExamModal: React.FC<CloneExamModalProps> = ({
             lineHeight: 1.4,
           }}
         >
-          💡 <strong>Lợi ích:</strong> Bài thi mới được tạo ở trạng thái <em>Chưa kích hoạt</em>, giữ nguyên toàn bộ ngân hàng câu hỏi, thang điểm từng câu và các tùy chọn xáo trộn/xem điểm để thầy cô tổ chức thi cho lớp khác mà không cần nhập lại từ đầu.
+          💡 <strong>Lợi ích:</strong> Bài thi mới được tạo ở trạng thái <em>Chưa kích hoạt</em>,
+          giữ nguyên toàn bộ ngân hàng câu hỏi, thang điểm từng câu và các tùy chọn xáo trộn/xem
+          điểm để thầy cô tổ chức thi cho lớp khác mà không cần nhập lại từ đầu.
         </div>
 
         {/* Nút hành động */}

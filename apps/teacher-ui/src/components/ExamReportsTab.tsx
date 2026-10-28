@@ -1,9 +1,5 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
-import type {
-  ClassDto,
-  ExamListItemDto,
-  SessionDetailResponse,
-} from '@educlass/protocol';
+import type { ClassDto, ExamListItemDto, SessionDetailResponse } from '@educlass/protocol';
 import { Button, Card, Modal, UI_COLORS, UI_RADII, UI_SHADOWS, UI_SPACING } from '@educlass/ui-kit';
 import { api } from '../api/client.js';
 import { ExamReportDetailModal } from './ExamReportDetailModal.js';
@@ -108,20 +104,23 @@ export const ExamReportsTab: React.FC<ExamReportsTabProps> = ({
   const activeSessionCode = useMemo(() => getSessionJoinCode(activeSession), [activeSession]);
 
   // Nạp danh sách kỳ thi
-  const loadExams = useCallback(async (silent = false) => {
-    if (!silent) setIsLoading(true);
-    try {
-      const list = await api.getExams({
-        classId: selectedClassId !== 'all' ? selectedClassId : undefined,
-        status: statusFilter !== 'all' ? statusFilter : undefined,
-      });
-      setExams(list);
-    } catch {
-      if (!silent) onShowToast('Không thể tải danh sách kỳ thi. Vui lòng thử lại.');
-    } finally {
-      if (!silent) setIsLoading(false);
-    }
-  }, [selectedClassId, statusFilter, onShowToast]);
+  const loadExams = useCallback(
+    async (silent = false) => {
+      if (!silent) setIsLoading(true);
+      try {
+        const list = await api.getExams({
+          classId: selectedClassId !== 'all' ? selectedClassId : undefined,
+          status: statusFilter !== 'all' ? statusFilter : undefined,
+        });
+        setExams(list);
+      } catch {
+        if (!silent) onShowToast('Không thể tải danh sách kỳ thi. Vui lòng thử lại.');
+      } finally {
+        if (!silent) setIsLoading(false);
+      }
+    },
+    [selectedClassId, statusFilter, onShowToast]
+  );
 
   useEffect(() => {
     void loadExams();
@@ -129,7 +128,7 @@ export const ExamReportsTab: React.FC<ExamReportsTabProps> = ({
 
   // Tự động làm mới danh sách kỳ thi định kỳ để cập nhật tiến độ nộp bài trực tiếp (Vấn đề 4)
   useEffect(() => {
-    const hasActiveExam = exams.some((e) => e.status === 'in_progress');
+    const hasActiveExam = exams.some(e => e.status === 'in_progress');
     const intervalTime = hasActiveExam ? 4000 : 10000;
     const interval = setInterval(() => {
       void loadExams(true);
@@ -144,7 +143,7 @@ export const ExamReportsTab: React.FC<ExamReportsTabProps> = ({
 
   // Lọc tìm kiếm theo tên đề thi, môn, thư mục và vị trí cây thư mục hiện tại
   const filteredExams = useMemo(() => {
-    return exams.filter((e) => {
+    return exams.filter(e => {
       const eNormFolder = normalizeFolderPath(e.folder);
 
       // 1. Nếu người dùng chọn lọc theo dropdown Thư mục cụ thể:
@@ -220,10 +219,11 @@ export const ExamReportsTab: React.FC<ExamReportsTabProps> = ({
     const { type, exam } = confirmModal;
     if (!type || !exam) return;
 
-    setConfirmModal((prev) => ({ ...prev, isSubmitting: true }));
+    setConfirmModal(prev => ({ ...prev, isSubmitting: true }));
     try {
       if (type === 'start_batch') {
-        const nextBatch = exam.status === 'waiting_next_batch' ? exam.currentBatch + 1 : exam.currentBatch;
+        const nextBatch =
+          exam.status === 'waiting_next_batch' ? exam.currentBatch + 1 : exam.currentBatch;
         if (!activeSessionId) {
           // Chưa có phiên mở: Tự động mở phiên mới theo đúng lớp của kỳ thi (1-click)
           const newSession = await api.createSession({
@@ -237,7 +237,9 @@ export const ExamReportsTab: React.FC<ExamReportsTabProps> = ({
             sessionId: sId,
             batchIndex: nextBatch,
           });
-          onShowToast(`🎉 Đã mở phòng học ${sCode} (Lớp ${exam.className}) và kích hoạt Ca ${nextBatch} của "${exam.title}"!`);
+          onShowToast(
+            `🎉 Đã mở phòng học ${sCode} (Lớp ${exam.className}) và kích hoạt Ca ${nextBatch} của "${exam.title}"!`
+          );
           if (onSessionCreatedAndStartExam) {
             await onSessionCreatedAndStartExam(newSession);
           }
@@ -247,12 +249,16 @@ export const ExamReportsTab: React.FC<ExamReportsTabProps> = ({
             sessionId: activeSessionId,
             batchIndex: nextBatch,
           });
-          onShowToast(`🎉 Đã kích hoạt Ca ${nextBatch} của "${exam.title}" trong phòng ${activeSessionCode}!`);
+          onShowToast(
+            `🎉 Đã kích hoạt Ca ${nextBatch} của "${exam.title}" trong phòng ${activeSessionCode}!`
+          );
           onSwitchToSessionTab?.();
         }
       } else if (type === 'pause_batch') {
         await api.pauseExamBatch(exam.id);
-        onShowToast(`⏸ Đã tạm dừng Ca ${exam.currentBatch}. Kết quả của học sinh đã thi được lưu an toàn.`);
+        onShowToast(
+          `⏸ Đã tạm dừng Ca ${exam.currentBatch}. Kết quả của học sinh đã thi được lưu an toàn.`
+        );
       } else if (type === 'finish') {
         await api.finishExam(exam.id);
         onShowToast(`🏁 Đã hoàn tất kỳ thi "${exam.title}". Sổ điểm đã được khóa an toàn.`);
@@ -263,9 +269,12 @@ export const ExamReportsTab: React.FC<ExamReportsTabProps> = ({
       setConfirmModal({ isOpen: false, type: null, exam: null, isSubmitting: false });
       void loadExams();
     } catch (err: unknown) {
-      const msg = err instanceof Error ? err.message : 'Đã xảy ra lỗi khi thực hiện hành động. Vui lòng thử lại.';
+      const msg =
+        err instanceof Error
+          ? err.message
+          : 'Đã xảy ra lỗi khi thực hiện hành động. Vui lòng thử lại.';
       onShowToast(`Lỗi: ${msg}`);
-      setConfirmModal((prev) => ({ ...prev, isSubmitting: false }));
+      setConfirmModal(prev => ({ ...prev, isSubmitting: false }));
     }
   };
 
@@ -310,7 +319,8 @@ export const ExamReportsTab: React.FC<ExamReportsTabProps> = ({
               <span>📝</span> Quản Lý & Báo Cáo Kỳ Thi Theo Ca
             </h2>
             <p style={{ margin: '4px 0 0 0', fontSize: '14px', color: UI_COLORS.textMuted }}>
-              Lưu trữ báo cáo kỳ thi lâu dài. Hỗ trợ chia ca thi (Tiết 1 / Tiết 2) chung một bảng điểm tổng hợp.
+              Lưu trữ báo cáo kỳ thi lâu dài. Hỗ trợ chia ca thi (Tiết 1 / Tiết 2) chung một bảng
+              điểm tổng hợp.
             </p>
           </div>
 
@@ -349,10 +359,12 @@ export const ExamReportsTab: React.FC<ExamReportsTabProps> = ({
         >
           {/* Lọc Lớp */}
           <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-            <span style={{ fontSize: '14px', fontWeight: 600, color: UI_COLORS.text }}>Lớp học:</span>
+            <span style={{ fontSize: '14px', fontWeight: 600, color: UI_COLORS.text }}>
+              Lớp học:
+            </span>
             <select
               value={selectedClassId}
-              onChange={(e) => setSelectedClassId(e.target.value)}
+              onChange={e => setSelectedClassId(e.target.value)}
               style={{
                 padding: '8px 12px',
                 borderRadius: UI_RADII.input,
@@ -365,7 +377,7 @@ export const ExamReportsTab: React.FC<ExamReportsTabProps> = ({
               }}
             >
               <option value="all">Tất cả các lớp ({classes.length})</option>
-              {classes.map((c) => (
+              {classes.map(c => (
                 <option key={c.id} value={c.id}>
                   {c.name}
                 </option>
@@ -375,10 +387,12 @@ export const ExamReportsTab: React.FC<ExamReportsTabProps> = ({
 
           {/* Lọc Trạng thái */}
           <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-            <span style={{ fontSize: '14px', fontWeight: 600, color: UI_COLORS.text }}>Trạng thái:</span>
+            <span style={{ fontSize: '14px', fontWeight: 600, color: UI_COLORS.text }}>
+              Trạng thái:
+            </span>
             <select
               value={statusFilter}
-              onChange={(e) => setStatusFilter(e.target.value as StatusFilter)}
+              onChange={e => setStatusFilter(e.target.value as StatusFilter)}
               style={{
                 padding: '8px 12px',
                 borderRadius: UI_RADII.input,
@@ -400,10 +414,12 @@ export const ExamReportsTab: React.FC<ExamReportsTabProps> = ({
 
           {/* Lọc Thư mục */}
           <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-            <span style={{ fontSize: '14px', fontWeight: 600, color: UI_COLORS.text }}>Thư mục:</span>
+            <span style={{ fontSize: '14px', fontWeight: 600, color: UI_COLORS.text }}>
+              Thư mục:
+            </span>
             <select
               value={selectedFolder}
-              onChange={(e) => setSelectedFolder(e.target.value)}
+              onChange={e => setSelectedFolder(e.target.value)}
               style={{
                 padding: '8px 12px',
                 borderRadius: UI_RADII.input,
@@ -416,7 +432,7 @@ export const ExamReportsTab: React.FC<ExamReportsTabProps> = ({
               }}
             >
               <option value="all">📁 Tất cả thư mục ({allFolders.length})</option>
-              {allFolders.map((f) => {
+              {allFolders.map(f => {
                 const count = countExamsInFolder(f, exams, true);
                 const depth = f.split('/').length - 1;
                 const leaf = f.split('/').pop() || f;
@@ -427,7 +443,7 @@ export const ExamReportsTab: React.FC<ExamReportsTabProps> = ({
                 );
               })}
               <option value="__none__">
-                📄 Chưa phân loại ({exams.filter((ex) => !ex.folder).length})
+                📄 Chưa phân loại ({exams.filter(ex => !ex.folder).length})
               </option>
             </select>
           </div>
@@ -438,7 +454,7 @@ export const ExamReportsTab: React.FC<ExamReportsTabProps> = ({
               type="text"
               placeholder="🔍 Tìm theo tên bài thi, môn học..."
               value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
+              onChange={e => setSearchQuery(e.target.value)}
               style={{
                 width: '100%',
                 boxSizing: 'border-box',
@@ -473,7 +489,8 @@ export const ExamReportsTab: React.FC<ExamReportsTabProps> = ({
             <span style={{ fontSize: '14px', color: '#1E40AF' }}>
               Phiên học đang mở:{' '}
               <strong style={{ color: UI_COLORS.primary }}>Phòng {activeSessionCode}</strong>.
-              Thầy/Cô có thể bấm <strong>"▶ Mở ca thi trong phiên này"</strong> trên bất kỳ kỳ thi nào để học sinh vào làm bài.
+              Thầy/Cô có thể bấm <strong>"▶ Mở ca thi trong phiên này"</strong> trên bất kỳ kỳ thi
+              nào để học sinh vào làm bài.
             </span>
           </div>
         </div>
@@ -491,8 +508,8 @@ export const ExamReportsTab: React.FC<ExamReportsTabProps> = ({
         >
           <span style={{ fontSize: '18px' }}>ℹ️</span>
           <span style={{ fontSize: '14px', color: '#92400E' }}>
-            Hiện chưa có phiên học nào mở. Để tổ chức ca thi cho học sinh, Thầy/Cô vui lòng chuyển sang tab{' '}
-            <strong>"Phiên học & Hoạt động"</strong> để mở phiên học trước.
+            Hiện chưa có phiên học nào mở. Để tổ chức ca thi cho học sinh, Thầy/Cô vui lòng chuyển
+            sang tab <strong>"Phiên học & Hoạt động"</strong> để mở phiên học trước.
           </span>
         </div>
       )}
@@ -511,13 +528,23 @@ export const ExamReportsTab: React.FC<ExamReportsTabProps> = ({
         }}
       >
         {/* Hàng Breadcrumb và Nút Tạo Thư Mục Mới */}
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '10px' }}>
+        <div
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            flexWrap: 'wrap',
+            gap: '10px',
+          }}
+        >
           <div style={{ display: 'flex', alignItems: 'center', gap: '4px', flexWrap: 'wrap' }}>
             {breadcrumbs.map((crumb, idx) => {
               const isLast = idx === breadcrumbs.length - 1;
               return (
                 <React.Fragment key={crumb.path}>
-                  {idx > 0 && <span style={{ color: '#94A3B8', fontWeight: 700, margin: '0 2px' }}>›</span>}
+                  {idx > 0 && (
+                    <span style={{ color: '#94A3B8', fontWeight: 700, margin: '0 2px' }}>›</span>
+                  )}
                   <button
                     type="button"
                     onClick={() => {
@@ -580,7 +607,7 @@ export const ExamReportsTab: React.FC<ExamReportsTabProps> = ({
               borderTop: '1px solid #F1F5F9',
             }}
           >
-            {subFolders.map((sub) => {
+            {subFolders.map(sub => {
               const count = countExamsInFolder(sub.fullPath, exams, true);
               return (
                 <div
@@ -600,11 +627,11 @@ export const ExamReportsTab: React.FC<ExamReportsTabProps> = ({
                     cursor: 'pointer',
                     transition: 'all 0.15s ease',
                   }}
-                  onMouseEnter={(e) => {
+                  onMouseEnter={e => {
                     e.currentTarget.style.backgroundColor = '#EFF6FF';
                     e.currentTarget.style.borderColor = '#BFDBFE';
                   }}
-                  onMouseLeave={(e) => {
+                  onMouseLeave={e => {
                     e.currentTarget.style.backgroundColor = '#F8FAFC';
                     e.currentTarget.style.borderColor = '#E2E8F0';
                   }}
@@ -658,7 +685,14 @@ export const ExamReportsTab: React.FC<ExamReportsTabProps> = ({
         <Card>
           <div style={{ textAlign: 'center', padding: '48px 16px', color: UI_COLORS.textMuted }}>
             <div style={{ fontSize: '48px', marginBottom: '12px' }}>📋</div>
-            <h3 style={{ fontSize: '18px', fontWeight: 700, color: UI_COLORS.text, margin: '0 0 8px 0' }}>
+            <h3
+              style={{
+                fontSize: '18px',
+                fontWeight: 700,
+                color: UI_COLORS.text,
+                margin: '0 0 8px 0',
+              }}
+            >
               {exams.length === 0 ? 'Chưa có kỳ thi nào' : 'Không tìm thấy kỳ thi phù hợp'}
             </h3>
             <p style={{ fontSize: '14px', maxWidth: '480px', margin: '0 auto 20px auto' }}>
@@ -688,7 +722,7 @@ export const ExamReportsTab: React.FC<ExamReportsTabProps> = ({
             gap: '18px',
           }}
         >
-          {filteredExams.map((exam) => {
+          {filteredExams.map(exam => {
             const total = exam.totalStudents || 0;
             const submitted = exam.submittedCount || 0;
             const percent = total > 0 ? Math.round((submitted / total) * 100) : 0;
@@ -730,8 +764,7 @@ export const ExamReportsTab: React.FC<ExamReportsTabProps> = ({
               progressColor = '#F59E0B';
             }
 
-            const canStartBatch =
-              exam.status === 'ready' || exam.status === 'waiting_next_batch';
+            const canStartBatch = exam.status === 'ready' || exam.status === 'waiting_next_batch';
 
             return (
               <div
@@ -740,7 +773,10 @@ export const ExamReportsTab: React.FC<ExamReportsTabProps> = ({
                   backgroundColor: '#FFFFFF',
                   borderRadius: UI_RADII.card,
                   border: `1px solid ${exam.status === 'in_progress' ? '#86EFAC' : UI_COLORS.border}`,
-                  boxShadow: exam.status === 'in_progress' ? '0 4px 14px rgba(34, 197, 94, 0.15)' : UI_SHADOWS.card,
+                  boxShadow:
+                    exam.status === 'in_progress'
+                      ? '0 4px 14px rgba(34, 197, 94, 0.15)'
+                      : UI_SHADOWS.card,
                   padding: '20px',
                   display: 'flex',
                   flexDirection: 'column',
@@ -750,7 +786,14 @@ export const ExamReportsTab: React.FC<ExamReportsTabProps> = ({
               >
                 {/* Dòng Header thẻ: Tên bài thi & Badge trạng thái */}
                 <div>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: '8px' }}>
+                  <div
+                    style={{
+                      display: 'flex',
+                      justifyContent: 'space-between',
+                      alignItems: 'flex-start',
+                      gap: '8px',
+                    }}
+                  >
                     <h3
                       style={{
                         margin: 0,
@@ -923,7 +966,9 @@ export const ExamReportsTab: React.FC<ExamReportsTabProps> = ({
                 </div>
 
                 {/* Thanh tiến độ làm bài */}
-                <div style={{ backgroundColor: '#F8FAFC', padding: '10px 12px', borderRadius: '8px' }}>
+                <div
+                  style={{ backgroundColor: '#F8FAFC', padding: '10px 12px', borderRadius: '8px' }}
+                >
                   <div
                     style={{
                       display: 'flex',
@@ -973,11 +1018,19 @@ export const ExamReportsTab: React.FC<ExamReportsTabProps> = ({
                   >
                     <span>
                       Điểm trung bình:{' '}
-                      <strong style={{ color: exam.averageScore != null ? UI_COLORS.text : UI_COLORS.textMuted }}>
-                        {exam.averageScore != null ? `${exam.averageScore} / ${exam.maxScore ?? 10}` : 'Chưa có'}
+                      <strong
+                        style={{
+                          color: exam.averageScore != null ? UI_COLORS.text : UI_COLORS.textMuted,
+                        }}
+                      >
+                        {exam.averageScore != null
+                          ? `${exam.averageScore} / ${exam.maxScore ?? 10}`
+                          : 'Chưa có'}
                       </strong>
                     </span>
-                    <span>Ca hiện tại: <strong>Ca {exam.currentBatch}</strong></span>
+                    <span>
+                      Ca hiện tại: <strong>Ca {exam.currentBatch}</strong>
+                    </span>
                   </div>
 
                   {exam.status === 'in_progress' && (
@@ -1005,7 +1058,14 @@ export const ExamReportsTab: React.FC<ExamReportsTabProps> = ({
                 </div>
 
                 {/* Các nút hành động chính */}
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', marginTop: 'auto' }}>
+                <div
+                  style={{
+                    display: 'flex',
+                    flexDirection: 'column',
+                    gap: '8px',
+                    marginTop: 'auto',
+                  }}
+                >
                   {/* Điều khiển ca thi */}
                   {exam.status === 'in_progress' ? (
                     <div style={{ display: 'flex', gap: '8px' }}>
@@ -1052,12 +1112,12 @@ export const ExamReportsTab: React.FC<ExamReportsTabProps> = ({
                         }}
                       >
                         {exam.status === 'waiting_next_batch'
-                          ? (!activeSessionId
-                              ? `🚀 Tiếp tục Ca ${exam.currentBatch + 1} (Tự động mở phiên)`
-                              : `▶ Mở Ca ${exam.currentBatch + 1} trong phiên này`)
-                          : (!activeSessionId
-                              ? '🚀 Bắt đầu Ca 1 (Tự động mở phiên)'
-                              : '▶ Mở Ca 1 trong phiên này')}
+                          ? !activeSessionId
+                            ? `🚀 Tiếp tục Ca ${exam.currentBatch + 1} (Tự động mở phiên)`
+                            : `▶ Mở Ca ${exam.currentBatch + 1} trong phiên này`
+                          : !activeSessionId
+                            ? '🚀 Bắt đầu Ca 1 (Tự động mở phiên)'
+                            : '▶ Mở Ca 1 trong phiên này'}
                       </Button>
                       <Button
                         variant="ghost"
@@ -1100,7 +1160,11 @@ export const ExamReportsTab: React.FC<ExamReportsTabProps> = ({
                       variant="ghost"
                       onClick={() => handleDownloadExcel(exam.id, exam.title)}
                       disabled={submitted === 0}
-                      title={submitted === 0 ? 'Chưa có bài thi nào nộp để xuất bảng điểm' : 'Tải file Excel'}
+                      title={
+                        submitted === 0
+                          ? 'Chưa có bài thi nào nộp để xuất bảng điểm'
+                          : 'Tải file Excel'
+                      }
                       style={{
                         minHeight: '40px',
                         fontSize: '13px',
@@ -1129,23 +1193,30 @@ export const ExamReportsTab: React.FC<ExamReportsTabProps> = ({
             confirmModal.type === 'start_batch'
               ? `Xác nhận mở Ca ${confirmModal.exam.status === 'waiting_next_batch' ? confirmModal.exam.currentBatch + 1 : 1}`
               : confirmModal.type === 'pause_batch'
-              ? `Tạm dừng Ca ${confirmModal.exam.currentBatch}`
-              : confirmModal.type === 'finish'
-              ? 'Hoàn tất toàn bộ kỳ thi'
-              : 'Xóa kỳ thi'
+                ? `Tạm dừng Ca ${confirmModal.exam.currentBatch}`
+                : confirmModal.type === 'finish'
+                  ? 'Hoàn tất toàn bộ kỳ thi'
+                  : 'Xóa kỳ thi'
           }
           onClose={() =>
             !confirmModal.isSubmitting &&
             setConfirmModal({ isOpen: false, type: null, exam: null, isSubmitting: false })
           }
         >
-          <div style={{ padding: '8px 4px', display: 'flex', flexDirection: 'column', gap: '16px' }}>
+          <div
+            style={{ padding: '8px 4px', display: 'flex', flexDirection: 'column', gap: '16px' }}
+          >
             {confirmModal.type === 'start_batch' && (
               <>
                 {!activeSessionId ? (
                   <>
                     <p style={{ margin: 0, fontSize: '15px', color: UI_COLORS.text }}>
-                      Thầy/Cô có muốn <strong>tự động mở phiên học mới cho lớp "{confirmModal.exam.className || 'Lớp học'}"</strong> và bắt đầu{' '}
+                      Thầy/Cô có muốn{' '}
+                      <strong>
+                        tự động mở phiên học mới cho lớp "{confirmModal.exam.className || 'Lớp học'}
+                        "
+                      </strong>{' '}
+                      và bắt đầu{' '}
                       <strong>
                         {confirmModal.exam.status === 'waiting_next_batch'
                           ? `Ca ${confirmModal.exam.currentBatch + 1}`
@@ -1164,7 +1235,10 @@ export const ExamReportsTab: React.FC<ExamReportsTabProps> = ({
                         lineHeight: 1.5,
                       }}
                     >
-                      🚀 <strong>Tự động 1-chạm (1-click):</strong> Hệ thống sẽ tự động tạo một phiên học mới theo đúng danh sách lớp, cấp mã PIN phòng học và kích hoạt ca thi ngay lập tức. Thầy/Cô không cần phải ra ngoài tạo phiên học thủ công trước!
+                      🚀 <strong>Tự động 1-chạm (1-click):</strong> Hệ thống sẽ tự động tạo một
+                      phiên học mới theo đúng danh sách lớp, cấp mã PIN phòng học và kích hoạt ca
+                      thi ngay lập tức. Thầy/Cô không cần phải ra ngoài tạo phiên học thủ công
+                      trước!
                     </div>
                     <div
                       style={{
@@ -1177,7 +1251,9 @@ export const ExamReportsTab: React.FC<ExamReportsTabProps> = ({
                         lineHeight: 1.4,
                       }}
                     >
-                      🛡️ <strong>Khóa thí sinh ca trước:</strong> Những học sinh đã hoàn thành bài thi ở các ca trước sẽ tự động bị khóa danh tính, chỉ những học sinh chưa thi mới được vào làm bài.
+                      🛡️ <strong>Khóa thí sinh ca trước:</strong> Những học sinh đã hoàn thành bài
+                      thi ở các ca trước sẽ tự động bị khóa danh tính, chỉ những học sinh chưa thi
+                      mới được vào làm bài.
                     </div>
                   </>
                 ) : (
@@ -1190,7 +1266,8 @@ export const ExamReportsTab: React.FC<ExamReportsTabProps> = ({
                           : 'Ca 1'}
                       </strong>{' '}
                       của bài thi <strong>"{confirmModal.exam.title}"</strong> vào phòng học{' '}
-                      <strong style={{ color: UI_COLORS.primary }}>{activeSessionCode}</strong> không?
+                      <strong style={{ color: UI_COLORS.primary }}>{activeSessionCode}</strong>{' '}
+                      không?
                     </p>
                     <div
                       style={{
@@ -1203,9 +1280,10 @@ export const ExamReportsTab: React.FC<ExamReportsTabProps> = ({
                         lineHeight: 1.5,
                       }}
                     >
-                      🛡️ <strong>Cơ chế khóa an toàn:</strong> Những học sinh đã hoàn thành bài thi ở các ca trước sẽ tự
-                      động bị khóa trên cổng chọn tên. Chỉ những học sinh chưa làm bài mới có thể chọn tên và tham gia làm
-                      bài thi trọn vẹn {confirmModal.exam.durationMinutes} phút.
+                      🛡️ <strong>Cơ chế khóa an toàn:</strong> Những học sinh đã hoàn thành bài thi
+                      ở các ca trước sẽ tự động bị khóa trên cổng chọn tên. Chỉ những học sinh chưa
+                      làm bài mới có thể chọn tên và tham gia làm bài thi trọn vẹn{' '}
+                      {confirmModal.exam.durationMinutes} phút.
                     </div>
                   </>
                 )}
@@ -1215,7 +1293,8 @@ export const ExamReportsTab: React.FC<ExamReportsTabProps> = ({
             {confirmModal.type === 'pause_batch' && (
               <>
                 <p style={{ margin: 0, fontSize: '15px', color: UI_COLORS.text }}>
-                  Thầy/Cô có chắc chắn muốn tạm dừng <strong>Ca {confirmModal.exam.currentBatch}</strong> của bài thi{' '}
+                  Thầy/Cô có chắc chắn muốn tạm dừng{' '}
+                  <strong>Ca {confirmModal.exam.currentBatch}</strong> của bài thi{' '}
                   <strong>"{confirmModal.exam.title}"</strong> không?
                 </p>
                 <div
@@ -1229,9 +1308,11 @@ export const ExamReportsTab: React.FC<ExamReportsTabProps> = ({
                     lineHeight: 1.5,
                   }}
                 >
-                  💾 Toàn bộ kết quả bài nộp của học sinh Ca {confirmModal.exam.currentBatch} đã được ghi nhận an toàn
-                  vào hệ thống. Thầy/Cô có thể yên tâm kết thúc tiết học này, sang tiết sau mở phiên mới và bấm{' '}
-                  <strong>"▶ Mở Ca {confirmModal.exam.currentBatch + 1}"</strong> để tiếp tục cho học sinh ca sau.
+                  💾 Toàn bộ kết quả bài nộp của học sinh Ca {confirmModal.exam.currentBatch} đã
+                  được ghi nhận an toàn vào hệ thống. Thầy/Cô có thể yên tâm kết thúc tiết học này,
+                  sang tiết sau mở phiên mới và bấm{' '}
+                  <strong>"▶ Mở Ca {confirmModal.exam.currentBatch + 1}"</strong> để tiếp tục cho
+                  học sinh ca sau.
                 </div>
               </>
             )}
@@ -1239,7 +1320,8 @@ export const ExamReportsTab: React.FC<ExamReportsTabProps> = ({
             {confirmModal.type === 'finish' && (
               <>
                 <p style={{ margin: 0, fontSize: '15px', color: UI_COLORS.text }}>
-                  Thầy/Cô có chắc chắn muốn <strong>chốt hoàn tất kỳ thi "{confirmModal.exam.title}"</strong> không?
+                  Thầy/Cô có chắc chắn muốn{' '}
+                  <strong>chốt hoàn tất kỳ thi "{confirmModal.exam.title}"</strong> không?
                 </p>
                 <div
                   style={{
@@ -1252,8 +1334,9 @@ export const ExamReportsTab: React.FC<ExamReportsTabProps> = ({
                     lineHeight: 1.5,
                   }}
                 >
-                  ⚠️ Sau khi chốt hoàn tất, kỳ thi sẽ chuyển sang trạng thái kết thúc và không thể mở thêm ca mới.
-                  Thầy/Cô vẫn có thể xem lại báo cáo chi tiết và tải file Excel bất kỳ lúc nào.
+                  ⚠️ Sau khi chốt hoàn tất, kỳ thi sẽ chuyển sang trạng thái kết thúc và không thể
+                  mở thêm ca mới. Thầy/Cô vẫn có thể xem lại báo cáo chi tiết và tải file Excel bất
+                  kỳ lúc nào.
                 </div>
               </>
             )}
@@ -1279,7 +1362,14 @@ export const ExamReportsTab: React.FC<ExamReportsTabProps> = ({
               </>
             )}
 
-            <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '10px', marginTop: '16px' }}>
+            <div
+              style={{
+                display: 'flex',
+                justifyContent: 'flex-end',
+                gap: '10px',
+                marginTop: '16px',
+              }}
+            >
               <Button
                 variant="ghost"
                 disabled={confirmModal.isSubmitting}
@@ -1326,14 +1416,14 @@ export const ExamReportsTab: React.FC<ExamReportsTabProps> = ({
                 {confirmModal.isSubmitting
                   ? 'Đang xử lý...'
                   : confirmModal.type === 'delete'
-                  ? '🗑️ Xác nhận xóa'
-                  : confirmModal.type === 'finish'
-                  ? '🏁 Xác nhận hoàn tất'
-                  : confirmModal.type === 'pause_batch'
-                  ? '⏸️ Xác nhận tạm dừng'
-                  : !activeSessionId
-                  ? '🚀 Mở phiên mới & Bắt đầu Ca thi'
-                  : '▶️ Xác nhận mở Ca thi'}
+                    ? '🗑️ Xác nhận xóa'
+                    : confirmModal.type === 'finish'
+                      ? '🏁 Xác nhận hoàn tất'
+                      : confirmModal.type === 'pause_batch'
+                        ? '⏸️ Xác nhận tạm dừng'
+                        : !activeSessionId
+                          ? '🚀 Mở phiên mới & Bắt đầu Ca thi'
+                          : '▶️ Xác nhận mở Ca thi'}
               </Button>
             </div>
           </div>
@@ -1405,7 +1495,7 @@ export const ExamReportsTab: React.FC<ExamReportsTabProps> = ({
         allFolders={allFolders}
         onClose={() => setIsCreateFolderModalOpen(false)}
         onShowToast={onShowToast}
-        onSuccess={(newPath) => {
+        onSuccess={newPath => {
           setCurrentFolderPath(newPath);
           setSelectedFolder('all');
           void loadExams();

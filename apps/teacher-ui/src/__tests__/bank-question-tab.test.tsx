@@ -32,10 +32,10 @@ describe('BankQuestionTab Component (Task 3.3)', () => {
       contentJson: JSON.stringify({
         stem: { text: 'Cho hàm số $y = f(x)$ đồng biến trên $(a; b)$...' },
         options: [
-          { id: 'opt_0', text: '$f\'(x) \\ge 0$' },
-          { id: 'opt_1', text: '$f\'(x) \\le 0$' },
-          { id: 'opt_2', text: '$f\'(x) < 0$' },
-          { id: 'opt_3', text: '$f\'(x) = 0$' },
+          { id: 'opt_0', text: "$f'(x) \\ge 0$" },
+          { id: 'opt_1', text: "$f'(x) \\le 0$" },
+          { id: 'opt_2', text: "$f'(x) < 0$" },
+          { id: 'opt_3', text: "$f'(x) = 0$" },
         ],
       }),
       answerJson: JSON.stringify({

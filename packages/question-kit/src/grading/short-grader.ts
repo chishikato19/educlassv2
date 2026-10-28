@@ -7,10 +7,7 @@ import type { GradeResult, ShortGradeDetails } from './types.js';
  * - So khớp số học kèm dung sai sai phân (hỗ trợ cả 3.14 và 3,14 kiểu Việt Nam)
  * - So khớp chuỗi ký tự theo danh sách accepted (hỗ trợ tùy chọn caseSensitive, trimWhitespace)
  */
-export function gradeShort(
-  question: ShortQuestion,
-  answer?: ShortAnswer | null
-): GradeResult {
+export function gradeShort(question: ShortQuestion, answer?: ShortAnswer | null): GradeResult {
   const rawText = answer?.text ?? '';
   const shouldTrim = question.trimWhitespace ?? true;
   const submitted = shouldTrim ? rawText.trim() : rawText;
@@ -76,7 +73,7 @@ export function gradeShort(
   const isCaseSensitive = question.caseSensitive ?? false;
   const compareSubmitted = isCaseSensitive ? submitted : submitted.toLowerCase();
 
-  const matched = question.accepted.some((acc) => {
+  const matched = question.accepted.some(acc => {
     const cleanAcc = shouldTrim ? acc.trim() : acc;
     const compareAcc = isCaseSensitive ? cleanAcc : cleanAcc.toLowerCase();
     return compareSubmitted === compareAcc;

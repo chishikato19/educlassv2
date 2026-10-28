@@ -49,7 +49,7 @@ export interface ExamsRoutesOptions {
  * Phục hồi các trường của câu hỏi từ database (contentJson + answerJson)
  */
 function restoreQuestionsFromItems(rawQuestions: QuestionItemData[]): unknown[] {
-  return rawQuestions.map((q) => {
+  return rawQuestions.map(q => {
     let content: Record<string, unknown> = {};
     let answer: Record<string, unknown> = {};
     try {
@@ -82,7 +82,10 @@ function calculateExamStats(
 ): ExamStats {
   let examMaxScore = 10;
   if (Array.isArray(rawQuestions) && rawQuestions.length > 0) {
-    const sumPts = rawQuestions.reduce((acc, q) => acc + (typeof q['points'] === 'number' ? q['points'] : 1), 0);
+    const sumPts = rawQuestions.reduce(
+      (acc, q) => acc + (typeof q['points'] === 'number' ? q['points'] : 1),
+      0
+    );
     if (sumPts > 0) {
       examMaxScore = Math.round(sumPts * 100) / 100;
     }
@@ -90,7 +93,7 @@ function calculateExamStats(
     examMaxScore = records[0].maxScore;
   }
 
-  const submitted = records.filter((r) => r.status === 'submitted');
+  const submitted = records.filter(r => r.status === 'submitted');
   if (submitted.length === 0) {
     return {
       averageScore: 0,
@@ -108,17 +111,19 @@ function calculateExamStats(
     };
   }
 
-  const scores = submitted.map((r) => r.score);
+  const scores = submitted.map(r => r.score);
   const totalScore = scores.reduce((sum, s) => sum + s, 0);
   const averageScore = Math.round((totalScore / submitted.length) * 10) / 10;
   const highestScore = Math.max(...scores);
   const lowestScore = Math.min(...scores);
 
   const gradeDistribution = {
-    tot: submitted.filter((r) => r.score >= 0.8 * examMaxScore).length,
-    kha: submitted.filter((r) => r.score >= 0.65 * examMaxScore && r.score < 0.8 * examMaxScore).length,
-    dat: submitted.filter((r) => r.score >= 0.5 * examMaxScore && r.score < 0.65 * examMaxScore).length,
-    chuaDat: submitted.filter((r) => r.score < 0.5 * examMaxScore).length,
+    tot: submitted.filter(r => r.score >= 0.8 * examMaxScore).length,
+    kha: submitted.filter(r => r.score >= 0.65 * examMaxScore && r.score < 0.8 * examMaxScore)
+      .length,
+    dat: submitted.filter(r => r.score >= 0.5 * examMaxScore && r.score < 0.65 * examMaxScore)
+      .length,
+    chuaDat: submitted.filter(r => r.score < 0.5 * examMaxScore).length,
   };
 
   const questionAnalysis = rawQuestions.map((q, idx) => {
@@ -133,7 +138,11 @@ function calculateExamStats(
 
         // 1. Kiểm tra từ answersJson
         const answers = JSON.parse(r.answersJson || '{}') as Record<string, unknown>;
-        if (answers[qId] !== undefined || answers[`q_${idx + 1}`] !== undefined || answers[`q${idx + 1}`] !== undefined) {
+        if (
+          answers[qId] !== undefined ||
+          answers[`q_${idx + 1}`] !== undefined ||
+          answers[`q${idx + 1}`] !== undefined
+        ) {
           isAnswered = true;
         }
 
@@ -143,7 +152,7 @@ function calculateExamStats(
           if (Array.isArray(res)) {
             // Trường hợp reviewData là danh sách các câu hỏi
             const found = res.find(
-              (it) =>
+              it =>
                 it &&
                 typeof it === 'object' &&
                 ('questionId' in it || 'id' in it || 'order' in it) &&
@@ -163,8 +172,7 @@ function calculateExamStats(
           } else if (res && typeof res === 'object') {
             const mapObj = res as Record<string, unknown>;
             const found = (mapObj[qId] || mapObj[`q_${idx + 1}`] || mapObj[`q${idx + 1}`]) as
-              | { isCorrect?: boolean; correct?: boolean; pointsEarned?: number }
-              | undefined;
+              { isCorrect?: boolean; correct?: boolean; pointsEarned?: number } | undefined;
 
             if (found) {
               isAnswered = true;
@@ -186,8 +194,14 @@ function calculateExamStats(
           if (studentAns !== undefined && correctKey !== undefined) {
             if (studentAns === correctKey) {
               isCorrect = true;
-            } else if (typeof studentAns === 'object' && studentAns !== null && 'selected' in (studentAns as Record<string, unknown>)) {
-              if (Number((studentAns as Record<string, unknown>)['selected']) === Number(correctKey)) {
+            } else if (
+              typeof studentAns === 'object' &&
+              studentAns !== null &&
+              'selected' in (studentAns as Record<string, unknown>)
+            ) {
+              if (
+                Number((studentAns as Record<string, unknown>)['selected']) === Number(correctKey)
+              ) {
                 isCorrect = true;
               }
             }
@@ -288,7 +302,11 @@ export const examsRoutes: FastifyPluginAsync<ExamsRoutesOptions> = async (fastif
    */
   fastify.get('/api/exams', { preHandler: authenticate }, async (request, reply) => {
     const user = request.user!;
-    const query = request.query as { classId?: string; status?: ExamSelect['status']; folder?: string };
+    const query = request.query as {
+      classId?: string;
+      status?: ExamSelect['status'];
+      folder?: string;
+    };
 
     const examList = await examRepo.list({
       ownerId: user.role === 'admin' ? undefined : user.id,
@@ -304,7 +322,10 @@ export const examsRoutes: FastifyPluginAsync<ExamsRoutesOptions> = async (fastif
       } catch {
         // ignore
       }
-      const folder = typeof examConfig.folder === 'string' && examConfig.folder.trim() ? examConfig.folder.trim() : null;
+      const folder =
+        typeof examConfig.folder === 'string' && examConfig.folder.trim()
+          ? examConfig.folder.trim()
+          : null;
 
       // Lọc theo thư mục nếu có query.folder
       if (query.folder !== undefined && query.folder !== '') {
@@ -318,8 +339,8 @@ export const examsRoutes: FastifyPluginAsync<ExamsRoutesOptions> = async (fastif
       const cls = await classRepo.findById(exam.classId);
       const classStudents = await studentRepo.listByClassId(exam.classId);
       const records = await examRecordRepo.listByExam(exam.id);
-      const submitted = records.filter((r) => r.status === 'submitted');
-      let inProgressCount = records.filter((r) => r.status === 'in_progress').length;
+      const submitted = records.filter(r => r.status === 'submitted');
+      let inProgressCount = records.filter(r => r.status === 'in_progress').length;
 
       if (exam.activeSessionId) {
         const activeRun = activityEngine.getActiveRun(exam.activeSessionId);
@@ -328,7 +349,9 @@ export const examsRoutes: FastifyPluginAsync<ExamsRoutesOptions> = async (fastif
             participants?: Record<string, { isSubmitted?: boolean }>;
           };
           if (stateObj?.participants) {
-            const liveInProgress = Object.values(stateObj.participants).filter((p) => !p.isSubmitted).length;
+            const liveInProgress = Object.values(stateObj.participants).filter(
+              p => !p.isSubmitted
+            ).length;
             inProgressCount = Math.max(inProgressCount, liveInProgress);
           }
         }
@@ -348,15 +371,20 @@ export const examsRoutes: FastifyPluginAsync<ExamsRoutesOptions> = async (fastif
         }
       }
 
-      const classStudentIds = new Set(classStudents.map((s) => s.id));
-      const extraGuestCount = records.filter((r) => !classStudentIds.has(r.studentId)).length;
+      const classStudentIds = new Set(classStudents.map(s => s.id));
+      const extraGuestCount = records.filter(r => !classStudentIds.has(r.studentId)).length;
       const totalStudents = Math.max(1, classStudents.length + extraGuestCount);
 
       let examMaxScore = 10;
       try {
-        const rawQs = JSON.parse(exam.questionsSnapshotJson || '[]') as Array<Record<string, unknown>>;
+        const rawQs = JSON.parse(exam.questionsSnapshotJson || '[]') as Array<
+          Record<string, unknown>
+        >;
         if (Array.isArray(rawQs) && rawQs.length > 0) {
-          const sumPts = rawQs.reduce((sum, q) => sum + (typeof q['points'] === 'number' ? q['points'] : 1), 0);
+          const sumPts = rawQs.reduce(
+            (sum, q) => sum + (typeof q['points'] === 'number' ? q['points'] : 1),
+            0
+          );
           if (sumPts > 0) {
             examMaxScore = Math.round(sumPts * 100) / 100;
           }
@@ -471,519 +499,579 @@ export const examsRoutes: FastifyPluginAsync<ExamsRoutesOptions> = async (fastif
    * GET /api/exams/:id
    * Chi tiết kỳ thi, danh sách điểm toàn bộ học sinh và thống kê phổ điểm
    */
-  fastify.get<{ Params: { id: string } }>('/api/exams/:id', { preHandler: authenticate }, async (request, reply) => {
-    const user = request.user!;
-    const { id } = request.params;
+  fastify.get<{ Params: { id: string } }>(
+    '/api/exams/:id',
+    { preHandler: authenticate },
+    async (request, reply) => {
+      const user = request.user!;
+      const { id } = request.params;
 
-    const exam = await examRepo.findById(id);
-    if (!exam) {
-      return reply.status(404).send({
-        error: formatProtocolError('EXAM_NOT_FOUND', 'Không tìm thấy kỳ thi này.'),
-      });
-    }
-
-    if (exam.ownerId !== user.id && user.role !== 'admin') {
-      return reply.status(403).send({
-        error: formatProtocolError('FORBIDDEN', 'Bạn không có quyền xem kỳ thi này.'),
-      });
-    }
-
-    const cls = await classRepo.findById(exam.classId);
-    const classStudents = await studentRepo.listByClassId(exam.classId);
-    const dbRecords = await examRecordRepo.listByExam(exam.id);
-
-    let questions: Array<Record<string, unknown>> = [];
-    try {
-      questions = JSON.parse(exam.questionsSnapshotJson) as Array<Record<string, unknown>>;
-    } catch {
-      // ignore
-    }
-
-    let examConfig = {};
-    try {
-      examConfig = JSON.parse(exam.configJson);
-    } catch {
-      // ignore
-    }
-
-    let activeSessionJoinCode: string | null = null;
-    if (exam.activeSessionId) {
-      const sess = await sessionRepo.findById(exam.activeSessionId);
-      if (sess) {
-        activeSessionJoinCode = sess.joinCode;
+      const exam = await examRepo.findById(id);
+      if (!exam) {
+        return reply.status(404).send({
+          error: formatProtocolError('EXAM_NOT_FOUND', 'Không tìm thấy kỳ thi này.'),
+        });
       }
-    }
 
-    const stats = calculateExamStats(dbRecords, questions);
+      if (exam.ownerId !== user.id && user.role !== 'admin') {
+        return reply.status(403).send({
+          error: formatProtocolError('FORBIDDEN', 'Bạn không có quyền xem kỳ thi này.'),
+        });
+      }
 
-    // Xây dựng danh sách tổng thể toàn bộ học sinh trong lớp kết hợp CSDL và trạng thái thời gian thực
-    const studentRecordMap = new Map<string, ExamRecordDto>();
+      const cls = await classRepo.findById(exam.classId);
+      const classStudents = await studentRepo.listByClassId(exam.classId);
+      const dbRecords = await examRecordRepo.listByExam(exam.id);
 
-    // 1. Nạp tất cả bản ghi đã lưu từ CSDL
-    for (const r of dbRecords) {
-      studentRecordMap.set(r.studentId, toRecordDto(r));
-    }
+      let questions: Array<Record<string, unknown>> = [];
+      try {
+        questions = JSON.parse(exam.questionsSnapshotJson) as Array<Record<string, unknown>>;
+      } catch {
+        // ignore
+      }
 
-    // 2. Nếu có phiên đang mở, đồng bộ trạng thái thí sinh đang làm bài từ ActivityEngine
-    if (exam.activeSessionId) {
-      const activeRun = activityEngine.getActiveRun(exam.activeSessionId);
-      if (activeRun && activeRun.run.activityId === 'exam') {
-        const stateObj = activeRun.state as {
-          participants?: Record<
-            string,
-            {
-              displayName?: string;
-              isSubmitted?: boolean;
-              startedAt?: number | null;
-              submittedAt?: number | null;
-              answers?: Record<string, unknown>;
-              result?: {
-                score?: number;
-                maxScore?: number;
-                percentage?: number;
-                correctCount?: number;
-              };
+      let examConfig = {};
+      try {
+        examConfig = JSON.parse(exam.configJson);
+      } catch {
+        // ignore
+      }
+
+      let activeSessionJoinCode: string | null = null;
+      if (exam.activeSessionId) {
+        const sess = await sessionRepo.findById(exam.activeSessionId);
+        if (sess) {
+          activeSessionJoinCode = sess.joinCode;
+        }
+      }
+
+      const stats = calculateExamStats(dbRecords, questions);
+
+      // Xây dựng danh sách tổng thể toàn bộ học sinh trong lớp kết hợp CSDL và trạng thái thời gian thực
+      const studentRecordMap = new Map<string, ExamRecordDto>();
+
+      // 1. Nạp tất cả bản ghi đã lưu từ CSDL
+      for (const r of dbRecords) {
+        studentRecordMap.set(r.studentId, toRecordDto(r));
+      }
+
+      // 2. Nếu có phiên đang mở, đồng bộ trạng thái thí sinh đang làm bài từ ActivityEngine
+      if (exam.activeSessionId) {
+        const activeRun = activityEngine.getActiveRun(exam.activeSessionId);
+        if (activeRun && activeRun.run.activityId === 'exam') {
+          const stateObj = activeRun.state as {
+            participants?: Record<
+              string,
+              {
+                displayName?: string;
+                isSubmitted?: boolean;
+                startedAt?: number | null;
+                submittedAt?: number | null;
+                answers?: Record<string, unknown>;
+                result?: {
+                  score?: number;
+                  maxScore?: number;
+                  percentage?: number;
+                  correctCount?: number;
+                };
+              }
+            >;
+          };
+
+          if (stateObj?.participants && participantRepo) {
+            const sessionParticipants = await participantRepo.listBySessionId(exam.activeSessionId);
+            for (const p of sessionParticipants) {
+              const live = stateObj.participants[p.id];
+              if (!live) continue;
+
+              let sId = p.studentId;
+              if (!sId) {
+                const match = classStudents.find(
+                  cs => cs.fullName.trim().toLowerCase() === p.displayName.trim().toLowerCase()
+                );
+                if (match) sId = match.id;
+              }
+              if (!sId) {
+                sId = p.id;
+              }
+
+              const existing = studentRecordMap.get(sId);
+              if (existing && existing.status === 'submitted') continue;
+
+              const timeSpent = live.startedAt
+                ? Math.max(
+                    0,
+                    Math.round(((live.submittedAt ?? Date.now()) - live.startedAt) / 1000)
+                  )
+                : 0;
+
+              studentRecordMap.set(sId, {
+                id: existing?.id ?? `live_${p.id}`,
+                examId: exam.id,
+                studentId: sId,
+                studentName: p.displayName || existing?.studentName || 'Học sinh',
+                studentCode: classStudents.find(cs => cs.id === sId)?.code ?? null,
+                batchIndex: exam.currentBatch,
+                status: live.isSubmitted ? 'submitted' : 'in_progress',
+                score: live.result?.score ?? 0,
+                maxScore: live.result?.maxScore ?? 10,
+                percentage: live.result?.percentage ?? 0,
+                correctCount: live.result?.correctCount ?? 0,
+                totalQuestions: questions.length || 1,
+                answers: live.answers ?? {},
+                result: live.result ?? null,
+                timeSpentSeconds: timeSpent,
+                submittedAt: live.submittedAt ?? live.startedAt ?? Date.now(),
+              });
             }
-          >;
-        };
-
-        if (stateObj?.participants && participantRepo) {
-          const sessionParticipants = await participantRepo.listBySessionId(exam.activeSessionId);
-          for (const p of sessionParticipants) {
-            const live = stateObj.participants[p.id];
-            if (!live) continue;
-
-            let sId = p.studentId;
-            if (!sId) {
-              const match = classStudents.find(
-                (cs) => cs.fullName.trim().toLowerCase() === p.displayName.trim().toLowerCase()
-              );
-              if (match) sId = match.id;
-            }
-            if (!sId) {
-              sId = p.id;
-            }
-
-            const existing = studentRecordMap.get(sId);
-            if (existing && existing.status === 'submitted') continue;
-
-            const timeSpent = live.startedAt
-              ? Math.max(0, Math.round(((live.submittedAt ?? Date.now()) - live.startedAt) / 1000))
-              : 0;
-
-            studentRecordMap.set(sId, {
-              id: existing?.id ?? `live_${p.id}`,
-              examId: exam.id,
-              studentId: sId,
-              studentName: p.displayName || existing?.studentName || 'Học sinh',
-              studentCode: classStudents.find((cs) => cs.id === sId)?.code ?? null,
-              batchIndex: exam.currentBatch,
-              status: live.isSubmitted ? 'submitted' : 'in_progress',
-              score: live.result?.score ?? 0,
-              maxScore: live.result?.maxScore ?? 10,
-              percentage: live.result?.percentage ?? 0,
-              correctCount: live.result?.correctCount ?? 0,
-              totalQuestions: questions.length || 1,
-              answers: live.answers ?? {},
-              result: live.result ?? null,
-              timeSpentSeconds: timeSpent,
-              submittedAt: live.submittedAt ?? (live.startedAt ?? Date.now()),
-            });
           }
         }
       }
-    }
 
-    // 3. Đối với tất cả học sinh còn lại trong danh sách lớp chưa tham gia thi:
-    for (const student of classStudents) {
-      if (!studentRecordMap.has(student.id)) {
-        studentRecordMap.set(student.id, {
-          id: `not_started_${student.id}`,
-          examId: exam.id,
-          studentId: student.id,
-          studentName: student.fullName,
-          studentCode: student.code ?? null,
-          batchIndex: exam.currentBatch,
-          status: 'not_started',
-          score: 0,
-          maxScore: 10,
-          percentage: 0,
-          correctCount: 0,
-          totalQuestions: questions.length || 1,
-          answers: {},
-          result: null,
-          timeSpentSeconds: 0,
-          submittedAt: 0,
-        });
+      // 3. Đối với tất cả học sinh còn lại trong danh sách lớp chưa tham gia thi:
+      for (const student of classStudents) {
+        if (!studentRecordMap.has(student.id)) {
+          studentRecordMap.set(student.id, {
+            id: `not_started_${student.id}`,
+            examId: exam.id,
+            studentId: student.id,
+            studentName: student.fullName,
+            studentCode: student.code ?? null,
+            batchIndex: exam.currentBatch,
+            status: 'not_started',
+            score: 0,
+            maxScore: 10,
+            percentage: 0,
+            correctCount: 0,
+            totalQuestions: questions.length || 1,
+            answers: {},
+            result: null,
+            timeSpentSeconds: 0,
+            submittedAt: 0,
+          });
+        }
       }
+
+      const formattedRecords = Array.from(studentRecordMap.values());
+      const classStudentIds = new Set(classStudents.map(s => s.id));
+      const extraGuestCount = formattedRecords.filter(
+        r => !classStudentIds.has(r.studentId) && r.status !== 'not_started'
+      ).length;
+      const computedTotalStudents = Math.max(1, classStudents.length + extraGuestCount);
+
+      const detail: ExamDetailDto = ExamDetailDtoSchema.parse({
+        id: exam.id,
+        ownerId: exam.ownerId,
+        classId: exam.classId,
+        className: cls?.name,
+        title: exam.title,
+        subject: exam.subject,
+        durationMinutes: exam.durationMinutes,
+        config: examConfig,
+        status: exam.status,
+        currentBatch: exam.currentBatch,
+        activeSessionId: exam.activeSessionId,
+        activeSessionJoinCode,
+        totalStudents: computedTotalStudents,
+        submittedCount: formattedRecords.filter(r => r.status === 'submitted').length,
+        records: formattedRecords,
+        questions,
+        stats,
+        createdAt: exam.createdAt,
+        updatedAt: exam.updatedAt,
+      });
+
+      return reply.status(200).send({ exam: detail });
     }
-
-    const formattedRecords = Array.from(studentRecordMap.values());
-    const classStudentIds = new Set(classStudents.map((s) => s.id));
-    const extraGuestCount = formattedRecords.filter((r) => !classStudentIds.has(r.studentId) && r.status !== 'not_started').length;
-    const computedTotalStudents = Math.max(1, classStudents.length + extraGuestCount);
-
-    const detail: ExamDetailDto = ExamDetailDtoSchema.parse({
-      id: exam.id,
-      ownerId: exam.ownerId,
-      classId: exam.classId,
-      className: cls?.name,
-      title: exam.title,
-      subject: exam.subject,
-      durationMinutes: exam.durationMinutes,
-      config: examConfig,
-      status: exam.status,
-      currentBatch: exam.currentBatch,
-      activeSessionId: exam.activeSessionId,
-      activeSessionJoinCode,
-      totalStudents: computedTotalStudents,
-      submittedCount: formattedRecords.filter((r) => r.status === 'submitted').length,
-      records: formattedRecords,
-      questions,
-      stats,
-      createdAt: exam.createdAt,
-      updatedAt: exam.updatedAt,
-    });
-
-    return reply.status(200).send({ exam: detail });
-  });
+  );
 
   /**
    * PUT /api/exams/:id
    * Cập nhật thông tin cấu hình kỳ thi
    */
-  fastify.put<{ Params: { id: string } }>('/api/exams/:id', { preHandler: authenticate }, async (request, reply) => {
-    const user = request.user!;
-    const { id } = request.params;
+  fastify.put<{ Params: { id: string } }>(
+    '/api/exams/:id',
+    { preHandler: authenticate },
+    async (request, reply) => {
+      const user = request.user!;
+      const { id } = request.params;
 
-    const exam = await examRepo.findById(id);
-    if (!exam) {
-      return reply.status(404).send({
-        error: formatProtocolError('EXAM_NOT_FOUND', 'Không tìm thấy kỳ thi này.'),
-      });
-    }
-    if (exam.ownerId !== user.id && user.role !== 'admin') {
-      return reply.status(403).send({
-        error: formatProtocolError('FORBIDDEN', 'Bạn không có quyền chỉnh sửa kỳ thi này.'),
-      });
-    }
-
-    const parsed = UpdateExamRequestSchema.safeParse(request.body);
-    if (!parsed.success) {
-      return reply.status(400).send({
-        error: formatProtocolError('INVALID_PAYLOAD', 'Dữ liệu cập nhật không hợp lệ', parsed.error.issues),
-      });
-    }
-
-    const updateData: Partial<Omit<ExamInsert, 'id' | 'createdAt' | 'updatedAt'>> = {};
-    if (parsed.data.title !== undefined) {
-      updateData.title = parsed.data.title.trim();
-    }
-    if (parsed.data.subject !== undefined) {
-      updateData.subject = parsed.data.subject ? parsed.data.subject.trim() : null;
-    }
-    if (parsed.data.durationMinutes !== undefined) {
-      updateData.durationMinutes = parsed.data.durationMinutes;
-    }
-    if (parsed.data.config !== undefined) {
-      let currentConfig: Record<string, unknown> = {};
-      try {
-        currentConfig = JSON.parse(exam.configJson) as Record<string, unknown>;
-      } catch {
-        // ignore
+      const exam = await examRepo.findById(id);
+      if (!exam) {
+        return reply.status(404).send({
+          error: formatProtocolError('EXAM_NOT_FOUND', 'Không tìm thấy kỳ thi này.'),
+        });
       }
-      updateData.configJson = JSON.stringify({
-        ...currentConfig,
-        ...parsed.data.config,
-      });
+      if (exam.ownerId !== user.id && user.role !== 'admin') {
+        return reply.status(403).send({
+          error: formatProtocolError('FORBIDDEN', 'Bạn không có quyền chỉnh sửa kỳ thi này.'),
+        });
+      }
+
+      const parsed = UpdateExamRequestSchema.safeParse(request.body);
+      if (!parsed.success) {
+        return reply.status(400).send({
+          error: formatProtocolError(
+            'INVALID_PAYLOAD',
+            'Dữ liệu cập nhật không hợp lệ',
+            parsed.error.issues
+          ),
+        });
+      }
+
+      const updateData: Partial<Omit<ExamInsert, 'id' | 'createdAt' | 'updatedAt'>> = {};
+      if (parsed.data.title !== undefined) {
+        updateData.title = parsed.data.title.trim();
+      }
+      if (parsed.data.subject !== undefined) {
+        updateData.subject = parsed.data.subject ? parsed.data.subject.trim() : null;
+      }
+      if (parsed.data.durationMinutes !== undefined) {
+        updateData.durationMinutes = parsed.data.durationMinutes;
+      }
+      if (parsed.data.config !== undefined) {
+        let currentConfig: Record<string, unknown> = {};
+        try {
+          currentConfig = JSON.parse(exam.configJson) as Record<string, unknown>;
+        } catch {
+          // ignore
+        }
+        updateData.configJson = JSON.stringify({
+          ...currentConfig,
+          ...parsed.data.config,
+        });
+      }
+
+      const updated = await examRepo.update(id, updateData);
+
+      return reply.status(200).send({ exam: updated });
     }
-
-    const updated = await examRepo.update(id, updateData);
-
-    return reply.status(200).send({ exam: updated });
-  });
+  );
 
   /**
    * POST /api/exams/:id/clone
    * Sao chép kỳ thi sang lớp khác (giữ nguyên bộ câu hỏi snapshot & cấu hình)
    */
-  fastify.post<{ Params: { id: string } }>('/api/exams/:id/clone', { preHandler: authenticate }, async (request, reply) => {
-    const user = request.user!;
-    const { id } = request.params;
+  fastify.post<{ Params: { id: string } }>(
+    '/api/exams/:id/clone',
+    { preHandler: authenticate },
+    async (request, reply) => {
+      const user = request.user!;
+      const { id } = request.params;
 
-    const exam = await examRepo.findById(id);
-    if (!exam) {
-      return reply.status(404).send({
-        error: formatProtocolError('EXAM_NOT_FOUND', 'Không tìm thấy kỳ thi này.'),
+      const exam = await examRepo.findById(id);
+      if (!exam) {
+        return reply.status(404).send({
+          error: formatProtocolError('EXAM_NOT_FOUND', 'Không tìm thấy kỳ thi này.'),
+        });
+      }
+      if (exam.ownerId !== user.id && user.role !== 'admin') {
+        return reply.status(403).send({
+          error: formatProtocolError('FORBIDDEN', 'Bạn không có quyền sao chép kỳ thi này.'),
+        });
+      }
+
+      const parsed = CloneExamRequestSchema.safeParse(request.body);
+      if (!parsed.success) {
+        return reply.status(400).send({
+          error: formatProtocolError(
+            'INVALID_PAYLOAD',
+            'Dữ liệu sao chép không hợp lệ',
+            parsed.error.issues
+          ),
+        });
+      }
+
+      const { targetClassId, newTitle } = parsed.data;
+      const targetClass = await classRepo.findById(targetClassId);
+      if (!targetClass) {
+        return reply.status(404).send({
+          error: formatProtocolError('CLASS_NOT_FOUND', 'Không tìm thấy lớp học đích.'),
+        });
+      }
+      if (targetClass.ownerId !== user.id && user.role !== 'admin') {
+        return reply.status(403).send({
+          error: formatProtocolError(
+            'FORBIDDEN',
+            'Bạn không có quyền thêm kỳ thi vào lớp học này.'
+          ),
+        });
+      }
+
+      const title = newTitle && newTitle.trim() ? newTitle.trim() : `${exam.title} (Bản sao)`;
+
+      const created = await examRepo.create({
+        ownerId: user.id,
+        classId: targetClassId,
+        title,
+        subject: exam.subject,
+        durationMinutes: exam.durationMinutes,
+        configJson: exam.configJson,
+        questionsSnapshotJson: exam.questionsSnapshotJson,
+        status: 'ready',
+        currentBatch: 1,
       });
-    }
-    if (exam.ownerId !== user.id && user.role !== 'admin') {
-      return reply.status(403).send({
-        error: formatProtocolError('FORBIDDEN', 'Bạn không có quyền sao chép kỳ thi này.'),
-      });
-    }
 
-    const parsed = CloneExamRequestSchema.safeParse(request.body);
-    if (!parsed.success) {
-      return reply.status(400).send({
-        error: formatProtocolError('INVALID_PAYLOAD', 'Dữ liệu sao chép không hợp lệ', parsed.error.issues),
-      });
+      return reply.status(201).send({ exam: created });
     }
-
-    const { targetClassId, newTitle } = parsed.data;
-    const targetClass = await classRepo.findById(targetClassId);
-    if (!targetClass) {
-      return reply.status(404).send({
-        error: formatProtocolError('CLASS_NOT_FOUND', 'Không tìm thấy lớp học đích.'),
-      });
-    }
-    if (targetClass.ownerId !== user.id && user.role !== 'admin') {
-      return reply.status(403).send({
-        error: formatProtocolError('FORBIDDEN', 'Bạn không có quyền thêm kỳ thi vào lớp học này.'),
-      });
-    }
-
-    const title = newTitle && newTitle.trim() ? newTitle.trim() : `${exam.title} (Bản sao)`;
-
-    const created = await examRepo.create({
-      ownerId: user.id,
-      classId: targetClassId,
-      title,
-      subject: exam.subject,
-      durationMinutes: exam.durationMinutes,
-      configJson: exam.configJson,
-      questionsSnapshotJson: exam.questionsSnapshotJson,
-      status: 'ready',
-      currentBatch: 1,
-    });
-
-    return reply.status(201).send({ exam: created });
-  });
+  );
 
   /**
    * DELETE /api/exams/:id
    * Xóa kỳ thi
    */
-  fastify.delete<{ Params: { id: string } }>('/api/exams/:id', { preHandler: authenticate }, async (request, reply) => {
-    const user = request.user!;
-    const { id } = request.params;
+  fastify.delete<{ Params: { id: string } }>(
+    '/api/exams/:id',
+    { preHandler: authenticate },
+    async (request, reply) => {
+      const user = request.user!;
+      const { id } = request.params;
 
-    const exam = await examRepo.findById(id);
-    if (!exam) {
-      return reply.status(404).send({
-        error: formatProtocolError('EXAM_NOT_FOUND', 'Không tìm thấy kỳ thi này.'),
-      });
-    }
-    if (exam.ownerId !== user.id && user.role !== 'admin') {
-      return reply.status(403).send({
-        error: formatProtocolError('FORBIDDEN', 'Bạn không có quyền xóa kỳ thi này.'),
-      });
-    }
+      const exam = await examRepo.findById(id);
+      if (!exam) {
+        return reply.status(404).send({
+          error: formatProtocolError('EXAM_NOT_FOUND', 'Không tìm thấy kỳ thi này.'),
+        });
+      }
+      if (exam.ownerId !== user.id && user.role !== 'admin') {
+        return reply.status(403).send({
+          error: formatProtocolError('FORBIDDEN', 'Bạn không có quyền xóa kỳ thi này.'),
+        });
+      }
 
-    await examRepo.delete(id);
-    return reply.status(200).send({ ok: true });
-  });
+      await examRepo.delete(id);
+      return reply.status(200).send({ ok: true });
+    }
+  );
 
   /**
    * POST /api/exams/:id/start-batch
    * Kích hoạt ca thi tiếp theo trong một phiên học đang mở
    */
-  fastify.post<{ Params: { id: string } }>('/api/exams/:id/start-batch', { preHandler: authenticate }, async (request, reply) => {
-    const user = request.user!;
-    const { id } = request.params;
+  fastify.post<{ Params: { id: string } }>(
+    '/api/exams/:id/start-batch',
+    { preHandler: authenticate },
+    async (request, reply) => {
+      const user = request.user!;
+      const { id } = request.params;
 
-    const exam = await examRepo.findById(id);
-    if (!exam) {
-      return reply.status(404).send({
-        error: formatProtocolError('EXAM_NOT_FOUND', 'Không tìm thấy kỳ thi này.'),
+      const exam = await examRepo.findById(id);
+      if (!exam) {
+        return reply.status(404).send({
+          error: formatProtocolError('EXAM_NOT_FOUND', 'Không tìm thấy kỳ thi này.'),
+        });
+      }
+      if (exam.ownerId !== user.id && user.role !== 'admin') {
+        return reply.status(403).send({
+          error: formatProtocolError('FORBIDDEN', 'Bạn không có quyền điều khiển kỳ thi này.'),
+        });
+      }
+      if (exam.status === 'finished') {
+        return reply.status(400).send({
+          error: formatProtocolError(
+            'INVALID_PAYLOAD',
+            'Kỳ thi đã kết thúc hoàn toàn, không thể mở thêm ca mới.'
+          ),
+        });
+      }
+
+      const parsed = StartExamBatchRequestSchema.safeParse(request.body);
+      if (!parsed.success) {
+        return reply.status(400).send({
+          error: formatProtocolError(
+            'INVALID_PAYLOAD',
+            'Dữ liệu mở ca thi không hợp lệ',
+            parsed.error.issues
+          ),
+        });
+      }
+
+      const { sessionId, batchIndex } = parsed.data;
+      const session = await sessionRepo.findById(sessionId);
+      if (!session) {
+        return reply.status(404).send({
+          error: formatProtocolError('SESSION_NOT_FOUND', 'Không tìm thấy phiên học.'),
+        });
+      }
+      if (session.ownerId !== user.id && user.role !== 'admin') {
+        return reply.status(403).send({
+          error: formatProtocolError('FORBIDDEN', 'Bạn không có quyền điều khiển phiên học này.'),
+        });
+      }
+      if (session.status !== 'open') {
+        return reply.status(400).send({
+          error: formatProtocolError(
+            'SESSION_CLOSED',
+            'Phiên học đã đóng. Vui lòng mở phiên học mới trước.'
+          ),
+        });
+      }
+
+      // Xác định ca thi (nếu đang chờ ca tiếp thì tăng currentBatch)
+      const nextBatch =
+        batchIndex ??
+        (exam.status === 'waiting_next_batch' ? exam.currentBatch + 1 : exam.currentBatch);
+
+      // Lấy danh sách học sinh đã thi ở các ca trước để khóa danh tính
+      const existingRecords = await examRecordRepo.listByExam(exam.id);
+      const completedStudentIds = existingRecords
+        .filter(r => r.status === 'submitted')
+        .map(r => r.studentId);
+
+      // Gắn kỳ thi vào phiên trong CSDL
+      const updatedExam = await examRepo.attachSession(exam.id, sessionId, nextBatch);
+
+      // Khởi chạy hoạt động thi trong ActivityEngine
+      let questions: unknown[] = [];
+      try {
+        questions = JSON.parse(exam.questionsSnapshotJson);
+      } catch {
+        // ignore
+      }
+
+      let rawConfig: Record<string, unknown> = {};
+      try {
+        rawConfig = JSON.parse(exam.configJson) as Record<string, unknown>;
+      } catch {
+        // ignore
+      }
+
+      await activityEngine.startActivity(sessionId, 'exam', {
+        ...rawConfig,
+        title: exam.title,
+        durationMinutes: exam.durationMinutes,
+        questions,
+        examId: exam.id,
+        batchIndex: nextBatch,
+        completedStudentIds,
       });
-    }
-    if (exam.ownerId !== user.id && user.role !== 'admin') {
-      return reply.status(403).send({
-        error: formatProtocolError('FORBIDDEN', 'Bạn không có quyền điều khiển kỳ thi này.'),
-      });
-    }
-    if (exam.status === 'finished') {
-      return reply.status(400).send({
-        error: formatProtocolError('INVALID_PAYLOAD', 'Kỳ thi đã kết thúc hoàn toàn, không thể mở thêm ca mới.'),
-      });
-    }
 
-    const parsed = StartExamBatchRequestSchema.safeParse(request.body);
-    if (!parsed.success) {
-      return reply.status(400).send({
-        error: formatProtocolError('INVALID_PAYLOAD', 'Dữ liệu mở ca thi không hợp lệ', parsed.error.issues),
-      });
+      return reply.status(200).send({ ok: true, exam: updatedExam });
     }
-
-    const { sessionId, batchIndex } = parsed.data;
-    const session = await sessionRepo.findById(sessionId);
-    if (!session) {
-      return reply.status(404).send({
-        error: formatProtocolError('SESSION_NOT_FOUND', 'Không tìm thấy phiên học.'),
-      });
-    }
-    if (session.ownerId !== user.id && user.role !== 'admin') {
-      return reply.status(403).send({
-        error: formatProtocolError('FORBIDDEN', 'Bạn không có quyền điều khiển phiên học này.'),
-      });
-    }
-    if (session.status !== 'open') {
-      return reply.status(400).send({
-        error: formatProtocolError('SESSION_CLOSED', 'Phiên học đã đóng. Vui lòng mở phiên học mới trước.'),
-      });
-    }
-
-    // Xác định ca thi (nếu đang chờ ca tiếp thì tăng currentBatch)
-    const nextBatch = batchIndex ?? (exam.status === 'waiting_next_batch' ? exam.currentBatch + 1 : exam.currentBatch);
-
-    // Lấy danh sách học sinh đã thi ở các ca trước để khóa danh tính
-    const existingRecords = await examRecordRepo.listByExam(exam.id);
-    const completedStudentIds = existingRecords
-      .filter((r) => r.status === 'submitted')
-      .map((r) => r.studentId);
-
-    // Gắn kỳ thi vào phiên trong CSDL
-    const updatedExam = await examRepo.attachSession(exam.id, sessionId, nextBatch);
-
-    // Khởi chạy hoạt động thi trong ActivityEngine
-    let questions: unknown[] = [];
-    try {
-      questions = JSON.parse(exam.questionsSnapshotJson);
-    } catch {
-      // ignore
-    }
-
-    let rawConfig: Record<string, unknown> = {};
-    try {
-      rawConfig = JSON.parse(exam.configJson) as Record<string, unknown>;
-    } catch {
-      // ignore
-    }
-
-    await activityEngine.startActivity(sessionId, 'exam', {
-      ...rawConfig,
-      title: exam.title,
-      durationMinutes: exam.durationMinutes,
-      questions,
-      examId: exam.id,
-      batchIndex: nextBatch,
-      completedStudentIds,
-    });
-
-    return reply.status(200).send({ ok: true, exam: updatedExam });
-  });
+  );
 
   /**
    * POST /api/exams/:id/pause-batch
    * Tạm dừng ca thi hiện tại để chờ ca tiếp theo
    */
-  fastify.post<{ Params: { id: string } }>('/api/exams/:id/pause-batch', { preHandler: authenticate }, async (request, reply) => {
-    const user = request.user!;
-    const { id } = request.params;
+  fastify.post<{ Params: { id: string } }>(
+    '/api/exams/:id/pause-batch',
+    { preHandler: authenticate },
+    async (request, reply) => {
+      const user = request.user!;
+      const { id } = request.params;
 
-    const exam = await examRepo.findById(id);
-    if (!exam) {
-      return reply.status(404).send({
-        error: formatProtocolError('EXAM_NOT_FOUND', 'Không tìm thấy kỳ thi này.'),
-      });
-    }
-    if (exam.ownerId !== user.id && user.role !== 'admin') {
-      return reply.status(403).send({
-        error: formatProtocolError('FORBIDDEN', 'Bạn không có quyền điều khiển kỳ thi này.'),
-      });
-    }
+      const exam = await examRepo.findById(id);
+      if (!exam) {
+        return reply.status(404).send({
+          error: formatProtocolError('EXAM_NOT_FOUND', 'Không tìm thấy kỳ thi này.'),
+        });
+      }
+      if (exam.ownerId !== user.id && user.role !== 'admin') {
+        return reply.status(403).send({
+          error: formatProtocolError('FORBIDDEN', 'Bạn không có quyền điều khiển kỳ thi này.'),
+        });
+      }
 
-    // Ngắt phiên và chuyển trạng thái sang waiting_next_batch
-    if (exam.activeSessionId) {
-      const active = activityEngine.getActiveRun(exam.activeSessionId);
-      if (active) {
-        try {
-          await activityEngine.endActivity(exam.activeSessionId, active.run.id);
-        } catch {
-          // ignore nếu activity đã dừng
+      // Ngắt phiên và chuyển trạng thái sang waiting_next_batch
+      if (exam.activeSessionId) {
+        const active = activityEngine.getActiveRun(exam.activeSessionId);
+        if (active) {
+          try {
+            await activityEngine.endActivity(exam.activeSessionId, active.run.id);
+          } catch {
+            // ignore nếu activity đã dừng
+          }
         }
       }
-    }
 
-    const updatedExam = await examRepo.detachSession(id, 'waiting_next_batch');
-    return reply.status(200).send({ ok: true, exam: updatedExam });
-  });
+      const updatedExam = await examRepo.detachSession(id, 'waiting_next_batch');
+      return reply.status(200).send({ ok: true, exam: updatedExam });
+    }
+  );
 
   /**
    * POST /api/exams/:id/finish
    * Hoàn tất toàn bộ kỳ thi
    */
-  fastify.post<{ Params: { id: string } }>('/api/exams/:id/finish', { preHandler: authenticate }, async (request, reply) => {
-    const user = request.user!;
-    const { id } = request.params;
+  fastify.post<{ Params: { id: string } }>(
+    '/api/exams/:id/finish',
+    { preHandler: authenticate },
+    async (request, reply) => {
+      const user = request.user!;
+      const { id } = request.params;
 
-    const exam = await examRepo.findById(id);
-    if (!exam) {
-      return reply.status(404).send({
-        error: formatProtocolError('EXAM_NOT_FOUND', 'Không tìm thấy kỳ thi này.'),
-      });
-    }
-    if (exam.ownerId !== user.id && user.role !== 'admin') {
-      return reply.status(403).send({
-        error: formatProtocolError('FORBIDDEN', 'Bạn không có quyền kết thúc kỳ thi này.'),
-      });
-    }
+      const exam = await examRepo.findById(id);
+      if (!exam) {
+        return reply.status(404).send({
+          error: formatProtocolError('EXAM_NOT_FOUND', 'Không tìm thấy kỳ thi này.'),
+        });
+      }
+      if (exam.ownerId !== user.id && user.role !== 'admin') {
+        return reply.status(403).send({
+          error: formatProtocolError('FORBIDDEN', 'Bạn không có quyền kết thúc kỳ thi này.'),
+        });
+      }
 
-    if (exam.activeSessionId) {
-      const active = activityEngine.getActiveRun(exam.activeSessionId);
-      if (active) {
-        try {
-          await activityEngine.endActivity(exam.activeSessionId, active.run.id);
-        } catch {
-          // ignore
+      if (exam.activeSessionId) {
+        const active = activityEngine.getActiveRun(exam.activeSessionId);
+        if (active) {
+          try {
+            await activityEngine.endActivity(exam.activeSessionId, active.run.id);
+          } catch {
+            // ignore
+          }
         }
       }
-    }
 
-    const updatedExam = await examRepo.detachSession(id, 'finished');
-    return reply.status(200).send({ ok: true, exam: updatedExam });
-  });
+      const updatedExam = await examRepo.detachSession(id, 'finished');
+      return reply.status(200).send({ ok: true, exam: updatedExam });
+    }
+  );
 
   /**
    * GET /api/exams/:id/eligibility
    * Danh sách học sinh trong lớp và trạng thái điều kiện dự thi (ai đã thi, ai chưa thi)
    */
-  fastify.get<{ Params: { id: string } }>('/api/exams/:id/eligibility', { preHandler: authenticate }, async (request, reply) => {
-    const user = request.user!;
-    const { id } = request.params;
+  fastify.get<{ Params: { id: string } }>(
+    '/api/exams/:id/eligibility',
+    { preHandler: authenticate },
+    async (request, reply) => {
+      const user = request.user!;
+      const { id } = request.params;
 
-    const exam = await examRepo.findById(id);
-    if (!exam) {
-      return reply.status(404).send({
-        error: formatProtocolError('EXAM_NOT_FOUND', 'Không tìm thấy kỳ thi này.'),
+      const exam = await examRepo.findById(id);
+      if (!exam) {
+        return reply.status(404).send({
+          error: formatProtocolError('EXAM_NOT_FOUND', 'Không tìm thấy kỳ thi này.'),
+        });
+      }
+      if (exam.ownerId !== user.id && user.role !== 'admin') {
+        return reply.status(403).send({
+          error: formatProtocolError('FORBIDDEN', 'Bạn không có quyền truy cập kỳ thi này.'),
+        });
+      }
+
+      const classStudents = await studentRepo.listByClassId(exam.classId);
+      const records = await examRecordRepo.listByExam(exam.id);
+      const recordMap = new Map(records.map(r => [r.studentId, r]));
+
+      const result = classStudents.map((st: StudentSelect) => {
+        const rec = recordMap.get(st.id);
+        const isSubmitted = rec?.status === 'submitted';
+        return StudentExamEligibilityDtoSchema.parse({
+          studentId: st.id,
+          fullName: st.fullName,
+          code: st.code,
+          alreadySubmitted: isSubmitted,
+          batchIndex: rec?.batchIndex,
+          score: rec?.score,
+        });
       });
+
+      return reply.status(200).send({ students: result });
     }
-    if (exam.ownerId !== user.id && user.role !== 'admin') {
-      return reply.status(403).send({
-        error: formatProtocolError('FORBIDDEN', 'Bạn không có quyền truy cập kỳ thi này.'),
-      });
-    }
-
-    const classStudents = await studentRepo.listByClassId(exam.classId);
-    const records = await examRecordRepo.listByExam(exam.id);
-    const recordMap = new Map(records.map((r) => [r.studentId, r]));
-
-    const result = classStudents.map((st: StudentSelect) => {
-      const rec = recordMap.get(st.id);
-      const isSubmitted = rec?.status === 'submitted';
-      return StudentExamEligibilityDtoSchema.parse({
-        studentId: st.id,
-        fullName: st.fullName,
-        code: st.code,
-        alreadySubmitted: isSubmitted,
-        batchIndex: rec?.batchIndex,
-        score: rec?.score,
-      });
-    });
-
-    return reply.status(200).send({ students: result });
-  });
+  );
 
   /**
    * GET /api/exams/:id/export-excel
@@ -1030,12 +1118,12 @@ export const examsRoutes: FastifyPluginAsync<ExamsRoutesOptions> = async (fastif
           createdAt: exam.createdAt,
         },
         className: cls?.name ?? 'Lớp học',
-        students: classStudents.map((st) => ({
+        students: classStudents.map(st => ({
           id: st.id,
           fullName: st.fullName,
           code: st.code,
         })),
-        records: dbRecords.map((r) => ({
+        records: dbRecords.map(r => ({
           studentId: r.studentId,
           studentName: r.studentName,
           batchIndex: r.batchIndex,
@@ -1056,10 +1144,7 @@ export const examsRoutes: FastifyPluginAsync<ExamsRoutesOptions> = async (fastif
 
       const filename = `BangDiem_${exam.id}.xlsx`;
       return reply
-        .header(
-          'Content-Type',
-          'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
-        )
+        .header('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
         .header('Content-Disposition', `attachment; filename="${filename}"`)
         .send(buffer);
     }

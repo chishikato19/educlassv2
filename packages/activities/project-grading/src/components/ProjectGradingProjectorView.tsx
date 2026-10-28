@@ -1,9 +1,6 @@
 import React, { useState } from 'react';
 import type { ProjectGradingState } from '@educlass/protocol';
-import {
-  calculateAllFinalScores,
-  calculateGradingProgress,
-} from '../project-grading-logic.js';
+import { calculateAllFinalScores, calculateGradingProgress } from '../project-grading-logic.js';
 
 export interface ProjectGradingProjectorViewProps {
   runId?: string;
@@ -23,9 +20,9 @@ export const ProjectGradingProjectorView: React.FC<ProjectGradingProjectorViewPr
   const isFinished = state.status === 'ended';
   const [viewMode, setViewMode] = useState<'matrix' | 'podium'>(isFinished ? 'podium' : 'matrix');
 
-  const top1 = results.find((r) => r.rank === 1);
-  const top2 = results.find((r) => r.rank === 2);
-  const top3 = results.find((r) => r.rank === 3);
+  const top1 = results.find(r => r.rank === 1);
+  const top2 = results.find(r => r.rank === 2);
+  const top3 = results.find(r => r.rank === 3);
 
   return (
     <div
@@ -63,14 +60,23 @@ export const ProjectGradingProjectorView: React.FC<ProjectGradingProjectorViewPr
               {config.title}
             </h1>
             <div style={{ fontSize: '14px', color: '#94A3B8', marginTop: '4px' }}>
-              Đánh giá đa chiều 4 cột điểm • Trọng số: Tự chấm ({config.weights.self}%) • Nhóm ({config.weights.teamMember}%) • Chéo ({config.weights.crossTeam}%) • GV ({config.weights.teacher}%)
+              Đánh giá đa chiều 4 cột điểm • Trọng số: Tự chấm ({config.weights.self}%) • Nhóm (
+              {config.weights.teamMember}%) • Chéo ({config.weights.crossTeam}%) • GV (
+              {config.weights.teacher}%)
             </div>
           </div>
         </div>
 
         <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
           {/* Nút chuyển chế độ xem */}
-          <div style={{ display: 'flex', backgroundColor: '#0F172A', borderRadius: '12px', padding: '4px' }}>
+          <div
+            style={{
+              display: 'flex',
+              backgroundColor: '#0F172A',
+              borderRadius: '12px',
+              padding: '4px',
+            }}
+          >
             <button
               type="button"
               onClick={() => setViewMode('matrix')}
@@ -137,59 +143,183 @@ export const ProjectGradingProjectorView: React.FC<ProjectGradingProjectorViewPr
         }}
       >
         {/* Tự chấm */}
-        <div style={{ backgroundColor: '#1E293B', padding: '16px', borderRadius: '16px', border: '1px solid #334155' }}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '13px', color: '#94A3B8' }}>
+        <div
+          style={{
+            backgroundColor: '#1E293B',
+            padding: '16px',
+            borderRadius: '16px',
+            border: '1px solid #334155',
+          }}
+        >
+          <div
+            style={{
+              display: 'flex',
+              justifyContent: 'space-between',
+              fontSize: '13px',
+              color: '#94A3B8',
+            }}
+          >
             <span>👤 Học sinh tự chấm</span>
-            <span style={{ fontWeight: 700, color: '#38BDF8' }}>{progress.selfGrading.percentage}%</span>
+            <span style={{ fontWeight: 700, color: '#38BDF8' }}>
+              {progress.selfGrading.percentage}%
+            </span>
           </div>
           <div style={{ fontSize: '20px', fontWeight: 800, margin: '6px 0', color: '#FFFFFF' }}>
-            {progress.selfGrading.submitted} / {progress.selfGrading.total} <span style={{ fontSize: '14px', fontWeight: 500, color: '#64748B' }}>học sinh</span>
+            {progress.selfGrading.submitted} / {progress.selfGrading.total}{' '}
+            <span style={{ fontSize: '14px', fontWeight: 500, color: '#64748B' }}>học sinh</span>
           </div>
-          <div style={{ width: '100%', height: '8px', backgroundColor: '#334155', borderRadius: '4px', overflow: 'hidden' }}>
-            <div style={{ width: `${progress.selfGrading.percentage}%`, height: '100%', backgroundColor: '#38BDF8', transition: 'width 0.3s' }} />
+          <div
+            style={{
+              width: '100%',
+              height: '8px',
+              backgroundColor: '#334155',
+              borderRadius: '4px',
+              overflow: 'hidden',
+            }}
+          >
+            <div
+              style={{
+                width: `${progress.selfGrading.percentage}%`,
+                height: '100%',
+                backgroundColor: '#38BDF8',
+                transition: 'width 0.3s',
+              }}
+            />
           </div>
         </div>
 
         {/* Nhóm trưởng chấm thành viên */}
-        <div style={{ backgroundColor: '#1E293B', padding: '16px', borderRadius: '16px', border: '1px solid #334155' }}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '13px', color: '#94A3B8' }}>
+        <div
+          style={{
+            backgroundColor: '#1E293B',
+            padding: '16px',
+            borderRadius: '16px',
+            border: '1px solid #334155',
+          }}
+        >
+          <div
+            style={{
+              display: 'flex',
+              justifyContent: 'space-between',
+              fontSize: '13px',
+              color: '#94A3B8',
+            }}
+          >
             <span>👥 Tổ chấm thành viên</span>
-            <span style={{ fontWeight: 700, color: '#A855F7' }}>{progress.teamMemberGrading.percentage}%</span>
+            <span style={{ fontWeight: 700, color: '#A855F7' }}>
+              {progress.teamMemberGrading.percentage}%
+            </span>
           </div>
           <div style={{ fontSize: '20px', fontWeight: 800, margin: '6px 0', color: '#FFFFFF' }}>
-            {progress.teamMemberGrading.submitted} / {progress.teamMemberGrading.total} <span style={{ fontSize: '14px', fontWeight: 500, color: '#64748B' }}>lượt</span>
+            {progress.teamMemberGrading.submitted} / {progress.teamMemberGrading.total}{' '}
+            <span style={{ fontSize: '14px', fontWeight: 500, color: '#64748B' }}>lượt</span>
           </div>
-          <div style={{ width: '100%', height: '8px', backgroundColor: '#334155', borderRadius: '4px', overflow: 'hidden' }}>
-            <div style={{ width: `${progress.teamMemberGrading.percentage}%`, height: '100%', backgroundColor: '#A855F7', transition: 'width 0.3s' }} />
+          <div
+            style={{
+              width: '100%',
+              height: '8px',
+              backgroundColor: '#334155',
+              borderRadius: '4px',
+              overflow: 'hidden',
+            }}
+          >
+            <div
+              style={{
+                width: `${progress.teamMemberGrading.percentage}%`,
+                height: '100%',
+                backgroundColor: '#A855F7',
+                transition: 'width 0.3s',
+              }}
+            />
           </div>
         </div>
 
         {/* Chấm chéo giữa các nhóm */}
-        <div style={{ backgroundColor: '#1E293B', padding: '16px', borderRadius: '16px', border: '1px solid #334155' }}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '13px', color: '#94A3B8' }}>
+        <div
+          style={{
+            backgroundColor: '#1E293B',
+            padding: '16px',
+            borderRadius: '16px',
+            border: '1px solid #334155',
+          }}
+        >
+          <div
+            style={{
+              display: 'flex',
+              justifyContent: 'space-between',
+              fontSize: '13px',
+              color: '#94A3B8',
+            }}
+          >
             <span>🔄 Chấm chéo nhóm bạn</span>
-            <span style={{ fontWeight: 700, color: '#22C55E' }}>{progress.crossTeamGrading.percentage}%</span>
+            <span style={{ fontWeight: 700, color: '#22C55E' }}>
+              {progress.crossTeamGrading.percentage}%
+            </span>
           </div>
           <div style={{ fontSize: '20px', fontWeight: 800, margin: '6px 0', color: '#FFFFFF' }}>
-            {progress.crossTeamGrading.submitted} / {progress.crossTeamGrading.total} <span style={{ fontSize: '14px', fontWeight: 500, color: '#64748B' }}>nhóm</span>
+            {progress.crossTeamGrading.submitted} / {progress.crossTeamGrading.total}{' '}
+            <span style={{ fontSize: '14px', fontWeight: 500, color: '#64748B' }}>nhóm</span>
           </div>
-          <div style={{ width: '100%', height: '8px', backgroundColor: '#334155', borderRadius: '4px', overflow: 'hidden' }}>
-            <div style={{ width: `${progress.crossTeamGrading.percentage}%`, height: '100%', backgroundColor: '#22C55E', transition: 'width 0.3s' }} />
+          <div
+            style={{
+              width: '100%',
+              height: '8px',
+              backgroundColor: '#334155',
+              borderRadius: '4px',
+              overflow: 'hidden',
+            }}
+          >
+            <div
+              style={{
+                width: `${progress.crossTeamGrading.percentage}%`,
+                height: '100%',
+                backgroundColor: '#22C55E',
+                transition: 'width 0.3s',
+              }}
+            />
           </div>
         </div>
 
         {/* Điểm Giáo viên */}
-        <div style={{ backgroundColor: '#1E293B', padding: '16px', borderRadius: '16px', border: '1px solid #334155' }}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '13px', color: '#94A3B8' }}>
+        <div
+          style={{
+            backgroundColor: '#1E293B',
+            padding: '16px',
+            borderRadius: '16px',
+            border: '1px solid #334155',
+          }}
+        >
+          <div
+            style={{
+              display: 'flex',
+              justifyContent: 'space-between',
+              fontSize: '13px',
+              color: '#94A3B8',
+            }}
+          >
             <span>🎓 Điểm Giáo viên</span>
             <span style={{ fontWeight: 700, color: '#F59E0B' }}>
-              {Math.round((progress.teacherGrading.groupsGraded / Math.max(1, progress.teacherGrading.totalGroups)) * 100)}%
+              {Math.round(
+                (progress.teacherGrading.groupsGraded /
+                  Math.max(1, progress.teacherGrading.totalGroups)) *
+                  100
+              )}
+              %
             </span>
           </div>
           <div style={{ fontSize: '20px', fontWeight: 800, margin: '6px 0', color: '#FFFFFF' }}>
-            {progress.teacherGrading.groupsGraded} / {progress.teacherGrading.totalGroups} <span style={{ fontSize: '14px', fontWeight: 500, color: '#64748B' }}>nhóm</span>
+            {progress.teacherGrading.groupsGraded} / {progress.teacherGrading.totalGroups}{' '}
+            <span style={{ fontSize: '14px', fontWeight: 500, color: '#64748B' }}>nhóm</span>
           </div>
-          <div style={{ width: '100%', height: '8px', backgroundColor: '#334155', borderRadius: '4px', overflow: 'hidden' }}>
+          <div
+            style={{
+              width: '100%',
+              height: '8px',
+              backgroundColor: '#334155',
+              borderRadius: '4px',
+              overflow: 'hidden',
+            }}
+          >
             <div
               style={{
                 width: `${Math.round((progress.teacherGrading.groupsGraded / Math.max(1, progress.teacherGrading.totalGroups)) * 100)}%`,
@@ -213,7 +343,7 @@ export const ProjectGradingProjectorView: React.FC<ProjectGradingProjectorViewPr
             flex: 1,
           }}
         >
-          {config.groups.map((group) => {
+          {config.groups.map(group => {
             const leaderId = group.leaderParticipantId;
             const myTeamScores = leaderId ? teamMemberGrades[leaderId] || {} : {};
             const myCrossScores = leaderId ? crossTeamGrades[leaderId] || {} : {};
@@ -247,13 +377,30 @@ export const ProjectGradingProjectorView: React.FC<ProjectGradingProjectorViewPr
                     <span style={{ fontSize: '20px', fontWeight: 800, color: '#FFFFFF' }}>
                       {group.name}
                     </span>
-                    <span style={{ fontSize: '12px', padding: '2px 8px', borderRadius: '10px', backgroundColor: '#334155', color: '#94A3B8' }}>
+                    <span
+                      style={{
+                        fontSize: '12px',
+                        padding: '2px 8px',
+                        borderRadius: '10px',
+                        backgroundColor: '#334155',
+                        color: '#94A3B8',
+                      }}
+                    >
                       {group.memberParticipantIds.length} HS
                     </span>
                   </div>
 
                   {teacherGrade ? (
-                    <span style={{ fontSize: '13px', fontWeight: 700, padding: '4px 10px', borderRadius: '10px', backgroundColor: '#FEF3C7', color: '#92400E' }}>
+                    <span
+                      style={{
+                        fontSize: '13px',
+                        fontWeight: 700,
+                        padding: '4px 10px',
+                        borderRadius: '10px',
+                        backgroundColor: '#FEF3C7',
+                        color: '#92400E',
+                      }}
+                    >
                       GV: {teacherGrade.score}đ
                     </span>
                   ) : (
@@ -274,14 +421,27 @@ export const ProjectGradingProjectorView: React.FC<ProjectGradingProjectorViewPr
                     alignItems: 'center',
                   }}
                 >
-                  <span>⭐ Nhóm trưởng: <strong>{group.leaderDisplayName || 'Chưa chỉ định'}</strong></span>
                   <span>
-                    Chấm chéo: <strong>{Object.keys(myCrossScores).length}/{Math.max(0, config.groups.length - 1)}</strong>
+                    ⭐ Nhóm trưởng: <strong>{group.leaderDisplayName || 'Chưa chỉ định'}</strong>
+                  </span>
+                  <span>
+                    Chấm chéo:{' '}
+                    <strong>
+                      {Object.keys(myCrossScores).length}/{Math.max(0, config.groups.length - 1)}
+                    </strong>
                   </span>
                 </div>
 
                 {/* Danh sách thành viên và trạng thái nộp */}
-                <div style={{ padding: '16px 20px', display: 'flex', flexDirection: 'column', gap: '10px', flex: 1 }}>
+                <div
+                  style={{
+                    padding: '16px 20px',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    gap: '10px',
+                    flex: 1,
+                  }}
+                >
                   {group.memberParticipantIds.map((mId, idx) => {
                     const isMLeader = mId === leaderId;
                     const hasSelfGraded = selfGrades[mId] !== undefined;
@@ -302,8 +462,15 @@ export const ProjectGradingProjectorView: React.FC<ProjectGradingProjectorViewPr
                         }}
                       >
                         <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                          <span style={{ color: '#64748B', fontSize: '12px', minWidth: '16px' }}>{idx + 1}.</span>
-                          <span style={{ fontWeight: isMLeader ? 700 : 500, color: isMLeader ? '#FDE047' : '#E2E8F0' }}>
+                          <span style={{ color: '#64748B', fontSize: '12px', minWidth: '16px' }}>
+                            {idx + 1}.
+                          </span>
+                          <span
+                            style={{
+                              fontWeight: isMLeader ? 700 : 500,
+                              color: isMLeader ? '#FDE047' : '#E2E8F0',
+                            }}
+                          >
                             Học sinh ({mId.slice(-4)})
                           </span>
                           {isMLeader && <span style={{ fontSize: '12px' }}>⭐</span>}
@@ -375,11 +542,15 @@ export const ProjectGradingProjectorView: React.FC<ProjectGradingProjectorViewPr
                 }}
               >
                 <div style={{ fontSize: '40px' }}>🥈</div>
-                <div style={{ fontSize: '15px', fontWeight: 700, color: '#E2E8F0', marginTop: '4px' }}>
+                <div
+                  style={{ fontSize: '15px', fontWeight: 700, color: '#E2E8F0', marginTop: '4px' }}
+                >
                   {top2.displayName}
                 </div>
                 <div style={{ fontSize: '12px', color: '#94A3B8' }}>{top2.groupName}</div>
-                <div style={{ fontSize: '22px', fontWeight: 900, color: '#CBD5E1', margin: '8px 0' }}>
+                <div
+                  style={{ fontSize: '22px', fontWeight: 900, color: '#CBD5E1', margin: '8px 0' }}
+                >
                   {top2.finalScore}đ
                 </div>
                 <div
@@ -412,11 +583,15 @@ export const ProjectGradingProjectorView: React.FC<ProjectGradingProjectorViewPr
                 }}
               >
                 <div style={{ fontSize: '50px' }}>👑</div>
-                <div style={{ fontSize: '18px', fontWeight: 800, color: '#FDE047', marginTop: '4px' }}>
+                <div
+                  style={{ fontSize: '18px', fontWeight: 800, color: '#FDE047', marginTop: '4px' }}
+                >
                   {top1.displayName}
                 </div>
                 <div style={{ fontSize: '13px', color: '#FEF08A' }}>{top1.groupName}</div>
-                <div style={{ fontSize: '28px', fontWeight: 900, color: '#FACC15', margin: '8px 0' }}>
+                <div
+                  style={{ fontSize: '28px', fontWeight: 900, color: '#FACC15', margin: '8px 0' }}
+                >
                   {top1.finalScore}đ
                 </div>
                 <div
@@ -450,11 +625,15 @@ export const ProjectGradingProjectorView: React.FC<ProjectGradingProjectorViewPr
                 }}
               >
                 <div style={{ fontSize: '40px' }}>🥉</div>
-                <div style={{ fontSize: '15px', fontWeight: 700, color: '#E2E8F0', marginTop: '4px' }}>
+                <div
+                  style={{ fontSize: '15px', fontWeight: 700, color: '#E2E8F0', marginTop: '4px' }}
+                >
                   {top3.displayName}
                 </div>
                 <div style={{ fontSize: '12px', color: '#94A3B8' }}>{top3.groupName}</div>
-                <div style={{ fontSize: '22px', fontWeight: 900, color: '#F97316', margin: '8px 0' }}>
+                <div
+                  style={{ fontSize: '22px', fontWeight: 900, color: '#F97316', margin: '8px 0' }}
+                >
                   {top3.finalScore}đ
                 </div>
                 <div
@@ -487,11 +666,20 @@ export const ProjectGradingProjectorView: React.FC<ProjectGradingProjectorViewPr
               overflowX: 'auto',
             }}
           >
-            <h3 style={{ margin: '0 0 16px 0', fontSize: '18px', fontWeight: 700, color: '#38BDF8' }}>
+            <h3
+              style={{ margin: '0 0 16px 0', fontSize: '18px', fontWeight: 700, color: '#38BDF8' }}
+            >
               📋 Bảng Điểm Chi Tiết 4 Cột Toàn Lớp
             </h3>
 
-            <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left', fontSize: '14px' }}>
+            <table
+              style={{
+                width: '100%',
+                borderCollapse: 'collapse',
+                textAlign: 'left',
+                fontSize: '14px',
+              }}
+            >
               <thead>
                 <tr style={{ borderBottom: '2px solid #334155', color: '#94A3B8' }}>
                   <th style={{ padding: '10px 12px' }}>Hạng</th>
@@ -505,20 +693,41 @@ export const ProjectGradingProjectorView: React.FC<ProjectGradingProjectorViewPr
                 </tr>
               </thead>
               <tbody>
-                {results.map((r) => (
+                {results.map(r => (
                   <tr key={r.participantId} style={{ borderBottom: '1px solid #334155' }}>
                     <td style={{ padding: '12px', fontWeight: 800 }}>
-                      {r.rank === 1 ? '🥇 1' : r.rank === 2 ? '🥈 2' : r.rank === 3 ? '🥉 3' : `#${r.rank}`}
+                      {r.rank === 1
+                        ? '🥇 1'
+                        : r.rank === 2
+                          ? '🥈 2'
+                          : r.rank === 3
+                            ? '🥉 3'
+                            : `#${r.rank}`}
                     </td>
                     <td style={{ padding: '12px', fontWeight: 600, color: '#FFFFFF' }}>
                       {r.displayName} {r.isLeader && '⭐'}
                     </td>
                     <td style={{ padding: '12px', color: '#94A3B8' }}>{r.groupName}</td>
-                    <td style={{ padding: '12px' }}>{r.selfScore !== null ? `${r.selfScore}đ` : '-'}</td>
-                    <td style={{ padding: '12px' }}>{r.teamMemberScore !== null ? `${r.teamMemberScore}đ` : '-'}</td>
-                    <td style={{ padding: '12px' }}>{r.crossTeamScore !== null ? `${r.crossTeamScore}đ` : '-'}</td>
-                    <td style={{ padding: '12px' }}>{r.teacherScore !== null ? `${r.teacherScore}đ` : '-'}</td>
-                    <td style={{ padding: '12px', fontWeight: 900, fontSize: '16px', color: '#38BDF8' }}>
+                    <td style={{ padding: '12px' }}>
+                      {r.selfScore !== null ? `${r.selfScore}đ` : '-'}
+                    </td>
+                    <td style={{ padding: '12px' }}>
+                      {r.teamMemberScore !== null ? `${r.teamMemberScore}đ` : '-'}
+                    </td>
+                    <td style={{ padding: '12px' }}>
+                      {r.crossTeamScore !== null ? `${r.crossTeamScore}đ` : '-'}
+                    </td>
+                    <td style={{ padding: '12px' }}>
+                      {r.teacherScore !== null ? `${r.teacherScore}đ` : '-'}
+                    </td>
+                    <td
+                      style={{
+                        padding: '12px',
+                        fontWeight: 900,
+                        fontSize: '16px',
+                        color: '#38BDF8',
+                      }}
+                    >
                       {r.finalScore}đ
                     </td>
                   </tr>

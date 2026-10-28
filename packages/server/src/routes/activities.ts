@@ -37,14 +37,10 @@ export const activitiesRoutes: FastifyPluginAsync<ActivitiesRoutesOptions> = asy
    * GET /api/activities
    * Lấy danh sách tất cả các Activity có sẵn trong hệ thống
    */
-  fastify.get(
-    '/api/activities',
-    { preHandler: authenticate },
-    async (_request, reply) => {
-      const activities = registry.list();
-      return reply.send(ActivityListResponseSchema.parse({ activities }));
-    }
-  );
+  fastify.get('/api/activities', { preHandler: authenticate }, async (_request, reply) => {
+    const activities = registry.list();
+    return reply.send(ActivityListResponseSchema.parse({ activities }));
+  });
 
   /**
    * GET /api/sessions/:id/activities
@@ -273,54 +269,51 @@ export const activitiesRoutes: FastifyPluginAsync<ActivitiesRoutesOptions> = asy
    * POST /api/activities/run
    * Tiện ích khởi chạy Activity (alias hỗ trợ cả gọi trực tiếp từ UI)
    */
-  fastify.post(
-    '/api/activities/run',
-    { preHandler: authenticate },
-    async (request, reply) => {
-      const user = request.user!;
-      const body = (request.body as { sessionId?: string; activityId?: string; config?: unknown }) ?? {};
-      const sessionId = body.sessionId;
-      const activityId = body.activityId;
+  fastify.post('/api/activities/run', { preHandler: authenticate }, async (request, reply) => {
+    const user = request.user!;
+    const body =
+      (request.body as { sessionId?: string; activityId?: string; config?: unknown }) ?? {};
+    const sessionId = body.sessionId;
+    const activityId = body.activityId;
 
-      if (!sessionId || !activityId) {
-        return reply
-          .status(400)
-          .send(formatProtocolError('INVALID_PAYLOAD', 'Thiếu sessionId hoặc activityId.'));
-      }
-
-      const session = await sessionRepo.findById(sessionId);
-      if (!session) {
-        return reply
-          .status(404)
-          .send(formatProtocolError('SESSION_NOT_FOUND', 'Không tìm thấy phiên học.'));
-      }
-
-      if (session.ownerId !== user.id && user.role !== 'admin') {
-        return reply
-          .status(403)
-          .send(formatProtocolError('FORBIDDEN', 'Bạn không có quyền điều khiển phiên học này.'));
-      }
-
-      try {
-        const result = await activityEngine.startActivity(sessionId, activityId, body.config ?? {});
-        return reply.status(200).send({
-          runId: result.run.id,
-          activityId: result.run.activityId,
-          run: result.run,
-          state: result.state,
-        });
-      } catch (err: unknown) {
-        return reply
-          .status(400)
-          .send(
-            formatProtocolError(
-              'INVALID_PAYLOAD',
-              err instanceof Error ? err.message : 'Không thể bắt đầu hoạt động'
-            )
-          );
-      }
+    if (!sessionId || !activityId) {
+      return reply
+        .status(400)
+        .send(formatProtocolError('INVALID_PAYLOAD', 'Thiếu sessionId hoặc activityId.'));
     }
-  );
+
+    const session = await sessionRepo.findById(sessionId);
+    if (!session) {
+      return reply
+        .status(404)
+        .send(formatProtocolError('SESSION_NOT_FOUND', 'Không tìm thấy phiên học.'));
+    }
+
+    if (session.ownerId !== user.id && user.role !== 'admin') {
+      return reply
+        .status(403)
+        .send(formatProtocolError('FORBIDDEN', 'Bạn không có quyền điều khiển phiên học này.'));
+    }
+
+    try {
+      const result = await activityEngine.startActivity(sessionId, activityId, body.config ?? {});
+      return reply.status(200).send({
+        runId: result.run.id,
+        activityId: result.run.activityId,
+        run: result.run,
+        state: result.state,
+      });
+    } catch (err: unknown) {
+      return reply
+        .status(400)
+        .send(
+          formatProtocolError(
+            'INVALID_PAYLOAD',
+            err instanceof Error ? err.message : 'Không thể bắt đầu hoạt động'
+          )
+        );
+    }
+  });
 
   /**
    * POST /api/activities/runs/:runId/intent
@@ -343,7 +336,14 @@ export const activitiesRoutes: FastifyPluginAsync<ActivitiesRoutesOptions> = asy
       }
 
       if (!sessionId) {
-        return reply.status(404).send(formatProtocolError('SESSION_NOT_FOUND', 'Không tìm thấy phiên đang chạy của hoạt động.'));
+        return reply
+          .status(404)
+          .send(
+            formatProtocolError(
+              'SESSION_NOT_FOUND',
+              'Không tìm thấy phiên đang chạy của hoạt động.'
+            )
+          );
       }
 
       const res = await activityEngine.handleTeacherIntent(sessionId, runId, body.intent);
@@ -375,19 +375,28 @@ export const activitiesRoutes: FastifyPluginAsync<ActivitiesRoutesOptions> = asy
       }
 
       if (!sessionId) {
-        return reply.status(404).send(formatProtocolError('SESSION_NOT_FOUND', 'Không tìm thấy phiên đang chạy của hoạt động.'));
+        return reply
+          .status(404)
+          .send(
+            formatProtocolError(
+              'SESSION_NOT_FOUND',
+              'Không tìm thấy phiên đang chạy của hoạt động.'
+            )
+          );
       }
 
       try {
         const result = await activityEngine.endActivity(sessionId, runId);
         return reply.send(result);
       } catch (err: unknown) {
-        return reply.status(400).send(
-          formatProtocolError(
-            'INVALID_PAYLOAD',
-            err instanceof Error ? err.message : 'Không thể kết thúc hoạt động'
-          )
-        );
+        return reply
+          .status(400)
+          .send(
+            formatProtocolError(
+              'INVALID_PAYLOAD',
+              err instanceof Error ? err.message : 'Không thể kết thúc hoạt động'
+            )
+          );
       }
     }
   );

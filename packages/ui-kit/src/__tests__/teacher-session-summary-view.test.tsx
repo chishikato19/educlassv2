@@ -65,7 +65,15 @@ describe('TeacherSessionSummaryView Component (Task 5.4)', () => {
           accuracy: 90,
           expEarned: 50,
           rank: 1,
-          avatar: { base: 'dragon', color: '#EF4444', headwear: 'none', glasses: 'none', outfit: 'default', wings: 'none', held: 'none' },
+          avatar: {
+            base: 'dragon',
+            color: '#EF4444',
+            headwear: 'none',
+            glasses: 'none',
+            outfit: 'default',
+            wings: 'none',
+            held: 'none',
+          },
         },
         {
           participantId: 'p-2',
@@ -78,7 +86,15 @@ describe('TeacherSessionSummaryView Component (Task 5.4)', () => {
           accuracy: 60,
           expEarned: 30,
           rank: 2,
-          avatar: { base: 'fox', color: '#3B82F6', headwear: 'none', glasses: 'none', outfit: 'default', wings: 'none', held: 'none' },
+          avatar: {
+            base: 'fox',
+            color: '#3B82F6',
+            headwear: 'none',
+            glasses: 'none',
+            outfit: 'default',
+            wings: 'none',
+            held: 'none',
+          },
         },
         {
           participantId: 'p-3',
@@ -91,7 +107,15 @@ describe('TeacherSessionSummaryView Component (Task 5.4)', () => {
           accuracy: 50,
           expEarned: 20,
           rank: 3,
-          avatar: { base: 'bear', color: '#10B981', headwear: 'none', glasses: 'none', outfit: 'default', wings: 'none', held: 'none' },
+          avatar: {
+            base: 'bear',
+            color: '#10B981',
+            headwear: 'none',
+            glasses: 'none',
+            outfit: 'default',
+            wings: 'none',
+            held: 'none',
+          },
         },
       ],
       difficultQuestions: [
@@ -123,7 +147,15 @@ describe('TeacherSessionSummaryView Component (Task 5.4)', () => {
             accuracy: 90,
             identityLevel: 'roster',
             teamName: 'Đội Rồng Lửa',
-            avatar: { base: 'dragon', color: '#EF4444', headwear: 'none', glasses: 'none', outfit: 'default', wings: 'none', held: 'none' },
+            avatar: {
+              base: 'dragon',
+              color: '#EF4444',
+              headwear: 'none',
+              glasses: 'none',
+              outfit: 'default',
+              wings: 'none',
+              held: 'none',
+            },
           },
           {
             rank: 2,
@@ -134,7 +166,15 @@ describe('TeacherSessionSummaryView Component (Task 5.4)', () => {
             accuracy: 60,
             identityLevel: 'roster',
             teamName: 'Đội Hổ Trắng',
-            avatar: { base: 'fox', color: '#3B82F6', headwear: 'none', glasses: 'none', outfit: 'default', wings: 'none', held: 'none' },
+            avatar: {
+              base: 'fox',
+              color: '#3B82F6',
+              headwear: 'none',
+              glasses: 'none',
+              outfit: 'default',
+              wings: 'none',
+              held: 'none',
+            },
           },
           {
             rank: 3,
@@ -145,7 +185,15 @@ describe('TeacherSessionSummaryView Component (Task 5.4)', () => {
             accuracy: 50,
             identityLevel: 'account',
             teamName: 'Đội Rồng Lửa',
-            avatar: { base: 'bear', color: '#10B981', headwear: 'none', glasses: 'none', outfit: 'default', wings: 'none', held: 'none' },
+            avatar: {
+              base: 'bear',
+              color: '#10B981',
+              headwear: 'none',
+              glasses: 'none',
+              outfit: 'default',
+              wings: 'none',
+              held: 'none',
+            },
           },
         ],
         newTitlesAwarded: [
@@ -289,12 +337,7 @@ describe('TeacherSessionSummaryView Component (Task 5.4)', () => {
       },
     };
 
-    render(
-      <TeacherSessionSummaryView
-        report={emptyReport}
-        defaultTab="gamification"
-      />
-    );
+    render(<TeacherSessionSummaryView report={emptyReport} defaultTab="gamification" />);
 
     expect(screen.getByTestId('podium-empty')).toBeDefined();
     expect(screen.getByTestId('titles-spotlight-empty')).toBeDefined();

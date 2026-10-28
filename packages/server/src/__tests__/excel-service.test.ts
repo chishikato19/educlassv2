@@ -97,11 +97,7 @@ describe('ExcelService (.xlsx processing)', () => {
     expect(buf.length).toBeGreaterThan(0);
 
     const wb = XLSX.read(buf, { type: 'buffer' });
-    expect(wb.SheetNames).toEqual([
-      'Tổng quan phiên',
-      'Bảng điểm học sinh',
-      'Câu hỏi sai nhiều',
-    ]);
+    expect(wb.SheetNames).toEqual(['Tổng quan phiên', 'Bảng điểm học sinh', 'Câu hỏi sai nhiều']);
 
     // Kiểm tra sheet Bảng điểm học sinh
     const scoreboardSheet = wb.Sheets['Bảng điểm học sinh']!;
@@ -186,4 +182,3 @@ describe('ExcelService (.xlsx processing)', () => {
     expect(rows[3]).toContain('ĐIỂM TỔNG KẾT');
   });
 });
-

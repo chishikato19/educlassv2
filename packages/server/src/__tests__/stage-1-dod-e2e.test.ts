@@ -154,8 +154,10 @@ describe('Chặng 1 Definition of Done - E2E Verification', () => {
       expect(sessionB.status).toBe('open');
 
       // 5. 30 HS vào đủ 3 cấp danh tính (15 vào phiên A, 15 vào phiên B)
-      const participantsA: Array<{ id: string; identityLevel: string; studentId: string | null }> = [];
-      const participantsB: Array<{ id: string; identityLevel: string; studentId: string | null }> = [];
+      const participantsA: Array<{ id: string; identityLevel: string; studentId: string | null }> =
+        [];
+      const participantsB: Array<{ id: string; identityLevel: string; studentId: string | null }> =
+        [];
 
       // Phiên A: 5 Account
       for (let i = 0; i < 5; i++) {

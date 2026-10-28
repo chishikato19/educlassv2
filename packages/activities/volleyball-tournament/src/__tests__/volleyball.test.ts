@@ -5,14 +5,8 @@ import {
   generatePoolSchedule,
   calculatePoolStandings,
 } from '../volleyball-pools.js';
-import {
-  generatePlacementBrackets,
-  advanceBracketFinals,
-} from '../volleyball-brackets.js';
-import {
-  checkVolleyballAnswerCorrectness,
-  evaluateMatchupResult,
-} from '../volleyball-scoring.js';
+import { generatePlacementBrackets, advanceBracketFinals } from '../volleyball-brackets.js';
+import { checkVolleyballAnswerCorrectness, evaluateMatchupResult } from '../volleyball-scoring.js';
 import type {
   VolleyballMatchup,
   VolleyballParticipantState,
@@ -142,10 +136,50 @@ describe('Volleyball Brackets Logic', () => {
         name: 'Bảng A',
         playerIds: ['p1', 'p2', 'p3', 'p4'],
         standings: [
-          { rankInPool: 1, participantId: 'p1', displayName: 'P1', tournamentPoints: 6, matchesWon: 3, matchesDrawn: 0, matchesLost: 0, correctCount: 6, totalTimeMs: 1000 },
-          { rankInPool: 2, participantId: 'p2', displayName: 'P2', tournamentPoints: 4, matchesWon: 2, matchesDrawn: 0, matchesLost: 1, correctCount: 4, totalTimeMs: 1200 },
-          { rankInPool: 3, participantId: 'p3', displayName: 'P3', tournamentPoints: 2, matchesWon: 1, matchesDrawn: 0, matchesLost: 2, correctCount: 2, totalTimeMs: 1400 },
-          { rankInPool: 4, participantId: 'p4', displayName: 'P4', tournamentPoints: 0, matchesWon: 0, matchesDrawn: 0, matchesLost: 3, correctCount: 0, totalTimeMs: 1600 },
+          {
+            rankInPool: 1,
+            participantId: 'p1',
+            displayName: 'P1',
+            tournamentPoints: 6,
+            matchesWon: 3,
+            matchesDrawn: 0,
+            matchesLost: 0,
+            correctCount: 6,
+            totalTimeMs: 1000,
+          },
+          {
+            rankInPool: 2,
+            participantId: 'p2',
+            displayName: 'P2',
+            tournamentPoints: 4,
+            matchesWon: 2,
+            matchesDrawn: 0,
+            matchesLost: 1,
+            correctCount: 4,
+            totalTimeMs: 1200,
+          },
+          {
+            rankInPool: 3,
+            participantId: 'p3',
+            displayName: 'P3',
+            tournamentPoints: 2,
+            matchesWon: 1,
+            matchesDrawn: 0,
+            matchesLost: 2,
+            correctCount: 2,
+            totalTimeMs: 1400,
+          },
+          {
+            rankInPool: 4,
+            participantId: 'p4',
+            displayName: 'P4',
+            tournamentPoints: 0,
+            matchesWon: 0,
+            matchesDrawn: 0,
+            matchesLost: 3,
+            correctCount: 0,
+            totalTimeMs: 1600,
+          },
         ],
       },
       B: {
@@ -153,10 +187,50 @@ describe('Volleyball Brackets Logic', () => {
         name: 'Bảng B',
         playerIds: ['p5', 'p6', 'p7', 'p8'],
         standings: [
-          { rankInPool: 1, participantId: 'p5', displayName: 'P5', tournamentPoints: 6, matchesWon: 3, matchesDrawn: 0, matchesLost: 0, correctCount: 6, totalTimeMs: 1000 },
-          { rankInPool: 2, participantId: 'p6', displayName: 'P6', tournamentPoints: 4, matchesWon: 2, matchesDrawn: 0, matchesLost: 1, correctCount: 4, totalTimeMs: 1200 },
-          { rankInPool: 3, participantId: 'p7', displayName: 'P7', tournamentPoints: 2, matchesWon: 1, matchesDrawn: 0, matchesLost: 2, correctCount: 2, totalTimeMs: 1400 },
-          { rankInPool: 4, participantId: 'p8', displayName: 'P8', tournamentPoints: 0, matchesWon: 0, matchesDrawn: 0, matchesLost: 3, correctCount: 0, totalTimeMs: 1600 },
+          {
+            rankInPool: 1,
+            participantId: 'p5',
+            displayName: 'P5',
+            tournamentPoints: 6,
+            matchesWon: 3,
+            matchesDrawn: 0,
+            matchesLost: 0,
+            correctCount: 6,
+            totalTimeMs: 1000,
+          },
+          {
+            rankInPool: 2,
+            participantId: 'p6',
+            displayName: 'P6',
+            tournamentPoints: 4,
+            matchesWon: 2,
+            matchesDrawn: 0,
+            matchesLost: 1,
+            correctCount: 4,
+            totalTimeMs: 1200,
+          },
+          {
+            rankInPool: 3,
+            participantId: 'p7',
+            displayName: 'P7',
+            tournamentPoints: 2,
+            matchesWon: 1,
+            matchesDrawn: 0,
+            matchesLost: 2,
+            correctCount: 2,
+            totalTimeMs: 1400,
+          },
+          {
+            rankInPool: 4,
+            participantId: 'p8',
+            displayName: 'P8',
+            tournamentPoints: 0,
+            matchesWon: 0,
+            matchesDrawn: 0,
+            matchesLost: 3,
+            correctCount: 0,
+            totalTimeMs: 1600,
+          },
         ],
       },
     };
@@ -170,10 +244,78 @@ describe('Volleyball Brackets Logic', () => {
 
   it('advances winners to final and losers to third place', () => {
     const pools: Record<string, VolleyballPool> = {
-      A: { id: 'A', name: 'A', playerIds: ['p1'], standings: [{ rankInPool: 1, participantId: 'p1', displayName: 'P1', tournamentPoints: 0, matchesWon: 0, matchesDrawn: 0, matchesLost: 0, correctCount: 0, totalTimeMs: 0 }] },
-      B: { id: 'B', name: 'B', playerIds: ['p2'], standings: [{ rankInPool: 1, participantId: 'p2', displayName: 'P2', tournamentPoints: 0, matchesWon: 0, matchesDrawn: 0, matchesLost: 0, correctCount: 0, totalTimeMs: 0 }] },
-      C: { id: 'C', name: 'C', playerIds: ['p3'], standings: [{ rankInPool: 1, participantId: 'p3', displayName: 'P3', tournamentPoints: 0, matchesWon: 0, matchesDrawn: 0, matchesLost: 0, correctCount: 0, totalTimeMs: 0 }] },
-      D: { id: 'D', name: 'D', playerIds: ['p4'], standings: [{ rankInPool: 1, participantId: 'p4', displayName: 'P4', tournamentPoints: 0, matchesWon: 0, matchesDrawn: 0, matchesLost: 0, correctCount: 0, totalTimeMs: 0 }] },
+      A: {
+        id: 'A',
+        name: 'A',
+        playerIds: ['p1'],
+        standings: [
+          {
+            rankInPool: 1,
+            participantId: 'p1',
+            displayName: 'P1',
+            tournamentPoints: 0,
+            matchesWon: 0,
+            matchesDrawn: 0,
+            matchesLost: 0,
+            correctCount: 0,
+            totalTimeMs: 0,
+          },
+        ],
+      },
+      B: {
+        id: 'B',
+        name: 'B',
+        playerIds: ['p2'],
+        standings: [
+          {
+            rankInPool: 1,
+            participantId: 'p2',
+            displayName: 'P2',
+            tournamentPoints: 0,
+            matchesWon: 0,
+            matchesDrawn: 0,
+            matchesLost: 0,
+            correctCount: 0,
+            totalTimeMs: 0,
+          },
+        ],
+      },
+      C: {
+        id: 'C',
+        name: 'C',
+        playerIds: ['p3'],
+        standings: [
+          {
+            rankInPool: 1,
+            participantId: 'p3',
+            displayName: 'P3',
+            tournamentPoints: 0,
+            matchesWon: 0,
+            matchesDrawn: 0,
+            matchesLost: 0,
+            correctCount: 0,
+            totalTimeMs: 0,
+          },
+        ],
+      },
+      D: {
+        id: 'D',
+        name: 'D',
+        playerIds: ['p4'],
+        standings: [
+          {
+            rankInPool: 1,
+            participantId: 'p4',
+            displayName: 'P4',
+            tournamentPoints: 0,
+            matchesWon: 0,
+            matchesDrawn: 0,
+            matchesLost: 0,
+            correctCount: 0,
+            totalTimeMs: 0,
+          },
+        ],
+      },
     };
 
     const brackets = generatePlacementBrackets(pools);

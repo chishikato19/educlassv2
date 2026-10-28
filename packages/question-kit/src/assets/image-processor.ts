@@ -23,11 +23,11 @@ export async function calculateSha256(data: ArrayBuffer | Uint8Array): Promise<s
   if (typeof globalThis !== 'undefined' && globalThis.crypto?.subtle) {
     const arrayBuffer = bytes.buffer.slice(
       bytes.byteOffset,
-      bytes.byteOffset + bytes.byteLength,
+      bytes.byteOffset + bytes.byteLength
     ) as ArrayBuffer;
     const hashBuffer = await globalThis.crypto.subtle.digest('SHA-256', arrayBuffer);
     const hashArray = Array.from(new Uint8Array(hashBuffer));
-    return hashArray.map((b) => b.toString(16).padStart(2, '0')).join('');
+    return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
   }
 
   // Node.js fallback
@@ -91,7 +91,7 @@ export async function fileToDataUrl(blob: Blob): Promise<string> {
  */
 export async function compressImage(
   fileOrBlob: Blob,
-  options: CompressOptions = {},
+  options: CompressOptions = {}
 ): Promise<CompressedImageResult> {
   const maxWidth = options.maxWidth ?? 1600;
   const maxHeight = options.maxHeight ?? 1600;
@@ -105,9 +105,7 @@ export async function compressImage(
     navigator.userAgent.includes('jsdom');
 
   const hasDomCanvas =
-    typeof document !== 'undefined' &&
-    typeof document.createElement === 'function' &&
-    !isJsdom;
+    typeof document !== 'undefined' && typeof document.createElement === 'function' && !isJsdom;
 
   if (!hasDomCanvas) {
     // Non-DOM or test environment fallback
@@ -159,7 +157,7 @@ export async function compressImage(
       ctx.drawImage(img, 0, 0, width, height);
 
       canvas.toBlob(
-        async (compressedBlob) => {
+        async compressedBlob => {
           if (!compressedBlob) {
             return reject(new Error('Nén ảnh thất bại'));
           }
@@ -176,7 +174,7 @@ export async function compressImage(
           });
         },
         format,
-        quality,
+        quality
       );
     };
 

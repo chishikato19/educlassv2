@@ -19,7 +19,7 @@ const MAX_CROSSHAIR_Y = GALLERY_HEIGHT - 90; // 510
 const clampCrosshairX = (x: number) => Math.max(MIN_CROSSHAIR_X, Math.min(MAX_CROSSHAIR_X, x));
 const clampCrosshairY = (y: number) => Math.max(MIN_CROSSHAIR_Y, Math.min(MAX_CROSSHAIR_Y, y));
 
-const wait = (ms: number) => new Promise<void>((resolve) => window.setTimeout(resolve, ms));
+const wait = (ms: number) => new Promise<void>(resolve => window.setTimeout(resolve, ms));
 
 // Tạo texture ánh đèn rọi spotlight 3200x3200 bao phủ trọn vẹn mọi góc màn hình không bao giờ bị hở mép
 let cachedSpotlightTexture: Texture | null = null;
@@ -262,15 +262,25 @@ export const DuckHuntMode: React.FC<RandomPickerModeProps> = ({
         duckBody.rect(headX - 2, -27, 6, 2).fill({ color: 0x111827 });
       }
     } else if (skin.accessory === 'crown') {
-      duckBody.poly([
-        headX - 8, -40,
-        headX - 11, -48,
-        headX - 4, -43,
-        headX, -50,
-        headX + 4, -43,
-        headX + 11, -48,
-        headX + 8, -40,
-      ]).fill({ color: 0xfbbf24 }).stroke({ width: 1, color: 0xb45309 });
+      duckBody
+        .poly([
+          headX - 8,
+          -40,
+          headX - 11,
+          -48,
+          headX - 4,
+          -43,
+          headX,
+          -50,
+          headX + 4,
+          -43,
+          headX + 11,
+          -48,
+          headX + 8,
+          -40,
+        ])
+        .fill({ color: 0xfbbf24 })
+        .stroke({ width: 1, color: 0xb45309 });
     } else if (skin.accessory === 'bow') {
       duckBody.ellipse(headX - 6 * direction, -40, 7, 5).fill({ color: 0xf43f5e });
       duckBody.ellipse(headX + 6 * direction, -40, 7, 5).fill({ color: 0xf43f5e });
@@ -327,12 +337,8 @@ export const DuckHuntMode: React.FC<RandomPickerModeProps> = ({
   };
 
   // Tái dựng đàn vịt: Phân bổ đều từng hàng, khoảng cách an toàn KHÔNG BAO GIỜ đè lên nhau
-  const rebuildDucks = (
-    root: Container,
-    studentList: PickerStudent[],
-    isHidden: boolean
-  ) => {
-    ducksRef.current.forEach((item) => {
+  const rebuildDucks = (root: Container, studentList: PickerStudent[], isHidden: boolean) => {
+    ducksRef.current.forEach(item => {
       try {
         if (item.container.parent) {
           item.container.parent.removeChild(item.container);
@@ -448,11 +454,11 @@ export const DuckHuntMode: React.FC<RandomPickerModeProps> = ({
       }
 
       // Ticker bơi ngang có chu kỳ wrap toán học không bao giờ đè lên nhau
-      app.ticker.add((ticker) => {
+      app.ticker.add(ticker => {
         const delta = ticker.deltaTime;
         const now = performance.now() * 0.003;
 
-        ducksRef.current.forEach((item) => {
+        ducksRef.current.forEach(item => {
           if (!item.isDead) {
             item.container.x += item.speed * delta;
             item.container.y = item.baseY + Math.sin(now + item.bobPhase) * 3;
@@ -518,7 +524,7 @@ export const DuckHuntMode: React.FC<RandomPickerModeProps> = ({
       if (canvasRef.current) {
         canvasRef.current.removeEventListener('mousemove', handleMouseMove);
       }
-      activeTweensRef.current.forEach((t) => {
+      activeTweensRef.current.forEach(t => {
         try {
           t.kill();
         } catch {
@@ -558,7 +564,7 @@ export const DuckHuntMode: React.FC<RandomPickerModeProps> = ({
     }
 
     // 3 thanh ray gỗ trượt ngang
-    LANE_Y_POSITIONS.forEach((y) => {
+    LANE_Y_POSITIONS.forEach(y => {
       // Bóng đổ dưới ray
       bgGraphics.rect(0, y + 42, GALLERY_WIDTH, 14).fill({ color: 0x0c0604, alpha: 0.85 });
       // Ván gỗ ray
@@ -595,7 +601,9 @@ export const DuckHuntMode: React.FC<RandomPickerModeProps> = ({
     drape.roundRect(0, 0, 48, GALLERY_HEIGHT, 10).stroke({ width: 2, color: 0xb45309 });
 
     drape.roundRect(GALLERY_WIDTH - 48, 0, 48, GALLERY_HEIGHT, 10).fill({ color: 0x991b1b });
-    drape.roundRect(GALLERY_WIDTH - 48, 0, 48, GALLERY_HEIGHT, 10).stroke({ width: 2, color: 0xb45309 });
+    drape
+      .roundRect(GALLERY_WIDTH - 48, 0, 48, GALLERY_HEIGHT, 10)
+      .stroke({ width: 2, color: 0xb45309 });
   };
 
   // 4. Tạo tâm ngắm súng săn
@@ -628,11 +636,8 @@ export const DuckHuntMode: React.FC<RandomPickerModeProps> = ({
   };
 
   // Helper: Di chuyển tâm ngắm đón đầu con vịt đang bơi mượt mà từng frame
-  const animateCrosshairToDuck = (
-    targetItem: DuckDisplayItem,
-    duration: number
-  ): Promise<void> => {
-    return new Promise((resolve) => {
+  const animateCrosshairToDuck = (targetItem: DuckDisplayItem, duration: number): Promise<void> => {
+    return new Promise(resolve => {
       if (abortHuntRef.current) {
         resolve();
         return;
@@ -687,7 +692,7 @@ export const DuckHuntMode: React.FC<RandomPickerModeProps> = ({
   };
 
   const runTween = (target: object, vars: gsap.TweenVars): Promise<void> => {
-    return new Promise((resolve) => {
+    return new Promise(resolve => {
       if (abortHuntRef.current) {
         resolve();
         return;
@@ -707,7 +712,7 @@ export const DuckHuntMode: React.FC<RandomPickerModeProps> = ({
 
   // Lấy các chú vịt bơi an toàn ở khu vực trung tâm, tuyệt đối không chọn vịt đang bơi sát biên hoặc sắp khuất vào rèm
   const getSafeDucks = (excludeDuck?: DuckDisplayItem | null): DuckDisplayItem[] => {
-    const safeList = ducksRef.current.filter((d) => {
+    const safeList = ducksRef.current.filter(d => {
       if (d.isDead) return false;
       if (excludeDuck && d === excludeDuck) return false;
       const x = d.container.x;
@@ -726,7 +731,7 @@ export const DuckHuntMode: React.FC<RandomPickerModeProps> = ({
 
     // Dự phòng an toàn nếu số lượng vịt ít
     return ducksRef.current.filter(
-      (d) =>
+      d =>
         !d.isDead &&
         (!excludeDuck || d !== excludeDuck) &&
         d.container.x >= 180 &&
@@ -736,7 +741,7 @@ export const DuckHuntMode: React.FC<RandomPickerModeProps> = ({
 
   // Lấy các chú vịt có hành lang bơi dài nhất để khóa mục tiêu và bắn trúng
   const getSafeTargetDucks = (excludeDuck?: DuckDisplayItem | null): DuckDisplayItem[] => {
-    const primePool = ducksRef.current.filter((d) => {
+    const primePool = ducksRef.current.filter(d => {
       if (d.isDead) return false;
       if (excludeDuck && d === excludeDuck) return false;
       const x = d.container.x;
@@ -842,7 +847,7 @@ export const DuckHuntMode: React.FC<RandomPickerModeProps> = ({
       // 2. KHÓA MỤC TIÊU VÀO CHÚ VỊT THỨ `totalVisits` (CHÍNH LÀ NGƯỜI CHIẾN THẮNG)
       // Lấy danh sách các chú vịt có hành lang an toàn cực rộng ở trung tâm
       const targetPool = getSafeTargetDucks(currentDuck);
-      const uncalledTargetPool = targetPool.filter((d) => !d.student.alreadyCalled);
+      const uncalledTargetPool = targetPool.filter(d => !d.student.alreadyCalled);
       const finalCandidatePool = uncalledTargetPool.length > 0 ? uncalledTargetPool : targetPool;
 
       let targetDuck: DuckDisplayItem;
@@ -852,14 +857,14 @@ export const DuckHuntMode: React.FC<RandomPickerModeProps> = ({
             a.student.academicPerformance === 'tot'
               ? 3
               : a.student.academicPerformance === 'kha'
-              ? 2
-              : a.student.score || 0;
+                ? 2
+                : a.student.score || 0;
           const rankB =
             b.student.academicPerformance === 'tot'
               ? 3
               : b.student.academicPerformance === 'kha'
-              ? 2
-              : b.student.score || 0;
+                ? 2
+                : b.student.score || 0;
           return rankB - rankA;
         });
         targetDuck = sorted[0] || finalCandidatePool[0]!;
@@ -869,7 +874,7 @@ export const DuckHuntMode: React.FC<RandomPickerModeProps> = ({
 
       // Đảm bảo targetDuck tuyệt đối không ở gần biên
       if (isDuckNearBorder(targetDuck)) {
-        const freshSafe = getSafeTargetDucks(null).filter((d) => !isDuckNearBorder(d));
+        const freshSafe = getSafeTargetDucks(null).filter(d => !isDuckNearBorder(d));
         if (freshSafe.length > 0) {
           targetDuck = freshSafe[0]!;
         }
@@ -884,7 +889,7 @@ export const DuckHuntMode: React.FC<RandomPickerModeProps> = ({
 
       // Nếu trong trường hợp hy hữu targetDuck bị chạm biên, đổi ngay sang chú vịt an toàn khác
       if (isDuckNearBorder(targetDuck)) {
-        const fallbackSafe = getSafeTargetDucks(null).filter((d) => !isDuckNearBorder(d));
+        const fallbackSafe = getSafeTargetDucks(null).filter(d => !isDuckNearBorder(d));
         if (fallbackSafe.length > 0) {
           targetDuck = fallbackSafe[0]!;
           await animateCrosshairToDuck(targetDuck, 0.35);
@@ -1085,14 +1090,15 @@ export const DuckHuntMode: React.FC<RandomPickerModeProps> = ({
               <input
                 type="checkbox"
                 checked={hideNames}
-                onChange={(e) => setHideNames(e.target.checked)}
+                onChange={e => setHideNames(e.target.checked)}
                 className="w-4 h-4 rounded text-amber-600 focus:ring-amber-500 bg-slate-800 border-slate-600 cursor-pointer"
               />
               <span className="font-medium">Chế độ ẩn (Dấu ?)</span>
             </label>
 
             <span className="text-slate-300">
-              Tổng vịt: <strong className="text-amber-300 font-mono text-sm">{candidates.length}</strong>
+              Tổng vịt:{' '}
+              <strong className="text-amber-300 font-mono text-sm">{candidates.length}</strong>
             </span>
           </div>
         </div>
@@ -1122,9 +1128,7 @@ export const DuckHuntMode: React.FC<RandomPickerModeProps> = ({
                 <div className="text-[11px] uppercase tracking-wider text-amber-400 font-extrabold">
                   Học sinh trúng giải
                 </div>
-                <div className="text-2xl font-black text-white">
-                  {winnerStudent.name}
-                </div>
+                <div className="text-2xl font-black text-white">{winnerStudent.name}</div>
               </div>
             </div>
           )}

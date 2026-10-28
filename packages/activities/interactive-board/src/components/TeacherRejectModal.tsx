@@ -46,7 +46,9 @@ export const TeacherRejectModal: React.FC<TeacherRejectModalProps> = ({
 
         <form onSubmit={handleSubmit} className="p-5 space-y-4">
           <div>
-            <span className="text-xs text-slate-400 uppercase font-bold tracking-wider">Học sinh</span>
+            <span className="text-xs text-slate-400 uppercase font-bold tracking-wider">
+              Học sinh
+            </span>
             <h3 className="text-lg font-extrabold text-slate-800 mt-0.5">{post.authorName}</h3>
             <p className="text-xs text-slate-500 mt-1">
               Bài sẽ được gửi trả về cho học sinh kèm lý do để các em chỉnh sửa và nộp lại.
@@ -54,9 +56,11 @@ export const TeacherRejectModal: React.FC<TeacherRejectModalProps> = ({
           </div>
 
           <div>
-            <label className="text-xs font-bold text-slate-500 block mb-1.5">CHỌN NHANH LÝ DO</label>
+            <label className="text-xs font-bold text-slate-500 block mb-1.5">
+              CHỌN NHANH LÝ DO
+            </label>
             <div className="space-y-1.5">
-              {QUICK_REASONS.map((r) => (
+              {QUICK_REASONS.map(r => (
                 <button
                   key={r}
                   type="button"
@@ -74,10 +78,12 @@ export const TeacherRejectModal: React.FC<TeacherRejectModalProps> = ({
           </div>
 
           <div>
-            <label className="text-xs font-bold text-slate-500 block mb-1.5">HOẶC NHẬP LÝ DO RIÊNG</label>
+            <label className="text-xs font-bold text-slate-500 block mb-1.5">
+              HOẶC NHẬP LÝ DO RIÊNG
+            </label>
             <textarea
               value={reason}
-              onChange={(e) => setReason(e.target.value)}
+              onChange={e => setReason(e.target.value)}
               placeholder="Nhập hướng dẫn cụ thể để học sinh sửa bài..."
               rows={3}
               className="w-full p-3 rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-rose-400 text-sm text-slate-800 resize-none"

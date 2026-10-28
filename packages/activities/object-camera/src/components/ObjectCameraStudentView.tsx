@@ -16,14 +16,12 @@ export const ObjectCameraStudentView: React.FC<ObjectCameraStudentViewProps> = (
   const canvasRefSecondary = useRef<HTMLCanvasElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
 
-  const activePhoto = state.photos.find((p) => p.id === state.activePhotoId) || null;
-  const comparePhoto = state.photos.find((p) => p.id === state.comparePhotoId) || null;
+  const activePhoto = state.photos.find(p => p.id === state.activePhotoId) || null;
+  const comparePhoto = state.photos.find(p => p.id === state.comparePhotoId) || null;
 
-  const annotationsPrimary = state.annotations.filter(
-    (a) => a.photoId === (activePhoto?.id || '')
-  );
+  const annotationsPrimary = state.annotations.filter(a => a.photoId === (activePhoto?.id || ''));
   const annotationsSecondary = state.annotations.filter(
-    (a) => a.photoId === (comparePhoto?.id || '')
+    a => a.photoId === (comparePhoto?.id || '')
   );
 
   // Hàm render 1 ảnh và các nét bút của giáo viên lên canvas
@@ -70,7 +68,10 @@ export const ObjectCameraStudentView: React.FC<ObjectCameraStudentViewProps> = (
       ctx.scale(viewport.zoom, viewport.zoom);
 
       // Kích thước vẽ vừa vặn màn hình học sinh
-      const scale = Math.min((canvas.width * 0.95) / img.width, (canvas.height * 0.95) / img.height);
+      const scale = Math.min(
+        (canvas.width * 0.95) / img.width,
+        (canvas.height * 0.95) / img.height
+      );
       const drawWidth = img.width * scale;
       const drawHeight = img.height * scale;
       const drawX = -drawWidth / 2;
@@ -154,7 +155,12 @@ export const ObjectCameraStudentView: React.FC<ObjectCameraStudentViewProps> = (
   // Render ảnh 1
   useEffect(() => {
     if (state.isStudentBroadcastEnabled) {
-      renderStudentCanvas(canvasRefPrimary.current, activePhoto, annotationsPrimary, state.viewport);
+      renderStudentCanvas(
+        canvasRefPrimary.current,
+        activePhoto,
+        annotationsPrimary,
+        state.viewport
+      );
     }
   }, [activePhoto, annotationsPrimary, state.viewport, state.isStudentBroadcastEnabled]);
 
@@ -189,7 +195,11 @@ export const ObjectCameraStudentView: React.FC<ObjectCameraStudentViewProps> = (
         <div className="flex items-center gap-2">
           <span className="text-base">📷</span>
           <span className="font-bold text-white truncate max-w-[180px]">
-            {state.displayMode !== 'single' ? 'So sánh 2 bài làm' : activePhoto ? activePhoto.name : 'Camera vật thể'}
+            {state.displayMode !== 'single'
+              ? 'So sánh 2 bài làm'
+              : activePhoto
+                ? activePhoto.name
+                : 'Camera vật thể'}
           </span>
         </div>
         <div className="flex items-center gap-1.5">
@@ -230,9 +240,12 @@ export const ObjectCameraStudentView: React.FC<ObjectCameraStudentViewProps> = (
                 <div className="w-16 h-16 rounded-2xl bg-slate-900 border border-slate-800 flex items-center justify-center text-3xl mb-3 shadow-inner">
                   📷
                 </div>
-                <h3 className="text-base font-bold text-slate-200 mb-1">Thầy/Cô đang chuẩn bị bài làm</h3>
+                <h3 className="text-base font-bold text-slate-200 mb-1">
+                  Thầy/Cô đang chuẩn bị bài làm
+                </h3>
                 <p className="text-xs text-slate-400 leading-relaxed">
-                  Hình ảnh bài tập và từng nét chữa của Thầy/Cô sẽ tự động xuất hiện trên màn hình của em.
+                  Hình ảnh bài tập và từng nét chữa của Thầy/Cô sẽ tự động xuất hiện trên màn hình
+                  của em.
                 </p>
               </div>
             )}
@@ -241,7 +254,9 @@ export const ObjectCameraStudentView: React.FC<ObjectCameraStudentViewProps> = (
           // Chế độ so sánh 2 ảnh (dọc hoặc ngang)
           <div
             className={`flex-1 w-full h-full flex ${
-              state.displayMode === 'compare_vertical' ? 'flex-row divide-x divide-slate-800' : 'flex-col divide-y divide-slate-800'
+              state.displayMode === 'compare_vertical'
+                ? 'flex-row divide-x divide-slate-800'
+                : 'flex-col divide-y divide-slate-800'
             }`}
           >
             {/* Ảnh 1 */}
@@ -267,8 +282,8 @@ export const ObjectCameraStudentView: React.FC<ObjectCameraStudentViewProps> = (
           <div className="absolute top-3 left-1/2 -translate-x-1/2 bg-gradient-to-r from-amber-500 to-yellow-400 text-slate-950 px-4 py-1.5 rounded-full shadow-xl font-bold text-xs flex items-center gap-1.5 animate-bounce z-30">
             <span>🎉</span>
             <span>
-              {isMeAwarded ? 'Em được' : `${state.lastAwardedStudent.studentName} được`} Thầy/Cô thưởng +
-              {state.lastAwardedStudent.exp} EXP!
+              {isMeAwarded ? 'Em được' : `${state.lastAwardedStudent.studentName} được`} Thầy/Cô
+              thưởng +{state.lastAwardedStudent.exp} EXP!
             </span>
           </div>
         )}
@@ -277,7 +292,9 @@ export const ObjectCameraStudentView: React.FC<ObjectCameraStudentViewProps> = (
         {state.displayMode === 'single' && activePhoto?.studentName && (
           <div className="absolute bottom-3 left-3 bg-slate-900/85 backdrop-blur-sm border border-slate-700 text-white px-3 py-1 rounded-full text-xs shadow-md flex items-center gap-1.5 z-10">
             <span>📝</span>
-            <span>Bài của: <strong>{activePhoto.studentName}</strong></span>
+            <span>
+              Bài của: <strong>{activePhoto.studentName}</strong>
+            </span>
           </div>
         )}
       </div>

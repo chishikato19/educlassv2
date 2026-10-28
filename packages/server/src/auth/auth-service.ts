@@ -141,7 +141,11 @@ export class AuthService {
   async registerTeacher(request: RegisterTeacherRequest): Promise<UserDto> {
     const existing = await this.userRepo.findByUsername(request.username);
     if (existing) {
-      throw new AuthError('USER_ALREADY_EXISTS', 'Tên đăng nhập này đã tồn tại, vui lòng chọn tên khác.', 409);
+      throw new AuthError(
+        'USER_ALREADY_EXISTS',
+        'Tên đăng nhập này đã tồn tại, vui lòng chọn tên khác.',
+        409
+      );
     }
 
     const defaultPinHash = await this.passwordHasher.hash('1234');

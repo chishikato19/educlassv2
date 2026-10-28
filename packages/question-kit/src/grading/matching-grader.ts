@@ -13,7 +13,7 @@ export function gradeMatching(
   const totalItems = question.leftItems.length;
 
   let correctCount = 0;
-  const pairDetails: MatchingPairDetail[] = question.leftItems.map((item) => {
+  const pairDetails: MatchingPairDetail[] = question.leftItems.map(item => {
     const leftId = item.id;
     const correctRightId = question.correctPairs[leftId] ?? '';
     const selectedRightId = studentPairs[leftId] ?? null;

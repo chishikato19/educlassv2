@@ -200,7 +200,7 @@ export const ProjectGradingActivity: ActivityDefinition<
         }
 
         // Kiểm tra nhóm mục tiêu có tồn tại
-        const targetGroup = st.config.groups.find((g) => g.id === intentData.targetGroupId);
+        const targetGroup = st.config.groups.find(g => g.id === intentData.targetGroupId);
         if (!targetGroup) {
           return {
             ok: false,
@@ -292,10 +292,7 @@ export const ProjectGradingActivity: ActivityDefinition<
     /**
      * Tổng hợp kết quả xếp hạng và khen thưởng khi kết thúc hoạt động
      */
-    onEnd(
-      ctx: ActivityContext,
-      st: ProjectGradingState
-    ): ProjectGradingStudentResult[] {
+    onEnd(ctx: ActivityContext, st: ProjectGradingState): ProjectGradingStudentResult[] {
       const results = calculateAllFinalScores(st);
 
       // Trao thưởng EXP khi kết thúc

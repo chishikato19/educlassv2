@@ -9,14 +9,11 @@ import type { ActivityHostPlugin, ActivityHostProps } from '../types.js';
 /**
  * Host Component cho Chiếu & Chữa bài PDF/Word (Mô hình A: Cắt dãn khoảng trống)
  */
-const PdfPresenterHostComponent: React.FC<ActivityHostProps> = ({
-  state,
-  onSendIntent,
-}) => {
+const PdfPresenterHostComponent: React.FC<ActivityHostProps> = ({ state, onSendIntent }) => {
   return (
     <PdfPresenterTeacherPanel
       state={state as PdfPresenterState}
-      onSendIntent={(intent) => onSendIntent(intent as PdfPresenterTeacherIntent)}
+      onSendIntent={intent => onSendIntent(intent as PdfPresenterTeacherIntent)}
     />
   );
 };

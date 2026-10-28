@@ -9,11 +9,7 @@ export interface AdminLoginModalProps {
   onSuccess: (user: UserDto) => void;
 }
 
-export const AdminLoginModal: React.FC<AdminLoginModalProps> = ({
-  isOpen,
-  onClose,
-  onSuccess,
-}) => {
+export const AdminLoginModal: React.FC<AdminLoginModalProps> = ({ isOpen, onClose, onSuccess }) => {
   const [username, setUsername] = useState('admin');
   const [password, setPassword] = useState('');
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
@@ -46,7 +42,7 @@ export const AdminLoginModal: React.FC<AdminLoginModalProps> = ({
           <label className="block text-sm font-bold text-gray-700 mb-1">Tên đăng nhập</label>
           <Input
             value={username}
-            onChange={(e) => setUsername(e.target.value)}
+            onChange={e => setUsername(e.target.value)}
             placeholder="admin"
             autoFocus
           />
@@ -57,7 +53,7 @@ export const AdminLoginModal: React.FC<AdminLoginModalProps> = ({
           <Input
             type="password"
             value={password}
-            onChange={(e) => setPassword(e.target.value)}
+            onChange={e => setPassword(e.target.value)}
             placeholder="Nhập mật khẩu quản trị viên"
           />
         </div>

@@ -1,6 +1,7 @@
 # Danh sách Công việc Triển khai: Ngân hàng Câu hỏi & Ma trận Đề thi (Tasks)
 
 > **Lưu ý:** Tuyệt đối tuân thủ quy tắc `AGENTS.md` khi triển khai:
+>
 > - Chỉ thực hiện đúng 1 task tại một thời điểm.
 > - Sau mỗi task: chạy kiểm tra nhanh `pnpm run typecheck` (`tsc -b`), không tự ý chạy Vitest / Lint trừ khi người dùng yêu cầu.
 > - Cập nhật trạng thái `[x]` sau khi hoàn thành.

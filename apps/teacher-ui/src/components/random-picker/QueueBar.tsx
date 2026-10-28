@@ -20,7 +20,8 @@ export const QueueBar: React.FC<QueueBarProps> = ({
     return (
       <div className="w-full bg-slate-50 border border-dashed border-slate-200 rounded-2xl p-4 text-center text-sm text-slate-400">
         <span className="mr-2">⏳</span>
-        Hàng chờ học sinh lên bảng hiện đang trống. Khi gọi học sinh lên bảng làm bài, bạn có thể bấm &quot;Cho vào hàng chờ&quot; để chấm điểm sau.
+        Hàng chờ học sinh lên bảng hiện đang trống. Khi gọi học sinh lên bảng làm bài, bạn có thể
+        bấm &quot;Cho vào hàng chờ&quot; để chấm điểm sau.
       </div>
     );
   }
@@ -47,7 +48,7 @@ export const QueueBar: React.FC<QueueBarProps> = ({
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3">
-        {queue.map((item) => {
+        {queue.map(item => {
           const perf = item.student.academicPerformance;
           const perfLabel = ACADEMIC_PERFORMANCE_LABELS[perf];
 
@@ -63,17 +64,15 @@ export const QueueBar: React.FC<QueueBarProps> = ({
                   </div>
                   <div className="flex items-center gap-2 mt-0.5">
                     {item.student.code && (
-                      <span className="text-xs font-mono text-slate-500">
-                        {item.student.code}
-                      </span>
+                      <span className="text-xs font-mono text-slate-500">{item.student.code}</span>
                     )}
                     <span
                       className={`text-[10px] font-bold px-1.5 py-0.2 rounded ${
                         perf === 'tot'
                           ? 'bg-emerald-100 text-emerald-800'
                           : perf === 'kha'
-                          ? 'bg-blue-100 text-blue-800'
-                          : 'bg-amber-100 text-amber-800'
+                            ? 'bg-blue-100 text-blue-800'
+                            : 'bg-amber-100 text-amber-800'
                       }`}
                     >
                       {perfLabel}

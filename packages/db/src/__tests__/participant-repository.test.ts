@@ -125,7 +125,10 @@ describe('ParticipantRepository & TeamRepository (Task 1.6)', () => {
       const foundBySt2 = await participantRepo.findBySessionAndAnyStudentId(session.id, [st2.id]);
       expect(foundBySt2?.id).toBe(pPair.id);
 
-      const foundOnlineBySt1 = await participantRepo.findOnlineBySessionAndAnyStudentId(session.id, [st1.id]);
+      const foundOnlineBySt1 = await participantRepo.findOnlineBySessionAndAnyStudentId(
+        session.id,
+        [st1.id]
+      );
       expect(foundOnlineBySt1?.id).toBe(pPair.id);
 
       // Không tìm thấy nếu ID không tồn tại

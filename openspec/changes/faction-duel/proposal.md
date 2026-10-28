@@ -3,11 +3,13 @@
 ## 1. Bối cảnh & Động lực (Context & Motivation)
 
 Trong các lớp học hiện đại, các hoạt động tương tác nhóm thường gặp phải 3 vấn đề cố hữu:
+
 1. **Mất cân bằng trình độ ban đầu:** Khi chia nhóm tự do hoặc ngẫu nhiên hoàn toàn, một đội có thể quy tụ quá nhiều bạn giỏi dẫn đến trận đấu một chiều, làm giảm động lực thi đấu của cả lớp.
 2. **Chiến thuật "bắt nạt" bạn yếu (Bullying/Farming):** Trong các trò chơi cho phép chọn đối thủ, đội mạnh thường có xu hướng nhắm vào những bạn có học lực yếu bên đội đối phương để kiếm điểm dễ dàng, gây tâm lý tự ti, tổn thương cho học sinh.
 3. **Thời gian chờ đợi và xử lý sĩ số lẻ:** Các trò chơi đối kháng 1v1 thường gặp khó khăn khi sĩ số lớp lẻ (buộc 1 bạn phải ngồi ngoài làm "khán giả") hoặc thời gian bắt cặp quá lâu làm gián đoạn tiết học.
 
 **Đại Chiến Xanh Đỏ (Faction Duel)** ra đời nhằm giải quyết trọn vẹn các thách thức trên thông qua sự kết hợp giữa:
+
 - **Cân bằng Elo tự động:** Chia 2 phe Xanh - Đỏ cân bằng lực lượng dựa trên điểm trình độ ẩn (Elo/MMR).
 - **Cơ chế săn đuổi 15 giây:** Phe thắng ở mỗi lượt được quyền chọn đối thủ phe thua.
 - **Tính điểm có trọng số Elo:** Kèo dưới thắng nhận thưởng đột biến (+3đ), kèo trên thắng chỉ nhận điểm cơ sở (+1đ), kích thích chiến thuật và bảo vệ học sinh yếu.
@@ -39,6 +41,7 @@ Trong các lớp học hiện đại, các hoạt động tương tác nhóm th�
 ## 3. Phạm vi Triển khai (Scope)
 
 ### Trong phạm vi (In-Scope):
+
 - Package Activity mới: `packages/activities/faction-duel` (`@educlass/activity-faction-duel`).
 - Lõi thuật toán & Schemas:
   - `faction-schemas.ts`: State machine, Matchup, PickPhase, Config, Results.
@@ -55,5 +58,6 @@ Trong các lớp học hiện đại, các hoạt động tương tác nhóm th�
   - Cấu hình trao thưởng EXP theo chuẩn D8 (Team bonus + MVP cá nhân).
 
 ### Ngoài phạm vi (Out-of-Scope):
+
 - Không thay đổi cấu trúc bảng cơ sở dữ liệu (`packages/db`).
 - Không can thiệp vào các hoạt động khác.

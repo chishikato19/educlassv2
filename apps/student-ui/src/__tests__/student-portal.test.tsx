@@ -8,7 +8,11 @@ describe('StudentPortal Component (Task 1.6 - Mobile-first 360x640)', () => {
   // Thiết lập viewport mobile 360x640 theo đúng PLAN 7.2
   beforeEach(() => {
     Object.defineProperty(window, 'innerWidth', { writable: true, configurable: true, value: 360 });
-    Object.defineProperty(window, 'innerHeight', { writable: true, configurable: true, value: 640 });
+    Object.defineProperty(window, 'innerHeight', {
+      writable: true,
+      configurable: true,
+      value: 640,
+    });
     window.dispatchEvent(new Event('resize'));
     localStorage.clear();
   });
@@ -169,12 +173,7 @@ describe('StudentPortal Component (Task 1.6 - Mobile-first 360x640)', () => {
   it('locks already taken names (D7) and provides report-teacher modal', async () => {
     const customRosterFetcher = vi.fn().mockResolvedValue(mockRosterResponse);
 
-    render(
-      <StudentPortal
-        initialJoinCode="123456"
-        customRosterFetcher={customRosterFetcher}
-      />
-    );
+    render(<StudentPortal initialJoinCode="123456" customRosterFetcher={customRosterFetcher} />);
 
     await act(async () => {});
 
@@ -394,7 +393,9 @@ describe('StudentPortal Component (Task 1.6 - Mobile-first 360x640)', () => {
   });
 
   it('transitions to session_closed when resume fails with SESSION_CLOSED error', async () => {
-    const customResumeHandler = vi.fn().mockRejectedValue(new Error('SESSION_CLOSED: Phiên đã đóng'));
+    const customResumeHandler = vi
+      .fn()
+      .mockRejectedValue(new Error('SESSION_CLOSED: Phiên đã đóng'));
 
     render(
       <StudentPortal
@@ -410,14 +411,16 @@ describe('StudentPortal Component (Task 1.6 - Mobile-first 360x640)', () => {
   });
 
   it('displays real-time reward notification banner when receiving reward event (Task 1.9)', async () => {
-    let triggerReward: ((reward: {
-      exp: number;
-      reason: string;
-      persisted: boolean;
-      newTotalExp?: number | null;
-      newLevel?: number | null;
-      leveledUp?: boolean;
-    }) => void) | null = null;
+    let triggerReward:
+      | ((reward: {
+          exp: number;
+          reason: string;
+          persisted: boolean;
+          newTotalExp?: number | null;
+          newLevel?: number | null;
+          leveledUp?: boolean;
+        }) => void)
+      | null = null;
 
     const customWsListener = vi.fn().mockImplementation((_onClosed, onReward) => {
       triggerReward = onReward;
@@ -563,7 +566,8 @@ describe('StudentPortal Component (Task 1.6 - Mobile-first 360x640)', () => {
 
   it('renders student end-of-session summary with reminder PIN login banner for roster/guest (Task 5.3)', async () => {
     let triggerClose: (() => void) | null = null;
-    let triggerReward: ((reward: { exp: number; reason: string; persisted: boolean }) => void) | null = null;
+    let triggerReward:
+      ((reward: { exp: number; reason: string; persisted: boolean }) => void) | null = null;
 
     const customWsListener = vi.fn().mockImplementation((onClosed, onReward) => {
       triggerClose = onClosed;
@@ -653,9 +657,7 @@ describe('StudentPortal Component (Task 1.6 - Mobile-first 360x640)', () => {
             { exp: 70, reason: 'Giải nhất mini quiz', ts: Date.now() },
             { exp: 50, reason: 'Chăm chỉ phát biểu', ts: Date.now() },
           ],
-          newTitlesAwarded: [
-            { key: 'title_1', name: 'Chiến thần trắc nghiệm', iconKey: 'trophy' },
-          ],
+          newTitlesAwarded: [{ key: 'title_1', name: 'Chiến thần trắc nghiệm', iconKey: 'trophy' }],
           avatar: undefined,
           reminderPinLogin: false,
         }}
@@ -846,6 +848,3 @@ describe('StudentPortal Component (Task 1.6 - Mobile-first 360x640)', () => {
     expect(pairedBadge.textContent).toContain('2 bạn chung máy');
   });
 });
-
-
-

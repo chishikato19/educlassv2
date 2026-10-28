@@ -1,9 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import {
-  createDatabaseConnection,
-  runMigrations,
-  UserRepository,
-} from '@educlass/db';
+import { createDatabaseConnection, runMigrations, UserRepository } from '@educlass/db';
 import { QuickPollActivity } from '@educlass/activity-quick-poll';
 import { buildServer } from '../app.js';
 import { ScryptPasswordHasher } from '../auth/password-hasher.js';
@@ -245,7 +241,11 @@ describe('Reward Rules REST Routes & Engine Caps Integration (Task 3.2)', () => 
       expect(endRes1.statusCode).toBe(200);
 
       // Kiểm tra tổng EXP nhận được sau lượt 1: 10 EXP
-      const totals1 = await app.rewardRepo.getParticipantExpTotals(sessionId, participantId, 'quick-poll');
+      const totals1 = await app.rewardRepo.getParticipantExpTotals(
+        sessionId,
+        participantId,
+        'quick-poll'
+      );
       expect(totals1.activityExp).toBe(10);
       expect(totals1.sessionExp).toBe(10);
 
@@ -288,7 +288,11 @@ describe('Reward Rules REST Routes & Engine Caps Integration (Task 3.2)', () => 
       expect(endRes2.statusCode).toBe(200);
 
       // Kiểm tra tổng EXP sau lượt 2: 15 EXP (chạm đúng trần activity_cap)
-      const totals2 = await app.rewardRepo.getParticipantExpTotals(sessionId, participantId, 'quick-poll');
+      const totals2 = await app.rewardRepo.getParticipantExpTotals(
+        sessionId,
+        participantId,
+        'quick-poll'
+      );
       expect(totals2.activityExp).toBe(15);
       expect(totals2.sessionExp).toBe(15);
     } finally {

@@ -35,13 +35,7 @@ describe('Gamification UI Components', () => {
 
   describe('ExpLevelBar', () => {
     it('renders level badge and progress bar with calculated percentage', () => {
-      render(
-        <ExpLevelBar
-          level={3}
-          currentExp={50}
-          maxExp={100}
-        />
-      );
+      render(<ExpLevelBar level={3} currentExp={50} maxExp={100} />);
 
       expect(screen.getByText('3')).toBeDefined();
       expect(screen.getByText('50 / 100 EXP')).toBeDefined();
@@ -50,13 +44,7 @@ describe('Gamification UI Components', () => {
     });
 
     it('handles explicit progress percent', () => {
-      render(
-        <ExpLevelBar
-          level={5}
-          progressPercent={85}
-          showExpLabel={false}
-        />
-      );
+      render(<ExpLevelBar level={5} progressPercent={85} showExpLabel={false} />);
 
       const progressbar = screen.getByRole('progressbar');
       expect(progressbar.getAttribute('aria-valuenow')).toBe('85');
@@ -67,12 +55,7 @@ describe('Gamification UI Components', () => {
     it('renders title badge with name and unlocked state', () => {
       const handleClick = vi.fn();
       render(
-        <TitleBadge
-          name="Học sinh chăm chỉ"
-          iconKey="star"
-          unlocked={true}
-          onClick={handleClick}
-        />
+        <TitleBadge name="Học sinh chăm chỉ" iconKey="star" unlocked={true} onClick={handleClick} />
       );
 
       const badge = screen.getByText('Học sinh chăm chỉ');
@@ -125,12 +108,7 @@ describe('Gamification UI Components', () => {
     });
 
     it('restricts locked items based on level', () => {
-      render(
-        <AvatarCustomizer
-          studentLevel={1}
-          currentConfig={{ base: 'cat' }}
-        />
-      );
+      render(<AvatarCustomizer studentLevel={1} currentConfig={{ base: 'cat' }} />);
 
       // Rồng thần cần level 5 nên bị khóa ở level 1
       const dragonBtn = screen.getByTitle('Cần đạt Cấp độ 5');

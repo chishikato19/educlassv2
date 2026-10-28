@@ -61,9 +61,9 @@ export class TeamRepository {
       .from(participants)
       .where(eq(participants.sessionId, sessionId));
 
-    return sessionTeams.map((team) => {
+    return sessionTeams.map(team => {
       const memberCount = sessionParticipants.filter(
-        (p) => p.teamId === team.id && p.status === 'online'
+        p => p.teamId === team.id && p.status === 'online'
       ).length;
       return {
         ...team,

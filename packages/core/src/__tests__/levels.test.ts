@@ -1,9 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import {
-  calculateLevel,
-  getCumulativeExpForLevel,
-  getExpProgress,
-} from '../levels/levels.js';
+import { calculateLevel, getCumulativeExpForLevel, getExpProgress } from '../levels/levels.js';
 
 describe('Level & EXP Calculation (core/levels)', () => {
   it('calculates cumulative exp for levels according to PLAN 6 default formula', () => {

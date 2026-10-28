@@ -251,17 +251,15 @@ describe('Session Report & Excel Export Integration', () => {
     });
     expect(excelRes.statusCode).toBe(200);
     expect(excelRes.headers['content-type']).toContain('spreadsheetml.sheet');
-    expect(excelRes.headers['content-disposition']).toContain(`bao-cao-phien-${session.joinCode}.xlsx`);
+    expect(excelRes.headers['content-disposition']).toContain(
+      `bao-cao-phien-${session.joinCode}.xlsx`
+    );
 
     // Phân tích workbook trả về
     const excelBuffer = excelRes.rawPayload;
     expect(excelBuffer.length).toBeGreaterThan(0);
     const wb = XLSX.read(excelBuffer, { type: 'buffer' });
-    expect(wb.SheetNames).toEqual([
-      'Tổng quan phiên',
-      'Bảng điểm học sinh',
-      'Câu hỏi sai nhiều',
-    ]);
+    expect(wb.SheetNames).toEqual(['Tổng quan phiên', 'Bảng điểm học sinh', 'Câu hỏi sai nhiều']);
 
     // 8. Test Forbidden với teacher2
     const forbiddenRes = await app.inject({

@@ -57,11 +57,7 @@ export const CircuitProjectorView: React.FC<ProjectorViewProps> = ({ state }) =>
               </h1>
               <span
                 style={{
-                  background: isActionWindow
-                    ? '#F59E0B'
-                    : isQuestionPhase
-                    ? '#38BDF8'
-                    : '#10B981',
+                  background: isActionWindow ? '#F59E0B' : isQuestionPhase ? '#38BDF8' : '#10B981',
                   color: '#0F172A',
                   padding: '4px 12px',
                   borderRadius: '12px',
@@ -72,8 +68,8 @@ export const CircuitProjectorView: React.FC<ProjectorViewProps> = ({ state }) =>
                 {isActionWindow
                   ? `⚡ DÙNG THẺ: CÒN ${remainingSeconds}S`
                   : isQuestionPhase
-                  ? `📝 LÀM BÀI: CÒN ${remainingSeconds}S`
-                  : '🏆 ĐÃ VỀ ĐÍCH'}
+                    ? `📝 LÀM BÀI: CÒN ${remainingSeconds}S`
+                    : '🏆 ĐÃ VỀ ĐÍCH'}
               </span>
             </div>
             <div style={{ fontSize: '13px', color: '#94A3B8', marginTop: '2px' }}>
@@ -162,17 +158,24 @@ export const CircuitProjectorView: React.FC<ProjectorViewProps> = ({ state }) =>
                       idx === 0
                         ? 'rgba(245,158,11,0.25)'
                         : idx === 1
-                        ? 'rgba(148,163,184,0.2)'
-                        : idx === 2
-                        ? 'rgba(180,83,9,0.2)'
-                        : 'rgba(255,255,255,0.04)',
+                          ? 'rgba(148,163,184,0.2)'
+                          : idx === 2
+                            ? 'rgba(180,83,9,0.2)'
+                            : 'rgba(255,255,255,0.04)',
                     border: idx === 0 ? '1px solid #F59E0B' : '1px solid rgba(255,255,255,0.06)',
                     borderRadius: '10px',
                     fontSize: '13px',
                     fontWeight: 800,
                   }}
                 >
-                  <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', maxWidth: '160px' }}>
+                  <span
+                    style={{
+                      overflow: 'hidden',
+                      textOverflow: 'ellipsis',
+                      whiteSpace: 'nowrap',
+                      maxWidth: '160px',
+                    }}
+                  >
                     {idx === 0 ? '🥇' : idx === 1 ? '🥈' : idx === 2 ? '🥉' : `#${idx + 1}`}{' '}
                     {p.displayName}
                   </span>
@@ -191,7 +194,9 @@ export const CircuitProjectorView: React.FC<ProjectorViewProps> = ({ state }) =>
               border: '1px solid rgba(255,255,255,0.12)',
             }}
           >
-            <div style={{ fontSize: '14px', fontWeight: 900, color: '#FDE68A', marginBottom: '10px' }}>
+            <div
+              style={{ fontSize: '14px', fontWeight: 900, color: '#FDE68A', marginBottom: '10px' }}
+            >
               ⚔️ DIỄN BIẾN ĐƯỜNG ĐUA
             </div>
             <div
@@ -316,7 +321,9 @@ export const CircuitProjectorView: React.FC<ProjectorViewProps> = ({ state }) =>
                 }}
               >
                 <div style={{ fontSize: '52px' }}>🥇</div>
-                <div style={{ fontSize: '24px', fontWeight: 900, marginTop: '8px', color: '#FFFFFF' }}>
+                <div
+                  style={{ fontSize: '24px', fontWeight: 900, marginTop: '8px', color: '#FFFFFF' }}
+                >
                   {state.podium.rank1}
                 </div>
                 <div style={{ fontSize: '16px', color: '#FEF3C7', fontWeight: 700 }}>

@@ -261,7 +261,9 @@ describe('ExamActivity Plugin Lifecycle & Behavior (Task 4.1)', () => {
 
     // Kiểm tra trao thưởng EXP:
     // HS 1: hoàn thành (30) + điểm giỏi (20) + điểm tuyệt đối (50) = 3 lần grantReward
-    const rewards = (ctx as unknown as { _getRewards: () => Array<{ participantId: string; trigger: string }> })._getRewards();
+    const rewards = (
+      ctx as unknown as { _getRewards: () => Array<{ participantId: string; trigger: string }> }
+    )._getRewards();
     const hs1Rewards = rewards.filter(r => r.participantId === 'hs-01');
     expect(hs1Rewards.map(r => r.trigger)).toContain('exam_finish');
     expect(hs1Rewards.map(r => r.trigger)).toContain('exam_high_score');
@@ -453,7 +455,9 @@ describe('ExamActivity Plugin Lifecycle & Behavior (Task 4.1)', () => {
       displayName: 'Học sinh Vào Sớm',
     }) as ExamState;
     expect(state.participants['hs-early']?.startedAt).toBe(1700000000000);
-    expect(state.participants['hs-early']?.individualExpiresAt).toBe(1700000000000 + 15 * 60 * 1000);
+    expect(state.participants['hs-early']?.individualExpiresAt).toBe(
+      1700000000000 + 15 * 60 * 1000
+    );
 
     // 2. Thời gian trôi qua 10 phút (học sinh 2 vào muộn 10 phút)
     ctx._advanceTime(10 * 60 * 1000);
@@ -505,7 +509,12 @@ describe('ExamActivity Plugin Lifecycle & Behavior (Task 4.1)', () => {
         id: 'q-a',
         type: 'mcq4',
         stem: toRichText('Câu hỏi A'),
-        options: [toRichText('Opt 0'), toRichText('Opt 1'), toRichText('Opt 2'), toRichText('Opt 3')],
+        options: [
+          toRichText('Opt 0'),
+          toRichText('Opt 1'),
+          toRichText('Opt 2'),
+          toRichText('Opt 3'),
+        ],
         correct: 2, // 'Opt 2'
         points: 2.5,
       },
@@ -513,7 +522,12 @@ describe('ExamActivity Plugin Lifecycle & Behavior (Task 4.1)', () => {
         id: 'q-b',
         type: 'mcq4',
         stem: toRichText('Câu hỏi B'),
-        options: [toRichText('Opt 0'), toRichText('Opt 1'), toRichText('Opt 2'), toRichText('Opt 3')],
+        options: [
+          toRichText('Opt 0'),
+          toRichText('Opt 1'),
+          toRichText('Opt 2'),
+          toRichText('Opt 3'),
+        ],
         correct: 0,
         points: 2.5,
       },

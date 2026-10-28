@@ -83,12 +83,7 @@ describe('Exam Management REST Routes (Task 2.1)', () => {
               id: 'q1',
               type: 'mcq4',
               stem: { text: 'Nguyên tử khối của Oxi là bao nhiêu?' },
-              options: [
-                { text: '16' },
-                { text: '12' },
-                { text: '14' },
-                { text: '32' },
-              ],
+              options: [{ text: '16' }, { text: '12' }, { text: '14' }, { text: '32' }],
               correct: 0,
               points: 10,
             },

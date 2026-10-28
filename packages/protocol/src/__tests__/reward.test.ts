@@ -148,4 +148,3 @@ describe('Reward Protocol Schemas', () => {
     expect(resetResponse.success).toBe(true);
   });
 });
-

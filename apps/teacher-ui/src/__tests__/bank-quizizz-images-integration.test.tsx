@@ -89,7 +89,7 @@ describe('UI Test: Question Bank to Quizizz with Question & Option Images', () =
         onStartActivity={handleStartActivity}
         onSendTeacherIntent={vi.fn()}
         onEndActivity={vi.fn()}
-      />,
+      />
     );
 
     // 1. Mở Modal cấu hình Quiz Live
@@ -156,7 +156,7 @@ describe('UI Test: Question Bank to Quizizz with Question & Option Images', () =
             correctAnswer: ['2', 'hai'],
           }),
         ]),
-      }),
+      })
     );
   });
 
@@ -214,7 +214,7 @@ describe('UI Test: Question Bank to Quizizz with Question & Option Images', () =
         state={mockState}
         participantId="p_student_1"
         onSendIntent={vi.fn()}
-      />,
+      />
     );
 
     // Kiểm tra ảnh của câu hỏi được render

@@ -21,30 +21,44 @@ describe('Students REST Routes & Import Flow (Task 1.3)', () => {
         method: 'POST',
         url: '/api/admin/users',
         headers: { authorization: `Bearer ${adminToken}` },
-        payload: { username: 'gv_a', password: 'password123', displayName: 'Cô A', role: 'teacher' },
+        payload: {
+          username: 'gv_a',
+          password: 'password123',
+          displayName: 'Cô A',
+          role: 'teacher',
+        },
       });
 
       await app.inject({
         method: 'POST',
         url: '/api/admin/users',
         headers: { authorization: `Bearer ${adminToken}` },
-        payload: { username: 'gv_b', password: 'password123', displayName: 'Thầy B', role: 'teacher' },
+        payload: {
+          username: 'gv_b',
+          password: 'password123',
+          displayName: 'Thầy B',
+          role: 'teacher',
+        },
       });
 
       const tokenA = JSON.parse(
-        (await app.inject({
-          method: 'POST',
-          url: '/api/auth/login',
-          payload: { username: 'gv_a', password: 'password123' },
-        })).body
+        (
+          await app.inject({
+            method: 'POST',
+            url: '/api/auth/login',
+            payload: { username: 'gv_a', password: 'password123' },
+          })
+        ).body
       ).token;
 
       const tokenB = JSON.parse(
-        (await app.inject({
-          method: 'POST',
-          url: '/api/auth/login',
-          payload: { username: 'gv_b', password: 'password123' },
-        })).body
+        (
+          await app.inject({
+            method: 'POST',
+            url: '/api/auth/login',
+            payload: { username: 'gv_b', password: 'password123' },
+          })
+        ).body
       ).token;
 
       // 2. GV A tạo lớp học 12A1

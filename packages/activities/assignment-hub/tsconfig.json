@@ -6,9 +6,6 @@
     "outDir": "dist",
     "jsx": "react-jsx"
   },
-  "references": [
-    { "path": "../../protocol" },
-    { "path": "../../core" }
-  ],
+  "references": [{ "path": "../../protocol" }, { "path": "../../core" }],
   "include": ["src/**/*"]
 }

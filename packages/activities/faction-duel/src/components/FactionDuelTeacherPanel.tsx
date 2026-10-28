@@ -29,7 +29,11 @@ export const FactionDuelTeacherPanel: React.FC<TeacherPanelProps> = ({
   };
 
   const handleFinish = () => {
-    if (window.confirm('Thầy/Cô có chắc chắn muốn kết thúc trận Đại Chiến Xanh Đỏ ngay bây giờ không?')) {
+    if (
+      window.confirm(
+        'Thầy/Cô có chắc chắn muốn kết thúc trận Đại Chiến Xanh Đỏ ngay bây giờ không?'
+      )
+    ) {
       onSendIntent({ type: 'finish' });
       onEndActivity();
     }
@@ -46,17 +50,18 @@ export const FactionDuelTeacherPanel: React.FC<TeacherPanelProps> = ({
           <div>
             <h2 className="text-lg font-black text-white">{state.title || 'Đại Chiến Xanh Đỏ'}</h2>
             <p className="text-xs text-slate-400">
-              Lượt {state.currentRound}/{state.totalRounds} • {state.questionsPerMatch} câu/trận • Trạng thái:{' '}
+              Lượt {state.currentRound}/{state.totalRounds} • {state.questionsPerMatch} câu/trận •
+              Trạng thái:{' '}
               <span className="font-bold text-amber-400">
                 {state.status === 'round_active'
                   ? 'Đang làm bài'
                   : state.status === 'pick_phase'
-                  ? 'Đang chọn đối thủ'
-                  : state.status === 'round_eval'
-                  ? 'Tổng kết lượt'
-                  : state.status === 'finished'
-                  ? 'Đã kết thúc'
-                  : state.status}
+                    ? 'Đang chọn đối thủ'
+                    : state.status === 'round_eval'
+                      ? 'Tổng kết lượt'
+                      : state.status === 'finished'
+                        ? 'Đã kết thúc'
+                        : state.status}
               </span>
             </p>
           </div>
@@ -134,9 +139,7 @@ export const FactionDuelTeacherPanel: React.FC<TeacherPanelProps> = ({
               <div
                 key={m.id}
                 className={`p-3 rounded-xl border text-xs flex items-center justify-between transition ${
-                  isDone
-                    ? 'bg-slate-800/80 border-slate-700'
-                    : 'bg-slate-950 border-slate-800'
+                  isDone ? 'bg-slate-800/80 border-slate-700' : 'bg-slate-950 border-slate-800'
                 }`}
               >
                 <div className="flex-1 truncate">

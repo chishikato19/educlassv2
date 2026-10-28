@@ -1,0 +1,1 @@
+{"version":3,"file":"TeacherLoginScreen.d.ts","sourceRoot":"","sources":["../../../src/components/auth/TeacherLoginScreen.tsx"],"names":[],"mappings":"AAAA,OAAO,KAA2C,MAAM,OAAO,CAAC;AAChE,OAAO,KAAK,EAAwB,OAAO,EAAE,MAAM,oBAAoB,CAAC;AAOxE,MAAM,WAAW,uBAAuB;IACtC,cAAc,EAAE,CAAC,IAAI,EAAE,OAAO,KAAK,IAAI,CAAC;CACzC;AAqBD,eAAO,MAAM,kBAAkB,EAAE,KAAK,CAAC,EAAE,CAAC,uBAAuB,CAsKhE,CAAC"}

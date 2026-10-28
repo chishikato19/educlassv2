@@ -62,16 +62,38 @@ function getRoundRobinPairs(players: string[], roundIndex: number): Array<[strin
 
   if (n === 4) {
     const [p0, p1, p2, p3] = players as [string, string, string, string];
-    if (roundIndex === 0) return [[p0, p1], [p2, p3]];
-    if (roundIndex === 1) return [[p0, p2], [p1, p3]];
-    return [[p0, p3], [p1, p2]];
+    if (roundIndex === 0)
+      return [
+        [p0, p1],
+        [p2, p3],
+      ];
+    if (roundIndex === 1)
+      return [
+        [p0, p2],
+        [p1, p3],
+      ];
+    return [
+      [p0, p3],
+      [p1, p2],
+    ];
   }
 
   if (n === 5) {
     const [p0, p1, p2, p3, p4] = players as [string, string, string, string, string];
-    if (roundIndex === 0) return [[p0, p1], [p2, p3]];
-    if (roundIndex === 1) return [[p0, p2], [p3, p4]];
-    return [[p0, p4], [p1, p3]];
+    if (roundIndex === 0)
+      return [
+        [p0, p1],
+        [p2, p3],
+      ];
+    if (roundIndex === 1)
+      return [
+        [p0, p2],
+        [p3, p4],
+      ];
+    return [
+      [p0, p4],
+      [p1, p3],
+    ];
   }
 
   // Trường hợp n > 5 (nếu có): thuật toán Berger chuẩn
@@ -96,9 +118,7 @@ function getRoundRobinPairs(players: string[], roundIndex: number): Array<[strin
 /**
  * Sinh danh sách trận đấu cho 3 lượt vòng bảng
  */
-export function generatePoolSchedule(
-  pools: Record<string, VolleyballPool>
-): VolleyballMatchup[][] {
+export function generatePoolSchedule(pools: Record<string, VolleyballPool>): VolleyballMatchup[][] {
   const rounds: VolleyballMatchup[][] = [[], [], []];
 
   for (let r = 0; r < 3; r++) {
@@ -215,10 +235,12 @@ export function calculatePoolStandings(
         (m.player1Id === b.participantId && m.player2Id === a.participantId)
     );
     if (headToHead) {
-      if (headToHead.player1Id === a.participantId && headToHead.result === 'player1_win') return -1;
+      if (headToHead.player1Id === a.participantId && headToHead.result === 'player1_win')
+        return -1;
       if (headToHead.player1Id === a.participantId && headToHead.result === 'player2_win') return 1;
       if (headToHead.player1Id === b.participantId && headToHead.result === 'player1_win') return 1;
-      if (headToHead.player1Id === b.participantId && headToHead.result === 'player2_win') return -1;
+      if (headToHead.player1Id === b.participantId && headToHead.result === 'player2_win')
+        return -1;
     }
 
     return a.totalTimeMs - b.totalTimeMs;

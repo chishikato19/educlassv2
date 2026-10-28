@@ -130,7 +130,7 @@ describe('QuestionEditor (apps/teacher-ui - Task 2.2)', () => {
           },
           correct: true,
         }}
-      />,
+      />
     );
 
     // Initial thumbnail should exist

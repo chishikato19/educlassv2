@@ -78,7 +78,9 @@ export const SwissDuelStudentView: React.FC<StudentViewProps> = ({
         (state.roundQuestions || []).reduce(
           (acc, q) => acc + (q.timeLimit || state.timeLimitPerQuestion || 30),
           0
-        ) || (state.timeLimitPerQuestion * 2) || 60;
+        ) ||
+        state.timeLimitPerQuestion * 2 ||
+        60;
 
       const deadline = state.roundStartedAt + roundTotalSeconds * 1000;
 
@@ -123,7 +125,9 @@ export const SwissDuelStudentView: React.FC<StudentViewProps> = ({
 
   const myBadge = getChessTitleBadge(myState?.tournamentPoints || 0, myState?.streak || 0);
 
-  const fontStyle = { fontFamily: 'system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif' };
+  const fontStyle = {
+    fontFamily: 'system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif',
+  };
 
   // 1. MÀN HÌNH KẾT THÚC GIẢI ĐẤU
   if (state.status === 'finished') {
@@ -137,17 +141,13 @@ export const SwissDuelStudentView: React.FC<StudentViewProps> = ({
         <ChessWoodCard className="p-6 max-w-sm w-full text-center space-y-5 border-2 border-amber-500/60">
           <div className="text-5xl animate-bounce">🏆</div>
           <div>
-            <h2 className="text-2xl font-bold text-amber-300 uppercase">
-              Tổng Kết Giải Đấu
-            </h2>
+            <h2 className="text-2xl font-bold text-amber-300 uppercase">Tổng Kết Giải Đấu</h2>
             <p className="text-xs text-amber-200/80 mt-1">Đấu Cờ Thụy Sỹ • {state.title}</p>
           </div>
 
           <div className="p-4 bg-black/40 rounded-xl border border-amber-500/30 space-y-2">
             <div className="text-sm text-amber-200">Thứ Hạng Chung Cuộc</div>
-            <div className="text-4xl font-black text-amber-400">
-              #{myRank}
-            </div>
+            <div className="text-4xl font-black text-amber-400">#{myRank}</div>
             <div className="text-xs text-amber-300 font-bold">
               Danh hiệu: {myBadge.icon} {myBadge.title}
             </div>
@@ -185,16 +185,12 @@ export const SwissDuelStudentView: React.FC<StudentViewProps> = ({
             <span className="text-xs uppercase text-amber-400 font-bold">
               Vòng {state.currentRound} / {state.totalRounds}
             </span>
-            <h2 className="text-xl font-bold text-amber-300">
-              Suất Nghỉ Ngơi Danh Dự!
-            </h2>
+            <h2 className="text-xl font-bold text-amber-300">Suất Nghỉ Ngơi Danh Dự!</h2>
           </div>
 
           <div className="p-4 bg-amber-950/60 rounded-xl border border-amber-500/50 text-amber-100 text-xs leading-relaxed">
             Bạn may mắn nhận được suất <b>Miễn đấu (BYE)</b> ở vòng này!
-            <div className="text-2xl font-black text-amber-400 my-2">
-              +2 ĐIỂM CHIẾN THẮNG
-            </div>
+            <div className="text-2xl font-black text-amber-400 my-2">+2 ĐIỂM CHIẾN THẮNG</div>
             Hãy thư giãn và sẵn sàng cho vòng so tài tiếp theo.
           </div>
 
@@ -224,9 +220,7 @@ export const SwissDuelStudentView: React.FC<StudentViewProps> = ({
             <span className="text-xs uppercase text-amber-400 font-bold block">
               Vòng {state.currentRound} / {state.totalRounds}
             </span>
-            <h2 className="text-xl font-bold text-amber-300">
-              Bạn Vừa Vào Phòng Đấu!
-            </h2>
+            <h2 className="text-xl font-bold text-amber-300">Bạn Vừa Vào Phòng Đấu!</h2>
           </div>
 
           <div className="p-4 bg-amber-950/60 rounded-xl border border-amber-500/40 text-amber-100 text-xs leading-relaxed space-y-2">
@@ -263,10 +257,16 @@ export const SwissDuelStudentView: React.FC<StudentViewProps> = ({
 
   // 3. MÀN HÌNH THI ĐẤU ĐỐI KHÁNG 1V1
   const currentQ = state.roundQuestions[activeQuestionIndex];
-  const myScoreInMatch = isPlayer1 ? (myMatchup?.player1Score ?? 0) : (myMatchup?.player2Score ?? 0);
-  const oppScoreInMatch = isPlayer1 ? (myMatchup?.player2Score ?? 0) : (myMatchup?.player1Score ?? 0);
+  const myScoreInMatch = isPlayer1
+    ? (myMatchup?.player1Score ?? 0)
+    : (myMatchup?.player2Score ?? 0);
+  const oppScoreInMatch = isPlayer1
+    ? (myMatchup?.player2Score ?? 0)
+    : (myMatchup?.player1Score ?? 0);
 
-  const answeredCount = [0, 1].filter(idx => selectedAnswers[idx] !== undefined && selectedAnswers[idx] !== '').length;
+  const answeredCount = [0, 1].filter(
+    idx => selectedAnswers[idx] !== undefined && selectedAnswers[idx] !== ''
+  ).length;
 
   return (
     <div
@@ -276,7 +276,9 @@ export const SwissDuelStudentView: React.FC<StudentViewProps> = ({
       {/* 3.1 Header Bàn đấu cờ */}
       <div className="bg-[#24160c] border border-[#5c371d] rounded-2xl p-3 shadow-lg flex items-center justify-between text-xs shrink-0">
         <div className="flex items-center gap-2">
-          <span className="text-xl text-amber-400">{isPlayer1 ? CHESS_PIECES.whiteKnight : CHESS_PIECES.blackKnight}</span>
+          <span className="text-xl text-amber-400">
+            {isPlayer1 ? CHESS_PIECES.whiteKnight : CHESS_PIECES.blackKnight}
+          </span>
           <div>
             <span className="font-bold text-amber-300 block">
               Bàn #{myMatchup?.tableNumber || 1} • Vòng {state.currentRound}
@@ -296,7 +298,9 @@ export const SwissDuelStudentView: React.FC<StudentViewProps> = ({
           )}
           <div className="text-right">
             <span className="text-[10px] text-slate-400 block">Điểm cờ</span>
-            <span className="text-sm font-black text-amber-400">{myState?.tournamentPoints || 0} đ</span>
+            <span className="text-sm font-black text-amber-400">
+              {myState?.tournamentPoints || 0} đ
+            </span>
           </div>
         </div>
       </div>
@@ -319,7 +323,9 @@ export const SwissDuelStudentView: React.FC<StudentViewProps> = ({
           <div className="px-3 py-1 bg-black/40 rounded-xl border border-amber-500/40 text-center shrink-0">
             <span className="text-[10px] text-amber-400 block font-bold">TỶ SỐ</span>
             <span className="text-base font-black text-amber-300 font-mono">
-              {myAnsweredAll && opponentAnsweredAll ? `${myScoreInMatch} - ${oppScoreInMatch}` : `? - ?`}
+              {myAnsweredAll && opponentAnsweredAll
+                ? `${myScoreInMatch} - ${oppScoreInMatch}`
+                : `? - ?`}
             </span>
           </div>
 
@@ -343,9 +349,7 @@ export const SwissDuelStudentView: React.FC<StudentViewProps> = ({
             {myMatchup?.result === (isPlayer1 ? 'player1_win' : 'player2_win') ? (
               <div className="space-y-1">
                 <span className="text-4xl block animate-bounce">🏆</span>
-                <h3 className="text-xl font-bold text-emerald-400 uppercase">
-                  Chiến Thắng! (+2đ)
-                </h3>
+                <h3 className="text-xl font-bold text-emerald-400 uppercase">Chiến Thắng! (+2đ)</h3>
                 <p className="text-xs text-amber-200">
                   Bạn đúng {myScoreInMatch}/2 câu, đối thủ đúng {oppScoreInMatch}/2 câu.
                 </p>
@@ -353,9 +357,7 @@ export const SwissDuelStudentView: React.FC<StudentViewProps> = ({
             ) : myMatchup?.result === 'draw' ? (
               <div className="space-y-1">
                 <span className="text-4xl block">🤝</span>
-                <h3 className="text-xl font-bold text-amber-300 uppercase">
-                  Hòa Trận! (+1đ)
-                </h3>
+                <h3 className="text-xl font-bold text-amber-300 uppercase">Hòa Trận! (+1đ)</h3>
                 <p className="text-xs text-amber-200">
                   Cả hai đều trả lời đúng {myScoreInMatch}/2 câu.
                 </p>
@@ -363,9 +365,7 @@ export const SwissDuelStudentView: React.FC<StudentViewProps> = ({
             ) : (
               <div className="space-y-1">
                 <span className="text-4xl block">♟️</span>
-                <h3 className="text-xl font-bold text-rose-400 uppercase">
-                  Thua Cuộc (+0đ)
-                </h3>
+                <h3 className="text-xl font-bold text-rose-400 uppercase">Thua Cuộc (+0đ)</h3>
                 <p className="text-xs text-slate-300">
                   Bạn đúng {myScoreInMatch}/2 câu, đối thủ đúng {oppScoreInMatch}/2 câu.
                 </p>
@@ -374,21 +374,33 @@ export const SwissDuelStudentView: React.FC<StudentViewProps> = ({
 
             {/* Chi tiết đáp án đúng / sai 2 câu */}
             <div className="mt-4 pt-3 border-t border-amber-900/60 text-left space-y-2 text-xs">
-              <span className="font-bold text-amber-300 block text-center">Chi tiết đáp án vòng này:</span>
+              <span className="font-bold text-amber-300 block text-center">
+                Chi tiết đáp án vòng này:
+              </span>
               {[0, 1].map(qIdx => {
                 const q = state.roundQuestions[qIdx];
                 const isRight = myResults ? myResults[qIdx] : false;
                 const myAns = myAnswers ? myAnswers[qIdx] : selectedAnswers[qIdx];
                 return (
-                  <div key={qIdx} className={`p-2 rounded-xl border ${isRight ? 'bg-emerald-950/60 border-emerald-600/60 text-emerald-200' : 'bg-rose-950/60 border-rose-600/60 text-rose-200'}`}>
+                  <div
+                    key={qIdx}
+                    className={`p-2 rounded-xl border ${isRight ? 'bg-emerald-950/60 border-emerald-600/60 text-emerald-200' : 'bg-rose-950/60 border-rose-600/60 text-rose-200'}`}
+                  >
                     <div className="flex justify-between font-bold mb-1">
-                      <span>Câu {qIdx + 1}: {isRight ? 'ĐÚNG ✓' : 'SAI ✗'}</span>
+                      <span>
+                        Câu {qIdx + 1}: {isRight ? 'ĐÚNG ✓' : 'SAI ✗'}
+                      </span>
                       {q?.correctAnswer !== undefined && (
-                        <span className="text-amber-300 font-mono">Đ/A: {String(q.correctAnswer)}</span>
+                        <span className="text-amber-300 font-mono">
+                          Đ/A: {String(q.correctAnswer)}
+                        </span>
                       )}
                     </div>
                     <div className="text-[11px] text-slate-300">
-                      Bạn đã chọn: <b className="text-white">{myAns !== undefined ? String(myAns) : '(Chưa chọn)'}</b>
+                      Bạn đã chọn:{' '}
+                      <b className="text-white">
+                        {myAns !== undefined ? String(myAns) : '(Chưa chọn)'}
+                      </b>
                     </div>
                   </div>
                 );
@@ -413,11 +425,10 @@ export const SwissDuelStudentView: React.FC<StudentViewProps> = ({
         <div className="my-auto py-8 text-center space-y-3">
           <ChessWoodCard className="p-6 border-amber-600/50">
             <span className="text-4xl block animate-spin-slow">⏳</span>
-            <h3 className="text-lg font-bold text-amber-300">
-              Bạn đã nộp bài thành công!
-            </h3>
+            <h3 className="text-lg font-bold text-amber-300">Bạn đã nộp bài thành công!</h3>
             <p className="text-xs text-amber-200/80 mt-1">
-              Đang đợi đối thủ <b>{opponentState?.displayName || 'đối thủ'}</b> hoàn thành nước đi để phân định kết quả...
+              Đang đợi đối thủ <b>{opponentState?.displayName || 'đối thủ'}</b> hoàn thành nước đi
+              để phân định kết quả...
             </p>
           </ChessWoodCard>
         </div>
@@ -437,8 +448,8 @@ export const SwissDuelStudentView: React.FC<StudentViewProps> = ({
                     activeQuestionIndex === qIdx
                       ? 'bg-amber-500 text-black border-amber-300 shadow-md'
                       : isPicked
-                      ? 'bg-emerald-950/80 text-emerald-300 border-emerald-600/60'
-                      : 'bg-[#24160c] text-amber-200 border-[#5c371d]'
+                        ? 'bg-emerald-950/80 text-emerald-300 border-emerald-600/60'
+                        : 'bg-[#24160c] text-amber-200 border-[#5c371d]'
                   }`}
                 >
                   Câu {qIdx + 1} {isPicked && '✓'}
@@ -544,8 +555,8 @@ export const SwissDuelStudentView: React.FC<StudentViewProps> = ({
                     myAnsweredAll
                       ? 'bg-slate-700 text-slate-300 border-slate-600 opacity-60 cursor-not-allowed'
                       : answeredCount === 2
-                      ? 'bg-gradient-to-r from-amber-400 via-amber-300 to-amber-500 border-amber-200 animate-pulse scale-[1.01]'
-                      : 'bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 border-amber-400'
+                        ? 'bg-gradient-to-r from-amber-400 via-amber-300 to-amber-500 border-amber-200 animate-pulse scale-[1.01]'
+                        : 'bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 border-amber-400'
                   }`}
                 >
                   <span>
@@ -557,9 +568,7 @@ export const SwissDuelStudentView: React.FC<StudentViewProps> = ({
               </div>
             </div>
           ) : (
-            <div className="text-center text-xs text-amber-200 py-8">
-              Đang tải câu hỏi...
-            </div>
+            <div className="text-center text-xs text-amber-200 py-8">Đang tải câu hỏi...</div>
           )}
         </div>
       )}

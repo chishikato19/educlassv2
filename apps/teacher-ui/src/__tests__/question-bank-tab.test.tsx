@@ -46,7 +46,7 @@ describe('QuestionBankTab UI Component (apps/teacher-ui)', () => {
         onCloneQuestionSet={vi.fn()}
         onExportQuestionSet={vi.fn()}
         onImportQuestionSet={vi.fn()}
-      />,
+      />
     );
 
     expect(screen.getByText('Kiểm tra 15 phút Giải tích 12')).toBeDefined();
@@ -71,7 +71,7 @@ describe('QuestionBankTab UI Component (apps/teacher-ui)', () => {
         onCloneQuestionSet={vi.fn()}
         onExportQuestionSet={vi.fn()}
         onImportQuestionSet={vi.fn()}
-      />,
+      />
     );
 
     // 1. Tìm kiếm theo text
@@ -109,7 +109,7 @@ describe('QuestionBankTab UI Component (apps/teacher-ui)', () => {
         onCloneQuestionSet={vi.fn()}
         onExportQuestionSet={vi.fn()}
         onImportQuestionSet={vi.fn()}
-      />,
+      />
     );
 
     const openCreateBtn = screen.getByTestId('btn-open-create-set');
@@ -155,7 +155,7 @@ describe('QuestionBankTab UI Component (apps/teacher-ui)', () => {
         onCloneQuestionSet={handleClone}
         onExportQuestionSet={handleExport}
         onImportQuestionSet={vi.fn()}
-      />,
+      />
     );
 
     // Nhân bản set_1
@@ -192,7 +192,7 @@ describe('QuestionBankTab UI Component (apps/teacher-ui)', () => {
         onCloneQuestionSet={vi.fn()}
         onExportQuestionSet={vi.fn()}
         onImportQuestionSet={handleImport}
-      />,
+      />
     );
 
     const fileInput = screen.getByTestId('input-import-educlass');
@@ -232,7 +232,7 @@ describe('QuestionBankTab UI Component (apps/teacher-ui)', () => {
         onCloneQuestionSet={vi.fn()}
         onExportQuestionSet={vi.fn()}
         onImportQuestionSet={vi.fn()}
-      />,
+      />
     );
 
     expect(screen.getByText(/Đang tải danh sách bộ đề/i)).toBeDefined();
@@ -246,7 +246,7 @@ describe('QuestionBankTab UI Component (apps/teacher-ui)', () => {
         onCloneQuestionSet={vi.fn()}
         onExportQuestionSet={vi.fn()}
         onImportQuestionSet={vi.fn()}
-      />,
+      />
     );
 
     expect(screen.getByText(/Chưa có bộ câu hỏi nào/i)).toBeDefined();
@@ -261,7 +261,7 @@ describe('QuestionBankTab UI Component (apps/teacher-ui)', () => {
         onCloneQuestionSet={vi.fn()}
         onExportQuestionSet={vi.fn()}
         onImportQuestionSet={vi.fn()}
-      />,
+      />
     );
 
     const openWordBtn = screen.getByTestId('btn-open-word-import');

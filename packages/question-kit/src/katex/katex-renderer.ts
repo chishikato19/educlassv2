@@ -54,7 +54,7 @@ export function parseMathSegments(input: string): MathSegment[] {
   // 3: $...$
   // 4: \(...\)
   const mathRegex =
-    /(?:\$\$([\s\S]+?)\$\$)|(?:\\\[([\s\S]+?)\\\])|(?:\$((?:[^$\\\n]|\\.)+?)\$)|(?:\\\(([\s\S]+?)\\\))/g;
+    /(?:\$\$([\s\S]+?)\$\$)|(?:\\\[([\s\S]+?)\\\])|(?:\$((?:(?!\n\s*\n)[^$\\]|\\.)+?)\$)|(?:\\\(([\s\S]+?)\\\))/g;
 
   let lastIndex = 0;
   let match: RegExpExecArray | null;
@@ -125,9 +125,9 @@ export function parseMathSegments(input: string): MathSegment[] {
 export function renderLatexInText(input: string): string {
   const segments = parseMathSegments(input);
   return segments
-    .map((seg) => {
+    .map(seg => {
       if (seg.type === 'text') {
-        return escapeHtml(seg.value);
+        return escapeHtml(seg.value).replace(/\r?\n/g, '<br/>');
       }
       return renderLatex(seg.value, { displayMode: seg.type === 'display-math' });
     })

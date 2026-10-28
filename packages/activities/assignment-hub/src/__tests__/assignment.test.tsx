@@ -63,7 +63,8 @@ describe('AssignmentHub Activity Plugin (@educlass/activity-assignment-hub)', ()
           fileSize: 20480,
           mimeType: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
           submittedAt: 1728000000000,
-          downloadUrl: '/api/sessions/sess_test_1/activities/run_test_1/submissions/part_01/download',
+          downloadUrl:
+            '/api/sessions/sess_test_1/activities/run_test_1/submissions/part_01/download',
           status: 'submitted',
         },
       }
@@ -83,24 +84,19 @@ describe('AssignmentHub Activity Plugin (@educlass/activity-assignment-hub)', ()
     expect(lockedState.isLocked).toBe(true);
 
     // 4. onStudentIntent when locked -> reject
-    const rejected = AssignmentHubActivity.server.onStudentIntent(
-      mockCtx,
-      lockedState,
-      'part_02',
-      {
-        type: 'submit_assignment',
-        submission: {
-          participantId: 'part_02',
-          studentName: 'Trần Thị Bình',
-          fileName: 'Binh_BaiLam.docx',
-          fileSize: 1024,
-          mimeType: 'application/octet-stream',
-          submittedAt: 1728000000000,
-          downloadUrl: '/api/download/part_02',
-          status: 'submitted',
-        },
-      }
-    );
+    const rejected = AssignmentHubActivity.server.onStudentIntent(mockCtx, lockedState, 'part_02', {
+      type: 'submit_assignment',
+      submission: {
+        participantId: 'part_02',
+        studentName: 'Trần Thị Bình',
+        fileName: 'Binh_BaiLam.docx',
+        fileSize: 1024,
+        mimeType: 'application/octet-stream',
+        submittedAt: 1728000000000,
+        downloadUrl: '/api/download/part_02',
+        status: 'submitted',
+      },
+    });
     expect('ok' in rejected).toBe(true);
     if ('ok' in rejected) {
       expect(rejected.ok).toBe(false);

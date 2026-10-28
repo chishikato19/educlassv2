@@ -81,10 +81,7 @@ export class AdminService {
   /**
    * Quản trị viên đặt lại mật khẩu cho tài khoản người dùng
    */
-  async resetUserPassword(
-    targetUserId: string,
-    request: AdminResetPasswordRequest
-  ): Promise<void> {
+  async resetUserPassword(targetUserId: string, request: AdminResetPasswordRequest): Promise<void> {
     const targetUser = await this.userRepo.findById(targetUserId);
     if (!targetUser) {
       throw new AuthError('USER_NOT_FOUND', undefined, 404);

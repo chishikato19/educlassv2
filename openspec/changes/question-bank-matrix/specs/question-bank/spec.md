@@ -9,6 +9,7 @@ Module cung cấp khả năng quản lý kho câu hỏi tập trung có cấu tr
 ## 2. Các Yêu cầu & Kịch bản Chi tiết (Requirements & Scenarios)
 
 ### Yêu cầu 1: Phân cấp Kiến thức & Quản lý Câu hỏi trong Ngân hàng
+
 Hệ thống PHẢI cho phép lưu trữ và tổ chức câu hỏi theo cấu trúc phân cấp cố định: `Khối (1-12) → Môn học → Chương → Bài học`.
 
 - **Kịch bản 1.1: Thêm mới câu hỏi vào Ngân hàng**
@@ -19,12 +20,14 @@ Hệ thống PHẢI cho phép lưu trữ và tổ chức câu hỏi theo cấu t
 - **Kịch bản 1.2: Lọc và duyệt cây thư mục bài học**
   - **Giả sử:** Giáo viên đã nạp nhiều câu hỏi vào ngân hàng.
   - **Khi:** Giáo viên chọn Khối 12, Môn Toán trên thanh lọc.
-  - **Thì:** Hệ thống hiển thị cây danh mục các Chương và Bài học kèm số lượng câu hỏi hiện có trong từng bài (ví dụ: *Bài 1: Tính đơn điệu (25 câu)*).
+  - **Thì:** Hệ thống hiển thị cây danh mục các Chương và Bài học kèm số lượng câu hỏi hiện có trong từng bài (ví dụ: _Bài 1: Tính đơn điệu (25 câu)_).
 
 ---
 
 ### Yêu cầu 2: Bốn Mức độ Nhận thức Chuẩn Bộ GD&ĐT
+
 Hệ thống PHẢI áp dụng cố định 4 mức độ nhận thức:
+
 1. `nb` - Nhận biết (Recognition / Knowledge)
 2. `th` - Thông hiểu (Comprehension / Understanding)
 3. `vd` - Vận dụng (Application)
@@ -42,6 +45,7 @@ Hệ thống PHẢI áp dụng cố định 4 mức độ nhận thức:
 ---
 
 ### Yêu cầu 3: Nhập Câu hỏi Thông minh từ File Word (.docx)
+
 Hệ thống PHẢI hỗ trợ phân tích file Word có chứa các thẻ nhận diện phân loại bài học và mức độ nhận thức.
 
 - **Kịch bản 3.1: Nhập file Word có nhãn mức độ**
@@ -64,6 +68,7 @@ Hệ thống PHẢI hỗ trợ phân tích file Word có chứa các thẻ nhậ
 ---
 
 ### Yêu cầu 4: Bảng Ma trận Đề thi & Kiểm soát Số lượng Câu hỏi
+
 Tại Kho đề (`Question Sets`), hệ thống PHẢI cung cấp giao diện bảng ma trận 2 chiều để cấu hình số lượng câu hỏi cần bốc cho từng bài học theo từng mức độ.
 
 - **Kịch bản 4.1: Hiển thị số lượng câu sẵn có trong kho (Available Counts)**
@@ -79,11 +84,12 @@ Tại Kho đề (`Question Sets`), hệ thống PHẢI cung cấp giao diện b�
 
 - **Kịch bản 4.3: Tính tổng số câu và cơ cấu tỷ lệ tự động**
   - **Khi:** Giáo viên thay đổi số lượng ở bất kỳ ô nào trong ma trận.
-  - **Thì:** Hàng "Tổng cộng" ở đáy bảng tự động cập nhật tổng số câu và tỷ lệ phần trăm của từng mức độ (ví dụ: *NB: 4 câu (40%), TH: 3 câu (30%), VD: 2 câu (20%), VDC: 1 câu (10%) - Tổng: 10 câu*).
+  - **Thì:** Hàng "Tổng cộng" ở đáy bảng tự động cập nhật tổng số câu và tỷ lệ phần trăm của từng mức độ (ví dụ: _NB: 4 câu (40%), TH: 3 câu (30%), VD: 2 câu (20%), VDC: 1 câu (10%) - Tổng: 10 câu_).
 
 ---
 
 ### Yêu cầu 5: Thuật toán Sinh đề Ngẫu nhiên & Snapshot Bất biến
+
 Hệ thống PHẢI bốc ngẫu nhiên các câu hỏi thỏa mãn đúng ma trận và tạo ra một Bộ đề độc lập.
 
 - **Kịch bản 5.1: Sinh đề và xem trước (Preview & Swap)**
@@ -100,6 +106,7 @@ Hệ thống PHẢI bốc ngẫu nhiên các câu hỏi thỏa mãn đúng ma tr
 ---
 
 ### Yêu cầu 6: Tích hợp với Hoạt động Quizizz / Kahoot (`quiz-live`) & Kỳ thi (`exam`)
+
 Bộ đề tạo từ ma trận PHẢI có khả năng đưa ngay vào phòng chơi trực tiếp hoặc kỳ thi trực tuyến.
 
 - **Kịch bản 6.1: Khởi chạy Quizizz từ Bộ đề Ma trận**

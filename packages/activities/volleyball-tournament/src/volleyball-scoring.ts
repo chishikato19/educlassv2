@@ -1,7 +1,4 @@
-import type {
-  VolleyballMatchupResult,
-  VolleyballQuestion,
-} from './volleyball-schemas.js';
+import type { VolleyballMatchupResult, VolleyballQuestion } from './volleyball-schemas.js';
 
 export function toOptionIndex(val: unknown): number {
   if (typeof val === 'number') return val;
@@ -35,9 +32,10 @@ export function shuffleQuestionOptions(
   }
 
   const origIdx = toOptionIndex(question.correctAnswer);
-  const origText = typeof question.correctAnswer === 'string'
-    ? question.correctAnswer.trim().toLowerCase()
-    : undefined;
+  const origText =
+    typeof question.correctAnswer === 'string'
+      ? question.correctAnswer.trim().toLowerCase()
+      : undefined;
 
   const paired = question.options.map((text, index) => {
     const isCorrect =

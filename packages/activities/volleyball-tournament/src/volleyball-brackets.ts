@@ -261,13 +261,15 @@ export function calculateFinalStandings(
 
     if (champMatch && champMatch.result !== 'in_progress') {
       const win = champMatch.result === 'player1_win' ? champMatch.player1Id : champMatch.player2Id;
-      const lose = champMatch.result === 'player1_win' ? champMatch.player2Id : champMatch.player1Id;
+      const lose =
+        champMatch.result === 'player1_win' ? champMatch.player2Id : champMatch.player1Id;
       tierRanked.push(win, lose);
     }
 
     if (thirdMatch && thirdMatch.result !== 'in_progress') {
       const win = thirdMatch.result === 'player1_win' ? thirdMatch.player1Id : thirdMatch.player2Id;
-      const lose = thirdMatch.result === 'player1_win' ? thirdMatch.player2Id : thirdMatch.player1Id;
+      const lose =
+        thirdMatch.result === 'player1_win' ? thirdMatch.player2Id : thirdMatch.player1Id;
       tierRanked.push(win, lose);
     }
 

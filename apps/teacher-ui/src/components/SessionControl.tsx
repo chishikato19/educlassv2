@@ -25,10 +25,13 @@ export interface SessionControlProps {
   onOpenSession: (req: CreateSessionRequest) => Promise<void> | void;
   onCloseSession: (sessionId: string) => Promise<void> | void;
   onReleaseParticipant?: ((participantId: string) => Promise<void> | void) | undefined;
-  onGrantReward?: ((participantId: string, exp: number, reason: string) => Promise<void> | void) | undefined;
+  onGrantReward?:
+    ((participantId: string, exp: number, reason: string) => Promise<void> | void) | undefined;
   onResetReport?: (() => void) | undefined;
   onExportExcel?: ((sessionId: string) => Promise<void> | void) | undefined;
-  onSendChatMessage?: ((payload: { content: string; toParticipantId?: string | null }) => Promise<void> | void) | undefined;
+  onSendChatMessage?:
+    | ((payload: { content: string; toParticipantId?: string | null }) => Promise<void> | void)
+    | undefined;
   onToggleChatLock?: ((locked: boolean) => Promise<void> | void) | undefined;
   onChangeChatMode?: ((mode: ChatMode) => Promise<void> | void) | undefined;
   onResolveHandRaise?: ((handRaiseId: string) => Promise<void> | void) | undefined;
@@ -104,7 +107,9 @@ export const SessionControl: React.FC<SessionControlProps> = ({
     let copied = false;
 
     // 1. Nếu đang chạy trong Electron: Dùng Electron native clipboard qua IPC (hoạt động 100% không phụ thuộc window focus)
-    const electronAPI = (window as unknown as { electronAPI?: { copyText?: (t: string) => Promise<boolean> } }).electronAPI;
+    const electronAPI = (
+      window as unknown as { electronAPI?: { copyText?: (t: string) => Promise<boolean> } }
+    ).electronAPI;
     if (typeof electronAPI?.copyText === 'function') {
       try {
         const ok = await electronAPI.copyText(targetUrl);
@@ -115,7 +120,12 @@ export const SessionControl: React.FC<SessionControlProps> = ({
     }
 
     // 2. Nếu chưa copy thành công, thử navigator.clipboard.writeText
-    if (!copied && typeof navigator !== 'undefined' && navigator.clipboard && typeof navigator.clipboard.writeText === 'function') {
+    if (
+      !copied &&
+      typeof navigator !== 'undefined' &&
+      navigator.clipboard &&
+      typeof navigator.clipboard.writeText === 'function'
+    ) {
       try {
         window.focus();
         await navigator.clipboard.writeText(targetUrl);
@@ -174,7 +184,7 @@ export const SessionControl: React.FC<SessionControlProps> = ({
         text: payload.content,
         ts: Date.now(),
       };
-      setInternalChatMessages((prev) => [...prev, newMsg]);
+      setInternalChatMessages(prev => [...prev, newMsg]);
     }
   };
 
@@ -203,9 +213,7 @@ export const SessionControl: React.FC<SessionControlProps> = ({
     if (onResolveHandRaise) {
       await onResolveHandRaise(participantId);
     } else {
-      setInternalHandRaises((prev) =>
-        prev.filter((h) => h.participantId !== participantId)
-      );
+      setInternalHandRaises(prev => prev.filter(h => h.participantId !== participantId));
     }
   };
 
@@ -273,545 +281,565 @@ export const SessionControl: React.FC<SessionControlProps> = ({
 
   // Màn hình khi phiên đang mở
   if (activeSession) {
-    const rawClass = activeSession.className || (activeSession as unknown as { session?: { className?: string } }).session?.className;
+    const rawClass =
+      activeSession.className ||
+      (activeSession as unknown as { session?: { className?: string } }).session?.className;
     const joinCodeDisplay = getSessionJoinCode(activeSession);
-    const joinUrlDisplay = activeSession.joinUrl || (activeSession as unknown as { session?: { joinUrl?: string } }).session?.joinUrl;
-    const qrDataUrlDisplay = activeSession.qrDataUrl || (activeSession as unknown as { session?: { qrDataUrl?: string } }).session?.qrDataUrl;
+    const joinUrlDisplay =
+      activeSession.joinUrl ||
+      (activeSession as unknown as { session?: { joinUrl?: string } }).session?.joinUrl;
+    const qrDataUrlDisplay =
+      activeSession.qrDataUrl ||
+      (activeSession as unknown as { session?: { qrDataUrl?: string } }).session?.qrDataUrl;
 
     return (
       <>
         <Card data-testid="active-session-card">
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
-          <div
-            style={{
-              display: 'flex',
-              justifyContent: 'space-between',
-              alignItems: 'center',
-              borderBottom: `1px solid ${UI_COLORS.border}`,
-              paddingBottom: '16px',
-            }}
-          >
-            <div>
-              <span
-                style={{
-                  display: 'inline-block',
-                  backgroundColor: '#E8F5E9',
-                  color: UI_COLORS.success,
-                  padding: '4px 12px',
-                  borderRadius: '12px',
-                  fontSize: '14px',
-                  fontWeight: 700,
-                  marginBottom: '6px',
-                }}
-              >
-                ● ĐANG DIỄN RA
-              </span>
-              <h2 style={{ margin: 0, fontSize: '24px' }}>
-                {rawClass ? `Lớp: ${rawClass}` : 'Phiên học tự do'}
-              </h2>
-            </div>
-            <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
-              <Button
-                variant="ghost"
-                onClick={() => setIsChatOpen(true)}
-                data-testid="btn-open-chat"
-                style={{
-                  border: `1px solid ${UI_COLORS.primary}`,
-                  color: UI_COLORS.primary,
-                  fontWeight: 600,
-                }}
-              >
-                💬 Trò chuyện & Trợ giúp {unresolvedCount > 0 ? `✋ (${unresolvedCount})` : ''}
-              </Button>
-              <Button
-                variant="danger"
-                onClick={() => void handleCloseSession()}
-                disabled={isClosing}
-                data-testid="btn-close-session"
-              >
-                {isClosing ? 'Đang kết thúc...' : 'Kết thúc tiết học'}
-              </Button>
-            </div>
-          </div>
-
-          <div
-            style={{
-              display: 'grid',
-              gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))',
-              gap: '24px',
-              alignItems: 'center',
-            }}
-          >
-            {/* Mã vào lớp 6 chữ số */}
-            <div
-              style={{
-                backgroundColor: '#EFF6FF',
-                border: `2px dashed ${UI_COLORS.primary}`,
-                borderRadius: UI_RADII.card,
-                padding: '24px',
-                textAlign: 'center',
-              }}
-            >
-              <div style={{ fontSize: '16px', color: UI_COLORS.textMuted, marginBottom: '8px' }}>
-                MÃ VÀO LỚP CHO HỌC SINH
-              </div>
-              <div
-                style={{
-                  fontSize: '54px',
-                  fontWeight: 800,
-                  letterSpacing: '8px',
-                  color: UI_COLORS.primary,
-                  fontFamily: 'monospace',
-                }}
-                data-testid="session-join-code"
-              >
-                {joinCodeDisplay}
-              </div>
-              {joinUrlDisplay && (
-                <div
-                  style={{
-                    marginTop: '16px',
-                    padding: '10px 14px',
-                    backgroundColor: '#F8FAFC',
-                    borderRadius: '10px',
-                    border: '1px solid #E2E8F0',
-                    display: 'flex',
-                    flexDirection: 'column',
-                    gap: '8px',
-                    alignItems: 'center',
-                  }}
-                >
-                  <div style={{ fontSize: '12px', fontWeight: 600, color: '#64748B' }}>
-                    🔗 Liên kết vào lớp cho học sinh:
-                  </div>
-                  <div
-                    style={{
-                      fontSize: '13px',
-                      wordBreak: 'break-all',
-                      color: UI_COLORS.primary,
-                      display: 'flex',
-                      flexWrap: 'wrap',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      gap: '8px',
-                    }}
-                  >
-                    <a
-                      href={joinUrlDisplay}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      style={{
-                        color: UI_COLORS.primary,
-                        textDecoration: 'underline',
-                        fontWeight: 600,
-                      }}
-                      title="Mở liên kết học sinh trong tab mới"
-                    >
-                      {joinUrlDisplay}
-                    </a>
-                    <button
-                      type="button"
-                      onClick={handleCopyJoinLink}
-                      style={{
-                        padding: '4px 10px',
-                        fontSize: '12px',
-                        fontWeight: 600,
-                        backgroundColor: copiedLink ? '#DCFCE7' : '#FFFFFF',
-                        color: copiedLink ? '#15803D' : '#334155',
-                        border: copiedLink ? '1px solid #86EFAC' : '1px solid #CBD5E1',
-                        borderRadius: '6px',
-                        cursor: 'pointer',
-                        display: 'inline-flex',
-                        alignItems: 'center',
-                        gap: '4px',
-                        transition: 'all 0.15s ease',
-                      }}
-                    >
-                      {copiedLink ? '✓ Đã sao chép!' : '📋 Sao chép link'}
-                    </button>
-                  </div>
-                </div>
-              )}
-            </div>
-
-            {/* Mã QR tham gia */}
-            {qrDataUrlDisplay && (
-              <div
-                style={{
-                  display: 'flex',
-                  flexDirection: 'column',
-                  alignItems: 'center',
-                  padding: '16px',
-                }}
-              >
-                <img
-                  src={qrDataUrlDisplay}
-                  alt="Mã QR tham gia phiên học"
-                  style={{ width: '200px', height: '200px', borderRadius: '12px' }}
-                  data-testid="session-qr-image"
-                />
-                <span style={{ marginTop: '8px', fontSize: '14px', color: UI_COLORS.textMuted }}>
-                  Học sinh quét mã để vào lớp ngay
-                </span>
-              </div>
-            )}
-          </div>
-
-          {/* Danh sách người tham gia phiên học (Online / Offline & Mở lại tên) */}
-          <div
-            style={{
-              borderTop: `1px solid ${UI_COLORS.border}`,
-              paddingTop: '20px',
-              display: 'flex',
-              flexDirection: 'column',
-              gap: '12px',
-            }}
-            data-testid="participants-section"
-          >
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
             <div
               style={{
                 display: 'flex',
                 justifyContent: 'space-between',
                 alignItems: 'center',
-                flexWrap: 'wrap',
-                gap: '8px',
+                borderBottom: `1px solid ${UI_COLORS.border}`,
+                paddingBottom: '16px',
               }}
             >
-              <h3 style={{ margin: 0, fontSize: '18px', fontWeight: 700 }}>
-                Người tham gia ({participants.filter((p) => p.status === 'online').length} Online / {participants.length} Tổng)
-              </h3>
-              <label
-                style={{
-                  fontSize: '13px',
-                  color: '#475569',
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '6px',
-                  cursor: 'pointer',
-                  fontWeight: 600,
-                }}
-              >
-                <input
-                  type="checkbox"
-                  checked={filterOnlineOnly}
-                  onChange={(e) => setFilterOnlineOnly(e.target.checked)}
-                />
-                Chỉ hiện học sinh đang có mặt
-              </label>
+              <div>
+                <span
+                  style={{
+                    display: 'inline-block',
+                    backgroundColor: '#E8F5E9',
+                    color: UI_COLORS.success,
+                    padding: '4px 12px',
+                    borderRadius: '12px',
+                    fontSize: '14px',
+                    fontWeight: 700,
+                    marginBottom: '6px',
+                  }}
+                >
+                  ● ĐANG DIỄN RA
+                </span>
+                <h2 style={{ margin: 0, fontSize: '24px' }}>
+                  {rawClass ? `Lớp: ${rawClass}` : 'Phiên học tự do'}
+                </h2>
+              </div>
+              <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
+                <Button
+                  variant="ghost"
+                  onClick={() => setIsChatOpen(true)}
+                  data-testid="btn-open-chat"
+                  style={{
+                    border: `1px solid ${UI_COLORS.primary}`,
+                    color: UI_COLORS.primary,
+                    fontWeight: 600,
+                  }}
+                >
+                  💬 Trò chuyện & Trợ giúp {unresolvedCount > 0 ? `✋ (${unresolvedCount})` : ''}
+                </Button>
+                <Button
+                  variant="danger"
+                  onClick={() => void handleCloseSession()}
+                  disabled={isClosing}
+                  data-testid="btn-close-session"
+                >
+                  {isClosing ? 'Đang kết thúc...' : 'Kết thúc tiết học'}
+                </Button>
+              </div>
             </div>
 
-            {(() => {
-              const displayed = filterOnlineOnly
-                ? participants.filter((p) => p.status === 'online')
-                : participants;
-
-              if (displayed.length === 0) {
-                return (
+            <div
+              style={{
+                display: 'grid',
+                gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))',
+                gap: '24px',
+                alignItems: 'center',
+              }}
+            >
+              {/* Mã vào lớp 6 chữ số */}
+              <div
+                style={{
+                  backgroundColor: '#EFF6FF',
+                  border: `2px dashed ${UI_COLORS.primary}`,
+                  borderRadius: UI_RADII.card,
+                  padding: '24px',
+                  textAlign: 'center',
+                }}
+              >
+                <div style={{ fontSize: '16px', color: UI_COLORS.textMuted, marginBottom: '8px' }}>
+                  MÃ VÀO LỚP CHO HỌC SINH
+                </div>
+                <div
+                  style={{
+                    fontSize: '54px',
+                    fontWeight: 800,
+                    letterSpacing: '8px',
+                    color: UI_COLORS.primary,
+                    fontFamily: 'monospace',
+                  }}
+                  data-testid="session-join-code"
+                >
+                  {joinCodeDisplay}
+                </div>
+                {joinUrlDisplay && (
                   <div
                     style={{
-                      textAlign: 'center',
-                      padding: '24px',
+                      marginTop: '16px',
+                      padding: '10px 14px',
                       backgroundColor: '#F8FAFC',
-                      borderRadius: UI_RADII.card,
-                      color: UI_COLORS.textMuted,
-                      fontSize: '14px',
+                      borderRadius: '10px',
+                      border: '1px solid #E2E8F0',
+                      display: 'flex',
+                      flexDirection: 'column',
+                      gap: '8px',
+                      alignItems: 'center',
                     }}
-                    data-testid="participants-empty"
                   >
-                    {filterOnlineOnly && participants.length > 0
-                      ? 'Tất cả học sinh đã rời khỏi lớp (offline).'
-                      : `Chưa có học sinh nào tham gia. Mã vào lớp là ${joinCodeDisplay}.`}
+                    <div style={{ fontSize: '12px', fontWeight: 600, color: '#64748B' }}>
+                      🔗 Liên kết vào lớp cho học sinh:
+                    </div>
+                    <div
+                      style={{
+                        fontSize: '13px',
+                        wordBreak: 'break-all',
+                        color: UI_COLORS.primary,
+                        display: 'flex',
+                        flexWrap: 'wrap',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        gap: '8px',
+                      }}
+                    >
+                      <a
+                        href={joinUrlDisplay}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        style={{
+                          color: UI_COLORS.primary,
+                          textDecoration: 'underline',
+                          fontWeight: 600,
+                        }}
+                        title="Mở liên kết học sinh trong tab mới"
+                      >
+                        {joinUrlDisplay}
+                      </a>
+                      <button
+                        type="button"
+                        onClick={handleCopyJoinLink}
+                        style={{
+                          padding: '4px 10px',
+                          fontSize: '12px',
+                          fontWeight: 600,
+                          backgroundColor: copiedLink ? '#DCFCE7' : '#FFFFFF',
+                          color: copiedLink ? '#15803D' : '#334155',
+                          border: copiedLink ? '1px solid #86EFAC' : '1px solid #CBD5E1',
+                          borderRadius: '6px',
+                          cursor: 'pointer',
+                          display: 'inline-flex',
+                          alignItems: 'center',
+                          gap: '4px',
+                          transition: 'all 0.15s ease',
+                        }}
+                      >
+                        {copiedLink ? '✓ Đã sao chép!' : '📋 Sao chép link'}
+                      </button>
+                    </div>
                   </div>
-                );
-              }
+                )}
+              </div>
 
-              return (
+              {/* Mã QR tham gia */}
+              {qrDataUrlDisplay && (
                 <div
                   style={{
                     display: 'flex',
                     flexDirection: 'column',
-                    gap: '8px',
-                    maxHeight: '300px',
-                    overflowY: 'auto',
+                    alignItems: 'center',
+                    padding: '16px',
                   }}
-                  data-testid="participants-list"
                 >
-                  {displayed.map((p) => {
-                    const isOnline = p.status === 'online';
+                  <img
+                    src={qrDataUrlDisplay}
+                    alt="Mã QR tham gia phiên học"
+                    style={{ width: '200px', height: '200px', borderRadius: '12px' }}
+                    data-testid="session-qr-image"
+                  />
+                  <span style={{ marginTop: '8px', fontSize: '14px', color: UI_COLORS.textMuted }}>
+                    Học sinh quét mã để vào lớp ngay
+                  </span>
+                </div>
+              )}
+            </div>
+
+            {/* Danh sách người tham gia phiên học (Online / Offline & Mở lại tên) */}
+            <div
+              style={{
+                borderTop: `1px solid ${UI_COLORS.border}`,
+                paddingTop: '20px',
+                display: 'flex',
+                flexDirection: 'column',
+                gap: '12px',
+              }}
+              data-testid="participants-section"
+            >
+              <div
+                style={{
+                  display: 'flex',
+                  justifyContent: 'space-between',
+                  alignItems: 'center',
+                  flexWrap: 'wrap',
+                  gap: '8px',
+                }}
+              >
+                <h3 style={{ margin: 0, fontSize: '18px', fontWeight: 700 }}>
+                  Người tham gia ({participants.filter(p => p.status === 'online').length} Online /{' '}
+                  {participants.length} Tổng)
+                </h3>
+                <label
+                  style={{
+                    fontSize: '13px',
+                    color: '#475569',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '6px',
+                    cursor: 'pointer',
+                    fontWeight: 600,
+                  }}
+                >
+                  <input
+                    type="checkbox"
+                    checked={filterOnlineOnly}
+                    onChange={e => setFilterOnlineOnly(e.target.checked)}
+                  />
+                  Chỉ hiện học sinh đang có mặt
+                </label>
+              </div>
+
+              {(() => {
+                const displayed = filterOnlineOnly
+                  ? participants.filter(p => p.status === 'online')
+                  : participants;
+
+                if (displayed.length === 0) {
                   return (
                     <div
-                      key={p.id}
                       style={{
-                        display: 'flex',
-                        justifyContent: 'space-between',
-                        alignItems: 'center',
-                        padding: '10px 16px',
+                        textAlign: 'center',
+                        padding: '24px',
+                        backgroundColor: '#F8FAFC',
                         borderRadius: UI_RADII.card,
-                        backgroundColor: isOnline ? '#FFFFFF' : '#F1F5F9',
-                        border: `1px solid ${isOnline ? UI_COLORS.border : '#E2E8F0'}`,
+                        color: UI_COLORS.textMuted,
+                        fontSize: '14px',
                       }}
-                      data-testid={`participant-row-${p.id}`}
+                      data-testid="participants-empty"
                     >
-                      <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-                        <span
-                          style={{
-                            display: 'inline-block',
-                            width: '10px',
-                            height: '10px',
-                            borderRadius: '50%',
-                            backgroundColor: isOnline ? UI_COLORS.success : '#94A3B8',
-                          }}
-                          title={isOnline ? 'Online' : 'Offline'}
-                          data-testid={`status-indicator-${p.id}`}
-                        />
-                        <div>
-                          <span
-                            style={{
-                              fontWeight: 600,
-                              color: isOnline ? UI_COLORS.text : '#64748B',
-                            }}
-                          >
-                            {p.displayName}
-                          </span>
-                          {Boolean(p.studentIds && p.studentIds.length > 1) && (
-                            <span
-                              style={{
-                                marginLeft: '8px',
-                                padding: '2px 8px',
-                                borderRadius: '12px',
-                                fontSize: '12px',
-                                fontWeight: 700,
-                                backgroundColor: '#E0F2FE',
-                                color: '#0284C7',
-                                display: 'inline-flex',
-                                alignItems: 'center',
-                                gap: '4px',
-                              }}
-                              data-testid={`pairing-badge-${p.id}`}
-                            >
-                              👥 {p.studentIds!.length} bạn chung máy
-                            </span>
-                          )}
-                          <span
-                            style={{
-                              marginLeft: '8px',
-                              fontSize: '12px',
-                              color: UI_COLORS.textMuted,
-                            }}
-                          >
-                            ({p.identityLevel === 'account'
-                              ? 'Tài khoản'
-                              : p.identityLevel === 'roster'
-                              ? 'Danh sách'
-                              : 'Khách'}
-                            {p.teamName ? ` • ${p.teamName}` : ''})
-                          </span>
-                        </div>
-                      </div>
-
-                      <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
-                        {isOnline && onGrantReward && (
-                          <Button
-                            variant="ghost"
-                            onClick={() => {
-                              setRewardTarget(p);
-                              setRewardExp(20);
-                              setRewardReason('Thưởng phát biểu tích cực');
-                              setRewardError('');
-                            }}
-                            style={{
-                              minHeight: '36px',
-                              padding: '4px 12px',
-                              fontSize: '13px',
-                              border: `1px solid ${UI_COLORS.primary}`,
-                              color: UI_COLORS.primary,
-                            }}
-                            data-testid={`btn-reward-participant-${p.id}`}
-                          >
-                            🎁 Thưởng EXP
-                          </Button>
-                        )}
-                        {isOnline && onReleaseParticipant && (
-                          <Button
-                            variant="ghost"
-                            onClick={() => void onReleaseParticipant(p.id)}
-                            style={{ minHeight: '36px', padding: '4px 12px', fontSize: '13px' }}
-                            data-testid={`btn-release-participant-${p.id}`}
-                          >
-                            🔓 Mở lại tên
-                          </Button>
-                        )}
-                      </div>
+                      {filterOnlineOnly && participants.length > 0
+                        ? 'Tất cả học sinh đã rời khỏi lớp (offline).'
+                        : `Chưa có học sinh nào tham gia. Mã vào lớp là ${joinCodeDisplay}.`}
                     </div>
                   );
-                })}
-              </div>
-            );
-          })()}
-        </div>
-        </div>
-      </Card>
-
-      {/* Modal Thưởng EXP (Task 1.9) */}
-      <Modal
-        isOpen={Boolean(rewardTarget)}
-        onClose={() => setRewardTarget(null)}
-        title={`🎁 Thưởng EXP cho ${rewardTarget?.displayName ?? ''}`}
-      >
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-          {rewardTarget?.studentIds && rewardTarget.studentIds.length > 1 && (
-            <div
-              style={{
-                padding: '8px 12px',
-                backgroundColor: '#F0FDF4',
-                border: '1px solid #BBF7D0',
-                borderRadius: '8px',
-                fontSize: '13px',
-                color: '#15803D',
-                fontWeight: 600,
-              }}
-              data-testid="pairing-reward-hint"
-            >
-              ℹ️ Máy này gồm {rewardTarget.studentIds.length} học sinh. Điểm EXP sẽ được tự động cộng đầy đủ cho từng bạn.
-            </div>
-          )}
-          {rewardError && (
-            <div
-              style={{
-                padding: '10px 12px',
-                backgroundColor: '#FEF2F2',
-                border: `1px solid ${UI_COLORS.error}`,
-                borderRadius: UI_RADII.card,
-                color: UI_COLORS.error,
-                fontSize: '13px',
-              }}
-              data-testid="reward-error-message"
-            >
-              {rewardError}
-            </div>
-          )}
-
-          <div>
-            <label style={{ display: 'block', fontSize: '14px', fontWeight: 600, marginBottom: '6px' }}>
-              Mức thưởng EXP:
-            </label>
-            <div style={{ display: 'flex', gap: '8px', marginBottom: '8px' }}>
-              {[10, 20, 50, 100].map((amount) => (
-                <Button
-                  key={amount}
-                  type="button"
-                  variant={rewardExp === amount ? 'primary' : 'ghost'}
-                  onClick={() => setRewardExp(amount)}
-                  style={{
-                    flex: 1,
-                    minHeight: '40px',
-                    border: `1px solid ${rewardExp === amount ? UI_COLORS.primary : UI_COLORS.border}`,
-                  }}
-                  data-testid={`btn-exp-${amount}`}
-                >
-                  +{amount}
-                </Button>
-              ))}
-            </div>
-            <input
-              type="number"
-              min={1}
-              max={1000}
-              value={rewardExp}
-              onChange={(e) => setRewardExp(Math.max(1, parseInt(e.target.value, 10) || 1))}
-              style={{
-                width: '100%',
-                padding: '8px 12px',
-                border: `1px solid ${UI_COLORS.border}`,
-                borderRadius: UI_RADII.card,
-                fontSize: '14px',
-                boxSizing: 'border-box',
-              }}
-              data-testid="input-reward-exp"
-            />
-          </div>
-
-          <div>
-            <label style={{ display: 'block', fontSize: '14px', fontWeight: 600, marginBottom: '6px' }}>
-              Lý do thưởng:
-            </label>
-            <input
-              type="text"
-              value={rewardReason}
-              onChange={(e) => setRewardReason(e.target.value)}
-              placeholder="VD: Phát biểu tích cực, Tinh thần đồng đội..."
-              style={{
-                width: '100%',
-                padding: '8px 12px',
-                border: `1px solid ${UI_COLORS.border}`,
-                borderRadius: UI_RADII.card,
-                fontSize: '14px',
-                boxSizing: 'border-box',
-              }}
-              data-testid="input-reward-reason"
-            />
-          </div>
-
-          <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '12px', marginTop: '8px' }}>
-            <Button
-              variant="ghost"
-              onClick={() => setRewardTarget(null)}
-              disabled={rewardLoading}
-              data-testid="btn-cancel-reward"
-            >
-              Hủy
-            </Button>
-            <Button
-              variant="primary"
-              onClick={async () => {
-                if (!rewardTarget || !onGrantReward) return;
-                setRewardLoading(true);
-                setRewardError('');
-                try {
-                  await onGrantReward(
-                    rewardTarget.id,
-                    rewardExp,
-                    rewardReason.trim() || 'Thưởng từ giáo viên'
-                  );
-                  setRewardTarget(null);
-                } catch (err) {
-                  setRewardError(err instanceof Error ? err.message : 'Không thể cộng thưởng.');
-                } finally {
-                  setRewardLoading(false);
                 }
-              }}
-              disabled={rewardLoading}
-              data-testid="btn-confirm-reward"
-            >
-              {rewardLoading ? 'Đang cộng...' : '🎁 Xác nhận thưởng'}
-            </Button>
-          </div>
-        </div>
-      </Modal>
 
-      {/* Modal Trò chuyện & Hỗ trợ (Task 5.2) */}
-      <Modal
-        isOpen={isChatOpen}
-        onClose={() => setIsChatOpen(false)}
-        title="💬 Trò chuyện & Yêu cầu trợ giúp"
-      >
-        <div style={{ height: '520px', display: 'flex', flexDirection: 'column' }} data-testid="session-chat-modal">
-          <ChatBox
-            role="teacher"
-            messages={messages}
-            activeHandRaises={handRaisesList}
-            chatLocked={locked}
-            chatMode={currentMode}
-            onSendMessage={(content, toPartId) => void handleSendChat({ content, toParticipantId: toPartId ?? null })}
-            onToggleChatLock={handleToggleLock}
-            onChangeChatMode={handleChangeChatMode}
-            onResolveHandRaise={handleResolveHandRaise}
-          />
-        </div>
-      </Modal>
-    </>
-  );
-}
+                return (
+                  <div
+                    style={{
+                      display: 'flex',
+                      flexDirection: 'column',
+                      gap: '8px',
+                      maxHeight: '300px',
+                      overflowY: 'auto',
+                    }}
+                    data-testid="participants-list"
+                  >
+                    {displayed.map(p => {
+                      const isOnline = p.status === 'online';
+                      return (
+                        <div
+                          key={p.id}
+                          style={{
+                            display: 'flex',
+                            justifyContent: 'space-between',
+                            alignItems: 'center',
+                            padding: '10px 16px',
+                            borderRadius: UI_RADII.card,
+                            backgroundColor: isOnline ? '#FFFFFF' : '#F1F5F9',
+                            border: `1px solid ${isOnline ? UI_COLORS.border : '#E2E8F0'}`,
+                          }}
+                          data-testid={`participant-row-${p.id}`}
+                        >
+                          <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                            <span
+                              style={{
+                                display: 'inline-block',
+                                width: '10px',
+                                height: '10px',
+                                borderRadius: '50%',
+                                backgroundColor: isOnline ? UI_COLORS.success : '#94A3B8',
+                              }}
+                              title={isOnline ? 'Online' : 'Offline'}
+                              data-testid={`status-indicator-${p.id}`}
+                            />
+                            <div>
+                              <span
+                                style={{
+                                  fontWeight: 600,
+                                  color: isOnline ? UI_COLORS.text : '#64748B',
+                                }}
+                              >
+                                {p.displayName}
+                              </span>
+                              {Boolean(p.studentIds && p.studentIds.length > 1) && (
+                                <span
+                                  style={{
+                                    marginLeft: '8px',
+                                    padding: '2px 8px',
+                                    borderRadius: '12px',
+                                    fontSize: '12px',
+                                    fontWeight: 700,
+                                    backgroundColor: '#E0F2FE',
+                                    color: '#0284C7',
+                                    display: 'inline-flex',
+                                    alignItems: 'center',
+                                    gap: '4px',
+                                  }}
+                                  data-testid={`pairing-badge-${p.id}`}
+                                >
+                                  👥 {p.studentIds!.length} bạn chung máy
+                                </span>
+                              )}
+                              <span
+                                style={{
+                                  marginLeft: '8px',
+                                  fontSize: '12px',
+                                  color: UI_COLORS.textMuted,
+                                }}
+                              >
+                                (
+                                {p.identityLevel === 'account'
+                                  ? 'Tài khoản'
+                                  : p.identityLevel === 'roster'
+                                    ? 'Danh sách'
+                                    : 'Khách'}
+                                {p.teamName ? ` • ${p.teamName}` : ''})
+                              </span>
+                            </div>
+                          </div>
+
+                          <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
+                            {isOnline && onGrantReward && (
+                              <Button
+                                variant="ghost"
+                                onClick={() => {
+                                  setRewardTarget(p);
+                                  setRewardExp(20);
+                                  setRewardReason('Thưởng phát biểu tích cực');
+                                  setRewardError('');
+                                }}
+                                style={{
+                                  minHeight: '36px',
+                                  padding: '4px 12px',
+                                  fontSize: '13px',
+                                  border: `1px solid ${UI_COLORS.primary}`,
+                                  color: UI_COLORS.primary,
+                                }}
+                                data-testid={`btn-reward-participant-${p.id}`}
+                              >
+                                🎁 Thưởng EXP
+                              </Button>
+                            )}
+                            {isOnline && onReleaseParticipant && (
+                              <Button
+                                variant="ghost"
+                                onClick={() => void onReleaseParticipant(p.id)}
+                                style={{ minHeight: '36px', padding: '4px 12px', fontSize: '13px' }}
+                                data-testid={`btn-release-participant-${p.id}`}
+                              >
+                                🔓 Mở lại tên
+                              </Button>
+                            )}
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                );
+              })()}
+            </div>
+          </div>
+        </Card>
+
+        {/* Modal Thưởng EXP (Task 1.9) */}
+        <Modal
+          isOpen={Boolean(rewardTarget)}
+          onClose={() => setRewardTarget(null)}
+          title={`🎁 Thưởng EXP cho ${rewardTarget?.displayName ?? ''}`}
+        >
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+            {rewardTarget?.studentIds && rewardTarget.studentIds.length > 1 && (
+              <div
+                style={{
+                  padding: '8px 12px',
+                  backgroundColor: '#F0FDF4',
+                  border: '1px solid #BBF7D0',
+                  borderRadius: '8px',
+                  fontSize: '13px',
+                  color: '#15803D',
+                  fontWeight: 600,
+                }}
+                data-testid="pairing-reward-hint"
+              >
+                ℹ️ Máy này gồm {rewardTarget.studentIds.length} học sinh. Điểm EXP sẽ được tự động
+                cộng đầy đủ cho từng bạn.
+              </div>
+            )}
+            {rewardError && (
+              <div
+                style={{
+                  padding: '10px 12px',
+                  backgroundColor: '#FEF2F2',
+                  border: `1px solid ${UI_COLORS.error}`,
+                  borderRadius: UI_RADII.card,
+                  color: UI_COLORS.error,
+                  fontSize: '13px',
+                }}
+                data-testid="reward-error-message"
+              >
+                {rewardError}
+              </div>
+            )}
+
+            <div>
+              <label
+                style={{ display: 'block', fontSize: '14px', fontWeight: 600, marginBottom: '6px' }}
+              >
+                Mức thưởng EXP:
+              </label>
+              <div style={{ display: 'flex', gap: '8px', marginBottom: '8px' }}>
+                {[10, 20, 50, 100].map(amount => (
+                  <Button
+                    key={amount}
+                    type="button"
+                    variant={rewardExp === amount ? 'primary' : 'ghost'}
+                    onClick={() => setRewardExp(amount)}
+                    style={{
+                      flex: 1,
+                      minHeight: '40px',
+                      border: `1px solid ${rewardExp === amount ? UI_COLORS.primary : UI_COLORS.border}`,
+                    }}
+                    data-testid={`btn-exp-${amount}`}
+                  >
+                    +{amount}
+                  </Button>
+                ))}
+              </div>
+              <input
+                type="number"
+                min={1}
+                max={1000}
+                value={rewardExp}
+                onChange={e => setRewardExp(Math.max(1, parseInt(e.target.value, 10) || 1))}
+                style={{
+                  width: '100%',
+                  padding: '8px 12px',
+                  border: `1px solid ${UI_COLORS.border}`,
+                  borderRadius: UI_RADII.card,
+                  fontSize: '14px',
+                  boxSizing: 'border-box',
+                }}
+                data-testid="input-reward-exp"
+              />
+            </div>
+
+            <div>
+              <label
+                style={{ display: 'block', fontSize: '14px', fontWeight: 600, marginBottom: '6px' }}
+              >
+                Lý do thưởng:
+              </label>
+              <input
+                type="text"
+                value={rewardReason}
+                onChange={e => setRewardReason(e.target.value)}
+                placeholder="VD: Phát biểu tích cực, Tinh thần đồng đội..."
+                style={{
+                  width: '100%',
+                  padding: '8px 12px',
+                  border: `1px solid ${UI_COLORS.border}`,
+                  borderRadius: UI_RADII.card,
+                  fontSize: '14px',
+                  boxSizing: 'border-box',
+                }}
+                data-testid="input-reward-reason"
+              />
+            </div>
+
+            <div
+              style={{ display: 'flex', justifyContent: 'flex-end', gap: '12px', marginTop: '8px' }}
+            >
+              <Button
+                variant="ghost"
+                onClick={() => setRewardTarget(null)}
+                disabled={rewardLoading}
+                data-testid="btn-cancel-reward"
+              >
+                Hủy
+              </Button>
+              <Button
+                variant="primary"
+                onClick={async () => {
+                  if (!rewardTarget || !onGrantReward) return;
+                  setRewardLoading(true);
+                  setRewardError('');
+                  try {
+                    await onGrantReward(
+                      rewardTarget.id,
+                      rewardExp,
+                      rewardReason.trim() || 'Thưởng từ giáo viên'
+                    );
+                    setRewardTarget(null);
+                  } catch (err) {
+                    setRewardError(err instanceof Error ? err.message : 'Không thể cộng thưởng.');
+                  } finally {
+                    setRewardLoading(false);
+                  }
+                }}
+                disabled={rewardLoading}
+                data-testid="btn-confirm-reward"
+              >
+                {rewardLoading ? 'Đang cộng...' : '🎁 Xác nhận thưởng'}
+              </Button>
+            </div>
+          </div>
+        </Modal>
+
+        {/* Modal Trò chuyện & Hỗ trợ (Task 5.2) */}
+        <Modal
+          isOpen={isChatOpen}
+          onClose={() => setIsChatOpen(false)}
+          title="💬 Trò chuyện & Yêu cầu trợ giúp"
+        >
+          <div
+            style={{ height: '520px', display: 'flex', flexDirection: 'column' }}
+            data-testid="session-chat-modal"
+          >
+            <ChatBox
+              role="teacher"
+              messages={messages}
+              activeHandRaises={handRaisesList}
+              chatLocked={locked}
+              chatMode={currentMode}
+              onSendMessage={(content, toPartId) =>
+                void handleSendChat({ content, toParticipantId: toPartId ?? null })
+              }
+              onToggleChatLock={handleToggleLock}
+              onChangeChatMode={handleChangeChatMode}
+              onResolveHandRaise={handleResolveHandRaise}
+            />
+          </div>
+        </Modal>
+      </>
+    );
+  }
 
   // Màn hình hiển thị Báo cáo tổng kết khi phiên đã đóng (Task 1.8 & Task 3.4)
   if (sessionReport && !activeSession) {
@@ -896,7 +924,7 @@ export const SessionControl: React.FC<SessionControlProps> = ({
             </label>
             <select
               value={selectedClassId}
-              onChange={(e) => setSelectedClassId(e.target.value)}
+              onChange={e => setSelectedClassId(e.target.value)}
               style={{
                 width: '100%',
                 minHeight: '48px',
@@ -909,7 +937,7 @@ export const SessionControl: React.FC<SessionControlProps> = ({
               data-testid="select-class"
             >
               <option value="">-- Phiên tự do (Không theo danh sách lớp) --</option>
-              {classes.map((cls) => (
+              {classes.map(cls => (
                 <option key={cls.id} value={cls.id}>
                   {cls.name} ({cls.year})
                 </option>
@@ -924,7 +952,9 @@ export const SessionControl: React.FC<SessionControlProps> = ({
               Chế độ danh tính học sinh (Identity Mode)
             </label>
             <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-              <label style={{ display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer' }}>
+              <label
+                style={{ display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer' }}
+              >
                 <input
                   type="radio"
                   name="identityMode"
@@ -935,7 +965,9 @@ export const SessionControl: React.FC<SessionControlProps> = ({
                 <span>Chọn tên trong danh sách hoặc tự nhập nickname (Khuyên dùng)</span>
               </label>
 
-              <label style={{ display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer' }}>
+              <label
+                style={{ display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer' }}
+              >
                 <input
                   type="radio"
                   name="identityMode"
@@ -949,7 +981,9 @@ export const SessionControl: React.FC<SessionControlProps> = ({
                 </span>
               </label>
 
-              <label style={{ display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer' }}>
+              <label
+                style={{ display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer' }}
+              >
                 <input
                   type="radio"
                   name="identityMode"
@@ -967,7 +1001,7 @@ export const SessionControl: React.FC<SessionControlProps> = ({
               <input
                 type="checkbox"
                 checked={allowTeams}
-                onChange={(e) => setAllowTeams(e.target.checked)}
+                onChange={e => setAllowTeams(e.target.checked)}
                 data-testid="checkbox-allow-teams"
               />
               <span style={{ fontWeight: 600 }}>Cho phép chia đội / nhóm học tập</span>
@@ -979,7 +1013,7 @@ export const SessionControl: React.FC<SessionControlProps> = ({
               <input
                 type="checkbox"
                 checked={allowPairing}
-                onChange={(e) => setAllowPairing(e.target.checked)}
+                onChange={e => setAllowPairing(e.target.checked)}
                 data-testid="checkbox-allow-pairing"
               />
               <span style={{ fontWeight: 600 }}>Cho phép ghép 2–3 học sinh ngồi chung 1 máy</span>
@@ -997,7 +1031,7 @@ export const SessionControl: React.FC<SessionControlProps> = ({
                 <span style={{ color: UI_COLORS.textMuted }}>Số lượng tối đa mỗi máy:</span>
                 <select
                   value={maxStudentsPerDevice}
-                  onChange={(e) => setMaxStudentsPerDevice(Number(e.target.value))}
+                  onChange={e => setMaxStudentsPerDevice(Number(e.target.value))}
                   style={{
                     padding: '6px 12px',
                     borderRadius: '8px',

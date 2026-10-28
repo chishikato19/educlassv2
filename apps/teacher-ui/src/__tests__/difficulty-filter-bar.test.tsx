@@ -1,10 +1,7 @@
 // @vitest-environment jsdom
 import { fireEvent, render, screen } from '@testing-library/react';
 import { describe, expect, it, vi } from 'vitest';
-import {
-  DifficultyFilterBar,
-  getDifficultyBadgeInfo,
-} from '../components/DifficultyFilterBar.js';
+import { DifficultyFilterBar, getDifficultyBadgeInfo } from '../components/DifficultyFilterBar.js';
 
 describe('DifficultyFilterBar Component (Task 3.2)', () => {
   it('renders all 4 difficulty levels and All button', () => {
@@ -14,7 +11,7 @@ describe('DifficultyFilterBar Component (Task 3.2)', () => {
         selectedDifficulty="all"
         onSelectDifficulty={onSelect}
         counts={{ nb: 5, th: 3, vd: 2, vdc: 1 }}
-      />,
+      />
     );
 
     expect(screen.getByText('Tất cả')).toBeDefined();
@@ -33,12 +30,7 @@ describe('DifficultyFilterBar Component (Task 3.2)', () => {
 
   it('triggers onSelectDifficulty callback when button clicked', () => {
     const onSelect = vi.fn();
-    render(
-      <DifficultyFilterBar
-        selectedDifficulty="all"
-        onSelectDifficulty={onSelect}
-      />,
-    );
+    render(<DifficultyFilterBar selectedDifficulty="all" onSelectDifficulty={onSelect} />);
 
     const nbBtn = screen.getByTitle('Nhận biết (NB)');
     fireEvent.click(nbBtn);

@@ -128,7 +128,7 @@ describe('ClassGroupRepository', () => {
       expect(result3.groups[2]?.group.name).toBe('Tổ 3');
 
       // 10 HS chia 3 nhóm: 4, 3, 3
-      const memberCounts = result3.groups.map((g) => g.members.length).sort((a, b) => b - a);
+      const memberCounts = result3.groups.map(g => g.members.length).sort((a, b) => b - a);
       expect(memberCounts).toEqual([4, 3, 3]);
 
       // Mỗi nhóm đều có nhóm trưởng
@@ -144,7 +144,7 @@ describe('ClassGroupRepository', () => {
       });
       expect(result4.groups).toHaveLength(4);
       // 10 HS chia 4 nhóm: 3, 3, 2, 2
-      const memberCounts4 = result4.groups.map((g) => g.members.length).sort((a, b) => b - a);
+      const memberCounts4 = result4.groups.map(g => g.members.length).sort((a, b) => b - a);
       expect(memberCounts4).toEqual([3, 3, 2, 2]);
     } finally {
       close();

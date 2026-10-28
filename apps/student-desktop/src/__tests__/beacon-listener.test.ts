@@ -13,7 +13,7 @@ describe('BeaconListener', () => {
       listener = null;
     }
     if (testSender) {
-      await new Promise<void>((resolve) => {
+      await new Promise<void>(resolve => {
         testSender?.close(() => resolve());
       });
       testSender = null;
@@ -27,8 +27,8 @@ describe('BeaconListener', () => {
     const openedEvents: DiscoveryBeaconPayload[] = [];
     const closedEvents: DiscoveryBeaconPayload[] = [];
 
-    listener.on('session-opened', (p) => openedEvents.push(p));
-    listener.on('session-closed', (p) => closedEvents.push(p));
+    listener.on('session-opened', p => openedEvents.push(p));
+    listener.on('session-closed', p => closedEvents.push(p));
 
     await listener.start();
     expect(listener.isListening()).toBe(true);
@@ -47,7 +47,7 @@ describe('BeaconListener', () => {
       timestamp: Date.now(),
     };
     const openMsg = Buffer.from(JSON.stringify(openPacket));
-    await new Promise<void>((resolve) => {
+    await new Promise<void>(resolve => {
       testSender!.send(openMsg, 0, openMsg.length, testPort, '127.0.0.1', () => resolve());
     });
 
@@ -61,12 +61,12 @@ describe('BeaconListener', () => {
       timestamp: Date.now(),
     };
     const closeMsg = Buffer.from(JSON.stringify(closePacket));
-    await new Promise<void>((resolve) => {
+    await new Promise<void>(resolve => {
       testSender!.send(closeMsg, 0, closeMsg.length, testPort, '127.0.0.1', () => resolve());
     });
 
     // Chờ 200ms để các event kích hoạt
-    await new Promise((r) => setTimeout(r, 200));
+    await new Promise(r => setTimeout(r, 200));
 
     expect(openedEvents.length).toBe(1);
     expect(openedEvents[0]?.sessionId).toBe('sess_100');
@@ -82,17 +82,19 @@ describe('BeaconListener', () => {
     listener = new BeaconListener({ port: testPort, address: '127.0.0.1' });
 
     let received = false;
-    listener.on('session-opened', () => { received = true; });
+    listener.on('session-opened', () => {
+      received = true;
+    });
 
     await listener.start();
     testSender = dgram.createSocket('udp4');
 
     const garbageMsg = Buffer.from('NOT_A_VALID_JSON');
-    await new Promise<void>((resolve) => {
+    await new Promise<void>(resolve => {
       testSender!.send(garbageMsg, 0, garbageMsg.length, testPort, '127.0.0.1', () => resolve());
     });
 
-    await new Promise((r) => setTimeout(r, 100));
+    await new Promise(r => setTimeout(r, 100));
     expect(received).toBe(false);
   });
 });

@@ -7,7 +7,14 @@ export interface TeacherAwardModalProps {
   onClose: () => void;
 }
 
-const AWARDS: { id: 'top1' | 'top2' | 'top3' | 'creative'; title: string; subtitle: string; icon: string; bg: string; border: string }[] = [
+const AWARDS: {
+  id: 'top1' | 'top2' | 'top3' | 'creative';
+  title: string;
+  subtitle: string;
+  icon: string;
+  bg: string;
+  border: string;
+}[] = [
   {
     id: 'top1',
     title: 'Quán quân (Top 1)',
@@ -42,11 +49,7 @@ const AWARDS: { id: 'top1' | 'top2' | 'top3' | 'creative'; title: string; subtit
   },
 ];
 
-export const TeacherAwardModal: React.FC<TeacherAwardModalProps> = ({
-  post,
-  onAward,
-  onClose,
-}) => {
+export const TeacherAwardModal: React.FC<TeacherAwardModalProps> = ({ post, onAward, onClose }) => {
   return (
     <div className="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4">
       <div className="bg-white w-full max-w-md rounded-3xl shadow-2xl border border-slate-200 overflow-hidden animate-in fade-in zoom-in duration-200">
@@ -66,12 +69,14 @@ export const TeacherAwardModal: React.FC<TeacherAwardModalProps> = ({
 
         <div className="p-5 space-y-4">
           <div className="text-center">
-            <span className="text-xs text-slate-400 uppercase font-bold tracking-wider">Tác giả</span>
+            <span className="text-xs text-slate-400 uppercase font-bold tracking-wider">
+              Tác giả
+            </span>
             <h3 className="text-xl font-extrabold text-slate-800 mt-0.5">{post.authorName}</h3>
           </div>
 
           <div className="space-y-2">
-            {AWARDS.map((award) => {
+            {AWARDS.map(award => {
               const isSelected = post.rankAward === award.id;
               return (
                 <button

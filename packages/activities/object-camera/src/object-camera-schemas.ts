@@ -98,7 +98,11 @@ export type ObjectCameraConfig = z.infer<typeof ObjectCameraConfigSchema>;
 /**
  * Chế độ hiển thị: 1 ảnh (đơn), so sánh chia đôi dọc (Trái | Phải), hoặc chia đôi ngang (Trên | Dưới)
  */
-export const ObjectCameraDisplayModeSchema = z.enum(['single', 'compare_vertical', 'compare_horizontal']);
+export const ObjectCameraDisplayModeSchema = z.enum([
+  'single',
+  'compare_vertical',
+  'compare_horizontal',
+]);
 export type ObjectCameraDisplayMode = z.infer<typeof ObjectCameraDisplayModeSchema>;
 
 /**

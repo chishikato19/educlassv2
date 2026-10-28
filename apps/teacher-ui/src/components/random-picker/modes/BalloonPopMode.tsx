@@ -3,14 +3,54 @@ import gsap from 'gsap';
 import type { BalloonItem, RandomPickerModeProps } from '../types.js';
 
 const BALLOON_COLORS = [
-  { bg: 'from-rose-500 via-red-500 to-rose-700', border: 'border-rose-300', text: 'text-rose-100', knot: 'bg-rose-700' },
-  { bg: 'from-sky-400 via-blue-500 to-indigo-600', border: 'border-sky-300', text: 'text-sky-100', knot: 'bg-indigo-700' },
-  { bg: 'from-emerald-400 via-green-500 to-emerald-700', border: 'border-emerald-300', text: 'text-emerald-100', knot: 'bg-emerald-800' },
-  { bg: 'from-amber-400 via-yellow-500 to-amber-600', border: 'border-yellow-200', text: 'text-amber-100', knot: 'bg-amber-700' },
-  { bg: 'from-purple-400 via-violet-500 to-purple-700', border: 'border-purple-300', text: 'text-purple-100', knot: 'bg-purple-800' },
-  { bg: 'from-pink-400 via-rose-400 to-pink-600', border: 'border-pink-200', text: 'text-pink-100', knot: 'bg-pink-700' },
-  { bg: 'from-orange-400 via-amber-500 to-orange-600', border: 'border-orange-200', text: 'text-orange-100', knot: 'bg-orange-700' },
-  { bg: 'from-teal-400 via-cyan-500 to-teal-700', border: 'border-teal-200', text: 'text-teal-100', knot: 'bg-teal-800' },
+  {
+    bg: 'from-rose-500 via-red-500 to-rose-700',
+    border: 'border-rose-300',
+    text: 'text-rose-100',
+    knot: 'bg-rose-700',
+  },
+  {
+    bg: 'from-sky-400 via-blue-500 to-indigo-600',
+    border: 'border-sky-300',
+    text: 'text-sky-100',
+    knot: 'bg-indigo-700',
+  },
+  {
+    bg: 'from-emerald-400 via-green-500 to-emerald-700',
+    border: 'border-emerald-300',
+    text: 'text-emerald-100',
+    knot: 'bg-emerald-800',
+  },
+  {
+    bg: 'from-amber-400 via-yellow-500 to-amber-600',
+    border: 'border-yellow-200',
+    text: 'text-amber-100',
+    knot: 'bg-amber-700',
+  },
+  {
+    bg: 'from-purple-400 via-violet-500 to-purple-700',
+    border: 'border-purple-300',
+    text: 'text-purple-100',
+    knot: 'bg-purple-800',
+  },
+  {
+    bg: 'from-pink-400 via-rose-400 to-pink-600',
+    border: 'border-pink-200',
+    text: 'text-pink-100',
+    knot: 'bg-pink-700',
+  },
+  {
+    bg: 'from-orange-400 via-amber-500 to-orange-600',
+    border: 'border-orange-200',
+    text: 'text-orange-100',
+    knot: 'bg-orange-700',
+  },
+  {
+    bg: 'from-teal-400 via-cyan-500 to-teal-700',
+    border: 'border-teal-200',
+    text: 'text-teal-100',
+    knot: 'bg-teal-800',
+  },
 ];
 
 export const BalloonPopMode: React.FC<RandomPickerModeProps> = ({
@@ -41,12 +81,12 @@ export const BalloonPopMode: React.FC<RandomPickerModeProps> = ({
     });
 
     return () => {
-      balloonEls.forEach((el) => gsap.killTweensOf(el));
+      balloonEls.forEach(el => gsap.killTweensOf(el));
     };
   }, [balloons.length]);
 
   // Hiệu ứng phóng to dần tên học sinh từ nhỏ xíu ra lớn khi bóng nổ
-  const poppedTargetBalloon = balloons.find((b) => b.isPopped && b.isTarget);
+  const poppedTargetBalloon = balloons.find(b => b.isPopped && b.isTarget);
   const studentToDisplay = poppedTargetBalloon?.student || selectedStudent;
 
   useEffect(() => {

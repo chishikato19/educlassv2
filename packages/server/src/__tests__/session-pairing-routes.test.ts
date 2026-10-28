@@ -157,7 +157,9 @@ describe('Multi-Student Device Pairing Server Routes (Stage 2)', () => {
         url: `/api/sessions/code/${joinCode}/roster`,
       });
       const rosterAfterJson = JSON.parse(rosterAfterJoin.body);
-      const takenMap = new Map(rosterAfterJson.students.map((s: { id: string; isTaken: boolean }) => [s.id, s.isTaken]));
+      const takenMap = new Map(
+        rosterAfterJson.students.map((s: { id: string; isTaken: boolean }) => [s.id, s.isTaken])
+      );
       expect(takenMap.get(s1.id)).toBe(true);
       expect(takenMap.get(s2.id)).toBe(true);
       expect(takenMap.get(s3.id)).toBe(false);

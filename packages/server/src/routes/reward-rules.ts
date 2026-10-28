@@ -55,7 +55,9 @@ export const rewardRulesRoutes: FastifyPluginAsync<RewardRulesRoutesOptions> = a
     async (request, reply) => {
       const user = request.user;
       if (!user) {
-        return reply.status(401).send(formatProtocolError('UNAUTHORIZED', 'Chưa xác thực danh tính') as never);
+        return reply
+          .status(401)
+          .send(formatProtocolError('UNAUTHORIZED', 'Chưa xác thực danh tính') as never);
       }
 
       const info = await rewardRuleService.getRulesForTeacher(user.id);
@@ -74,33 +76,33 @@ export const rewardRulesRoutes: FastifyPluginAsync<RewardRulesRoutesOptions> = a
    * PUT /api/reward-rules
    * Cập nhật danh sách quy tắc thưởng và trần EXP của giáo viên
    */
-  fastify.put(
-    '/api/reward-rules',
-    { preHandler: [authenticate] },
-    async (request, reply) => {
-      const user = request.user;
-      if (!user) {
-        return reply.status(401).send(formatProtocolError('UNAUTHORIZED', 'Chưa xác thực danh tính') as never);
-      }
-
-      const parseResult = SetRewardRulesRequestSchema.safeParse(request.body);
-      if (!parseResult.success) {
-        return reply
-          .status(400)
-          .send(formatProtocolError('INVALID_PAYLOAD', 'Dữ liệu quy tắc thưởng không hợp lệ') as never);
-      }
-
-      const info = await rewardRuleService.saveTeacherRules(user.id, parseResult.data.rules);
-
-      return reply.send({
-        globalRules: info.globalRules.map(toRewardRuleDto),
-        teacherRules: info.teacherRules.map(toRewardRuleDto),
-        effectiveRules: info.effectiveRules.map(toRewardRuleDto),
-        sessionCap: info.sessionCap,
-        activityCaps: info.activityCaps,
-      });
+  fastify.put('/api/reward-rules', { preHandler: [authenticate] }, async (request, reply) => {
+    const user = request.user;
+    if (!user) {
+      return reply
+        .status(401)
+        .send(formatProtocolError('UNAUTHORIZED', 'Chưa xác thực danh tính') as never);
     }
-  );
+
+    const parseResult = SetRewardRulesRequestSchema.safeParse(request.body);
+    if (!parseResult.success) {
+      return reply
+        .status(400)
+        .send(
+          formatProtocolError('INVALID_PAYLOAD', 'Dữ liệu quy tắc thưởng không hợp lệ') as never
+        );
+    }
+
+    const info = await rewardRuleService.saveTeacherRules(user.id, parseResult.data.rules);
+
+    return reply.send({
+      globalRules: info.globalRules.map(toRewardRuleDto),
+      teacherRules: info.teacherRules.map(toRewardRuleDto),
+      effectiveRules: info.effectiveRules.map(toRewardRuleDto),
+      sessionCap: info.sessionCap,
+      activityCaps: info.activityCaps,
+    });
+  });
 
   /**
    * POST /api/reward-rules/reset
@@ -112,7 +114,9 @@ export const rewardRulesRoutes: FastifyPluginAsync<RewardRulesRoutesOptions> = a
     async (request, reply) => {
       const user = request.user;
       if (!user) {
-        return reply.status(401).send(formatProtocolError('UNAUTHORIZED', 'Chưa xác thực danh tính') as never);
+        return reply
+          .status(401)
+          .send(formatProtocolError('UNAUTHORIZED', 'Chưa xác thực danh tính') as never);
       }
 
       const info = await rewardRuleService.resetTeacherRules(user.id);

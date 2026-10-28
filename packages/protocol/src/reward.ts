@@ -110,4 +110,3 @@ export const ResetRewardRulesResponseSchema = z.object({
   effectiveRules: z.array(RewardRuleDtoSchema),
 });
 export type ResetRewardRulesResponse = z.infer<typeof ResetRewardRulesResponseSchema>;
-

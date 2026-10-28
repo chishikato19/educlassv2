@@ -41,13 +41,7 @@ describe('ChatBox Component (Task 5.2)', () => {
   ];
 
   it('renders public messages for students', () => {
-    render(
-      <ChatBox
-        role="student"
-        currentParticipantId="p1"
-        messages={mockMessages}
-      />
-    );
+    render(<ChatBox role="student" currentParticipantId="p1" messages={mockMessages} />);
 
     expect(screen.getByText('Chào cả lớp!')).toBeDefined();
     expect(screen.getByText('Em chào thầy ạ!')).toBeDefined();
@@ -56,13 +50,7 @@ describe('ChatBox Component (Task 5.2)', () => {
   });
 
   it('switches to private tab and shows private messages', () => {
-    render(
-      <ChatBox
-        role="student"
-        currentParticipantId="p1"
-        messages={mockMessages}
-      />
-    );
+    render(<ChatBox role="student" currentParticipantId="p1" messages={mockMessages} />);
 
     const privateTab = screen.getByText(/Với Thầy\/Cô/i);
     fireEvent.click(privateTab);
@@ -72,17 +60,10 @@ describe('ChatBox Component (Task 5.2)', () => {
 
   it('displays chat locked banner and disables sending', () => {
     render(
-      <ChatBox
-        role="student"
-        currentParticipantId="p1"
-        messages={mockMessages}
-        chatLocked={true}
-      />
+      <ChatBox role="student" currentParticipantId="p1" messages={mockMessages} chatLocked={true} />
     );
 
-    expect(
-      screen.getByText(/Thầy\/cô đã tạm khóa trò chuyện trong lớp học/i)
-    ).toBeDefined();
+    expect(screen.getByText(/Thầy\/cô đã tạm khóa trò chuyện trong lớp học/i)).toBeDefined();
 
     const input = screen.getByPlaceholderText(/Trò chuyện đang bị khóa/i);
     expect(input.hasAttribute('disabled')).toBe(true);
@@ -158,13 +139,7 @@ describe('ChatBox Component (Task 5.2)', () => {
 
   it('khởi tạo với chatLocked = true mặc định cho GV', () => {
     const handleToggle = vi.fn();
-    render(
-      <ChatBox
-        role="teacher"
-        messages={[]}
-        onToggleChatLock={handleToggle}
-      />
-    );
+    render(<ChatBox role="teacher" messages={[]} onToggleChatLock={handleToggle} />);
 
     const lockedBtn = screen.getByRole('button', { name: /🔒 Đang khóa chat/i });
     expect(lockedBtn).toBeDefined();
@@ -172,4 +147,3 @@ describe('ChatBox Component (Task 5.2)', () => {
     expect(handleToggle).toHaveBeenCalledWith(false);
   });
 });
-

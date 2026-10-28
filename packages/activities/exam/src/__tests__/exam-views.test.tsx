@@ -67,13 +67,7 @@ describe('Exam Views (React Components)', () => {
 
   it('renders ExamStudentView password unlock form when not authenticated', () => {
     const sendIntent = vi.fn();
-    render(
-      <ExamStudentView
-        state={baseState}
-        participantId="hs-1"
-        sendIntent={sendIntent}
-      />
-    );
+    render(<ExamStudentView state={baseState} participantId="hs-1" sendIntent={sendIntent} />);
 
     expect(screen.getByPlaceholderText('Nhập mật khẩu kỳ thi...')).toBeDefined();
     expect(screen.getByText('Mở đề thi')).toBeDefined();
@@ -101,11 +95,7 @@ describe('Exam Views (React Components)', () => {
     };
 
     render(
-      <ExamStudentView
-        state={authenticatedState}
-        participantId="hs-1"
-        sendIntent={sendIntent}
-      />
+      <ExamStudentView state={authenticatedState} participantId="hs-1" sendIntent={sendIntent} />
     );
 
     expect(screen.getByText('Đã sẵn sàng · Chờ giáo viên mở đề thi...')).toBeDefined();
@@ -155,11 +145,7 @@ describe('Exam Views (React Components)', () => {
     };
 
     render(
-      <ExamStudentView
-        state={inProgressState}
-        participantId="hs-1"
-        sendIntent={sendIntent}
-      />
+      <ExamStudentView state={inProgressState} participantId="hs-1" sendIntent={sendIntent} />
     );
 
     // 1. Kiểm tra hiển thị tiêu đề, đồng hồ và lưới câu
@@ -241,13 +227,7 @@ describe('Exam Views (React Components)', () => {
       },
     };
 
-    render(
-      <ExamStudentView
-        state={expiredState}
-        participantId="hs-1"
-        sendIntent={sendIntent}
-      />
-    );
+    render(<ExamStudentView state={expiredState} participantId="hs-1" sendIntent={sendIntent} />);
 
     // Tự động gọi submit_exam khi hết giờ
     expect(sendIntent).toHaveBeenCalledWith({ type: 'submit_exam' });
@@ -346,11 +326,7 @@ describe('Exam Views (React Components)', () => {
     };
 
     render(
-      <ExamStudentView
-        state={inProgressState}
-        participantId="hs-1"
-        sendIntent={sendIntent}
-      />
+      <ExamStudentView state={inProgressState} participantId="hs-1" sendIntent={sendIntent} />
     );
 
     // Bắn sự kiện blur (rời cửa sổ)

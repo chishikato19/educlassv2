@@ -56,7 +56,7 @@ export function gradeQuestion(
           ? {
               correctCount: 0,
               totalItems: question.leftItems.length,
-              pairs: question.leftItems.map((item) => ({
+              pairs: question.leftItems.map(item => ({
                 leftId: item.id,
                 selectedRightId: null,
                 correctRightId: question.correctPairs[item.id] ?? '',
@@ -68,7 +68,7 @@ export function gradeQuestion(
           ? {
               correctCount: 0,
               totalBlanks: question.blanks.length,
-              blanks: question.blanks.map((blank) => ({
+              blanks: question.blanks.map(blank => ({
                 blankId: blank.id,
                 selected: null,
                 correct: blank.answer,

@@ -48,21 +48,15 @@ export const ArcadeDuelStudentView: React.FC<ArcadeDuelStudentViewProps> = ({ st
           👀 KHÁN ĐÀI THEO DÕI TRỰC TIẾP
         </span>
         <h3 className="text-xl font-black mt-2 text-white">ĐỐI KHÁNG 1VS1</h3>
-        <p className="text-xs text-slate-400 mt-1">
-          Hãy theo dõi màn hình máy chiếu của thầy/cô!
-        </p>
+        <p className="text-xs text-slate-400 mt-1">Hãy theo dõi màn hình máy chiếu của thầy/cô!</p>
       </div>
 
       {/* Tỷ số trận đấu */}
       <div className="my-6 p-4 rounded-2xl bg-slate-900/80 border border-slate-800">
         <div className="grid grid-cols-2 gap-4 text-center">
           <div className="p-3 rounded-xl bg-blue-950/40 border border-blue-800/40">
-            <span className="text-xs font-bold text-blue-300 block mb-1">
-              🔵 {blue.teamName}
-            </span>
-            <span className="text-3xl font-black font-mono text-blue-400">
-              {blue.score}đ
-            </span>
+            <span className="text-xs font-bold text-blue-300 block mb-1">🔵 {blue.teamName}</span>
+            <span className="text-3xl font-black font-mono text-blue-400">{blue.score}đ</span>
             {blue.streak > 1 && (
               <span className="text-[10px] text-amber-300 block mt-1">
                 🔥 x{blue.streak} streak
@@ -71,16 +65,10 @@ export const ArcadeDuelStudentView: React.FC<ArcadeDuelStudentViewProps> = ({ st
           </div>
 
           <div className="p-3 rounded-xl bg-red-950/40 border border-red-800/40">
-            <span className="text-xs font-bold text-red-300 block mb-1">
-              🔴 {red.teamName}
-            </span>
-            <span className="text-3xl font-black font-mono text-red-400">
-              {red.score}đ
-            </span>
+            <span className="text-xs font-bold text-red-300 block mb-1">🔴 {red.teamName}</span>
+            <span className="text-3xl font-black font-mono text-red-400">{red.score}đ</span>
             {red.streak > 1 && (
-              <span className="text-[10px] text-amber-300 block mt-1">
-                🔥 x{red.streak} streak
-              </span>
+              <span className="text-[10px] text-amber-300 block mt-1">🔥 x{red.streak} streak</span>
             )}
           </div>
         </div>

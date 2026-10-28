@@ -1,9 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import {
-  createDatabaseConnection,
-  runMigrations,
-  UserRepository,
-} from '@educlass/db';
+import { createDatabaseConnection, runMigrations, UserRepository } from '@educlass/db';
 import { type Question, toRichText } from '@educlass/question-kit';
 import { buildServer } from '../app.js';
 import { ScryptPasswordHasher } from '../auth/password-hasher.js';

@@ -12,7 +12,7 @@ describe('Word Samples Fixtures & DoD 95% Accuracy Verification (Task 2.4)', () 
   });
 
   it('generates at least 5 realistic Word sample files', () => {
-    const files = fs.readdirSync(fixturesDir).filter((f) => f.endsWith('.docx'));
+    const files = fs.readdirSync(fixturesDir).filter(f => f.endsWith('.docx'));
     expect(files.length).toBeGreaterThanOrEqual(5);
   });
 

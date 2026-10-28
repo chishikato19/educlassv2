@@ -1,7 +1,12 @@
 // @vitest-environment jsdom
 import { fireEvent, render, screen } from '@testing-library/react';
 import { describe, expect, it, vi } from 'vitest';
-import type { Mcq4Question, TfQuestion, TfGroupQuestion, ShortQuestion } from '@educlass/question-kit';
+import type {
+  Mcq4Question,
+  TfQuestion,
+  TfGroupQuestion,
+  ShortQuestion,
+} from '@educlass/question-kit';
 import { QuestionCardPreview } from '../components/QuestionCardPreview.js';
 
 describe('QuestionCardPreview Component', () => {
@@ -22,12 +27,7 @@ describe('QuestionCardPreview Component', () => {
 
   it('renders MCQ4 question stem, all options, and marks correct answer', () => {
     render(
-      <QuestionCardPreview
-        question={mcqQuestion}
-        index={0}
-        onEdit={vi.fn()}
-        onDelete={vi.fn()}
-      />,
+      <QuestionCardPreview question={mcqQuestion} index={0} onEdit={vi.fn()} onDelete={vi.fn()} />
     );
 
     expect(screen.getByText('Câu 1')).toBeDefined();
@@ -54,12 +54,7 @@ describe('QuestionCardPreview Component', () => {
     };
 
     render(
-      <QuestionCardPreview
-        question={tfQuestion}
-        index={1}
-        onEdit={vi.fn()}
-        onDelete={vi.fn()}
-      />,
+      <QuestionCardPreview question={tfQuestion} index={1} onEdit={vi.fn()} onDelete={vi.fn()} />
     );
 
     expect(screen.getByText('Câu 2')).toBeDefined();
@@ -88,7 +83,7 @@ describe('QuestionCardPreview Component', () => {
         index={2}
         onEdit={vi.fn()}
         onDelete={vi.fn()}
-      />,
+      />
     );
 
     expect(screen.getByText('Câu 3')).toBeDefined();
@@ -109,12 +104,7 @@ describe('QuestionCardPreview Component', () => {
     };
 
     render(
-      <QuestionCardPreview
-        question={shortQuestion}
-        index={3}
-        onEdit={vi.fn()}
-        onDelete={vi.fn()}
-      />,
+      <QuestionCardPreview question={shortQuestion} index={3} onEdit={vi.fn()} onDelete={vi.fn()} />
     );
 
     expect(screen.getByText('Câu 4')).toBeDefined();
@@ -133,7 +123,7 @@ describe('QuestionCardPreview Component', () => {
         index={0}
         onEdit={handleEdit}
         onDelete={handleDelete}
-      />,
+      />
     );
 
     fireEvent.click(screen.getByText('Sửa câu'));
@@ -151,7 +141,7 @@ describe('QuestionCardPreview Component', () => {
         showAnswers={false}
         onEdit={vi.fn()}
         onDelete={vi.fn()}
-      />,
+      />
     );
 
     expect(screen.getByText(/Thủ đô của Việt Nam là gì\?/)).toBeDefined();

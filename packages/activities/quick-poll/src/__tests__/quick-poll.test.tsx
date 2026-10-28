@@ -34,12 +34,10 @@ describe('QuickPoll Activity Plugin (@educlass/activity-quick-poll)', () => {
     expect(Object.keys(initialState.votes)).toHaveLength(0);
 
     // 2. onStudentIntent: vote
-    const votedState = QuickPollActivity.server.onStudentIntent(
-      mockCtx,
-      initialState,
-      'p_1',
-      { type: 'vote', choices: [0] }
-    );
+    const votedState = QuickPollActivity.server.onStudentIntent(mockCtx, initialState, 'p_1', {
+      type: 'vote',
+      choices: [0],
+    });
 
     expect('ok' in votedState).toBe(false);
     const validState = votedState as QuickPollState;
@@ -53,12 +51,10 @@ describe('QuickPoll Activity Plugin (@educlass/activity-quick-poll)', () => {
     expect(lockedState.isLocked).toBe(true);
 
     // 4. onStudentIntent when locked -> rejects
-    const rejected = QuickPollActivity.server.onStudentIntent(
-      mockCtx,
-      lockedState,
-      'p_2',
-      { type: 'vote', choices: [1] }
-    );
+    const rejected = QuickPollActivity.server.onStudentIntent(mockCtx, lockedState, 'p_2', {
+      type: 'vote',
+      choices: [1],
+    });
     expect('ok' in rejected).toBe(true);
     if ('ok' in rejected) {
       expect(rejected.ok).toBe(false);

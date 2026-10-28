@@ -14,11 +14,11 @@ import type { StudentGamificationStats } from '@educlass/protocol';
 describe('Gamification Core: Costumes & Avatar Items', () => {
   it('định nghĩa đầy đủ 8 loại nhân vật cơ bản', () => {
     expect(BASE_AVATARS).toHaveLength(8);
-    const cat = BASE_AVATARS.find((b) => b.id === 'cat');
+    const cat = BASE_AVATARS.find(b => b.id === 'cat');
     expect(cat).toBeDefined();
     expect(cat?.unlockLevel).toBe(1);
 
-    const dragon = BASE_AVATARS.find((b) => b.id === 'dragon');
+    const dragon = BASE_AVATARS.find(b => b.id === 'dragon');
     expect(dragon).toBeDefined();
     expect(dragon?.unlockLevel).toBe(8);
   });
@@ -62,8 +62,8 @@ describe('Gamification Core: Title Rules Evaluator', () => {
   });
 
   it('đánh giá điều kiện min_exp và min_level', () => {
-    const rookieTitle = DEFAULT_TITLES.find((t) => t.key === 'tan_binh')!;
-    const expertTitle = DEFAULT_TITLES.find((t) => t.key === 'dai_su')!;
+    const rookieTitle = DEFAULT_TITLES.find(t => t.key === 'tan_binh')!;
+    const expertTitle = DEFAULT_TITLES.find(t => t.key === 'dai_su')!;
 
     const stats1: StudentGamificationStats = {
       exp: 10,
@@ -88,8 +88,8 @@ describe('Gamification Core: Title Rules Evaluator', () => {
   });
 
   it('đánh giá điều kiện bài thi và chuỗi trắc nghiệm', () => {
-    const topScorer = DEFAULT_TITLES.find((t) => t.key === 'thu_khoa')!;
-    const lightning = DEFAULT_TITLES.find((t) => t.key === 'vua_toc_do')!;
+    const topScorer = DEFAULT_TITLES.find(t => t.key === 'thu_khoa')!;
+    const lightning = DEFAULT_TITLES.find(t => t.key === 'vua_toc_do')!;
 
     const statsExam: StudentGamificationStats = {
       exp: 100,

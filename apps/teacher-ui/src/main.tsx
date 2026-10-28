@@ -72,9 +72,7 @@ if (rootElement) {
 
   ReactDOM.createRoot(rootElement).render(
     <React.StrictMode>
-      <ErrorBoundary>
-        {windowContent}
-      </ErrorBoundary>
+      <ErrorBoundary>{windowContent}</ErrorBoundary>
     </React.StrictMode>
   );
 }

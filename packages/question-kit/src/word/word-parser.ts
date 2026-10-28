@@ -105,13 +105,12 @@ function extractDifficulty(htmlOrText: string): {
   return { difficulty, cleanedText };
 }
 
-
 /**
  * Phân tích cú pháp chuỗi HTML đã chuyển đổi từ Word thành danh sách câu hỏi
  */
 export function parseWordHtmlContent(
   html: string,
-  existingAssets: ExtractedDocxAsset[] = [],
+  existingAssets: ExtractedDocxAsset[] = []
 ): ParsedWordExamResult {
   const questions: Question[] = [];
   const warnings: ParsedWordQuestionWarning[] = [];
@@ -207,11 +206,11 @@ export function parseWordHtmlContent(
     block = block
       .replace(
         /(?:<p[^>]*>|^|\n)?\s*\[\s*(?:Chương|Chuong|Chapter)\s*[:\s-]?\s*([^\]\n]+)\s*\](?:\s*<\/p>)?/gi,
-        ' ',
+        ' '
       )
       .replace(
         /(?:<p[^>]*>|^|\n)?\s*\[\s*(?:Bài|Bai|Lesson)\s*[:\s-]?\s*([^\]\n]+)\s*\](?:\s*<\/p>)?/gi,
-        ' ',
+        ' '
       );
 
     // Trích xuất mức độ nhận thức (nếu [NB] đứng trước Câu X)
@@ -225,7 +224,7 @@ export function parseWordHtmlContent(
     // Bỏ phần đầu "Câu X:"
     block = block.replace(
       /(?:<p[^>]*>|^|\n)\s*(?:<(?:strong|b|span|u)[^>]*>)*\s*(?:Câu|Bài|Question)\s*\d+\s*(?:<\/(?:strong|b|span|u)>)*[\s.:\-–—)]\s*(?:<\/(?:strong|b|span|u)>)?/i,
-      '',
+      ''
     );
 
     // Trích xuất mức độ nhận thức (nếu [NB] đứng sau Câu X)
@@ -268,7 +267,7 @@ export function parseWordHtmlContent(
       // Nếu phía sau vị trí match vẫn còn chứa các phương án trắc nghiệm A, B, C, D thì dòng này thuộc về đề bài (stem), không phải đáp án cuối câu
       const hasOptionsAfter =
         /(?:<p[^>]*>|<td[^>]*>|^|\n)\s*\*?\s*(?:<(?:strong|b|u|span|mark|font|em)[^>]*>)*\s*\*?\s*[A-D]\s*\*?\s*(?:<\/(?:strong|b|u|span|mark|font|em)>)*[\s.):\-–]/i.test(
-          afterMatch,
+          afterMatch
         );
 
       if (!hasOptionsAfter) {
@@ -280,7 +279,12 @@ export function parseWordHtmlContent(
     // A. Kiểm tra TF Group (4 ý a, b, c, d thường)
     const tfGroupOptionRegex =
       /(?:<p[^>]*>|^|\n)\s*\*?\s*(?:<(?:strong|b|u|span|mark|font|em)[^>]*>)*\s*(\*?\s*[a-d]\s*\*?)\s*(?:<\/(?:strong|b|u|span|mark|font|em)>)*[\s.):\-–]\s*(?:<\/(?:strong|b|u|span|mark|font|em)>)*\s*([\s\S]*?)(?=(?:<p[^>]*>|^|\n)\s*\*?\s*(?:<(?:strong|b|u|span|mark|font|em)[^>]*>)*\s*\*?\s*[a-d]\s*\*?\s*(?:<\/(?:strong|b|u|span|mark|font|em)>)*[\s.):\-–]|$)/g;
-    const tfGroupItems: Array<{ key: string; rawKey: string; fullMatch: string; rawContent: string }> = [];
+    const tfGroupItems: Array<{
+      key: string;
+      rawKey: string;
+      fullMatch: string;
+      rawContent: string;
+    }> = [];
     let tfGroupStemRaw = block;
     let tgMatch: RegExpExecArray | null;
 
@@ -373,7 +377,7 @@ export function parseWordHtmlContent(
       const content = moMatch[2]!.trim();
       const prefixPart = fullMatch.slice(
         0,
-        fullMatch.indexOf(content) > 0 ? fullMatch.indexOf(content) : 35,
+        fullMatch.indexOf(content) > 0 ? fullMatch.indexOf(content) : 35
       );
       mcqItems.push({
         key: cleanKey,
@@ -462,7 +466,9 @@ export function parseWordHtmlContent(
           const opt = mcqItems[i]!;
           const hasBoldPrefix = /<(?:strong|b)\b[^>]*>[^<]*[A-D]/i.test(opt.prefixPart);
           const trimmedContent = opt.content.trim();
-          const hasBoldEntireContent = /^<(?:strong|b)\b[^>]*>[\s\S]+<\/(?:strong|b)>$/i.test(trimmedContent);
+          const hasBoldEntireContent = /^<(?:strong|b)\b[^>]*>[\s\S]+<\/(?:strong|b)>$/i.test(
+            trimmedContent
+          );
           if (hasBoldPrefix || hasBoldEntireContent) {
             boldIndices.push(i);
           }
@@ -656,8 +662,7 @@ export function parseWordHtmlContent(
     }
 
     // F. Kiểm tra Cloze Drag (Điền từ vào ô trống)
-    const isClozeDeclared =
-      /(?:\[|\()\s*(?:Điền từ|Kéo thả|Cloze|Kéo từ)\s*(?:\]|\))/i.test(block);
+    const isClozeDeclared = /(?:\[|\()\s*(?:Điền từ|Kéo thả|Cloze|Kéo từ)\s*(?:\]|\))/i.test(block);
     let cleanedBlockForCloze = block.replace(
       /(?:\[|\()\s*(?:Điền từ|Kéo thả|Cloze|Kéo từ)\s*(?:\]|\))/gi,
       ' '
@@ -670,8 +675,8 @@ export function parseWordHtmlContent(
     if (wordBankMatch && wordBankMatch[1]) {
       extraWordBank = wordBankMatch[1]
         .split(/[,;/|]/)
-        .map((w) => w.replace(/<[^>]+>/g, '').trim())
-        .filter((w) => w.length > 0);
+        .map(w => w.replace(/<[^>]+>/g, '').trim())
+        .filter(w => w.length > 0);
       cleanedBlockForCloze = cleanedBlockForCloze.replace(wordBankMatch[0], ' ');
     }
 
@@ -702,7 +707,7 @@ export function parseWordHtmlContent(
         };
       });
 
-      const wordBank = Array.from(new Set([...blanks.map((b) => b.answer), ...extraWordBank]));
+      const wordBank = Array.from(new Set([...blanks.map(b => b.answer), ...extraWordBank]));
 
       const qObj = {
         id: qId,
@@ -756,7 +761,7 @@ export function parseWordHtmlContent(
  * Phân tích trực tiếp tập tin Word (.docx) nhị phân
  */
 export async function parseWordDocx(
-  docxBuffer: Buffer | ArrayBuffer | Uint8Array,
+  docxBuffer: Buffer | ArrayBuffer | Uint8Array
 ): Promise<ParsedWordExamResult> {
   const zip = new JSZip();
   const loadedZip = await zip.loadAsync(docxBuffer);
@@ -781,7 +786,7 @@ export async function parseWordDocx(
   const conversion = await mammoth.convertToHtml(
     { buffer: modifiedDocxBuffer },
     {
-      convertImage: mammoth.images.imgElement(async (element) => {
+      convertImage: mammoth.images.imgElement(async element => {
         const imageBuffer = await element.read();
         const sha256 = createHash('sha256').update(imageBuffer).digest('hex');
         const base64 = imageBuffer.toString('base64');
@@ -797,7 +802,7 @@ export async function parseWordDocx(
           src: `/api/assets/${sha256}`,
         };
       }),
-    },
+    }
   );
 
   let html = conversion.value;
@@ -805,7 +810,7 @@ export async function parseWordDocx(
   // Đảm bảo các thẻ img có thêm thuộc tính data-asset
   html = html.replace(
     /<img([^>]*?)src="\/api\/assets\/([a-f0-9]+)"([^>]*?)>/gi,
-    '<img$1src="/api/assets/$2" data-asset="$2"$3>',
+    '<img$1src="/api/assets/$2" data-asset="$2"$3>'
   );
 
   return parseWordHtmlContent(html, extractedAssets);
@@ -823,7 +828,7 @@ export async function renderDocxToHtml(docxBuffer: Buffer): Promise<string> {
  * Trích xuất tóm tắt các slide của tệp PowerPoint (.pptx)
  */
 export async function extractPptxSummary(
-  pptxBuffer: Buffer,
+  pptxBuffer: Buffer
 ): Promise<Array<{ title?: string; text: string }>> {
   try {
     const zip = await JSZip.loadAsync(pptxBuffer);
@@ -847,7 +852,7 @@ export async function extractPptxSummary(
         .filter(t => t.length > 0);
 
       const title = texts.length > 0 ? texts[0] : undefined;
-      const text = texts.length > 1 ? texts.slice(1).join('\n') : (texts[0] || '');
+      const text = texts.length > 1 ? texts.slice(1).join('\n') : texts[0] || '';
 
       if (title !== undefined) {
         slides.push({ title, text });

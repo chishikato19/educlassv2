@@ -2,11 +2,7 @@ import type { FastifyPluginAsync } from 'fastify';
 import fs from 'node:fs';
 import path from 'node:path';
 import { createHash } from 'node:crypto';
-import type {
-  AssetRepository,
-  BankQuestionRepository,
-  QuestionSetRepository,
-} from '@educlass/db';
+import type { AssetRepository, BankQuestionRepository, QuestionSetRepository } from '@educlass/db';
 import {
   BatchCreateBankQuestionRequestSchema,
   CreateBankQuestionRequestSchema,
@@ -34,7 +30,7 @@ export interface BankRoutesOptions {
 async function processInlineBase64InJson(
   jsonStr: string,
   assetsDir: string,
-  assetRepo: AssetRepository,
+  assetRepo: AssetRepository
 ): Promise<string> {
   const dataUrlRegex = /data:image\/([a-zA-Z0-9/+-]+);base64,([a-zA-Z0-9+/=]+)/g;
   let match: RegExpExecArray | null;
@@ -49,7 +45,7 @@ async function processInlineBase64InJson(
     try {
       const buffer = Buffer.from(base64, 'base64');
       const sha256 = createHash('sha256').update(buffer).digest('hex');
-      const ext = match[1] === 'jpeg' ? 'jpg' : match[1] ?? 'png';
+      const ext = match[1] === 'jpeg' ? 'jpg' : (match[1] ?? 'png');
       const fileName = `${sha256}.${ext}`;
       const filePath = path.join(assetsDir, fileName);
 
@@ -106,7 +102,7 @@ async function cleanupOrphanAssets(
   bankRepo: BankQuestionRepository,
   questionSetRepo: QuestionSetRepository,
   assetRepo: AssetRepository,
-  assetsDir: string,
+  assetsDir: string
 ): Promise<string[]> {
   const cleaned: string[] = [];
   for (const hash of hashes) {
@@ -142,10 +138,7 @@ async function cleanupOrphanAssets(
   return cleaned;
 }
 
-export const bankRoutes: FastifyPluginAsync<BankRoutesOptions> = async (
-  fastify,
-  options,
-) => {
+export const bankRoutes: FastifyPluginAsync<BankRoutesOptions> = async (fastify, options) => {
   const { authService, bankRepo, questionSetRepo, assetRepo } = options;
   const authenticate = createAuthenticateHook(authService);
   const assetsDir = options.assetsDir ?? path.join(process.cwd(), 'data', 'assets');
@@ -271,38 +264,42 @@ export const bankRoutes: FastifyPluginAsync<BankRoutesOptions> = async (
    * POST /api/bank/questions/batch
    * Nhập hàng loạt câu hỏi vào ngân hàng (phục vụ Import Word)
    */
-  fastify.post('/api/bank/questions/batch', { preHandler: authenticate }, async (request, reply) => {
-    const parseResult = BatchCreateBankQuestionRequestSchema.safeParse(request.body);
-    if (!parseResult.success) {
-      return reply.status(400).send({
-        error: formatProtocolError('INVALID_PAYLOAD', 'Dữ liệu danh sách câu hỏi không hợp lệ'),
-        details: parseResult.error.format(),
-      });
+  fastify.post(
+    '/api/bank/questions/batch',
+    { preHandler: authenticate },
+    async (request, reply) => {
+      const parseResult = BatchCreateBankQuestionRequestSchema.safeParse(request.body);
+      if (!parseResult.success) {
+        return reply.status(400).send({
+          error: formatProtocolError('INVALID_PAYLOAD', 'Dữ liệu danh sách câu hỏi không hợp lệ'),
+          details: parseResult.error.format(),
+        });
+      }
+
+      const teacherId = request.user!.id;
+      const itemsToInsert = [];
+
+      for (const q of parseResult.data.questions) {
+        const contentJson = await processInlineBase64InJson(q.contentJson, assetsDir, assetRepo);
+        const answerJson = await processInlineBase64InJson(q.answerJson, assetsDir, assetRepo);
+        itemsToInsert.push({
+          ownerId: teacherId,
+          grade: q.grade,
+          subject: q.subject.trim(),
+          chapter: q.chapter.trim(),
+          lesson: q.lesson.trim(),
+          difficulty: q.difficulty,
+          type: q.type,
+          contentJson,
+          answerJson,
+          points: q.points,
+        });
+      }
+
+      const count = await bankRepo.createMany(itemsToInsert);
+      return reply.status(201).send({ success: true, count });
     }
-
-    const teacherId = request.user!.id;
-    const itemsToInsert = [];
-
-    for (const q of parseResult.data.questions) {
-      const contentJson = await processInlineBase64InJson(q.contentJson, assetsDir, assetRepo);
-      const answerJson = await processInlineBase64InJson(q.answerJson, assetsDir, assetRepo);
-      itemsToInsert.push({
-        ownerId: teacherId,
-        grade: q.grade,
-        subject: q.subject.trim(),
-        chapter: q.chapter.trim(),
-        lesson: q.lesson.trim(),
-        difficulty: q.difficulty,
-        type: q.type,
-        contentJson,
-        answerJson,
-        points: q.points,
-      });
-    }
-
-    const count = await bankRepo.createMany(itemsToInsert);
-    return reply.status(201).send({ success: true, count });
-  });
+  );
 
   /**
    * PUT /api/bank/questions/:id
@@ -344,10 +341,18 @@ export const bankRoutes: FastifyPluginAsync<BankRoutesOptions> = async (
     if (data.points !== undefined) updatePayload.points = data.points;
 
     if (data.contentJson !== undefined) {
-      updatePayload.contentJson = await processInlineBase64InJson(data.contentJson, assetsDir, assetRepo);
+      updatePayload.contentJson = await processInlineBase64InJson(
+        data.contentJson,
+        assetsDir,
+        assetRepo
+      );
     }
     if (data.answerJson !== undefined) {
-      updatePayload.answerJson = await processInlineBase64InJson(data.answerJson, assetsDir, assetRepo);
+      updatePayload.answerJson = await processInlineBase64InJson(
+        data.answerJson,
+        assetsDir,
+        assetRepo
+      );
     }
 
     const updated = await bankRepo.update(id, updatePayload);
@@ -358,41 +363,45 @@ export const bankRoutes: FastifyPluginAsync<BankRoutesOptions> = async (
    * DELETE /api/bank/questions/:id
    * Xóa câu hỏi khỏi ngân hàng và dọn dẹp ảnh mồ côi nếu có
    */
-  fastify.delete('/api/bank/questions/:id', { preHandler: authenticate }, async (request, reply) => {
-    const { id } = request.params as { id: string };
-    const existing = await bankRepo.findById(id);
+  fastify.delete(
+    '/api/bank/questions/:id',
+    { preHandler: authenticate },
+    async (request, reply) => {
+      const { id } = request.params as { id: string };
+      const existing = await bankRepo.findById(id);
 
-    if (!existing) {
-      return reply.status(404).send({
-        error: formatProtocolError('BANK_QUESTION_NOT_FOUND', 'Không tìm thấy câu hỏi ngân hàng'),
+      if (!existing) {
+        return reply.status(404).send({
+          error: formatProtocolError('BANK_QUESTION_NOT_FOUND', 'Không tìm thấy câu hỏi ngân hàng'),
+        });
+      }
+
+      if (existing.ownerId !== request.user!.id && request.user!.role !== 'admin') {
+        return reply.status(403).send({
+          error: formatProtocolError('FORBIDDEN', 'Bạn không có quyền xóa câu hỏi này'),
+        });
+      }
+
+      const hashes = extractAssetHashesFromStrings([existing.contentJson, existing.answerJson]);
+      const success = await bankRepo.delete(id);
+
+      let cleanedAssets: string[] = [];
+      if (success && hashes.length > 0) {
+        cleanedAssets = await cleanupOrphanAssets(
+          hashes,
+          bankRepo,
+          questionSetRepo,
+          assetRepo,
+          assetsDir
+        );
+      }
+
+      return reply.status(200).send({
+        success,
+        cleanedAssetsCount: cleanedAssets.length,
       });
     }
-
-    if (existing.ownerId !== request.user!.id && request.user!.role !== 'admin') {
-      return reply.status(403).send({
-        error: formatProtocolError('FORBIDDEN', 'Bạn không có quyền xóa câu hỏi này'),
-      });
-    }
-
-    const hashes = extractAssetHashesFromStrings([existing.contentJson, existing.answerJson]);
-    const success = await bankRepo.delete(id);
-
-    let cleanedAssets: string[] = [];
-    if (success && hashes.length > 0) {
-      cleanedAssets = await cleanupOrphanAssets(
-        hashes,
-        bankRepo,
-        questionSetRepo,
-        assetRepo,
-        assetsDir,
-      );
-    }
-
-    return reply.status(200).send({
-      success,
-      cleanedAssetsCount: cleanedAssets.length,
-    });
-  });
+  );
 
   /**
    * POST /api/bank/matrix-stats
@@ -447,7 +456,7 @@ export const bankRoutes: FastifyPluginAsync<BankRoutesOptions> = async (
       return reply.status(400).send({
         error: formatProtocolError(
           'INVALID_PAYLOAD',
-          'Không tìm thấy câu hỏi phù hợp trong kho theo ma trận đã chọn',
+          'Không tìm thấy câu hỏi phù hợp trong kho theo ma trận đã chọn'
         ),
       });
     }
@@ -464,7 +473,7 @@ export const bankRoutes: FastifyPluginAsync<BankRoutesOptions> = async (
     }
 
     // 3. Chuẩn bị snapshot câu hỏi đưa vào QuestionSet
-    const snapshotQuestions = pickedBankQuestions.map((bq) => ({
+    const snapshotQuestions = pickedBankQuestions.map(bq => ({
       type: bq.type,
       contentJson: bq.contentJson,
       answerJson: bq.answerJson,
@@ -522,7 +531,7 @@ export const bankRoutes: FastifyPluginAsync<BankRoutesOptions> = async (
       return reply.status(400).send({
         error: formatProtocolError(
           'INVALID_PAYLOAD',
-          'Không tìm thấy câu hỏi phù hợp trong kho theo ma trận đã chọn',
+          'Không tìm thấy câu hỏi phù hợp trong kho theo ma trận đã chọn'
         ),
       });
     }

@@ -25,6 +25,7 @@ export const circuitRacePlugin: ActivityHostPlugin = {
   id: 'circuit-race',
   name: 'Đường Đua Tri Thức',
   icon: '🏎️',
-  description: 'Trò chơi đua cờ đường đua gamification tương tác thời gian thực với thẻ bổ trợ và xúc xắc',
+  description:
+    'Trò chơi đua cờ đường đua gamification tương tác thời gian thực với thẻ bổ trợ và xúc xắc',
   component: CircuitRaceHostComponent,
 };

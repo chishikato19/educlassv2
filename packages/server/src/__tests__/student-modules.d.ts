@@ -2,7 +2,13 @@ declare module '*/public/student/js/state.js' {
   export const state: {
     participantId: string;
     studentName: string;
-    studentChatMessages: Array<{ id: string; text: string; fromParticipantId?: string; toParticipantId?: string; fromTeacher?: boolean }>;
+    studentChatMessages: Array<{
+      id: string;
+      text: string;
+      fromParticipantId?: string;
+      toParticipantId?: string;
+      fromTeacher?: boolean;
+    }>;
     unreadChatCount: number;
     isStudentChatOpen: boolean;
     isChatLocked: boolean;
@@ -33,7 +39,11 @@ declare module '*/public/student/js/quiz.js' {
   export function showQuestionReview(quizState: unknown): void;
   export function showLeaderboardStatus(quizState: unknown): void;
   export function showQuizFinished(quizState: unknown): void;
-  export function showQuizizzAnswerReview(quizState: unknown, lastAns: unknown, selectedAnswer: unknown): void;
+  export function showQuizizzAnswerReview(
+    quizState: unknown,
+    lastAns: unknown,
+    selectedAnswer: unknown
+  ): void;
   export function handleQuizReplay(): Promise<void>;
 }
 
@@ -61,7 +71,13 @@ declare module '*/public/student/js/chat.js' {
 declare module '*/public/student/js/poll.js' {
   export function handleQuickPollUpdate(
     runId: string,
-    pollState: { question?: string; allowMultiple?: boolean; options?: string[]; votes?: Record<string, number[]>; isLocked?: boolean }
+    pollState: {
+      question?: string;
+      allowMultiple?: boolean;
+      options?: string[];
+      votes?: Record<string, number[]>;
+      isLocked?: boolean;
+    }
   ): void;
   export function submitPollVote(choices: number[]): Promise<void>;
   export function handleSubmitPollMultiple(): void;
@@ -71,7 +87,10 @@ declare module '*/public/student/js/exam.js' {
   export function handleExamUpdate(runId: string, examStateData: unknown): void;
   export function getStudentExamQuestions(examStateData: {
     publicQuestions?: Array<{ id: string; type?: string; stem?: unknown; options?: unknown[] }>;
-    participants?: Record<string, { questionOrder?: string[]; optionOrders?: Record<string, number[]> }>;
+    participants?: Record<
+      string,
+      { questionOrder?: string[]; optionOrders?: Record<string, number[]> }
+    >;
   }): Array<{ id: string; type?: string; stem?: unknown; options?: unknown[] }>;
   export function getStudentExamOptions(
     q: { id: string; type?: string; options?: unknown[] },
@@ -108,7 +127,11 @@ declare module '*/public/student/js/swiss.js' {
   export function handleInputSwissShortAnswer(questionIndex: number, text: string): void;
   export function updateSwissSubmitBtnState(): void;
   export function handleSubmitSwissRound(): Promise<void>;
-  export function renderSwissAnswersReview(matchup: unknown, isP1: boolean, questions: unknown[]): void;
+  export function renderSwissAnswersReview(
+    matchup: unknown,
+    isP1: boolean,
+    questions: unknown[]
+  ): void;
   export function renderSwissMiniLeaderboard(leaderboard: unknown[]): void;
 }
 

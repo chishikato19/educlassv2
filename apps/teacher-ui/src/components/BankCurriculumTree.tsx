@@ -55,7 +55,7 @@ export const BankCurriculumTree: React.FC<BankCurriculumTreeProps> = ({
     if (selectedChapter) {
       initial.add(selectedChapter);
     } else {
-      tree.slice(0, 4).forEach((node) => initial.add(node.chapter));
+      tree.slice(0, 4).forEach(node => initial.add(node.chapter));
     }
     return initial;
   });
@@ -63,12 +63,12 @@ export const BankCurriculumTree: React.FC<BankCurriculumTreeProps> = ({
   // Tự động mở chương khi người dùng chọn một bài trong chương đó
   React.useEffect(() => {
     if (selectedChapter && !expandedChapters.has(selectedChapter)) {
-      setExpandedChapters((prev) => new Set([...prev, selectedChapter]));
+      setExpandedChapters(prev => new Set([...prev, selectedChapter]));
     }
   }, [selectedChapter]);
 
   const toggleChapter = (chapter: string) => {
-    setExpandedChapters((prev) => {
+    setExpandedChapters(prev => {
       const next = new Set(prev);
       if (next.has(chapter)) {
         next.delete(chapter);
@@ -80,7 +80,7 @@ export const BankCurriculumTree: React.FC<BankCurriculumTreeProps> = ({
   };
 
   const expandAll = () => {
-    setExpandedChapters(new Set(tree.map((node) => node.chapter)));
+    setExpandedChapters(new Set(tree.map(node => node.chapter)));
   };
 
   const collapseAll = () => {
@@ -118,10 +118,10 @@ export const BankCurriculumTree: React.FC<BankCurriculumTreeProps> = ({
             <select
               aria-label="Chọn khối lớp"
               value={currentGrade}
-              onChange={(e) => onGradeChange(Number(e.target.value))}
+              onChange={e => onGradeChange(Number(e.target.value))}
               className="w-full text-xs font-semibold px-2.5 py-2 rounded-xl bg-white dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 text-zinc-800 dark:text-zinc-200 focus:outline-none focus:ring-2 focus:ring-blue-500 min-h-[40px] cursor-pointer"
             >
-              {GRADES.map((g) => (
+              {GRADES.map(g => (
                 <option key={g} value={g}>
                   Khối {g}
                 </option>
@@ -137,10 +137,10 @@ export const BankCurriculumTree: React.FC<BankCurriculumTreeProps> = ({
             <select
               aria-label="Chọn môn học"
               value={currentSubject}
-              onChange={(e) => onSubjectChange(e.target.value)}
+              onChange={e => onSubjectChange(e.target.value)}
               className="w-full text-xs font-semibold px-2.5 py-2 rounded-xl bg-white dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 text-zinc-800 dark:text-zinc-200 focus:outline-none focus:ring-2 focus:ring-blue-500 min-h-[40px] cursor-pointer"
             >
-              {COMMON_SUBJECTS.map((s) => (
+              {COMMON_SUBJECTS.map(s => (
                 <option key={s} value={s}>
                   {s}
                 </option>
@@ -208,10 +208,9 @@ export const BankCurriculumTree: React.FC<BankCurriculumTreeProps> = ({
             </p>
           </div>
         ) : (
-          tree.map((chapterNode) => {
+          tree.map(chapterNode => {
             const isExpanded = expandedChapters.has(chapterNode.chapter);
-            const isChapterSelected =
-              selectedChapter === chapterNode.chapter && !selectedLesson;
+            const isChapterSelected = selectedChapter === chapterNode.chapter && !selectedLesson;
 
             return (
               <div
@@ -235,10 +234,7 @@ export const BankCurriculumTree: React.FC<BankCurriculumTreeProps> = ({
                     >
                       ▶
                     </span>
-                    <span
-                      className="text-xs font-bold truncate"
-                      title={chapterNode.chapter}
-                    >
+                    <span className="text-xs font-bold truncate" title={chapterNode.chapter}>
                       {chapterNode.chapter}
                     </span>
                   </div>
@@ -251,7 +247,7 @@ export const BankCurriculumTree: React.FC<BankCurriculumTreeProps> = ({
                       <button
                         type="button"
                         title="Lọc toàn bộ chương này"
-                        onClick={(e) => {
+                        onClick={e => {
                           e.stopPropagation();
                           onSelectChapter(chapterNode.chapter);
                         }}
@@ -271,7 +267,7 @@ export const BankCurriculumTree: React.FC<BankCurriculumTreeProps> = ({
                         Không có bài học
                       </div>
                     ) : (
-                      chapterNode.lessons.map((lessonItem) => {
+                      chapterNode.lessons.map(lessonItem => {
                         const isLessonSelected =
                           selectedChapter === chapterNode.chapter &&
                           selectedLesson === lessonItem.lesson;
@@ -280,9 +276,7 @@ export const BankCurriculumTree: React.FC<BankCurriculumTreeProps> = ({
                           <button
                             key={lessonItem.lesson}
                             type="button"
-                            onClick={() =>
-                              onSelectLesson(chapterNode.chapter, lessonItem.lesson)
-                            }
+                            onClick={() => onSelectLesson(chapterNode.chapter, lessonItem.lesson)}
                             title={`${lessonItem.lesson} (${lessonItem.totalQuestions} câu)`}
                             className={`w-full flex items-center justify-between px-2.5 py-2 rounded-lg text-left text-xs transition-all min-h-[40px] cursor-pointer ${
                               isLessonSelected
@@ -290,9 +284,7 @@ export const BankCurriculumTree: React.FC<BankCurriculumTreeProps> = ({
                                 : 'hover:bg-zinc-200/60 dark:hover:bg-zinc-800 text-zinc-700 dark:text-zinc-300'
                             }`}
                           >
-                            <span className="truncate pr-2 flex-1">
-                              {lessonItem.lesson}
-                            </span>
+                            <span className="truncate pr-2 flex-1">{lessonItem.lesson}</span>
 
                             {/* Badge Số Câu và 4 Mức Độ */}
                             <div className="flex items-center gap-1 flex-shrink-0">

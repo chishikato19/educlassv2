@@ -28,7 +28,10 @@ import {
 const activeRunRawQuestions = new Map<string, FactionQuestion[]>();
 
 // Lưu trữ tất cả các trận đấu đã hoàn thành qua các vòng để tính kết quả cuối cùng
-const activeRunCompletedMatchups = new Map<string, typeof FactionDuelStateSchema._type.currentMatchups>();
+const activeRunCompletedMatchups = new Map<
+  string,
+  typeof FactionDuelStateSchema._type.currentMatchups
+>();
 
 /**
  * Ẩn đáp án đúng khi gửi câu hỏi xuống học sinh
@@ -56,17 +59,12 @@ function startNewRound(
   cloneId?: string
 ): FactionDuelState {
   const rawPool = activeRunRawQuestions.get(ctx.runId) ?? [];
-  const roundQuestions = getQuestionsForRound(
-    rawPool,
-    roundIndex,
-    st.questionsPerMatch,
-    {
-      shuffleQuestions: st.shuffleQuestions,
-      shuffleOptions: st.shuffleOptions,
-      allowRecycle: st.allowQuestionRecycle,
-      rng: ctx.rng,
-    }
-  );
+  const roundQuestions = getQuestionsForRound(rawPool, roundIndex, st.questionsPerMatch, {
+    shuffleQuestions: st.shuffleQuestions,
+    shuffleOptions: st.shuffleOptions,
+    allowRecycle: st.allowQuestionRecycle,
+    rng: ctx.rng,
+  });
 
   const clientQuestions = sanitizeQuestionsForClient(roundQuestions);
   const now = ctx.now();
@@ -107,22 +105,14 @@ function areAllMatchupsDone(
 /**
  * Đánh giá kết thúc vòng làm bài (Round Eval)
  */
-function evaluateCurrentRound(
-  ctx: ActivityContext,
-  st: FactionDuelState
-): FactionDuelState {
+function evaluateCurrentRound(ctx: ActivityContext, st: FactionDuelState): FactionDuelState {
   const rawPool = activeRunRawQuestions.get(ctx.runId) ?? [];
   // Lấy câu hỏi đầy đủ đáp án của vòng này
-  const fullQuestions = getQuestionsForRound(
-    rawPool,
-    st.currentRound - 1,
-    st.questionsPerMatch,
-    {
-      shuffleQuestions: false,
-      shuffleOptions: false,
-      allowRecycle: st.allowQuestionRecycle,
-    }
-  );
+  const fullQuestions = getQuestionsForRound(rawPool, st.currentRound - 1, st.questionsPerMatch, {
+    shuffleQuestions: false,
+    shuffleOptions: false,
+    allowRecycle: st.allowQuestionRecycle,
+  });
 
   const evaluatedMatchups = st.currentMatchups.map(m =>
     evaluateFactionMatchup(m, fullQuestions, st.teamBlue, st.teamRed)
@@ -189,7 +179,9 @@ export const FactionDuelActivity: ActivityDefinition<
       activeRunCompletedMatchups.set(ctx.runId, []);
 
       // 1. Phân chia 2 phe Xanh - Đỏ cân bằng Elo
-      const participantsList = (ctx as { participants?: Array<{ id: string; displayName: string; elo?: number }> }).participants ?? [];
+      const participantsList =
+        (ctx as { participants?: Array<{ id: string; displayName: string; elo?: number }> })
+          .participants ?? [];
       const { teamBlue, teamRed } = initTeamsFromParticipants(
         participantsList.map((p: { id: string; displayName: string; elo?: number }) => ({
           id: p.id,
@@ -248,7 +240,11 @@ export const FactionDuelActivity: ActivityDefinition<
       // 1. Học sinh gửi câu trả lời trong lúc đang làm bài
       if (action.type === 'submit_answer') {
         if (st.status !== 'round_active') {
-          return { ok: false, reason: 'Vòng thi đấu chưa bắt đầu hoặc đã kết thúc', code: 'ROUND_NOT_ACTIVE' };
+          return {
+            ok: false,
+            reason: 'Vòng thi đấu chưa bắt đầu hoặc đã kết thúc',
+            code: 'ROUND_NOT_ACTIVE',
+          };
         }
 
         const targetMatchups = st.currentMatchups.filter(
@@ -256,7 +252,11 @@ export const FactionDuelActivity: ActivityDefinition<
         );
 
         if (targetMatchups.length === 0) {
-          return { ok: false, reason: 'Bạn không có trong cặp đấu hiện tại', code: 'NOT_IN_MATCHUP' };
+          return {
+            ok: false,
+            reason: 'Bạn không có trong cặp đấu hiện tại',
+            code: 'NOT_IN_MATCHUP',
+          };
         }
 
         const updatedMatchups = st.currentMatchups.map(m => {
@@ -308,7 +308,11 @@ export const FactionDuelActivity: ActivityDefinition<
       if (action.type === 'select_opponent') {
         const result = handleSelectOpponent(st, participantId, action.targetParticipantId);
         if (!result.success || !result.nextState) {
-          return { ok: false, reason: result.reason ?? 'Không thể chọn đối thủ', code: 'SELECTION_REJECTED' };
+          return {
+            ok: false,
+            reason: result.reason ?? 'Không thể chọn đối thủ',
+            code: 'SELECTION_REJECTED',
+          };
         }
         return result.nextState;
       }
@@ -316,11 +320,7 @@ export const FactionDuelActivity: ActivityDefinition<
       return st;
     },
 
-    onTeacherIntent(
-      ctx: ActivityContext,
-      st: FactionDuelState,
-      intent: unknown
-    ): FactionDuelState {
+    onTeacherIntent(ctx: ActivityContext, st: FactionDuelState, intent: unknown): FactionDuelState {
       const parsed = FactionDuelIntentSchema.safeParse(intent);
       if (!parsed.success) return st;
 

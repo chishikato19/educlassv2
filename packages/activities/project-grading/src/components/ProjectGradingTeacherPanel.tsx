@@ -1,8 +1,5 @@
 import React, { useState } from 'react';
-import type {
-  ProjectGradingState,
-  ProjectGradingTeacherIntent,
-} from '@educlass/protocol';
+import type { ProjectGradingState, ProjectGradingTeacherIntent } from '@educlass/protocol';
 import { Button, Modal, UI_COLORS, UI_RADII } from '@educlass/ui-kit';
 import {
   calculateAllFinalScores,
@@ -90,7 +87,9 @@ export const ProjectGradingTeacherPanel: React.FC<ProjectGradingTeacherPanelProp
       type: 'set_grading_status',
       status: targetStatus,
     });
-    showToast(targetStatus === 'frozen' ? '🔒 Đã tạm khóa lượt chấm của học sinh' : '🔓 Đã mở lại lượt chấm');
+    showToast(
+      targetStatus === 'frozen' ? '🔒 Đã tạm khóa lượt chấm của học sinh' : '🔓 Đã mở lại lượt chấm'
+    );
   };
 
   // 2. Giáo viên lưu điểm nhóm
@@ -170,7 +169,7 @@ export const ProjectGradingTeacherPanel: React.FC<ProjectGradingTeacherPanelProp
         `"Trọng số: Tự chấm ${config.weights.self}% | Tổ chấm ${config.weights.teamMember}% | Chéo nhóm ${config.weights.crossTeam}% | Giáo viên ${config.weights.teacher}%"`,
         '',
         headers.join(','),
-        ...rows.map((row) => row.join(',')),
+        ...rows.map(row => row.join(',')),
       ].join('\r\n');
 
     const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
@@ -253,7 +252,8 @@ export const ProjectGradingTeacherPanel: React.FC<ProjectGradingTeacherPanelProp
               </span>
             </div>
             <div style={{ fontSize: '13px', color: UI_COLORS.textMuted, marginTop: '4px' }}>
-              Trọng số: Tự chấm {config.weights.self}% • Tổ chấm {config.weights.teamMember}% • Chéo nhóm {config.weights.crossTeam}% • Giáo viên {config.weights.teacher}%
+              Trọng số: Tự chấm {config.weights.self}% • Tổ chấm {config.weights.teamMember}% • Chéo
+              nhóm {config.weights.crossTeam}% • Giáo viên {config.weights.teacher}%
             </div>
           </div>
         </div>
@@ -304,56 +304,174 @@ export const ProjectGradingTeacherPanel: React.FC<ProjectGradingTeacherPanelProp
           gap: '14px',
         }}
       >
-        <div style={{ backgroundColor: '#FFFFFF', padding: '16px', borderRadius: UI_RADII.card, border: `1px solid ${UI_COLORS.border}` }}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '13px', color: UI_COLORS.textMuted }}>
+        <div
+          style={{
+            backgroundColor: '#FFFFFF',
+            padding: '16px',
+            borderRadius: UI_RADII.card,
+            border: `1px solid ${UI_COLORS.border}`,
+          }}
+        >
+          <div
+            style={{
+              display: 'flex',
+              justifyContent: 'space-between',
+              fontSize: '13px',
+              color: UI_COLORS.textMuted,
+            }}
+          >
             <span>👤 Học sinh tự chấm</span>
-            <span style={{ fontWeight: 700, color: UI_COLORS.primary }}>{progress.selfGrading.percentage}%</span>
+            <span style={{ fontWeight: 700, color: UI_COLORS.primary }}>
+              {progress.selfGrading.percentage}%
+            </span>
           </div>
           <div style={{ fontSize: '18px', fontWeight: 800, margin: '6px 0' }}>
             {progress.selfGrading.submitted} / {progress.selfGrading.total} học sinh
           </div>
-          <div style={{ width: '100%', height: '6px', backgroundColor: '#F1F5F9', borderRadius: '3px', overflow: 'hidden' }}>
-            <div style={{ width: `${progress.selfGrading.percentage}%`, height: '100%', backgroundColor: UI_COLORS.primary }} />
+          <div
+            style={{
+              width: '100%',
+              height: '6px',
+              backgroundColor: '#F1F5F9',
+              borderRadius: '3px',
+              overflow: 'hidden',
+            }}
+          >
+            <div
+              style={{
+                width: `${progress.selfGrading.percentage}%`,
+                height: '100%',
+                backgroundColor: UI_COLORS.primary,
+              }}
+            />
           </div>
         </div>
 
-        <div style={{ backgroundColor: '#FFFFFF', padding: '16px', borderRadius: UI_RADII.card, border: `1px solid ${UI_COLORS.border}` }}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '13px', color: UI_COLORS.textMuted }}>
+        <div
+          style={{
+            backgroundColor: '#FFFFFF',
+            padding: '16px',
+            borderRadius: UI_RADII.card,
+            border: `1px solid ${UI_COLORS.border}`,
+          }}
+        >
+          <div
+            style={{
+              display: 'flex',
+              justifyContent: 'space-between',
+              fontSize: '13px',
+              color: UI_COLORS.textMuted,
+            }}
+          >
             <span>👥 Tổ chấm thành viên</span>
-            <span style={{ fontWeight: 700, color: '#9333EA' }}>{progress.teamMemberGrading.percentage}%</span>
+            <span style={{ fontWeight: 700, color: '#9333EA' }}>
+              {progress.teamMemberGrading.percentage}%
+            </span>
           </div>
           <div style={{ fontSize: '18px', fontWeight: 800, margin: '6px 0' }}>
             {progress.teamMemberGrading.submitted} / {progress.teamMemberGrading.total} lượt
           </div>
-          <div style={{ width: '100%', height: '6px', backgroundColor: '#F1F5F9', borderRadius: '3px', overflow: 'hidden' }}>
-            <div style={{ width: `${progress.teamMemberGrading.percentage}%`, height: '100%', backgroundColor: '#9333EA' }} />
+          <div
+            style={{
+              width: '100%',
+              height: '6px',
+              backgroundColor: '#F1F5F9',
+              borderRadius: '3px',
+              overflow: 'hidden',
+            }}
+          >
+            <div
+              style={{
+                width: `${progress.teamMemberGrading.percentage}%`,
+                height: '100%',
+                backgroundColor: '#9333EA',
+              }}
+            />
           </div>
         </div>
 
-        <div style={{ backgroundColor: '#FFFFFF', padding: '16px', borderRadius: UI_RADII.card, border: `1px solid ${UI_COLORS.border}` }}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '13px', color: UI_COLORS.textMuted }}>
+        <div
+          style={{
+            backgroundColor: '#FFFFFF',
+            padding: '16px',
+            borderRadius: UI_RADII.card,
+            border: `1px solid ${UI_COLORS.border}`,
+          }}
+        >
+          <div
+            style={{
+              display: 'flex',
+              justifyContent: 'space-between',
+              fontSize: '13px',
+              color: UI_COLORS.textMuted,
+            }}
+          >
             <span>🔄 Chấm chéo nhóm bạn</span>
-            <span style={{ fontWeight: 700, color: '#16A34A' }}>{progress.crossTeamGrading.percentage}%</span>
+            <span style={{ fontWeight: 700, color: '#16A34A' }}>
+              {progress.crossTeamGrading.percentage}%
+            </span>
           </div>
           <div style={{ fontSize: '18px', fontWeight: 800, margin: '6px 0' }}>
             {progress.crossTeamGrading.submitted} / {progress.crossTeamGrading.total} nhóm
           </div>
-          <div style={{ width: '100%', height: '6px', backgroundColor: '#F1F5F9', borderRadius: '3px', overflow: 'hidden' }}>
-            <div style={{ width: `${progress.crossTeamGrading.percentage}%`, height: '100%', backgroundColor: '#16A34A' }} />
+          <div
+            style={{
+              width: '100%',
+              height: '6px',
+              backgroundColor: '#F1F5F9',
+              borderRadius: '3px',
+              overflow: 'hidden',
+            }}
+          >
+            <div
+              style={{
+                width: `${progress.crossTeamGrading.percentage}%`,
+                height: '100%',
+                backgroundColor: '#16A34A',
+              }}
+            />
           </div>
         </div>
 
-        <div style={{ backgroundColor: '#FFFFFF', padding: '16px', borderRadius: UI_RADII.card, border: `1px solid ${UI_COLORS.border}` }}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '13px', color: UI_COLORS.textMuted }}>
+        <div
+          style={{
+            backgroundColor: '#FFFFFF',
+            padding: '16px',
+            borderRadius: UI_RADII.card,
+            border: `1px solid ${UI_COLORS.border}`,
+          }}
+        >
+          <div
+            style={{
+              display: 'flex',
+              justifyContent: 'space-between',
+              fontSize: '13px',
+              color: UI_COLORS.textMuted,
+            }}
+          >
             <span>🎓 Điểm Giáo viên</span>
             <span style={{ fontWeight: 700, color: '#D97706' }}>
-              {Math.round((progress.teacherGrading.groupsGraded / Math.max(1, progress.teacherGrading.totalGroups)) * 100)}%
+              {Math.round(
+                (progress.teacherGrading.groupsGraded /
+                  Math.max(1, progress.teacherGrading.totalGroups)) *
+                  100
+              )}
+              %
             </span>
           </div>
           <div style={{ fontSize: '18px', fontWeight: 800, margin: '6px 0' }}>
-            {progress.teacherGrading.groupsGraded} / {progress.teacherGrading.totalGroups} nhóm đã có điểm
+            {progress.teacherGrading.groupsGraded} / {progress.teacherGrading.totalGroups} nhóm đã
+            có điểm
           </div>
-          <div style={{ width: '100%', height: '6px', backgroundColor: '#F1F5F9', borderRadius: '3px', overflow: 'hidden' }}>
+          <div
+            style={{
+              width: '100%',
+              height: '6px',
+              backgroundColor: '#F1F5F9',
+              borderRadius: '3px',
+              overflow: 'hidden',
+            }}
+          >
             <div
               style={{
                 width: `${Math.round((progress.teacherGrading.groupsGraded / Math.max(1, progress.teacherGrading.totalGroups)) * 100)}%`,
@@ -378,17 +496,33 @@ export const ProjectGradingTeacherPanel: React.FC<ProjectGradingTeacherPanelProp
         }}
         data-testid="section-teacher-grading-hub"
       >
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '12px' }}>
+        <div
+          style={{
+            display: 'flex',
+            justifyContent: 'space-between',
+            alignItems: 'center',
+            flexWrap: 'wrap',
+            gap: '12px',
+          }}
+        >
           <div>
             <h3 style={{ margin: 0, fontSize: '17px', fontWeight: 700, color: UI_COLORS.text }}>
               4. Giáo viên nhập điểm đánh giá (Trọng số {config.weights.teacher}%)
             </h3>
             <div style={{ fontSize: '13px', color: UI_COLORS.textMuted, marginTop: '2px' }}>
-              Bạn có thể nhập điểm chung cho cả nhóm hoặc nhập điểm điều chỉnh riêng cho từng học sinh.
+              Bạn có thể nhập điểm chung cho cả nhóm hoặc nhập điểm điều chỉnh riêng cho từng học
+              sinh.
             </div>
           </div>
 
-          <div style={{ display: 'flex', backgroundColor: '#F1F5F9', borderRadius: '10px', padding: '3px' }}>
+          <div
+            style={{
+              display: 'flex',
+              backgroundColor: '#F1F5F9',
+              borderRadius: '10px',
+              padding: '3px',
+            }}
+          >
             <button
               type="button"
               onClick={() => setGradingMode('group')}
@@ -424,8 +558,14 @@ export const ProjectGradingTeacherPanel: React.FC<ProjectGradingTeacherPanelProp
 
         {/* Chế độ 1: Chấm theo Nhóm */}
         {gradingMode === 'group' && (
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: '16px' }}>
-            {config.groups.map((group) => {
+          <div
+            style={{
+              display: 'grid',
+              gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))',
+              gap: '16px',
+            }}
+          >
+            {config.groups.map(group => {
               const currentGrade = teacherGroupGrades[group.id];
               const score = groupScores[group.id] ?? 8.5;
               const comment = groupComments[group.id] ?? '';
@@ -443,16 +583,33 @@ export const ProjectGradingTeacherPanel: React.FC<ProjectGradingTeacherPanelProp
                     gap: '12px',
                   }}
                 >
-                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                  <div
+                    style={{
+                      display: 'flex',
+                      justifyContent: 'space-between',
+                      alignItems: 'center',
+                    }}
+                  >
                     <span style={{ fontSize: '16px', fontWeight: 800, color: UI_COLORS.text }}>
                       {group.name}
                     </span>
                     {currentGrade ? (
-                      <span style={{ fontSize: '12px', fontWeight: 700, padding: '3px 8px', borderRadius: '8px', backgroundColor: '#DCFCE7', color: '#15803D' }}>
+                      <span
+                        style={{
+                          fontSize: '12px',
+                          fontWeight: 700,
+                          padding: '3px 8px',
+                          borderRadius: '8px',
+                          backgroundColor: '#DCFCE7',
+                          color: '#15803D',
+                        }}
+                      >
                         Đã chấm: {currentGrade.score}đ
                       </span>
                     ) : (
-                      <span style={{ fontSize: '12px', color: '#B45309', fontWeight: 600 }}>Chưa nhập điểm</span>
+                      <span style={{ fontSize: '12px', color: '#B45309', fontWeight: 600 }}>
+                        Chưa nhập điểm
+                      </span>
                     )}
                   </div>
 
@@ -461,7 +618,7 @@ export const ProjectGradingTeacherPanel: React.FC<ProjectGradingTeacherPanelProp
                     <button
                       type="button"
                       onClick={() =>
-                        setGroupScores((prev) => ({
+                        setGroupScores(prev => ({
                           ...prev,
                           [group.id]: Math.max(0, Math.round((score - 0.5) * 10) / 10),
                         }))
@@ -487,10 +644,10 @@ export const ProjectGradingTeacherPanel: React.FC<ProjectGradingTeacherPanelProp
                       max={config.maxScore}
                       value={score}
                       data-testid={`input-teacher-group-${group.id}`}
-                      onChange={(e) => {
+                      onChange={e => {
                         const val = parseFloat(e.target.value);
                         if (!Number.isNaN(val)) {
-                          setGroupScores((prev) => ({ ...prev, [group.id]: val }));
+                          setGroupScores(prev => ({ ...prev, [group.id]: val }));
                         }
                       }}
                       style={{
@@ -509,9 +666,12 @@ export const ProjectGradingTeacherPanel: React.FC<ProjectGradingTeacherPanelProp
                     <button
                       type="button"
                       onClick={() =>
-                        setGroupScores((prev) => ({
+                        setGroupScores(prev => ({
                           ...prev,
-                          [group.id]: Math.min(config.maxScore, Math.round((score + 0.5) * 10) / 10),
+                          [group.id]: Math.min(
+                            config.maxScore,
+                            Math.round((score + 0.5) * 10) / 10
+                          ),
                         }))
                       }
                       style={{
@@ -531,11 +691,11 @@ export const ProjectGradingTeacherPanel: React.FC<ProjectGradingTeacherPanelProp
 
                   {/* Quick chips */}
                   <div style={{ display: 'flex', gap: '6px', flexWrap: 'wrap' }}>
-                    {[7, 8, 8.5, 9, 9.5, 10].map((quick) => (
+                    {[7, 8, 8.5, 9, 9.5, 10].map(quick => (
                       <button
                         key={quick}
                         type="button"
-                        onClick={() => setGroupScores((prev) => ({ ...prev, [group.id]: quick }))}
+                        onClick={() => setGroupScores(prev => ({ ...prev, [group.id]: quick }))}
                         style={{
                           padding: '4px 8px',
                           borderRadius: '6px',
@@ -555,8 +715,8 @@ export const ProjectGradingTeacherPanel: React.FC<ProjectGradingTeacherPanelProp
                     type="text"
                     placeholder="Nhận xét sản phẩm / thuyết trình của nhóm..."
                     value={comment}
-                    onChange={(e) =>
-                      setGroupComments((prev) => ({ ...prev, [group.id]: e.target.value }))
+                    onChange={e =>
+                      setGroupComments(prev => ({ ...prev, [group.id]: e.target.value }))
                     }
                     style={{
                       padding: '8px 12px',
@@ -584,8 +744,14 @@ export const ProjectGradingTeacherPanel: React.FC<ProjectGradingTeacherPanelProp
 
         {/* Chế độ 2: Chấm riêng từng Học sinh */}
         {gradingMode === 'student' && (
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: '16px' }}>
-            {results.map((r) => {
+          <div
+            style={{
+              display: 'grid',
+              gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))',
+              gap: '16px',
+            }}
+          >
+            {results.map(r => {
               const currentCustom = teacherStudentGrades[r.participantId];
               const score = studentScores[r.participantId] ?? r.teacherScore ?? 8.5;
               const comment = studentComments[r.participantId] ?? '';
@@ -603,7 +769,13 @@ export const ProjectGradingTeacherPanel: React.FC<ProjectGradingTeacherPanelProp
                     gap: '10px',
                   }}
                 >
-                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                  <div
+                    style={{
+                      display: 'flex',
+                      justifyContent: 'space-between',
+                      alignItems: 'center',
+                    }}
+                  >
                     <div>
                       <span style={{ fontSize: '15px', fontWeight: 700, color: UI_COLORS.text }}>
                         {r.displayName}
@@ -614,7 +786,16 @@ export const ProjectGradingTeacherPanel: React.FC<ProjectGradingTeacherPanelProp
                     </div>
 
                     {currentCustom ? (
-                      <span style={{ fontSize: '11px', fontWeight: 700, padding: '2px 8px', borderRadius: '8px', backgroundColor: '#FEF3C7', color: '#B45309' }}>
+                      <span
+                        style={{
+                          fontSize: '11px',
+                          fontWeight: 700,
+                          padding: '2px 8px',
+                          borderRadius: '8px',
+                          backgroundColor: '#FEF3C7',
+                          color: '#B45309',
+                        }}
+                      >
                         Điểm riêng: {currentCustom.score}đ
                       </span>
                     ) : (
@@ -631,10 +812,10 @@ export const ProjectGradingTeacherPanel: React.FC<ProjectGradingTeacherPanelProp
                       min={0}
                       max={config.maxScore}
                       value={score}
-                      onChange={(e) => {
+                      onChange={e => {
                         const val = parseFloat(e.target.value);
                         if (!Number.isNaN(val)) {
-                          setStudentScores((prev) => ({ ...prev, [r.participantId]: val }));
+                          setStudentScores(prev => ({ ...prev, [r.participantId]: val }));
                         }
                       }}
                       style={{
@@ -661,8 +842,8 @@ export const ProjectGradingTeacherPanel: React.FC<ProjectGradingTeacherPanelProp
                     type="text"
                     placeholder="Ghi chú đánh giá riêng bạn này..."
                     value={comment}
-                    onChange={(e) =>
-                      setStudentComments((prev) => ({ ...prev, [r.participantId]: e.target.value }))
+                    onChange={e =>
+                      setStudentComments(prev => ({ ...prev, [r.participantId]: e.target.value }))
                     }
                     style={{
                       padding: '6px 10px',
@@ -688,13 +869,23 @@ export const ProjectGradingTeacherPanel: React.FC<ProjectGradingTeacherPanelProp
           overflowX: 'auto',
         }}
       >
-        <h3 style={{ margin: '0 0 16px 0', fontSize: '17px', fontWeight: 700, color: UI_COLORS.text }}>
+        <h3
+          style={{ margin: '0 0 16px 0', fontSize: '17px', fontWeight: 700, color: UI_COLORS.text }}
+        >
           🏆 Bảng Điểm Tổng Hợp Thời Gian Thực ({results.length} học sinh)
         </h3>
 
-        <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left', fontSize: '14px' }}>
+        <table
+          style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left', fontSize: '14px' }}
+        >
           <thead>
-            <tr style={{ borderBottom: `2px solid ${UI_COLORS.border}`, color: UI_COLORS.textMuted, fontSize: '13px' }}>
+            <tr
+              style={{
+                borderBottom: `2px solid ${UI_COLORS.border}`,
+                color: UI_COLORS.textMuted,
+                fontSize: '13px',
+              }}
+            >
               <th style={{ padding: '10px 12px' }}>Hạng</th>
               <th style={{ padding: '10px 12px' }}>Học sinh</th>
               <th style={{ padding: '10px 12px' }}>Tổ / Nhóm</th>
@@ -706,20 +897,41 @@ export const ProjectGradingTeacherPanel: React.FC<ProjectGradingTeacherPanelProp
             </tr>
           </thead>
           <tbody>
-            {results.map((r) => (
+            {results.map(r => (
               <tr key={r.participantId} style={{ borderBottom: `1px solid ${UI_COLORS.border}` }}>
                 <td style={{ padding: '12px', fontWeight: 800 }}>
-                  {r.rank === 1 ? '🥇 1' : r.rank === 2 ? '🥈 2' : r.rank === 3 ? '🥉 3' : `#${r.rank}`}
+                  {r.rank === 1
+                    ? '🥇 1'
+                    : r.rank === 2
+                      ? '🥈 2'
+                      : r.rank === 3
+                        ? '🥉 3'
+                        : `#${r.rank}`}
                 </td>
                 <td style={{ padding: '12px', fontWeight: 600 }}>
                   {r.displayName} {r.isLeader && '⭐'}
                 </td>
                 <td style={{ padding: '12px', color: UI_COLORS.textMuted }}>{r.groupName}</td>
-                <td style={{ padding: '12px' }}>{r.selfScore !== null ? `${r.selfScore}đ` : '-'}</td>
-                <td style={{ padding: '12px' }}>{r.teamMemberScore !== null ? `${r.teamMemberScore}đ` : '-'}</td>
-                <td style={{ padding: '12px' }}>{r.crossTeamScore !== null ? `${r.crossTeamScore}đ` : '-'}</td>
-                <td style={{ padding: '12px' }}>{r.teacherScore !== null ? `${r.teacherScore}đ` : '-'}</td>
-                <td style={{ padding: '12px', fontWeight: 900, fontSize: '16px', color: UI_COLORS.primary }}>
+                <td style={{ padding: '12px' }}>
+                  {r.selfScore !== null ? `${r.selfScore}đ` : '-'}
+                </td>
+                <td style={{ padding: '12px' }}>
+                  {r.teamMemberScore !== null ? `${r.teamMemberScore}đ` : '-'}
+                </td>
+                <td style={{ padding: '12px' }}>
+                  {r.crossTeamScore !== null ? `${r.crossTeamScore}đ` : '-'}
+                </td>
+                <td style={{ padding: '12px' }}>
+                  {r.teacherScore !== null ? `${r.teacherScore}đ` : '-'}
+                </td>
+                <td
+                  style={{
+                    padding: '12px',
+                    fontWeight: 900,
+                    fontSize: '16px',
+                    color: UI_COLORS.primary,
+                  }}
+                >
                   {r.finalScore}đ
                 </td>
               </tr>
@@ -730,11 +942,7 @@ export const ProjectGradingTeacherPanel: React.FC<ProjectGradingTeacherPanelProp
 
       {/* Modal máy chiếu */}
       {isProjectorOpen && (
-        <Modal
-          title=""
-          isOpen={isProjectorOpen}
-          onClose={() => setIsProjectorOpen(false)}
-        >
+        <Modal title="" isOpen={isProjectorOpen} onClose={() => setIsProjectorOpen(false)}>
           <div style={{ margin: '-24px', height: '80vh', overflowY: 'auto' }}>
             <ProjectGradingProjectorView
               runId={runId}

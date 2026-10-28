@@ -17,7 +17,11 @@ export type ClassDto = z.infer<typeof ClassDtoSchema>;
  * Yêu cầu tạo lớp học mới
  */
 export const CreateClassRequestSchema = z.object({
-  name: z.string().trim().min(1, 'Vui lòng nhập tên lớp học').max(100, 'Tên lớp học tối đa 100 ký tự'),
+  name: z
+    .string()
+    .trim()
+    .min(1, 'Vui lòng nhập tên lớp học')
+    .max(100, 'Tên lớp học tối đa 100 ký tự'),
   year: z.coerce
     .number()
     .int()
@@ -38,7 +42,12 @@ export const UpdateClassRequestSchema = z.object({
     .min(1, 'Tên lớp học không được để trống')
     .max(100, 'Tên lớp học tối đa 100 ký tự')
     .optional(),
-  year: z.coerce.number().int().min(2000, 'Năm học không hợp lệ').max(2100, 'Năm học không hợp lệ').optional(),
+  year: z.coerce
+    .number()
+    .int()
+    .min(2000, 'Năm học không hợp lệ')
+    .max(2100, 'Năm học không hợp lệ')
+    .optional(),
 });
 
 export type UpdateClassRequest = z.infer<typeof UpdateClassRequestSchema>;

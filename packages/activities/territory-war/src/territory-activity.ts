@@ -1,4 +1,8 @@
-import { balanceTwoTeamsByElo, type ActivityContext, type ActivityDefinition } from '@educlass/core';
+import {
+  balanceTwoTeamsByElo,
+  type ActivityContext,
+  type ActivityDefinition,
+} from '@educlass/core';
 import type { ActivityReject } from '@educlass/protocol';
 import {
   type TerritoryQuestion,
@@ -75,31 +79,34 @@ export const TerritoryWarActivity: ActivityDefinition<
   server: {
     onStart(ctx: ActivityContext, cfg: TerritoryWarConfig): TerritoryWarState {
       // 1. Lưu kho câu hỏi cho run hiện tại
-      const questions = cfg.questions.length > 0 ? cfg.questions : [
-        {
-          id: 'sample_1',
-          stem: 'Thủ đô của Việt Nam là thành phố nào?',
-          type: 'mcq4' as const,
-          options: ['Hà Nội', 'Đà Nẵng', 'TP. Hồ Chí Minh', 'Cần Thơ'],
-          correctAnswer: 'Hà Nội',
-          timeLimit: 30,
-        },
-        {
-          id: 'sample_2',
-          stem: '2 + 2 x 2 bằng bao nhiêu?',
-          type: 'mcq4' as const,
-          options: ['6', '8', '4', '10'],
-          correctAnswer: '6',
-          timeLimit: 30,
-        },
-        {
-          id: 'sample_3',
-          stem: 'Mặt trời mọc ở hướng Đông, lặn ở hướng Tây.',
-          type: 'tf' as const,
-          correctAnswer: true,
-          timeLimit: 30,
-        },
-      ];
+      const questions =
+        cfg.questions.length > 0
+          ? cfg.questions
+          : [
+              {
+                id: 'sample_1',
+                stem: 'Thủ đô của Việt Nam là thành phố nào?',
+                type: 'mcq4' as const,
+                options: ['Hà Nội', 'Đà Nẵng', 'TP. Hồ Chí Minh', 'Cần Thơ'],
+                correctAnswer: 'Hà Nội',
+                timeLimit: 30,
+              },
+              {
+                id: 'sample_2',
+                stem: '2 + 2 x 2 bằng bao nhiêu?',
+                type: 'mcq4' as const,
+                options: ['6', '8', '4', '10'],
+                correctAnswer: '6',
+                timeLimit: 30,
+              },
+              {
+                id: 'sample_3',
+                stem: 'Mặt trời mọc ở hướng Đông, lặn ở hướng Tây.',
+                type: 'tf' as const,
+                correctAnswer: true,
+                timeLimit: 30,
+              },
+            ];
       activeRunQuestions.set(ctx.runId, questions);
 
       // 2. Tạo bản đồ theo kích thước đã chọn
@@ -130,7 +137,8 @@ export const TerritoryWarActivity: ActivityDefinition<
       // 4. Tính điểm ban đầu cho căn cứ 2 phe
       const dominance = calculateScoresAndDominance(cells, cfg);
 
-      const endTime = cfg.timeLimitMinutes > 0 ? ctx.now() + cfg.timeLimitMinutes * 60 * 1000 : null;
+      const endTime =
+        cfg.timeLimitMinutes > 0 ? ctx.now() + cfg.timeLimitMinutes * 60 * 1000 : null;
 
       return {
         title: cfg.title || 'Đại Chiến Lãnh Thổ',
@@ -258,7 +266,10 @@ export const TerritoryWarActivity: ActivityDefinition<
 
           // Kiểm tra ô có đang bị ai khóa không
           if (targetCell.lockedBy) {
-            if (targetCell.lockedBy.participantId !== participantId && targetCell.lockedBy.expiresAt > now) {
+            if (
+              targetCell.lockedBy.participantId !== participantId &&
+              targetCell.lockedBy.expiresAt > now
+            ) {
               return {
                 ok: false,
                 reason: `${targetCell.lockedBy.displayName} (${targetCell.lockedBy.team === 'blue' ? 'Phe Xanh' : 'Phe Đỏ'}) đang giao tranh ô này!`,
@@ -311,11 +322,7 @@ export const TerritoryWarActivity: ActivityDefinition<
           const isCorrect = checkTerritoryAnswerCorrectness(originalQ, action.answer);
 
           // Xử lý đòn công phá / gia cố
-          const { cell: updatedCell, event } = applyAttackToCell(
-            cell,
-            participant.team,
-            isCorrect
-          );
+          const { cell: updatedCell, event } = applyAttackToCell(cell, participant.team, isCorrect);
           updatedCell.lockedBy = null;
           st.cells[action.cellId] = updatedCell;
           participant.currentLockCellId = null;
@@ -335,10 +342,10 @@ export const TerritoryWarActivity: ActivityDefinition<
                 cell.terrain === 'big_castle'
                   ? 'Đại Bản Doanh Lâu Đài Lớn'
                   : cell.terrain === 'small_castle'
-                  ? 'Lâu Đài Nhỏ'
-                  : cell.terrain === 'watchtower'
-                  ? 'Tháp Canh'
-                  : 'Vùng Đất';
+                    ? 'Lâu Đài Nhỏ'
+                    : cell.terrain === 'watchtower'
+                      ? 'Tháp Canh'
+                      : 'Vùng Đất';
               st.logs.unshift({
                 id: `log_${now}_${participantId}`,
                 text: `🔥 [CHIẾM THÀNH] ${participant.displayName} (${teamTag}) đã đánh chiếm thành công ${terrainName}!`,
@@ -500,15 +507,15 @@ export const TerritoryWarActivity: ActivityDefinition<
 
         case 'auto_balance_teams': {
           const pList = Object.values(st.participants);
-          const candidates = pList.map((p) => ({
+          const candidates = pList.map(p => ({
             id: p.participantId,
             displayName: p.displayName,
             elo: p.elo ?? 1000,
             groupName: p.groupName ?? null,
           }));
           const balanced = balanceTwoTeamsByElo(candidates, { jitter: true });
-          const blueIds = new Set(balanced.blue.map((b) => b.id));
-          pList.forEach((p) => {
+          const blueIds = new Set(balanced.blue.map(b => b.id));
+          pList.forEach(p => {
             p.team = blueIds.has(p.participantId) ? 'blue' : 'red';
           });
           return { ...st };
@@ -580,10 +587,7 @@ export const TerritoryWarActivity: ActivityDefinition<
       }
     },
 
-    onEnd(
-      ctx: ActivityContext,
-      st: TerritoryWarState
-    ): TerritoryWarResult[] {
+    onEnd(ctx: ActivityContext, st: TerritoryWarState): TerritoryWarResult[] {
       const winner = st.winnerTeam;
 
       const results = Object.values(st.participants).map(p => {

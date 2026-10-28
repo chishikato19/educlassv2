@@ -5,8 +5,6 @@
     "rootDir": "src",
     "outDir": "dist"
   },
-  "references": [
-    { "path": "../../packages/protocol" }
-  ],
+  "references": [{ "path": "../../packages/protocol" }],
   "include": ["src/**/*"]
 }

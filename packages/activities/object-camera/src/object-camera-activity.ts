@@ -96,12 +96,15 @@ export const ObjectCameraActivity: ActivityDefinition<
         }
 
         case 'DELETE_PHOTO': {
-          const remainingPhotos = st.photos.filter((p) => p.id !== intent.photoId);
-          const remainingAnnotations = st.annotations.filter((a) => a.photoId !== intent.photoId);
+          const remainingPhotos = st.photos.filter(p => p.id !== intent.photoId);
+          const remainingAnnotations = st.annotations.filter(a => a.photoId !== intent.photoId);
           let nextActiveId = st.activePhotoId;
 
           if (st.activePhotoId === intent.photoId) {
-            nextActiveId = remainingPhotos.length > 0 ? (remainingPhotos[remainingPhotos.length - 1]?.id ?? null) : null;
+            nextActiveId =
+              remainingPhotos.length > 0
+                ? (remainingPhotos[remainingPhotos.length - 1]?.id ?? null)
+                : null;
           }
 
           return {
@@ -118,9 +121,9 @@ export const ObjectCameraActivity: ActivityDefinition<
 
         case 'CLEAR_ALL_PHOTOS': {
           // Giữ lại các ảnh đã được ghim lưu trữ
-          const pinnedPhotos = st.photos.filter((p) => p.isPinned);
-          const pinnedIds = new Set(pinnedPhotos.map((p) => p.id));
-          const keptAnnotations = st.annotations.filter((a) => pinnedIds.has(a.photoId));
+          const pinnedPhotos = st.photos.filter(p => p.isPinned);
+          const pinnedIds = new Set(pinnedPhotos.map(p => p.id));
+          const keptAnnotations = st.annotations.filter(a => pinnedIds.has(a.photoId));
           const nextActiveId = pinnedPhotos.length > 0 ? (pinnedPhotos[0]?.id ?? null) : null;
 
           return {
@@ -135,14 +138,14 @@ export const ObjectCameraActivity: ActivityDefinition<
         case 'PIN_PHOTO': {
           return {
             ...st,
-            photos: st.photos.map((p) =>
+            photos: st.photos.map(p =>
               p.id === intent.photoId ? { ...p, isPinned: intent.isPinned } : p
             ),
           };
         }
 
         case 'SELECT_PHOTO': {
-          if (!st.photos.some((p) => p.id === intent.photoId)) {
+          if (!st.photos.some(p => p.id === intent.photoId)) {
             return st;
           }
           return {
@@ -207,7 +210,7 @@ export const ObjectCameraActivity: ActivityDefinition<
           // Tìm nét vẽ cuối cùng của ảnh này để xóa
           const targetIndices = st.annotations
             .map((a, idx) => (a.photoId === targetPhotoId ? idx : -1))
-            .filter((idx) => idx !== -1);
+            .filter(idx => idx !== -1);
 
           if (targetIndices.length === 0) return st;
           const lastIdx = targetIndices[targetIndices.length - 1];
@@ -224,13 +227,12 @@ export const ObjectCameraActivity: ActivityDefinition<
 
           return {
             ...st,
-            annotations: st.annotations.filter((a) => a.photoId !== targetPhotoId),
+            annotations: st.annotations.filter(a => a.photoId !== targetPhotoId),
           };
         }
 
         case 'TOGGLE_LOCK_CAPTURE': {
-          const nextLocked =
-            intent.locked !== undefined ? intent.locked : !st.isCaptureLocked;
+          const nextLocked = intent.locked !== undefined ? intent.locked : !st.isCaptureLocked;
           return {
             ...st,
             isCaptureLocked: nextLocked,
@@ -264,7 +266,7 @@ export const ObjectCameraActivity: ActivityDefinition<
           let nextComparePhotoId = st.comparePhotoId;
           // Nếu chuyển sang chế độ so sánh mà chưa chọn ảnh thứ 2: tự động chọn 1 ảnh khác activePhotoId
           if (intent.mode !== 'single' && !nextComparePhotoId && st.photos.length > 1) {
-            const otherPhoto = st.photos.find((p) => p.id !== st.activePhotoId);
+            const otherPhoto = st.photos.find(p => p.id !== st.activePhotoId);
             if (otherPhoto) {
               nextComparePhotoId = otherPhoto.id;
             }

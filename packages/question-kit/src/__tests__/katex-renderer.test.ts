@@ -1,9 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import {
-  renderLatex,
-  parseMathSegments,
-  renderLatexInText,
-} from '../katex/katex-renderer.js';
+import { renderLatex, parseMathSegments, renderLatexInText } from '../katex/katex-renderer.js';
 
 describe('KaTeX Renderer', () => {
   it('renders inline latex formulas to html string', () => {
@@ -83,5 +79,23 @@ describe('KaTeX Renderer', () => {
     expect(html).not.toContain('<script>');
     expect(html).toContain('&lt;script&gt;');
     expect(html).toContain('class="katex"');
+  });
+
+  it('renders system of equations \\begin{cases} on multiple lines correctly', () => {
+    const text =
+      'Hệ phương trình $\\begin{cases} 2x - y = -1 \\\\ x - 3y = 7 \\end{cases}$ có nghiệm:';
+    const html = renderLatexInText(text);
+
+    expect(html).toContain('Hệ phương trình');
+    expect(html).toContain('class="katex"');
+    expect(html).not.toContain('katex-error');
+    expect(html).toContain('có nghiệm:');
+  });
+
+  it('converts plain text newlines to <br/> so equations on multiple lines break properly', () => {
+    const text = 'x - 2y = 3\n2x + y = 4';
+    const html = renderLatexInText(text);
+
+    expect(html).toBe('x - 2y = 3<br/>2x + y = 4');
   });
 });

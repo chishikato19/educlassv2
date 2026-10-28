@@ -28,9 +28,7 @@ export function findGroupByParticipantId(
   participantId: string
 ): ProjectGradingGroupConfig | undefined {
   return groups.find(
-    (g) =>
-      g.memberParticipantIds.includes(participantId) ||
-      g.leaderParticipantId === participantId
+    g => g.memberParticipantIds.includes(participantId) || g.leaderParticipantId === participantId
   );
 }
 
@@ -48,10 +46,15 @@ export function isParticipantLeader(
 /**
  * Thu thập và tính toán toàn diện điểm số 4 cột cho toàn bộ học sinh
  */
-export function calculateAllFinalScores(
-  state: ProjectGradingState
-): ProjectGradingStudentResult[] {
-  const { config, selfGrades, teamMemberGrades, crossTeamGrades, teacherGroupGrades, teacherStudentGrades } = state;
+export function calculateAllFinalScores(state: ProjectGradingState): ProjectGradingStudentResult[] {
+  const {
+    config,
+    selfGrades,
+    teamMemberGrades,
+    crossTeamGrades,
+    teacherGroupGrades,
+    teacherStudentGrades,
+  } = state;
   const weights = config.weights;
   const results: ProjectGradingStudentResult[] = [];
 
@@ -75,8 +78,7 @@ export function calculateAllFinalScores(
     const avgCrossScore =
       crossScoresForThisGroup.length > 0
         ? roundScore(
-            crossScoresForThisGroup.reduce((sum, s) => sum + s, 0) /
-              crossScoresForThisGroup.length
+            crossScoresForThisGroup.reduce((sum, s) => sum + s, 0) / crossScoresForThisGroup.length
           )
         : null;
 
@@ -121,7 +123,7 @@ export function calculateAllFinalScores(
       // [Cột 3]: Điểm chấm chéo (toàn nhóm hưởng chung điểm chéo này)
       const crossTeamScore = avgCrossScore;
       if (crossCommentsForThisGroup.length > 0) {
-        comments.push(...crossCommentsForThisGroup.map((c) => `Nhóm bạn nhận xét: ${c}`));
+        comments.push(...crossCommentsForThisGroup.map(c => `Nhóm bạn nhận xét: ${c}`));
       }
 
       // [Cột 4]: Điểm giáo viên (Ưu tiên điểm riêng từng bạn, fallback điểm nhóm)
@@ -161,13 +163,15 @@ export function calculateAllFinalScores(
         effectiveWeightSum += weights.teacher;
       }
 
-      const finalScore =
-        effectiveWeightSum > 0 ? roundScore(weightedSum / effectiveWeightSum) : 0;
+      const finalScore = effectiveWeightSum > 0 ? roundScore(weightedSum / effectiveWeightSum) : 0;
 
       results.push({
         participantId: memberId,
         studentId: memberId,
-        displayName: isLeader && group.leaderDisplayName ? group.leaderDisplayName : `Học sinh (${memberId.slice(-4)})`,
+        displayName:
+          isLeader && group.leaderDisplayName
+            ? group.leaderDisplayName
+            : `Học sinh (${memberId.slice(-4)})`,
         groupId: group.id,
         groupName: group.name,
         isLeader,
@@ -194,7 +198,14 @@ export function calculateAllFinalScores(
  * Thống kê tiến độ chấm điểm theo từng chiều
  */
 export function calculateGradingProgress(state: ProjectGradingState) {
-  const { config, selfGrades, teamMemberGrades, crossTeamGrades, teacherGroupGrades, teacherStudentGrades } = state;
+  const {
+    config,
+    selfGrades,
+    teamMemberGrades,
+    crossTeamGrades,
+    teacherGroupGrades,
+    teacherStudentGrades,
+  } = state;
 
   let totalMembers = 0;
   for (const g of config.groups) {
@@ -212,7 +223,9 @@ export function calculateGradingProgress(state: ProjectGradingState) {
   for (const g of config.groups) {
     if (g.leaderParticipantId) {
       // Nhóm trưởng chấm cho các thành viên còn lại
-      expectedTeamMemberGrades += g.memberParticipantIds.filter((id) => id !== g.leaderParticipantId).length;
+      expectedTeamMemberGrades += g.memberParticipantIds.filter(
+        id => id !== g.leaderParticipantId
+      ).length;
       const grades = teamMemberGrades[g.leaderParticipantId];
       if (grades) {
         actualTeamMemberGrades += Object.keys(grades).length;
@@ -250,9 +263,7 @@ export function calculateGradingProgress(state: ProjectGradingState) {
       submitted: actualCrossGrades,
       total: expectedCrossGrades,
       percentage:
-        expectedCrossGrades > 0
-          ? Math.round((actualCrossGrades / expectedCrossGrades) * 100)
-          : 100,
+        expectedCrossGrades > 0 ? Math.round((actualCrossGrades / expectedCrossGrades) * 100) : 100,
     },
     teacherGrading: {
       groupsGraded: teacherGroupGraded,

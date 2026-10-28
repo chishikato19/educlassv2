@@ -34,7 +34,9 @@ export const DuckRaceMode: React.FC<RandomPickerModeProps> = ({
   const duckNodesRef = useRef<DuckDisplayNode[]>([]);
   const isRacingRef = useRef<boolean>(false);
   const startTimeRef = useRef<number>(0);
-  const pendingStartRaceRef = useRef<{ target: PickerStudent; scenario: DuckRaceScenario } | null>(null);
+  const pendingStartRaceRef = useRef<{ target: PickerStudent; scenario: DuckRaceScenario } | null>(
+    null
+  );
 
   // Chọn ngẫu nhiên 1 trong 5 kịch bản kịch tính
   const [scenario, setScenario] = useState<DuckRaceScenario>(() => {
@@ -45,7 +47,7 @@ export const DuckRaceMode: React.FC<RandomPickerModeProps> = ({
 
   // Hàm tạo đàn vịt tại vạch xuất phát
   const spawnFlock = (container: Container, target: PickerStudent, sc: DuckRaceScenario) => {
-    duckNodesRef.current.forEach((node) => {
+    duckNodesRef.current.forEach(node => {
       try {
         container.removeChild(node.container);
         node.container.destroy({ children: true });
@@ -58,7 +60,7 @@ export const DuckRaceMode: React.FC<RandomPickerModeProps> = ({
     if (candidates.length === 0) return;
 
     const entities = initializeDuckFlock(candidates, target, sc, RIVER_HEIGHT);
-    duckNodesRef.current = entities.map((entity) => {
+    duckNodesRef.current = entities.map(entity => {
       const node = createDuckDisplayNode(entity);
       container.addChild(node.container);
       node.update(entity.currentX, entity.currentY, 0, false);
@@ -230,7 +232,8 @@ export const DuckRaceMode: React.FC<RandomPickerModeProps> = ({
     if (!isPicking || !selectedStudent || candidates.length === 0) return;
 
     // Chọn ngẫu nhiên kịch bản mới cho mỗi lần đua
-    const newScenario = SCENARIO_KEYS[Math.floor(Math.random() * SCENARIO_KEYS.length)] || 'comeback';
+    const newScenario =
+      SCENARIO_KEYS[Math.floor(Math.random() * SCENARIO_KEYS.length)] || 'comeback';
     setScenario(newScenario);
 
     if (raceContainerRef.current) {
@@ -267,7 +270,7 @@ export const DuckRaceMode: React.FC<RandomPickerModeProps> = ({
       let leadX = 0;
 
       // Cập nhật từng chú vịt
-      duckNodesRef.current.forEach((node) => {
+      duckNodesRef.current.forEach(node => {
         const { x, isSpeeding } = calculateDuckX(node.entity, progress, scenario);
         const bob = Math.sin(elapsed * 6 + node.entity.bobPhase) * 4.5;
         const wobble = Math.sin(elapsed * 8 + node.entity.bobPhase) * 0.08;
@@ -291,7 +294,7 @@ export const DuckRaceMode: React.FC<RandomPickerModeProps> = ({
       // Khi chạm đích 100% (cắt băng khánh thành vạch đích)
       if (progress >= 1.0) {
         isRacingRef.current = false;
-        duckNodesRef.current.find((n) => n.entity.isTarget)?.setTargetGlow(true);
+        duckNodesRef.current.find(n => n.entity.isTarget)?.setTargetGlow(true);
       }
     };
 
@@ -312,7 +315,10 @@ export const DuckRaceMode: React.FC<RandomPickerModeProps> = ({
     <div className="w-full flex flex-col items-center justify-center py-1 select-none">
       {/* KHUNG CHÍNH PIXI.JS CANVAS ĐƯỜNG ĐUA - CHIẾM 4/5 MÀN HÌNH HOÀNH TRÁNG */}
       <div className="relative w-full max-w-[96vw] xl:max-w-[1550px] rounded-3xl overflow-hidden border-4 border-amber-400 shadow-[0_20px_60px_rgba(0,0,0,0.85)] bg-sky-800 my-1">
-        <canvas ref={canvasRef} className="w-full h-[520px] sm:h-[580px] xl:h-[620px] block cursor-pointer" />
+        <canvas
+          ref={canvasRef}
+          className="w-full h-[520px] sm:h-[580px] xl:h-[620px] block cursor-pointer"
+        />
 
         {/* ĐẾM NGƯỢC XUẤT PHÁT 3... 2... 1... GO! */}
         {countdown !== null && (

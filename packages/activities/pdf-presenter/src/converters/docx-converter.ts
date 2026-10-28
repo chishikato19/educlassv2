@@ -48,7 +48,7 @@ export function paginateHtmlContent(html: string): DocxConversionResult {
   let estimatedHeight = 0;
   const A4_MAX_CONTENT_HEIGHT = 900; // Chiều cao nội dung an toàn của 1 trang A4
 
-  childNodes.forEach((node) => {
+  childNodes.forEach(node => {
     // Ước tính chiều cao từng phần tử dựa trên loại thẻ và độ dài chữ
     const tag = node.tagName.toLowerCase();
     const textLen = (node.textContent || '').length;

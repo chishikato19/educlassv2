@@ -47,7 +47,10 @@ export const CHESS_PIECES = {
 /**
  * Hiển thị huy hiệu cờ vua theo chuỗi thắng / thành tích
  */
-export function getChessTitleBadge(tournamentPoints: number, streak: number): { title: string; icon: string } {
+export function getChessTitleBadge(
+  tournamentPoints: number,
+  streak: number
+): { title: string; icon: string } {
   if (tournamentPoints >= 10 || streak >= 4) {
     return { title: 'Đại Kiện Tướng', icon: '♔' };
   }
@@ -65,7 +68,10 @@ export function getChessTitleBadge(tournamentPoints: number, streak: number): { 
  */
 export function renderLatexInText(text: string): string {
   if (!text) return '';
-  return text.replace(/\$([^$]+)\$/g, '<code class="font-serif px-1.5 py-0.5 rounded bg-black/20 text-amber-200">$1</code>');
+  return text.replace(
+    /\$([^$]+)\$/g,
+    '<code class="font-serif px-1.5 py-0.5 rounded bg-black/20 text-amber-200">$1</code>'
+  );
 }
 
 /**

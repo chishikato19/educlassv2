@@ -17,11 +17,7 @@ import {
   type SessionRepository,
   type StudentRepository,
 } from '@educlass/db';
-import {
-  createEnvelope,
-  type ActivityReject,
-  type ActivityRunDto,
-} from '@educlass/protocol';
+import { createEnvelope, type ActivityReject, type ActivityRunDto } from '@educlass/protocol';
 import type { WsGatewayManager } from '../ws/gateway.js';
 import type { ActivityRegistry } from './registry.js';
 import type { RewardRuleService } from '../rewards/reward-rule-service.js';
@@ -122,20 +118,29 @@ export class ActivityEngine {
   /**
    * Tìm lượt chạy theo sessionId và tùy chọn runId hoặc activityId
    */
-  private findActiveRun(sessionId: string, runIdOrActivityId?: string): ActiveSessionRun | undefined {
+  private findActiveRun(
+    sessionId: string,
+    runIdOrActivityId?: string
+  ): ActiveSessionRun | undefined {
     if (runIdOrActivityId) {
       // 1. Tìm chính xác theo runId
       const byRunId = this.activeRuns.get(runIdOrActivityId);
       if (
         byRunId &&
-        (byRunId.run.sessionId === sessionId || sessionId === 'active' || sessionId === 'current' || !sessionId)
+        (byRunId.run.sessionId === sessionId ||
+          sessionId === 'active' ||
+          sessionId === 'current' ||
+          !sessionId)
       ) {
         return byRunId;
       }
       // 2. Tìm theo activityId hoặc runId trong phiên
       for (const item of this.activeRuns.values()) {
         if (
-          (item.run.sessionId === sessionId || sessionId === 'active' || sessionId === 'current' || !sessionId) &&
+          (item.run.sessionId === sessionId ||
+            sessionId === 'active' ||
+            sessionId === 'current' ||
+            !sessionId) &&
           (item.run.id === runIdOrActivityId || item.run.activityId === runIdOrActivityId)
         ) {
           return item;
@@ -153,7 +158,7 @@ export class ActivityEngine {
       return undefined;
     }
 
-    const mainRun = sessionRuns.find((r) => r.run.activityId !== 'assignment-hub');
+    const mainRun = sessionRuns.find(r => r.run.activityId !== 'assignment-hub');
     return mainRun ?? sessionRuns[0];
   }
 
@@ -196,7 +201,9 @@ export class ActivityEngine {
 
         let expToGrant = qty;
         let isCapped = false;
-        let reason = currentActivityId ? `Hoạt động ${currentActivityId}: ${trigger}` : `Hoạt động: ${trigger}`;
+        let reason = currentActivityId
+          ? `Hoạt động ${currentActivityId}: ${trigger}`
+          : `Hoạt động: ${trigger}`;
 
         // Nếu có RewardRuleService: tính điểm theo luật GV và kiểm tra trần EXP chống lạm phát
         if (this.options.rewardRuleService) {
@@ -351,7 +358,7 @@ export class ActivityEngine {
       if (targetClassId) {
         const students = await this.options.studentRepo.listByClassId(targetClassId);
         const match = students.find(
-          (s) => s.fullName.trim().toLowerCase() === participant.displayName.trim().toLowerCase()
+          s => s.fullName.trim().toLowerCase() === participant.displayName.trim().toLowerCase()
         );
         if (match) {
           studentId = match.id;
@@ -365,7 +372,10 @@ export class ActivityEngine {
     }
 
     // Nếu bài đã nộp (submitted), không cho phép ghi đè lại thành 'in_progress'
-    const existing = await this.options.examRecordRepo.findByExamAndStudent(config.examId, studentId);
+    const existing = await this.options.examRecordRepo.findByExamAndStudent(
+      config.examId,
+      studentId
+    );
     if (existing && existing.status === 'submitted' && targetStatus === 'in_progress') {
       return;
     }
@@ -401,7 +411,9 @@ export class ActivityEngine {
       return;
     }
 
-    const effectiveStatus: 'in_progress' | 'submitted' = pState.isSubmitted ? 'submitted' : targetStatus;
+    const effectiveStatus: 'in_progress' | 'submitted' = pState.isSubmitted
+      ? 'submitted'
+      : targetStatus;
     const studentName = pState.displayName || participant.displayName || 'Học sinh';
     const batchIndex = typeof config.batchIndex === 'number' ? config.batchIndex : 1;
     const score = pState.result?.score ?? 0;
@@ -410,15 +422,16 @@ export class ActivityEngine {
     const correctCount = pState.result?.correctCount ?? 0;
     const totalQuestions = pState.result?.totalQuestions ?? stateObj.totalQuestions ?? 1;
     const answersJson = JSON.stringify(pState.answers ?? {});
-    const resultJson = pState.reviewData || pState.result ? JSON.stringify(pState.reviewData ?? pState.result ?? {}) : null;
-    const timeSpentSeconds =
-      pState.startedAt
-        ? Math.max(
-            0,
-            Math.round(((pState.submittedAt ?? Date.now()) - pState.startedAt) / 1000)
-          )
-        : 0;
-    const submittedAt = pState.submittedAt ?? (effectiveStatus === 'submitted' ? Date.now() : (pState.startedAt ?? Date.now()));
+    const resultJson =
+      pState.reviewData || pState.result
+        ? JSON.stringify(pState.reviewData ?? pState.result ?? {})
+        : null;
+    const timeSpentSeconds = pState.startedAt
+      ? Math.max(0, Math.round(((pState.submittedAt ?? Date.now()) - pState.startedAt) / 1000))
+      : 0;
+    const submittedAt =
+      pState.submittedAt ??
+      (effectiveStatus === 'submitted' ? Date.now() : (pState.startedAt ?? Date.now()));
 
     try {
       await this.options.examRecordRepo.upsert({
@@ -508,7 +521,7 @@ export class ActivityEngine {
         if (targetClassId) {
           const students = await this.options.studentRepo.listByClassId(targetClassId);
           const match = students.find(
-            (s) => s.fullName.trim().toLowerCase() === participant.displayName.trim().toLowerCase()
+            s => s.fullName.trim().toLowerCase() === participant.displayName.trim().toLowerCase()
           );
           if (match) {
             studentId = match.id;
@@ -551,7 +564,10 @@ export class ActivityEngine {
           submittedAt,
         });
       } catch (err) {
-        console.error('[ActivityEngine] Lỗi upsert examRecord cho học sinh ' + studentId + ':', err);
+        console.error(
+          '[ActivityEngine] Lỗi upsert examRecord cho học sinh ' + studentId + ':',
+          err
+        );
       }
     }
   }
@@ -599,11 +615,16 @@ export class ActivityEngine {
         try {
           const session = await this.options.sessionRepo.findById(sessionId);
           if (session) {
-            let targetClassId = (typeof cfgObj['classId'] === 'string' && cfgObj['classId']) ? cfgObj['classId'] : session.classId;
+            let targetClassId =
+              typeof cfgObj['classId'] === 'string' && cfgObj['classId']
+                ? cfgObj['classId']
+                : session.classId;
 
             // Nếu phiên tự do chưa có classId, tìm lớp có sẵn của giáo viên
             if (!targetClassId && this.options.classRepo) {
-              const teacherClasses = await this.options.classRepo.list({ ownerId: session.ownerId });
+              const teacherClasses = await this.options.classRepo.list({
+                ownerId: session.ownerId,
+              });
               if (teacherClasses.length > 0) {
                 targetClassId = teacherClasses[0]!.id;
               } else {
@@ -637,7 +658,8 @@ export class ActivityEngine {
                   classId: targetClassId,
                   title: String(cfgObj['title'] || 'Kỳ thi theo ca').trim(),
                   subject: typeof cfgObj['subject'] === 'string' ? cfgObj['subject'] : null,
-                  durationMinutes: typeof cfgObj['durationMinutes'] === 'number' ? cfgObj['durationMinutes'] : 45,
+                  durationMinutes:
+                    typeof cfgObj['durationMinutes'] === 'number' ? cfgObj['durationMinutes'] : 45,
                   configJson: JSON.stringify(cfgObj),
                   questionsSnapshotJson: JSON.stringify(cfgObj['questions'] ?? []),
                   status: 'in_progress',
@@ -866,7 +888,12 @@ export class ActivityEngine {
     active.revision++;
 
     // Tự động lưu bản ghi bài thi nếu giáo viên ép nộp bài hoặc đóng bài thi
-    if (active.run.activityId === 'exam' && intent && typeof intent === 'object' && 'type' in intent) {
+    if (
+      active.run.activityId === 'exam' &&
+      intent &&
+      typeof intent === 'object' &&
+      'type' in intent
+    ) {
       const teacherIntentObj = intent as { type: unknown; participantId?: unknown };
       if (
         teacherIntentObj.type === 'force_submit_student' &&
@@ -919,7 +946,7 @@ export class ActivityEngine {
 
     // 1. Thu thập kết quả từ Activity plugin
     const rawResults = active.activity.server.onEnd(ctx, active.state);
-    const results = rawResults.map((r) => active.activity.resultSchema.parse(r));
+    const results = rawResults.map(r => active.activity.resultSchema.parse(r));
 
     // 2. Cập nhật trạng thái CSDL
     await this.options.activityRunRepo.updateRunStatus(targetRunId, 'ended', endedAt);
@@ -930,8 +957,8 @@ export class ActivityEngine {
         let validResults = results;
         if (this.options.participantRepo) {
           const participants = await this.options.participantRepo.listBySessionId(sessionId);
-          const validParticipantIds = new Set(participants.map((p) => p.id));
-          validResults = results.filter((r) => {
+          const validParticipantIds = new Set(participants.map(p => p.id));
+          validResults = results.filter(r => {
             const item = r as Record<string, unknown>;
             const participantId = String(item['participantId'] ?? '');
             return (
@@ -941,7 +968,7 @@ export class ActivityEngine {
             );
           });
         } else {
-          validResults = results.filter((r) => {
+          validResults = results.filter(r => {
             const item = r as Record<string, unknown>;
             const participantId = String(item['participantId'] ?? '');
             return participantId !== '' && participantId !== 'teacher';
@@ -951,7 +978,7 @@ export class ActivityEngine {
         if (validResults.length > 0) {
           await this.options.activityRunRepo.saveResults(
             targetRunId,
-            validResults.map((r) => {
+            validResults.map(r => {
               const item = r as Record<string, unknown>;
               const participantId = String(item['participantId'] ?? '');
               const rank = typeof item['rank'] === 'number' ? item['rank'] : null;
@@ -964,7 +991,10 @@ export class ActivityEngine {
           );
         }
       } catch (saveError) {
-        console.error(`[ActivityEngine] Lỗi lưu activity_results cho runId ${targetRunId}:`, saveError);
+        console.error(
+          `[ActivityEngine] Lỗi lưu activity_results cho runId ${targetRunId}:`,
+          saveError
+        );
       }
     }
 
@@ -983,9 +1013,7 @@ export class ActivityEngine {
         const cameraState = active.state as {
           photos?: Array<{ url: string; isPinned?: boolean }>;
         };
-        const pinnedUrls = (cameraState?.photos || [])
-          .filter((p) => p.isPinned)
-          .map((p) => p.url);
+        const pinnedUrls = (cameraState?.photos || []).filter(p => p.isPinned).map(p => p.url);
 
         if (pinnedUrls.length === 0) {
           cleanupSessionObjectCameraFiles(sessionId);
@@ -1077,7 +1105,7 @@ export class ActivityEngine {
    */
   getActiveRuns(sessionId: string): Array<{ run: ActivityRunDto; state: unknown }> {
     const runs = this.getRunsForSession(sessionId);
-    return runs.map((active) => {
+    return runs.map(active => {
       let parsedConfig: unknown = {};
       try {
         parsedConfig = JSON.parse(active.run.configJson);
@@ -1103,10 +1131,7 @@ export class ActivityEngine {
   /**
    * Cập nhật điểm Elo ẩn cho học sinh khi kết thúc hoạt động
    */
-  private async updateStudentEloOnEnd(
-    active: ActiveSessionRun,
-    results: unknown[]
-  ): Promise<void> {
+  private async updateStudentEloOnEnd(active: ActiveSessionRun, results: unknown[]): Promise<void> {
     if (!this.options.studentRepo || !this.options.participantRepo) return;
     if (results.length === 0) return;
 
@@ -1114,7 +1139,7 @@ export class ActivityEngine {
     const sessionId = active.run.sessionId;
 
     const participants = await this.options.participantRepo.listBySessionId(sessionId);
-    const participantMap = new Map(participants.map((p) => [p.id, p]));
+    const participantMap = new Map(participants.map(p => [p.id, p]));
 
     // 1. Đối với trò chơi đồng đội 2 phe: Đại Chiến Lãnh Thổ (territory-war)
     if (activityId === 'territory-war') {
@@ -1123,8 +1148,18 @@ export class ActivityEngine {
       };
       const winner = stateObj.winnerTeam ?? 'draw';
 
-      const teamBlueInputs: Array<{ id: string; studentId: string; elo: number; contribution: number }> = [];
-      const teamRedInputs: Array<{ id: string; studentId: string; elo: number; contribution: number }> = [];
+      const teamBlueInputs: Array<{
+        id: string;
+        studentId: string;
+        elo: number;
+        contribution: number;
+      }> = [];
+      const teamRedInputs: Array<{
+        id: string;
+        studentId: string;
+        elo: number;
+        contribution: number;
+      }> = [];
 
       for (const raw of results) {
         const item = raw as Record<string, unknown>;
@@ -1155,8 +1190,8 @@ export class ActivityEngine {
 
       if (teamBlueInputs.length > 0 || teamRedInputs.length > 0) {
         const matchResults = calculateTeamMatchElo(
-          teamBlueInputs.map((b) => ({ id: b.studentId, elo: b.elo, contribution: b.contribution })),
-          teamRedInputs.map((r) => ({ id: r.studentId, elo: r.elo, contribution: r.contribution })),
+          teamBlueInputs.map(b => ({ id: b.studentId, elo: b.elo, contribution: b.contribution })),
+          teamRedInputs.map(r => ({ id: r.studentId, elo: r.elo, contribution: r.contribution })),
           winner
         );
 
@@ -1190,7 +1225,11 @@ export class ActivityEngine {
         let accuracyRatio = 0.5;
         if (typeof item['accuracy'] === 'number') {
           accuracyRatio = Math.max(0, Math.min(1, item['accuracy'] / 100));
-        } else if (typeof item['correctCount'] === 'number' && typeof item['totalQuestions'] === 'number' && item['totalQuestions'] > 0) {
+        } else if (
+          typeof item['correctCount'] === 'number' &&
+          typeof item['totalQuestions'] === 'number' &&
+          item['totalQuestions'] > 0
+        ) {
           accuracyRatio = Math.max(0, Math.min(1, item['correctCount'] / item['totalQuestions']));
         }
 
@@ -1208,7 +1247,11 @@ export class ActivityEngine {
       if (validParticipants.length > 0) {
         const avgAccuracy = totalAccuracy / Math.max(1, results.length);
         for (const vp of validParticipants) {
-          const { newElo } = calculateIndividualGameElo(vp.currentElo, vp.accuracyRatio, avgAccuracy);
+          const { newElo } = calculateIndividualGameElo(
+            vp.currentElo,
+            vp.accuracyRatio,
+            avgAccuracy
+          );
           await this.options.studentRepo.update(vp.studentId, { elo: newElo });
         }
       }

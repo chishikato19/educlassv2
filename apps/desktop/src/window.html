@@ -103,7 +103,23 @@
   <body>
     <div class="card">
       <div class="status-badge">● Máy chủ đang chạy</div>
-      <h2>EduClass v2 <span id="app-version" style="font-size: 13px; font-weight: 600; color: #475569; background: #f1f5f9; padding: 2px 8px; border-radius: 6px; border: 1px solid #e2e8f0; vertical-align: middle;">v2.0.85</span></h2>
+      <h2>
+        EduClass v2
+        <span
+          id="app-version"
+          style="
+            font-size: 13px;
+            font-weight: 600;
+            color: #475569;
+            background: #f1f5f9;
+            padding: 2px 8px;
+            border-radius: 6px;
+            border: 1px solid #e2e8f0;
+            vertical-align: middle;
+          "
+          >v2.0.85</span
+        >
+      </h2>
       <p style="margin-bottom: 16px; color: #475569">
         Quét mã QR để điện thoại học sinh vào lớp cùng mạng WiFi:
       </p>
@@ -122,12 +138,21 @@
         🌐 Mở trong Trình duyệt web (Chrome/Edge)
       </button>
 
-      <button class="btn btn-secondary" id="check-update-btn" style="font-size: 13px; min-height: 38px; margin-top: 8px;">
+      <button
+        class="btn btn-secondary"
+        id="check-update-btn"
+        style="font-size: 13px; min-height: 38px; margin-top: 8px"
+      >
         🔄 Kiểm tra cập nhật phần mềm
       </button>
-      <div id="update-status" style="font-size: 12px; color: #64748b; margin-top: 6px; display: none;"></div>
+      <div
+        id="update-status"
+        style="font-size: 12px; color: #64748b; margin-top: 6px; display: none"
+      ></div>
 
-      <p class="tip">Phần mềm vẫn duy trì kết nối lớp học khi thu nhỏ xuống khay tác vụ (System Tray).</p>
+      <p class="tip">
+        Phần mềm vẫn duy trì kết nối lớp học khi thu nhỏ xuống khay tác vụ (System Tray).
+      </p>
     </div>
 
     <script>
@@ -186,7 +211,10 @@
             try {
               const res = await window.electronAPI.checkForUpdate();
               if (res.hasUpdate) {
-                updateStatus.innerHTML = '<span style="color: #2563eb; font-weight: 700;">Đã có bản mới: v' + res.latestVersion + '</span>. Hãy mở Bàn làm việc để cập nhật.';
+                updateStatus.innerHTML =
+                  '<span style="color: #2563eb; font-weight: 700;">Đã có bản mới: v' +
+                  res.latestVersion +
+                  '</span>. Hãy mở Bàn làm việc để cập nhật.';
               } else if (res.error) {
                 updateStatus.innerText = 'Không thể kiểm tra: ' + res.error;
               } else {

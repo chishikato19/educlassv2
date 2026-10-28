@@ -74,16 +74,17 @@ packages/activities/volleyball-tournament/
 ## 3. Cấu Trúc Dữ Liệu (Zod Schemas)
 
 ### 3.1 Bảng đấu & Trận đấu
+
 ```typescript
 export const VolleyballMatchupSchema = z.object({
   tableNumber: z.number(),
   stage: z.enum(['pool', 'bracket']),
-  poolId: z.string().optional(),          // 'A' | 'B' | ... nếu là vòng bảng
+  poolId: z.string().optional(), // 'A' | 'B' | ... nếu là vòng bảng
   tier: z.enum(['diamond', 'gold', 'silver', 'bronze']).optional(), // nếu là playoff
   matchType: z.enum(['round_robin', 'semi_final', 'final', 'third_place']),
   player1Id: z.string(),
   player2Id: z.string(),
-  player1Score: z.number().default(0),    // Số câu đúng trong 2 câu (0, 1, 2)
+  player1Score: z.number().default(0), // Số câu đúng trong 2 câu (0, 1, 2)
   player2Score: z.number().default(0),
   player1Answered: z.boolean().default(false),
   player2Answered: z.boolean().default(false),
@@ -96,6 +97,7 @@ export const VolleyballMatchupSchema = z.object({
 ```
 
 ### 3.2 Bảng Xếp Hạng Bảng Đấu (Pool Standings Entry)
+
 ```typescript
 export const PoolStandingEntrySchema = z.object({
   rankInPool: z.number(),
@@ -115,6 +117,7 @@ export const PoolStandingEntrySchema = z.object({
 ## 4. Thuật Toán Bắt Cặp & Phân Nhánh (Algorithms)
 
 ### 4.1 Thuật toán Chia Bảng Thích Ứng (Adaptive Pool Assignment)
+
 1. Kiểm tra sĩ số `N = participants.length`.
 2. Nếu `config.poolMode === 'auto'`:
    - $N \le 23 \implies \text{poolCount} = 4$.
@@ -125,6 +128,7 @@ export const PoolStandingEntrySchema = z.object({
    - Kết quả: Các bảng luôn có sĩ số chênh lệch tối đa 1 người (ví dụ: 18 học sinh $\implies$ 2 bảng 5 em, 2 bảng 4 em).
 
 ### 4.2 Thuật toán Sinh Lịch Vòng Tròn (Round-Robin 3 Lượt)
+
 - Với bảng 4 người `[P1, P2, P3, P4]`:
   - Lượt 1: (P1 vs P2), (P3 vs P4)
   - Lượt 2: (P1 vs P3), (P2 vs P4)
@@ -132,7 +136,9 @@ export const PoolStandingEntrySchema = z.object({
 - Với bảng 5 người: Thêm 1 suất ảo `DUMMY_BYE`. Bạn nào gặp `DUMMY_BYE` trong lượt đó sẽ nhận lượt nghỉ và được bảo lưu điểm trung bình.
 
 ### 4.3 Thuật toán Phân Tầng Bắt Cặp Playoff (4 Cúp)
+
 Sau khi tính xong BXH vòng bảng:
+
 - **Nhánh Kim Cương (Diamond)**: Lấy `rankInPool === 1` của tất cả các bảng.
   - Với 4 bảng (A, B, C, D):
     - Bán kết 1: `Nhất A` vs `Nhất D`
@@ -149,11 +155,13 @@ Sau khi tính xong BXH vòng bảng:
 ## 5. Thiết Kế Giao Diện (UI/UX)
 
 ### 5.1 Giao diện Học sinh (Student View - Mobile First 360x640)
+
 - **Header cố định**: Tên bảng đấu của mình (`BẢNG B`), đối thủ trận hiện tại (`Đối thủ: Lê Bảo Châu`), tỷ số tạm thời.
 - **Khu vực làm bài**: 2 câu hỏi cuộn nhẹ hoặc chuyển tab câu 1 / câu 2; các nút bấm lựa chọn đáp án to rõ $\ge 48\times 48\text{px}$, màu sắc tươi sáng kèm ký hiệu khối (▲, ◆, ●, ■).
 - **Màn hình nghỉ giữa lượt**: Thẻ tóm tắt kết quả trận vừa đấu, BXH trực tiếp của bảng mình.
 
 ### 5.2 Giao diện Màn Chiếu (Projector View)
+
 - **Giai đoạn Vòng bảng**:
   - Với 4 bảng: Chia 4 cột thẻ thể thao lớn (Bảng A, Bảng B, Bảng C, Bảng D) hiển thị trạng thái từng cặp đấu.
   - Với 8 bảng: Lưới 2 hàng $\times$ 4 cột kèm khung "Sân đấu tâm điểm" (Spotlight Match) phóng to trận đấu kịch tính nhất.

@@ -8,11 +8,7 @@ export interface ChangePinModalProps {
   onSuccess: () => void;
 }
 
-export const ChangePinModal: React.FC<ChangePinModalProps> = ({
-  isOpen,
-  onClose,
-  onSuccess,
-}) => {
+export const ChangePinModal: React.FC<ChangePinModalProps> = ({ isOpen, onClose, onSuccess }) => {
   const [oldPin, setOldPin] = useState('');
   const [newPin, setNewPin] = useState('');
   const [confirmPin, setConfirmPin] = useState('');
@@ -61,7 +57,7 @@ export const ChangePinModal: React.FC<ChangePinModalProps> = ({
             type="password"
             maxLength={10}
             value={oldPin}
-            onChange={(e) => setOldPin(e.target.value)}
+            onChange={e => setOldPin(e.target.value)}
             placeholder="Mặc định ban đầu là 1234"
             autoFocus
           />
@@ -75,7 +71,7 @@ export const ChangePinModal: React.FC<ChangePinModalProps> = ({
             type="password"
             maxLength={10}
             value={newPin}
-            onChange={(e) => setNewPin(e.target.value)}
+            onChange={e => setNewPin(e.target.value)}
             placeholder="Nhập 4 số mới (VD: 5678)"
           />
         </div>
@@ -88,7 +84,7 @@ export const ChangePinModal: React.FC<ChangePinModalProps> = ({
             type="password"
             maxLength={10}
             value={confirmPin}
-            onChange={(e) => setConfirmPin(e.target.value)}
+            onChange={e => setConfirmPin(e.target.value)}
             placeholder="Nhập lại mã PIN mới"
           />
         </div>

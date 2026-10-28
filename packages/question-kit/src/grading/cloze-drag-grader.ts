@@ -14,7 +14,7 @@ export function gradeClozeDrag(
   const totalBlanks = question.blanks.length;
 
   let correctCount = 0;
-  const blankDetails: ClozeBlankDetail[] = question.blanks.map((blank) => {
+  const blankDetails: ClozeBlankDetail[] = question.blanks.map(blank => {
     const blankId = blank.id;
     const correctWord = blank.answer.trim();
     const selectedWord = studentFilled[blankId] ? studentFilled[blankId]!.trim() : null;

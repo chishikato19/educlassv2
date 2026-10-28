@@ -1,8 +1,5 @@
 import { z } from 'zod';
-import {
-  ExamRecordStatusSchema,
-  ExamStatusSchema,
-} from './enums.js';
+import { ExamRecordStatusSchema, ExamStatusSchema } from './enums.js';
 
 /**
  * Cấu hình tổ chức kỳ thi dạng JSON
@@ -129,9 +126,9 @@ export type ExamListItemDto = z.infer<typeof ExamListItemDtoSchema>;
  * Phân bố phổ điểm
  */
 export const ExamGradeDistributionSchema = z.object({
-  tot: z.number().int().nonnegative(),     // Điểm >= 8.0 (hoặc >= 80% thang điểm)
-  kha: z.number().int().nonnegative(),     // 6.5 <= Điểm < 8.0 (hoặc 65% - 80%)
-  dat: z.number().int().nonnegative(),     // 5.0 <= Điểm < 6.5 (hoặc 50% - 65%)
+  tot: z.number().int().nonnegative(), // Điểm >= 8.0 (hoặc >= 80% thang điểm)
+  kha: z.number().int().nonnegative(), // 6.5 <= Điểm < 8.0 (hoặc 65% - 80%)
+  dat: z.number().int().nonnegative(), // 5.0 <= Điểm < 6.5 (hoặc 50% - 65%)
   chuaDat: z.number().int().nonnegative(), // Điểm < 5.0 (hoặc < 50%)
 });
 export type ExamGradeDistribution = z.infer<typeof ExamGradeDistributionSchema>;

@@ -55,7 +55,7 @@ export class BeaconService {
     try {
       this.socket = dgram.createSocket({ type: 'udp4', reuseAddr: true });
 
-      this.socket.on('error', (err) => {
+      this.socket.on('error', err => {
         console.warn('[BeaconService] Lỗi socket UDP:', err.message);
       });
 
@@ -106,7 +106,7 @@ export class BeaconService {
     const message = Buffer.from(JSON.stringify(validated.data), 'utf-8');
 
     try {
-      socket.send(message, 0, message.length, this.port, this.broadcastAddress, (err) => {
+      socket.send(message, 0, message.length, this.port, this.broadcastAddress, err => {
         if (err) {
           // Bỏ qua lỗi mạng nội bộ tạm thời để không ảnh hưởng server chính
         }
@@ -221,7 +221,7 @@ export class BeaconService {
     this.stopHeartbeat();
     this.activeSession = null;
 
-    return new Promise((resolve) => {
+    return new Promise(resolve => {
       if (!this.socket) {
         resolve();
         return;

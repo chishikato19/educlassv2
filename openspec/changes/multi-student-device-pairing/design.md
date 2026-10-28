@@ -39,7 +39,9 @@
 ## 2. Thiết kế Giao thức & DTO (`packages/protocol`)
 
 ### 2.1 Cập nhật `SessionSettingsSchema`
+
 Mở rộng cấu hình phiên học:
+
 ```ts
 export const SessionSettingsSchema = z.object({
   maxParticipants: z.number().int().positive().optional(),
@@ -52,20 +54,23 @@ export const SessionSettingsSchema = z.object({
 ```
 
 ### 2.2 Cập nhật `StudentJoinRequestSchema`
+
 Hỗ trợ gửi mảng `studentIds` và từ điển `pins`:
+
 ```ts
 export const StudentJoinRequestSchema = z
   .object({
     joinCode: z.string().length(6),
-    studentId: z.string().min(1).optional(),          // Dành cho phiên cá nhân đơn lẻ
+    studentId: z.string().min(1).optional(), // Dành cho phiên cá nhân đơn lẻ
     studentIds: z.array(z.string().min(1)).optional(), // Dành cho phiên ghép máy 2-3 bạn
     nickname: z.string().min(1).max(50).optional(),
-    pin: z.string().optional(),                        // PIN đơn
-    pins: z.record(z.string(), z.string()).optional(),  // Map: { [studentId]: pin }
+    pin: z.string().optional(), // PIN đơn
+    pins: z.record(z.string(), z.string()).optional(), // Map: { [studentId]: pin }
     teamName: z.string().min(1).max(30).optional(),
   })
   .refine(
-    (data) => Boolean(data.studentId || (data.studentIds && data.studentIds.length > 0) || data.nickname),
+    data =>
+      Boolean(data.studentId || (data.studentIds && data.studentIds.length > 0) || data.nickname),
     {
       message: 'Vui lòng chọn học sinh trong danh sách hoặc nhập nickname.',
       path: ['studentIds'],
@@ -74,14 +79,16 @@ export const StudentJoinRequestSchema = z
 ```
 
 ### 2.3 Cập nhật `ParticipantDtoSchema`
+
 Bổ sung mảng `studentIds` để client và server cùng nhận diện các học sinh thuộc máy:
+
 ```ts
 export const ParticipantDtoSchema = z.object({
   id: z.string().min(1),
   sessionId: z.string().min(1),
-  studentId: z.string().nullable().optional(),          // ID đại diện chính (học sinh đầu tiên)
-  studentIds: z.array(z.string()).default([]),          // Danh sách toàn bộ các học sinh trên máy
-  displayName: z.string().min(1),                       // Tên ghép hiển thị
+  studentId: z.string().nullable().optional(), // ID đại diện chính (học sinh đầu tiên)
+  studentIds: z.array(z.string()).default([]), // Danh sách toàn bộ các học sinh trên máy
+  displayName: z.string().min(1), // Tên ghép hiển thị
   identityLevel: IdentityLevelSchema,
   teamId: z.string().nullable().optional(),
   teamName: z.string().nullable().optional(),
@@ -91,7 +98,9 @@ export const ParticipantDtoSchema = z.object({
 ```
 
 ### 2.4 Cập nhật `SessionRosterResponseSchema`
+
 Bổ sung cờ cấu hình ghép máy xuống cho Client:
+
 ```ts
 export const SessionRosterResponseSchema = z.object({
   sessionId: z.string().min(1),
@@ -109,18 +118,22 @@ export const SessionRosterResponseSchema = z.object({
 ## 3. Thiết kế Cơ sở Dữ liệu (`packages/db`)
 
 ### 3.1 Bảng `participants`
+
 Thêm cột `student_ids_json` dạng `text`:
+
 ```sql
 ALTER TABLE participants ADD COLUMN student_ids_json TEXT;
 ```
-* Giá trị lưu trữ: JSON array các chuỗi ULID, ví dụ: `'["01JABC...", "01JXYZ..."]'`.
-* Tương thích ngược: Nếu `student_ids_json` null hoặc rỗng, hệ thống tự động fallback về `[studentId]`.
+
+- Giá trị lưu trữ: JSON array các chuỗi ULID, ví dụ: `'["01JABC...", "01JXYZ..."]'`.
+- Tương thích ngược: Nếu `student_ids_json` null hoặc rỗng, hệ thống tự động fallback về `[studentId]`.
 
 ---
 
 ## 4. Xử lý Nghiệp vụ Phía Server (`packages/server`)
 
 ### 4.1 Quy trình Xử lý Vào lớp (`POST /api/sessions/join`)
+
 1. **Trích xuất danh sách học sinh:**
    - Nếu client gửi `studentIds`, lấy mảng `targetStudentIds = Array.from(new Set(studentIds))`.
    - Kiểm tra ràng buộc số lượng: `targetStudentIds.length <= maxStudentsPerDevice`.
@@ -142,7 +155,9 @@ ALTER TABLE participants ADD COLUMN student_ids_json TEXT;
    - Cấp `participantToken` lưu trữ phiên làm việc của máy.
 
 ### 4.2 Cơ chế Thưởng EXP Tự động (Rewards Fan-out - D8)
+
 Khi Activity gọi `ctx.grantReward(participantId, trigger, qty)`:
+
 1. Server tra cứu bản ghi Participant để lấy danh sách `studentIds`.
 2. Duyệt qua từng `studentId`:
    - Kiểm tra quyền lợi lưu trữ vĩnh viễn (`identityLevel === 'account'`).
@@ -157,37 +172,44 @@ Khi Activity gọi `ctx.grantReward(participantId, trigger, qty)`:
 ## 5. Thiết kế Giao diện Người dùng (UX/UI)
 
 ### 5.1 Giao diện Giáo viên (`apps/teacher-ui`)
-* **Modal Mở phiên học (`SessionControl.tsx`):**
+
+- **Modal Mở phiên học (`SessionControl.tsx`):**
   - Thêm cụm điều khiển:
     ```tsx
     <label style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
       <input
         type="checkbox"
         checked={allowPairing}
-        onChange={(e) => setAllowPairing(e.target.checked)}
+        onChange={e => setAllowPairing(e.target.checked)}
       />
       <span>Cho phép ghép 2–3 học sinh ngồi chung 1 máy</span>
-    </label>
-    {allowPairing && (
-      <div style={{ marginLeft: '24px', marginTop: '6px' }}>
-        <span>Tối đa mỗi máy: </span>
-        <select value={maxStudentsPerDevice} onChange={(e) => setMaxStudentsPerDevice(Number(e.target.value))}>
-          <option value={2}>2 học sinh / máy (Đôi bạn cùng tiến)</option>
-          <option value={3}>3 học sinh / máy (Nhóm nhỏ)</option>
-        </select>
-      </div>
-    )}
+    </label>;
+    {
+      allowPairing && (
+        <div style={{ marginLeft: '24px', marginTop: '6px' }}>
+          <span>Tối đa mỗi máy: </span>
+          <select
+            value={maxStudentsPerDevice}
+            onChange={e => setMaxStudentsPerDevice(Number(e.target.value))}
+          >
+            <option value={2}>2 học sinh / máy (Đôi bạn cùng tiến)</option>
+            <option value={3}>3 học sinh / máy (Nhóm nhỏ)</option>
+          </select>
+        </div>
+      );
+    }
     ```
 
 ### 5.2 Giao diện Học sinh (`apps/student-ui`)
-* **Khay thẻ học sinh đã chọn (Chips Bar):**
+
+- **Khay thẻ học sinh đã chọn (Chips Bar):**
   - Nằm cố định ngay phía trên danh sách chọn tên.
   - Mỗi thẻ hiển thị: `[ 👤 Họ và tên  ✕ ]`.
   - Bấm vào dấu `✕` để bỏ chọn ngay lập tức.
-* **Danh sách học sinh:**
+- **Danh sách học sinh:**
   - Học sinh đã được chọn: Đổi màu nền xanh dương nhạt (`#E8F1FF`), viền xanh đậm kèm icon tích xanh `✓`.
-  - Học sinh đang bị máy khác chiếm (`isTaken`): Màu xám mờ + nhãn *"Đang online"*.
-* **Nút hành động chính:**
+  - Học sinh đang bị máy khác chiếm (`isTaken`): Màu xám mờ + nhãn _"Đang online"_.
+- **Nút hành động chính:**
   - Tự động thay đổi kích thước và nội dung:
     - Chưa chọn bạn nào: `Vui lòng chọn học sinh` (disabled).
     - Đã chọn 1 bạn: `Vào lớp (1 học sinh: Nam Anh)`.

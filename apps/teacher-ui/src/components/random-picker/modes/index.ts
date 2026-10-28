@@ -72,19 +72,22 @@ export const PICKER_MODES: Record<RandomPickerModeId, PickerModeDefinition> = {
   duck_hunt: {
     id: 'duck_hunt',
     name: '🎯 Bắn vịt',
-    description: 'Trường bắn vịt hội chợ: Tâm ngắm lướt qua 5-10 chú vịt kịch tính trước khi nổ súng chốt hạ',
+    description:
+      'Trường bắn vịt hội chợ: Tâm ngắm lướt qua 5-10 chú vịt kịch tính trước khi nổ súng chốt hạ',
     component: DuckHuntMode,
   },
   elimination_grid: {
     id: 'elimination_grid',
     name: '⚔️ Đấu trường sinh tồn',
-    description: 'Tất cả học sinh xuất hiện trên các ô chữ nhật. Các ô biến mất dần: còn 5 ô -> còn 3 ô -> còn 1 ô chiến thắng!',
+    description:
+      'Tất cả học sinh xuất hiện trên các ô chữ nhật. Các ô biến mất dần: còn 5 ô -> còn 3 ô -> còn 1 ô chiến thắng!',
     component: EliminationGridMode,
   },
   ball_elimination: {
     id: 'ball_elimination',
     name: '💥 Dãy bóng số',
-    description: '1 dãy 10 quả bóng đánh số lộn xộn 0-9, nổ biến mất ngẫu nhiên từng quả, còn 2 hoặc 1 quả ghép thành số thứ tự học sinh',
+    description:
+      '1 dãy 10 quả bóng đánh số lộn xộn 0-9, nổ biến mất ngẫu nhiên từng quả, còn 2 hoặc 1 quả ghép thành số thứ tự học sinh',
     component: BallEliminationMode,
   },
   wheel: {
@@ -96,7 +99,8 @@ export const PICKER_MODES: Record<RandomPickerModeId, PickerModeDefinition> = {
   marble_race: {
     id: 'marble_race',
     name: '⚪ Đua bi rơi Pinball',
-    description: 'Mỗi học sinh là một viên bi rơi liên hoàn qua rừng đinh cản, cánh quạt xoay và máng trượt nghẹt thở',
+    description:
+      'Mỗi học sinh là một viên bi rơi liên hoàn qua rừng đinh cản, cánh quạt xoay và máng trượt nghẹt thở',
     component: MarbleRaceMode,
   },
 };
@@ -115,5 +119,3 @@ export {
   RandomWelcomeStage,
   SlotMachineMode,
 };
-
-

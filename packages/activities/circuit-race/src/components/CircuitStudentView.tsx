@@ -46,12 +46,9 @@ export const CircuitStudentView: React.FC<StudentViewProps> = ({
   // State cục bộ cho dạng câu hỏi
   const [selectedMcq, setSelectedMcq] = useState<number | null>(null);
   const [selectedTf, setSelectedTf] = useState<boolean | null>(null);
-  const [tfGroupAnswers, setTfGroupAnswers] = useState<[boolean | null, boolean | null, boolean | null, boolean | null]>([
-    null,
-    null,
-    null,
-    null,
-  ]);
+  const [tfGroupAnswers, setTfGroupAnswers] = useState<
+    [boolean | null, boolean | null, boolean | null, boolean | null]
+  >([null, null, null, null]);
   const [shortText, setShortText] = useState('');
 
   // Nộp câu trả lời MCQ
@@ -71,7 +68,12 @@ export const CircuitStudentView: React.FC<StudentViewProps> = ({
   // Nộp câu trả lời TF Group
   const handleTfGroupItem = (itemIdx: number, val: boolean) => {
     if (me.answeredCurrent || !isQuestionPhase) return;
-    const next = [...tfGroupAnswers] as [boolean | null, boolean | null, boolean | null, boolean | null];
+    const next = [...tfGroupAnswers] as [
+      boolean | null,
+      boolean | null,
+      boolean | null,
+      boolean | null,
+    ];
     next[itemIdx] = val;
     setTfGroupAnswers(next);
 
@@ -362,16 +364,8 @@ export const CircuitStudentView: React.FC<StudentViewProps> = ({
                     style={{
                       minHeight: '48px',
                       padding: '10px 14px',
-                      background: isEliminated
-                        ? '#F1F5F9'
-                        : isSelected
-                        ? '#4F8CFF'
-                        : '#F8FAFC',
-                      color: isEliminated
-                        ? '#94A3B8'
-                        : isSelected
-                        ? '#FFFFFF'
-                        : '#1E293B',
+                      background: isEliminated ? '#F1F5F9' : isSelected ? '#4F8CFF' : '#F8FAFC',
+                      color: isEliminated ? '#94A3B8' : isSelected ? '#FFFFFF' : '#1E293B',
                       border: isSelected ? '2px solid #2563EB' : '1px solid #E2E8F0',
                       borderRadius: '12px',
                       fontSize: '14px',
@@ -452,60 +446,62 @@ export const CircuitStudentView: React.FC<StudentViewProps> = ({
           {/* DẠNG 3: Chùm Đúng / Sai (TF Group - Chuẩn BGD 4 ý) */}
           {currentQ.type === 'tf_group' && currentQ.items && (
             <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
-              {(currentQ.items as Array<{ text: string; correct: boolean }>).map((it, idx: number) => (
-                <div
-                  key={idx}
-                  style={{
-                    background: '#F8FAFC',
-                    border: '1px solid #E2E8F0',
-                    borderRadius: '12px',
-                    padding: '8px 12px',
-                    display: 'flex',
-                    flexDirection: 'column',
-                    gap: '6px',
-                  }}
-                >
-                  <div style={{ fontSize: '13px', fontWeight: 600, color: '#334155' }}>
-                    <strong>{String.fromCharCode(97 + idx)})</strong> {it.text}
+              {(currentQ.items as Array<{ text: string; correct: boolean }>).map(
+                (it, idx: number) => (
+                  <div
+                    key={idx}
+                    style={{
+                      background: '#F8FAFC',
+                      border: '1px solid #E2E8F0',
+                      borderRadius: '12px',
+                      padding: '8px 12px',
+                      display: 'flex',
+                      flexDirection: 'column',
+                      gap: '6px',
+                    }}
+                  >
+                    <div style={{ fontSize: '13px', fontWeight: 600, color: '#334155' }}>
+                      <strong>{String.fromCharCode(97 + idx)})</strong> {it.text}
+                    </div>
+                    <div style={{ display: 'flex', gap: '8px' }}>
+                      <button
+                        type="button"
+                        disabled={me.answeredCurrent}
+                        onClick={() => handleTfGroupItem(idx, true)}
+                        style={{
+                          flex: 1,
+                          minHeight: '38px',
+                          background: tfGroupAnswers[idx] === true ? '#2ECC8F' : '#FFFFFF',
+                          color: tfGroupAnswers[idx] === true ? '#FFFFFF' : '#15803D',
+                          border: '1.5px solid #2ECC8F',
+                          borderRadius: '8px',
+                          fontWeight: 800,
+                          fontSize: '12px',
+                        }}
+                      >
+                        Đúng
+                      </button>
+                      <button
+                        type="button"
+                        disabled={me.answeredCurrent}
+                        onClick={() => handleTfGroupItem(idx, false)}
+                        style={{
+                          flex: 1,
+                          minHeight: '38px',
+                          background: tfGroupAnswers[idx] === false ? '#FF6B6B' : '#FFFFFF',
+                          color: tfGroupAnswers[idx] === false ? '#FFFFFF' : '#B91C1C',
+                          border: '1.5px solid #FF6B6B',
+                          borderRadius: '8px',
+                          fontWeight: 800,
+                          fontSize: '12px',
+                        }}
+                      >
+                        Sai
+                      </button>
+                    </div>
                   </div>
-                  <div style={{ display: 'flex', gap: '8px' }}>
-                    <button
-                      type="button"
-                      disabled={me.answeredCurrent}
-                      onClick={() => handleTfGroupItem(idx, true)}
-                      style={{
-                        flex: 1,
-                        minHeight: '38px',
-                        background: tfGroupAnswers[idx] === true ? '#2ECC8F' : '#FFFFFF',
-                        color: tfGroupAnswers[idx] === true ? '#FFFFFF' : '#15803D',
-                        border: '1.5px solid #2ECC8F',
-                        borderRadius: '8px',
-                        fontWeight: 800,
-                        fontSize: '12px',
-                      }}
-                    >
-                      Đúng
-                    </button>
-                    <button
-                      type="button"
-                      disabled={me.answeredCurrent}
-                      onClick={() => handleTfGroupItem(idx, false)}
-                      style={{
-                        flex: 1,
-                        minHeight: '38px',
-                        background: tfGroupAnswers[idx] === false ? '#FF6B6B' : '#FFFFFF',
-                        color: tfGroupAnswers[idx] === false ? '#FFFFFF' : '#B91C1C',
-                        border: '1.5px solid #FF6B6B',
-                        borderRadius: '8px',
-                        fontWeight: 800,
-                        fontSize: '12px',
-                      }}
-                    >
-                      Sai
-                    </button>
-                  </div>
-                </div>
-              ))}
+                )
+              )}
             </div>
           )}
 

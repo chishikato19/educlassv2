@@ -41,13 +41,11 @@ describe('BankWordImportModal Component (Task 3.4)', () => {
         onSuccess={vi.fn()}
         currentGrade={12}
         currentSubject="Toán"
-      />,
+      />
     );
 
     expect(screen.getByText('Nhập Câu Hỏi Word Vào Ngân Hàng')).toBeDefined();
-    expect(
-      screen.getByText('Kéo thả file Microsoft Word (.docx) vào đây'),
-    ).toBeDefined();
+    expect(screen.getByText('Kéo thả file Microsoft Word (.docx) vào đây')).toBeDefined();
     expect(screen.getByText('Chọn file từ máy tính')).toBeDefined();
     expect(screen.getByText('Khối lớp *')).toBeDefined();
     expect(screen.getByText('Môn học *')).toBeDefined();
@@ -63,7 +61,7 @@ describe('BankWordImportModal Component (Task 3.4)', () => {
         onSuccess={handleSuccess}
         currentGrade={12}
         currentSubject="Toán"
-      />,
+      />
     );
 
     // Giả lập chọn file .docx
@@ -102,7 +100,7 @@ describe('BankWordImportModal Component (Task 3.4)', () => {
           lesson: 'Bài 1: Tính đơn điệu',
           difficulty: 'nb',
         }),
-      ]),
+      ])
     );
     expect(handleSuccess).toHaveBeenCalledWith(1);
   });

@@ -28,10 +28,10 @@ export const CombatFeedBar: React.FC<CombatFeedBarProps> = ({ events, enablePowe
         latestEvent.blocked
           ? 'bg-amber-950/90 text-amber-200 border-amber-500'
           : latestEvent.powerUpType === 'freeze'
-          ? 'bg-cyan-950/90 text-cyan-200 border-cyan-400'
-          : latestEvent.powerUpType === 'double_points'
-          ? 'bg-yellow-950/90 text-yellow-200 border-yellow-400'
-          : 'bg-indigo-950/90 text-indigo-200 border-indigo-400'
+            ? 'bg-cyan-950/90 text-cyan-200 border-cyan-400'
+            : latestEvent.powerUpType === 'double_points'
+              ? 'bg-yellow-950/90 text-yellow-200 border-yellow-400'
+              : 'bg-indigo-950/90 text-indigo-200 border-indigo-400'
       }`}
     >
       <span className="text-sm">💥</span>

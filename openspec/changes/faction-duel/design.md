@@ -111,11 +111,11 @@ export interface FactionMatchup {
   blueParticipantId: string;
   redParticipantId: string;
   isCloneMatch?: boolean; // Đánh dấu trận có học sinh clone
-  
+
   // Trạng thái bài làm của 2 bên
   blueAnswers: Record<string, { answer: unknown; timeMs: number; isCorrect?: boolean }>;
   redAnswers: Record<string, { answer: unknown; timeMs: number; isCorrect?: boolean }>;
-  
+
   // Kết quả
   status: 'pending' | 'in_progress' | 'completed';
   winner?: 'blue' | 'red' | 'draw';
@@ -127,23 +127,23 @@ export interface FactionDuelState {
   phase: 'lobby' | 'team_reveal' | 'round_active' | 'round_eval' | 'pick_phase' | 'finished';
   currentRound: number;
   totalRounds: number;
-  
+
   teamBlue: FactionMember[];
   teamRed: FactionMember[];
-  
+
   scoreBlue: number; // Tổng điểm lũy kế phe Xanh
-  scoreRed: number;  // Tổng điểm lũy kế phe Đỏ
-  
+  scoreRed: number; // Tổng điểm lũy kế phe Đỏ
+
   currentMatchups: FactionMatchup[];
   matchHistory: { round: number; p1: string; p2: string }[];
-  
+
   // Thông tin trong pha chọn đối thủ 15 giây
   pickPhase?: {
     attackingTeam: 'blue' | 'red';
     expiresAt: number; // Timestamp hết hạn 15s
     claimedTargetIds: string[]; // Danh sách đối thủ đã bị chọn/khóa
   };
-  
+
   cloneParticipantId?: string; // Người được chọn clone ngẫu nhiên ở vòng này
   questions: FactionQuestion[];
 }
@@ -154,6 +154,7 @@ export interface FactionDuelState {
 ## 4. Thuật Toán Lõi
 
 ### 4.1 Cơ chế Phân thân khi lẻ sĩ số (`handleOddClone`)
+
 ```typescript
 export function selectRandomClone(
   smallerTeam: FactionMember[],
@@ -169,6 +170,7 @@ export function selectRandomClone(
 ```
 
 ### 4.2 Tính điểm Trọng số Elo (`calculateEloWeightedPoints`)
+
 ```typescript
 export function calculateMatchPoints(
   winnerElo: number,
@@ -178,7 +180,7 @@ export function calculateMatchPoints(
   if (isDraw) {
     return { winnerPoints: 0.5, loserPoints: 0.5, isUnderdog: false };
   }
-  
+
   const eloDiff = winnerElo - loserElo;
   if (eloDiff < -100) {
     // Kèo dưới thắng người hơn mình > 100 Elo
@@ -194,11 +196,13 @@ export function calculateMatchPoints(
 ```
 
 ### 4.3 Xử lý Khóa Mục Tiêu & Fallback 15s (`resolvePickPhase`)
+
 - Khi người chơi phe thắng bấm chọn: Xác thực (1) mục tiêu chưa bị ai khóa, (2) chưa từng đấu trước đó.
 - Nếu hợp lệ: Cập nhật `claimedTargetIds.push(targetId)` và tạo ngay cặp đấu `FactionMatchup`.
 - Khi hết 15s: Lọc danh sách những bạn chưa ghép đôi, gọi hàm shuffle ngẫu nhiên ghép cặp tự động.
 
 ### 4.4 Thuật toán Lấy Câu Hỏi & Xoay Vòng Tái Sử Dụng (`getQuestionsForRound`)
+
 ```typescript
 export function getQuestionsForRound(
   pool: FactionQuestion[],
@@ -209,15 +213,14 @@ export function getQuestionsForRound(
   if (pool.length === 0) return [];
   const needed = countPerMatch;
   const questions: FactionQuestion[] = [];
-  
+
   for (let i = 0; i < needed; i++) {
     const rawIdx = roundIndex * countPerMatch + i;
-    const finalIdx = options.allowRecycle !== false 
-      ? rawIdx % pool.length 
-      : Math.min(rawIdx, pool.length - 1);
+    const finalIdx =
+      options.allowRecycle !== false ? rawIdx % pool.length : Math.min(rawIdx, pool.length - 1);
     questions.push(pool[finalIdx]!);
   }
-  
+
   return options.shuffleQuestions ? shuffleList(questions, options.rng) : questions;
 }
 ```

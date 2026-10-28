@@ -38,7 +38,9 @@ export const AssignmentPreviewModal: React.FC<AssignmentPreviewModalProps> = ({
       setIsLoading(true);
       try {
         const previewUrl = submission.downloadUrl
-          ? submission.downloadUrl.replace('/submissions/', '/preview/').replace(/\/download\/?$/, '')
+          ? submission.downloadUrl
+              .replace('/submissions/', '/preview/')
+              .replace(/\/download\/?$/, '')
           : `/api/sessions/active/activities/current/assignment/preview/${submission.participantId}`;
         const res = await fetch(previewUrl);
         if (res.ok) {
@@ -88,12 +90,15 @@ export const AssignmentPreviewModal: React.FC<AssignmentPreviewModalProps> = ({
           <div className="flex items-center gap-3 min-w-0">
             <span className="text-2xl">📄</span>
             <div className="min-w-0">
-              <h3 className="text-base font-bold text-gray-800 truncate" title={submission.fileName}>
+              <h3
+                className="text-base font-bold text-gray-800 truncate"
+                title={submission.fileName}
+              >
                 {submission.fileName}
               </h3>
               <p className="text-xs text-gray-500">
-                Học sinh: <strong className="text-gray-700">{submission.studentName}</strong> • Dung lượng:{' '}
-                {formatFileSize(submission.fileSize)} • Nộp lúc:{' '}
+                Học sinh: <strong className="text-gray-700">{submission.studentName}</strong> • Dung
+                lượng: {formatFileSize(submission.fileSize)} • Nộp lúc:{' '}
                 {new Date(submission.submittedAt).toLocaleTimeString('vi-VN')}
               </p>
             </div>
@@ -203,7 +208,9 @@ export const AssignmentPreviewModal: React.FC<AssignmentPreviewModalProps> = ({
                 dangerouslySetInnerHTML={{ __html: previewData.html }}
               />
             </div>
-          ) : previewData?.type === 'xlsx' && previewData.sheets && previewData.sheets.length > 0 ? (
+          ) : previewData?.type === 'xlsx' &&
+            previewData.sheets &&
+            previewData.sheets.length > 0 ? (
             <div className="w-full h-full flex flex-col bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
               {/* Sheet tabs */}
               <div className="flex items-center gap-1 bg-gray-100 px-3 py-2 border-b border-gray-200 overflow-x-auto shrink-0">
@@ -273,10 +280,14 @@ export const AssignmentPreviewModal: React.FC<AssignmentPreviewModalProps> = ({
                 })()}
               </div>
             </div>
-          ) : previewData?.type === 'pptx' && previewData.slides && previewData.slides.length > 0 ? (
+          ) : previewData?.type === 'pptx' &&
+            previewData.slides &&
+            previewData.slides.length > 0 ? (
             <div className="w-full h-full overflow-auto p-4 space-y-4">
               <div className="text-xs text-amber-700 bg-amber-50 p-2.5 rounded-lg border border-amber-200 flex items-center justify-between">
-                <span>Trình xem trước tóm tắt Slide PowerPoint ({previewData.slides.length} trang)</span>
+                <span>
+                  Trình xem trước tóm tắt Slide PowerPoint ({previewData.slides.length} trang)
+                </span>
                 {submission.storedPath && onOpenFileInOs && (
                   <button
                     type="button"
@@ -295,7 +306,11 @@ export const AssignmentPreviewModal: React.FC<AssignmentPreviewModalProps> = ({
                   >
                     <div className="flex items-center justify-between border-b pb-2 mb-2 text-xs font-bold text-gray-500">
                       <span>Trang {idx + 1}</span>
-                      {sl.title && <span className="text-blue-700 font-semibold truncate max-w-[200px]">{sl.title}</span>}
+                      {sl.title && (
+                        <span className="text-blue-700 font-semibold truncate max-w-[200px]">
+                          {sl.title}
+                        </span>
+                      )}
                     </div>
                     <div className="text-xs text-gray-700 whitespace-pre-wrap flex-1 overflow-auto max-h-[140px]">
                       {sl.text || '(Slide không có văn bản hoặc chỉ có hình ảnh đồ họa)'}
@@ -318,7 +333,8 @@ export const AssignmentPreviewModal: React.FC<AssignmentPreviewModalProps> = ({
                 {previewData.error || 'Không thể tạo bản xem trước trực tiếp trên web.'}
               </p>
               <p className="text-xs text-gray-500 mb-4">
-                Bạn có thể mở tệp trực tiếp bằng phần mềm trên máy tính (Microsoft Word, Excel, PowerPoint...) hoặc tải về máy.
+                Bạn có thể mở tệp trực tiếp bằng phần mềm trên máy tính (Microsoft Word, Excel,
+                PowerPoint...) hoặc tải về máy.
               </p>
               <div className="flex gap-2">
                 {submission.storedPath && onOpenFileInOs && (
@@ -344,8 +360,8 @@ export const AssignmentPreviewModal: React.FC<AssignmentPreviewModalProps> = ({
               <span className="text-5xl mb-3">📁</span>
               <h4 className="text-base font-bold text-gray-800 mb-1">{submission.fileName}</h4>
               <p className="text-xs text-gray-500 mb-4">
-                Định dạng tệp này không hỗ trợ hiển thị trực tiếp trong khung xem trước web. Bạn có thể mở trực tiếp
-                bằng phần mềm trên máy tính hoặc tải về.
+                Định dạng tệp này không hỗ trợ hiển thị trực tiếp trong khung xem trước web. Bạn có
+                thể mở trực tiếp bằng phần mềm trên máy tính hoặc tải về.
               </p>
               <div className="flex gap-2">
                 {submission.storedPath && onOpenFileInOs && (

@@ -16,4 +16,3 @@ export * from './exam-repository.js';
 export * from './exam-record-repository.js';
 export * from './bank-question-repository.js';
 export * from './class-group-repository.js';
-

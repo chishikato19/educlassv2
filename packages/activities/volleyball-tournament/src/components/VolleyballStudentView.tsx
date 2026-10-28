@@ -87,11 +87,22 @@ export const VolleyballStudentView: React.FC<StudentViewProps> = ({
               Hạng #{myStanding.rank}
             </div>
             <div className="text-sm font-semibold text-slate-700 capitalize">
-              Cúp {myStanding.tier === 'diamond' ? 'Kim Cương' : myStanding.tier === 'gold' ? 'Vàng' : myStanding.tier === 'silver' ? 'Bạc' : 'Đồng'}
+              Cúp{' '}
+              {myStanding.tier === 'diamond'
+                ? 'Kim Cương'
+                : myStanding.tier === 'gold'
+                  ? 'Vàng'
+                  : myStanding.tier === 'silver'
+                    ? 'Bạc'
+                    : 'Đồng'}
             </div>
             <div className="flex justify-center gap-4 mt-4 pt-4 border-t border-amber-200 text-xs text-slate-600">
-              <div>Điểm giải: <b className="text-slate-800">{myStanding.tournamentPoints}đ</b></div>
-              <div>Số câu đúng: <b className="text-slate-800">{myStanding.correctCount}</b></div>
+              <div>
+                Điểm giải: <b className="text-slate-800">{myStanding.tournamentPoints}đ</b>
+              </div>
+              <div>
+                Số câu đúng: <b className="text-slate-800">{myStanding.correctCount}</b>
+              </div>
             </div>
           </div>
         )}
@@ -106,7 +117,9 @@ export const VolleyballStudentView: React.FC<StudentViewProps> = ({
       <div className="flex flex-col items-center p-4 max-w-md mx-auto select-none">
         <div className="text-5xl mb-2">🏐📋</div>
         <h3 className="text-xl font-black text-slate-800">KẾT THÚC VÒNG BẢNG</h3>
-        <p className="text-xs text-slate-500 mb-4">Chuẩn bị bước vào Vòng Bắt Cặp Xếp Hạng 4 Cúp!</p>
+        <p className="text-xs text-slate-500 mb-4">
+          Chuẩn bị bước vào Vòng Bắt Cặp Xếp Hạng 4 Cúp!
+        </p>
 
         {myPool && (
           <div className="w-full bg-white border border-slate-200 rounded-2xl p-4 shadow-sm mb-4">
@@ -128,10 +141,13 @@ export const VolleyballStudentView: React.FC<StudentViewProps> = ({
                       <span className="w-6 h-6 rounded-full bg-slate-100 flex items-center justify-center text-xs font-bold">
                         #{s.rankInPool}
                       </span>
-                      <span>{s.displayName} {isMe && '(Bạn)'}</span>
+                      <span>
+                        {s.displayName} {isMe && '(Bạn)'}
+                      </span>
                     </div>
                     <div className="text-xs text-slate-500">
-                      <span className="font-bold text-slate-800">{s.tournamentPoints}đ</span> ({s.correctCount} câu)
+                      <span className="font-bold text-slate-800">{s.tournamentPoints}đ</span> (
+                      {s.correctCount} câu)
                     </div>
                   </div>
                 );
@@ -156,9 +172,7 @@ export const VolleyballStudentView: React.FC<StudentViewProps> = ({
             <span>🏐</span>
             {state.currentStage === 'pools' ? `BẢNG ${myState?.poolId || 'A'}` : 'VÒNG XẾP HẠNG'}
           </span>
-          <span className="text-slate-500 font-medium">
-            Lượt {state.currentRound}/5
-          </span>
+          <span className="text-slate-500 font-medium">Lượt {state.currentRound}/5</span>
         </div>
 
         <div className="flex items-center justify-between mt-2 pt-2 border-t border-slate-100">
@@ -207,8 +221,8 @@ export const VolleyballStudentView: React.FC<StudentViewProps> = ({
                   isCurrent
                     ? 'bg-blue-600 text-white border-blue-600 shadow-sm'
                     : isDone
-                    ? 'bg-emerald-50 text-emerald-700 border-emerald-200'
-                    : 'bg-white text-slate-600 border-slate-200'
+                      ? 'bg-emerald-50 text-emerald-700 border-emerald-200'
+                      : 'bg-white text-slate-600 border-slate-200'
                 }`}
               >
                 <span>Câu {idx + 1}</span>
@@ -223,9 +237,7 @@ export const VolleyballStudentView: React.FC<StudentViewProps> = ({
       {activeQ ? (
         <div className="flex-1 flex flex-col justify-between">
           <div className="bg-white border border-slate-200 rounded-2xl p-4 shadow-sm mb-3">
-            <div className="text-sm font-bold text-slate-800 leading-relaxed">
-              {activeQ.stem}
-            </div>
+            <div className="text-sm font-bold text-slate-800 leading-relaxed">{activeQ.stem}</div>
             {activeQ.image && (
               <img
                 src={activeQ.image}
@@ -250,9 +262,7 @@ export const VolleyballStudentView: React.FC<StudentViewProps> = ({
                     disabled={selectedAnswers[activeQ.id] !== undefined}
                     onClick={() => handleSelectOption(activeQ.id, optIdx)}
                     className={`min-h-[52px] px-4 py-3 rounded-2xl font-bold text-sm border-2 text-left flex items-center gap-3 transition-all active:scale-[0.98] ${
-                      isSelected
-                        ? 'ring-4 ring-blue-300 ring-offset-1 ' + colorClass
-                        : colorClass
+                      isSelected ? 'ring-4 ring-blue-300 ring-offset-1 ' + colorClass : colorClass
                     }`}
                   >
                     <span className="w-7 h-7 rounded-lg bg-black/15 flex items-center justify-center text-xs font-black shrink-0">

@@ -36,15 +36,50 @@ export function buildNeonPinballTrack(): MarbleRaceTrack {
   walls.push({ x1: 840, y1: 50, x2: 840, y2: 4420, thickness: 14, color: '#4338ca' });
 
   // Tường phễu dẫn hướng ở Chặng 7
-  walls.push({ x1: 60, y1: 4420, x2: FINISH_NECK_X_LEFT, y2: 4700, thickness: 14, color: '#4f46e5' });
-  walls.push({ x1: 840, y1: 4420, x2: FINISH_NECK_X_RIGHT, y2: 4700, thickness: 14, color: '#4f46e5' });
+  walls.push({
+    x1: 60,
+    y1: 4420,
+    x2: FINISH_NECK_X_LEFT,
+    y2: 4700,
+    thickness: 14,
+    color: '#4f46e5',
+  });
+  walls.push({
+    x1: 840,
+    y1: 4420,
+    x2: FINISH_NECK_X_RIGHT,
+    y2: 4700,
+    thickness: 14,
+    color: '#4f46e5',
+  });
 
   // Ống cổ chai thẳng xuống vạch đích
-  walls.push({ x1: FINISH_NECK_X_LEFT, y1: 4700, x2: FINISH_NECK_X_LEFT, y2: 4950, thickness: 14, color: '#eab308' });
-  walls.push({ x1: FINISH_NECK_X_RIGHT, y1: 4700, x2: FINISH_NECK_X_RIGHT, y2: 4950, thickness: 14, color: '#eab308' });
+  walls.push({
+    x1: FINISH_NECK_X_LEFT,
+    y1: 4700,
+    x2: FINISH_NECK_X_LEFT,
+    y2: 4950,
+    thickness: 14,
+    color: '#eab308',
+  });
+  walls.push({
+    x1: FINISH_NECK_X_RIGHT,
+    y1: 4700,
+    x2: FINISH_NECK_X_RIGHT,
+    y2: 4950,
+    thickness: 14,
+    color: '#eab308',
+  });
 
   // Đáy hố hứng bi
-  walls.push({ x1: FINISH_NECK_X_LEFT, y1: 4950, x2: FINISH_NECK_X_RIGHT, y2: 4950, thickness: 16, color: '#ca8a04' });
+  walls.push({
+    x1: FINISH_NECK_X_LEFT,
+    y1: 4950,
+    x2: FINISH_NECK_X_RIGHT,
+    y2: 4950,
+    thickness: 16,
+    color: '#ca8a04',
+  });
 
   // ==================== CHẶNG 1: RỪNG ĐINH CẢN PACHINKO (Y: 280 -> 840) ====================
   const pegRows = 9;
@@ -177,7 +212,7 @@ export function buildNeonPinballTrack(): MarbleRaceTrack {
     const isOdd = r % 2 === 1;
     const xList = isOdd ? [180, 360, 540, 720] : [270, 450, 630];
 
-    xList.forEach((x) => {
+    xList.forEach(x => {
       bumpers.push({
         x,
         y,
@@ -274,15 +309,50 @@ export function buildGearCanyonTrack(): MarbleRaceTrack {
   walls.push({ x1: 840, y1: 50, x2: 840, y2: 4420, thickness: 14, color: '#b45309' });
 
   // Tường phễu dẫn hướng ở Chặng 7
-  walls.push({ x1: 60, y1: 4420, x2: FINISH_NECK_X_LEFT, y2: 4700, thickness: 14, color: '#d97706' });
-  walls.push({ x1: 840, y1: 4420, x2: FINISH_NECK_X_RIGHT, y2: 4700, thickness: 14, color: '#d97706' });
+  walls.push({
+    x1: 60,
+    y1: 4420,
+    x2: FINISH_NECK_X_LEFT,
+    y2: 4700,
+    thickness: 14,
+    color: '#d97706',
+  });
+  walls.push({
+    x1: 840,
+    y1: 4420,
+    x2: FINISH_NECK_X_RIGHT,
+    y2: 4700,
+    thickness: 14,
+    color: '#d97706',
+  });
 
   // Ống cổ chai thẳng xuống vạch đích
-  walls.push({ x1: FINISH_NECK_X_LEFT, y1: 4700, x2: FINISH_NECK_X_LEFT, y2: 4950, thickness: 14, color: '#f59e0b' });
-  walls.push({ x1: FINISH_NECK_X_RIGHT, y1: 4700, x2: FINISH_NECK_X_RIGHT, y2: 4950, thickness: 14, color: '#f59e0b' });
+  walls.push({
+    x1: FINISH_NECK_X_LEFT,
+    y1: 4700,
+    x2: FINISH_NECK_X_LEFT,
+    y2: 4950,
+    thickness: 14,
+    color: '#f59e0b',
+  });
+  walls.push({
+    x1: FINISH_NECK_X_RIGHT,
+    y1: 4700,
+    x2: FINISH_NECK_X_RIGHT,
+    y2: 4950,
+    thickness: 14,
+    color: '#f59e0b',
+  });
 
   // Đáy hố hứng bi
-  walls.push({ x1: FINISH_NECK_X_LEFT, y1: 4950, x2: FINISH_NECK_X_RIGHT, y2: 4950, thickness: 16, color: '#92400e' });
+  walls.push({
+    x1: FINISH_NECK_X_LEFT,
+    y1: 4950,
+    x2: FINISH_NECK_X_RIGHT,
+    y2: 4950,
+    thickness: 16,
+    color: '#92400e',
+  });
 
   // ==================== CHẶNG 1: MÁNG TRƯỢT SLALOM ĐAN CHÉO (Y: 280 -> 880) ====================
   // Ba máng trượt kết hợp "Khe rơi đường tắt" (Shortcut Gap) & "Vạch tăng tốc Turbo Neon"
@@ -440,7 +510,7 @@ export function buildGearCanyonTrack(): MarbleRaceTrack {
     thickness: 18,
     angle: -0.16,
     angularVelocity: 0,
-    maxAngle: 0.30,
+    maxAngle: 0.3,
     color: '#d97706',
   });
   seeSaws.push({
@@ -450,7 +520,7 @@ export function buildGearCanyonTrack(): MarbleRaceTrack {
     thickness: 18,
     angle: 0.16,
     angularVelocity: 0,
-    maxAngle: 0.30,
+    maxAngle: 0.3,
     color: '#ea580c',
   });
 
@@ -479,7 +549,7 @@ export function buildGearCanyonTrack(): MarbleRaceTrack {
     y: 4220,
     armLength: 74,
     angle: 0,
-    angularVelocity: 0.040,
+    angularVelocity: 0.04,
   });
 
   walls.push({ x1: 60, y1: 4320, x2: 180, y2: 4420, thickness: 14, color: '#d97706' });

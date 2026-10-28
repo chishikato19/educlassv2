@@ -31,10 +31,7 @@ function getExtensionForMime(mime: string): string {
   }
 }
 
-export const assetsRoutes: FastifyPluginAsync<AssetsRoutesOptions> = async (
-  fastify,
-  options,
-) => {
+export const assetsRoutes: FastifyPluginAsync<AssetsRoutesOptions> = async (fastify, options) => {
   const { authService, assetRepo } = options;
   const authenticate = createAuthenticateHook(authService);
   const storageDir = options.assetsDir ?? path.join(process.cwd(), 'data', 'assets');

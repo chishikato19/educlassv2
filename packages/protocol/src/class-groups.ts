@@ -30,11 +30,7 @@ export type ClassGroupWithMembersDto = z.infer<typeof ClassGroupWithMembersDtoSc
  * Yêu cầu tạo nhóm mới trong lớp
  */
 export const CreateClassGroupRequestSchema = z.object({
-  name: z
-    .string()
-    .trim()
-    .min(1, 'Vui lòng nhập tên nhóm')
-    .max(100, 'Tên nhóm tối đa 100 ký tự'),
+  name: z.string().trim().min(1, 'Vui lòng nhập tên nhóm').max(100, 'Tên nhóm tối đa 100 ký tự'),
   orderIndex: z.number().int().optional(),
   leaderStudentId: z.string().nullable().optional(),
 });

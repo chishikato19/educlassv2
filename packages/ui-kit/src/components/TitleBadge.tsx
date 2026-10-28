@@ -29,7 +29,15 @@ const renderTitleIcon = (iconKey?: string, isUnlocked: boolean = true) => {
   if (!isUnlocked) {
     // Biểu tượng ổ khóa
     return (
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-full h-full">
+      <svg
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="2"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        className="w-full h-full"
+      >
         <rect x="3" y="11" width="18" height="11" rx="2" ry="2" />
         <path d="M7 11V7a5 5 0 0 1 10 0v4" />
       </svg>
@@ -171,10 +179,7 @@ export const TitleBadge: React.FC<TitleBadgeProps> = ({
 
       {/* Mô tả phụ nếu bật */}
       {showDescription && description && (
-        <span
-          className="text-xs font-normal ml-1"
-          style={{ color: UI_COLORS.textMuted }}
-        >
+        <span className="text-xs font-normal ml-1" style={{ color: UI_COLORS.textMuted }}>
           ({description})
         </span>
       )}

@@ -1,8 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import {
-  isNameTaken,
-  resolveIdentityLevel,
-} from '../identity/identity-resolver.js';
+import { isNameTaken, resolveIdentityLevel } from '../identity/identity-resolver.js';
 
 describe('Identity Resolver & Name Collision Check (D6 & D7, Task 1.6)', () => {
   describe('resolveIdentityLevel', () => {

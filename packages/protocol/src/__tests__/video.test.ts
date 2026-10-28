@@ -11,7 +11,9 @@ describe('Video Protocol & Helpers', () => {
   describe('extractYouTubeId', () => {
     it('trích xuất đúng ID từ URL youtube.com/watch?v=...', () => {
       expect(extractYouTubeId('https://www.youtube.com/watch?v=dQw4w9WgXcQ')).toBe('dQw4w9WgXcQ');
-      expect(extractYouTubeId('http://youtube.com/watch?v=dQw4w9WgXcQ&feature=share')).toBe('dQw4w9WgXcQ');
+      expect(extractYouTubeId('http://youtube.com/watch?v=dQw4w9WgXcQ&feature=share')).toBe(
+        'dQw4w9WgXcQ'
+      );
     });
 
     it('trích xuất đúng ID từ URL youtu.be/...', () => {
@@ -25,7 +27,9 @@ describe('Video Protocol & Helpers', () => {
 
     it('trích xuất đúng ID từ URL youtube.com/embed/... hoặc nocookie', () => {
       expect(extractYouTubeId('https://www.youtube.com/embed/dQw4w9WgXcQ')).toBe('dQw4w9WgXcQ');
-      expect(extractYouTubeId('https://www.youtube-nocookie.com/embed/dQw4w9WgXcQ')).toBe('dQw4w9WgXcQ');
+      expect(extractYouTubeId('https://www.youtube-nocookie.com/embed/dQw4w9WgXcQ')).toBe(
+        'dQw4w9WgXcQ'
+      );
     });
 
     it('chấp nhận nhập trực tiếp chuỗi YouTube ID 11 ký tự', () => {
@@ -42,16 +46,22 @@ describe('Video Protocol & Helpers', () => {
   describe('getYouTubeEmbedUrl', () => {
     it('sinh link embed youtube-nocookie đúng chuẩn bảo vệ quyền riêng tư', () => {
       const embedUrl = getYouTubeEmbedUrl('dQw4w9WgXcQ', true);
-      expect(embedUrl).toBe('https://www.youtube-nocookie.com/embed/dQw4w9WgXcQ?autoplay=1&rel=0&modestbranding=1');
+      expect(embedUrl).toBe(
+        'https://www.youtube-nocookie.com/embed/dQw4w9WgXcQ?autoplay=1&rel=0&modestbranding=1'
+      );
 
       const noAutoplayUrl = getYouTubeEmbedUrl('dQw4w9WgXcQ', false);
-      expect(noAutoplayUrl).toBe('https://www.youtube-nocookie.com/embed/dQw4w9WgXcQ?autoplay=0&rel=0&modestbranding=1');
+      expect(noAutoplayUrl).toBe(
+        'https://www.youtube-nocookie.com/embed/dQw4w9WgXcQ?autoplay=0&rel=0&modestbranding=1'
+      );
     });
   });
 
   describe('getYouTubeThumbnailUrl', () => {
     it('sinh link thumbnail hqdefault', () => {
-      expect(getYouTubeThumbnailUrl('dQw4w9WgXcQ')).toBe('https://img.youtube.com/vi/dQw4w9WgXcQ/hqdefault.jpg');
+      expect(getYouTubeThumbnailUrl('dQw4w9WgXcQ')).toBe(
+        'https://img.youtube.com/vi/dQw4w9WgXcQ/hqdefault.jpg'
+      );
     });
   });
 

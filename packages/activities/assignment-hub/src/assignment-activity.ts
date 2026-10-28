@@ -116,11 +116,7 @@ export const AssignmentHubActivity: ActivityDefinition<
       return st;
     },
 
-    onTeacherIntent(
-      _ctx: ActivityContext,
-      st: AssignmentState,
-      intent: unknown
-    ): AssignmentState {
+    onTeacherIntent(_ctx: ActivityContext, st: AssignmentState, intent: unknown): AssignmentState {
       const parsed = AssignmentTeacherIntentSchema.safeParse(intent);
       if (!parsed.success) {
         return st;
@@ -174,10 +170,7 @@ export const AssignmentHubActivity: ActivityDefinition<
       }
     },
 
-    onEnd(
-      _ctx: ActivityContext,
-      st: AssignmentState
-    ): AssignmentResult[] {
+    onEnd(_ctx: ActivityContext, st: AssignmentState): AssignmentResult[] {
       const results: AssignmentResult[] = [];
 
       for (const [participantId, sub] of Object.entries(st.submissions)) {

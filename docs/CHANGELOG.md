@@ -1,5 +1,26 @@
 # CHANGELOG
 
+## [2.2.20] - 2026-10-28
+
+### Khắc Phục Lỗi Hiển Thị Hệ Phương Trình Bị Dồn Trên 1 Dòng (`@educlass/question-kit`)
+
+1. **Hỗ Trợ Cấu Trúc Hệ Phương Trình OMML sang LaTeX `\\begin{cases}` (`omml-to-latex.ts`)**:
+   - Nguyên nhân: Trước đây bộ chuyển đổi OMML sang LaTeX thiếu bộ xử lý cho các thẻ `m:eqArr` (Equation Array), `m:m` (Matrix) và các thẻ phân cách `m:d` dạng ngoặc nhọn `{` mở không có đóng. Do đó, các dòng của hệ phương trình bị gộp lại bằng chuỗi rỗng (`join('')`), dẫn đến các phương trình dính liền nhau trên một dòng duy nhất (ví dụ: `ax+y=5` và `3x+by=0` bị dính thành `ax+y=53x+by=0`).
+   - Xử lý thẻ `m:d` có `begChr="{"` (và không có đóng ngoặc hoặc đóng ngoặc rỗng):
+     - Tự động nhận diện hệ phương trình và chuyển đổi sang chuẩn LaTeX `\\begin{cases} pt1 \\\\ pt2 \\end{cases}`.
+     - Hỗ trợ cả trường hợp bên trong `m:d` chứa nhiều thẻ `m:e` trực tiếp hoặc chứa `m:eqArr` / `m:m`.
+   - Xử lý thẻ `m:d` có `begChr="["` (tuyển các nghiệm / hoặc) sang `\\left[\\begin{matrix} ... \\end{matrix}\\right.`.
+   - Hỗ trợ mảng phương trình độc lập `m:eqArr` sang `\\begin{aligned} ... \\end{aligned}` và ma trận `m:m` sang `\\begin{matrix} ... \\end{matrix}` với phân tách dòng `\\\\`.
+   - Hỗ trợ thẻ căn lề `m:aln` sang ký tự `&`.
+
+2. **Cải Tiến Trình Render KaTeX & Xuống Dòng Văn Bản (`katex-renderer.ts` & `utils.js`)**:
+   - Regex nhận diện công thức toán `mathRegex`: Mở rộng hỗ trợ công thức inline chứa dấu xuống dòng (không bị ngắt khi gặp `\\begin{cases}`).
+   - Trong `renderLatexInText`: Tự động chuyển đổi các ký tự xuống dòng `\r?\n` trong phần văn bản thường thành thẻ `<br/>`, bảo đảm các hệ phương trình hoặc phương án gõ thủ công 2 dòng bằng phím Enter / Shift+Enter không bị trình duyệt tự ý gộp lại thành 1 khoảng trắng.
+   - Đồng bộ hàm `renderMath` trên cổng Học Sinh (`packages/server/public/student/js/utils.js`).
+
+3. **Cập Nhật Giao Diện Nhập Đề Word (`WordImportModal.tsx`)**:
+   - Tích hợp `renderLatexInText` cho nội dung đề bài, các phương án A/B/C/D và ý a/b/c/d trong modal xem trước khi nhập đề Word, giúp hiển thị trực quan các công thức toán KaTeX và hệ phương trình 2 dòng ngay khi vừa phân tích tệp `.docx`.
+
 ## [2.2.19] - 2026-10-27
 
 ### Chế Độ Chơi: Đại Chiến Xanh Đỏ (thử nghiệm)

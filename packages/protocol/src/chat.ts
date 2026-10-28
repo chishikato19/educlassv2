@@ -29,7 +29,11 @@ export type ChatMessageDto = z.infer<typeof ChatMessageDtoSchema>;
  * Yêu cầu gửi tin nhắn chat
  */
 export const SendChatMessageRequestSchema = z.object({
-  text: z.string().trim().min(1, 'Nội dung tin nhắn không được để trống').max(1000, 'Tin nhắn quá dài (tối đa 1000 ký tự)'),
+  text: z
+    .string()
+    .trim()
+    .min(1, 'Nội dung tin nhắn không được để trống')
+    .max(1000, 'Tin nhắn quá dài (tối đa 1000 ký tự)'),
   toParticipantId: z.string().nullable().optional(),
   kind: ChatMessageKindSchema.default('text').optional(),
 });

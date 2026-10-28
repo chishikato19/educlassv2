@@ -9,11 +9,31 @@ export interface InteractiveBoardProjectorViewProps {
 }
 
 const COLOR_THEMES: Record<BoardColor, { card: string; header: string; pill: string }> = {
-  yellow: { card: 'bg-amber-50/95 border-amber-300', header: 'text-amber-950', pill: 'bg-amber-100 text-amber-900' },
-  mint: { card: 'bg-emerald-50/95 border-emerald-300', header: 'text-emerald-950', pill: 'bg-emerald-100 text-emerald-900' },
-  blue: { card: 'bg-blue-50/95 border-blue-300', header: 'text-blue-950', pill: 'bg-blue-100 text-blue-900' },
-  pink: { card: 'bg-pink-50/95 border-pink-300', header: 'text-pink-950', pill: 'bg-pink-100 text-pink-900' },
-  purple: { card: 'bg-purple-50/95 border-purple-300', header: 'text-purple-950', pill: 'bg-purple-100 text-purple-900' },
+  yellow: {
+    card: 'bg-amber-50/95 border-amber-300',
+    header: 'text-amber-950',
+    pill: 'bg-amber-100 text-amber-900',
+  },
+  mint: {
+    card: 'bg-emerald-50/95 border-emerald-300',
+    header: 'text-emerald-950',
+    pill: 'bg-emerald-100 text-emerald-900',
+  },
+  blue: {
+    card: 'bg-blue-50/95 border-blue-300',
+    header: 'text-blue-950',
+    pill: 'bg-blue-100 text-blue-900',
+  },
+  pink: {
+    card: 'bg-pink-50/95 border-pink-300',
+    header: 'text-pink-950',
+    pill: 'bg-pink-100 text-pink-900',
+  },
+  purple: {
+    card: 'bg-purple-50/95 border-purple-300',
+    header: 'text-purple-950',
+    pill: 'bg-purple-100 text-purple-900',
+  },
 };
 
 export const InteractiveBoardProjectorView: React.FC<InteractiveBoardProjectorViewProps> = ({
@@ -31,8 +51,8 @@ export const InteractiveBoardProjectorView: React.FC<InteractiveBoardProjectorVi
   }
 
   const postsObj = state.posts || {};
-  const approvedPosts = Object.values(postsObj).filter((p) => p.status === 'approved');
-  const spotlightPost = approvedPosts.find((p) => p.isSpotlight);
+  const approvedPosts = Object.values(postsObj).filter(p => p.status === 'approved');
+  const spotlightPost = approvedPosts.find(p => p.isSpotlight);
 
   const totalHearts = approvedPosts.reduce((acc, p) => acc + (p.hearts || []).length, 0);
   const totalLikes = approvedPosts.reduce((acc, p) => acc + (p.likes || []).length, 0);
@@ -100,10 +120,10 @@ export const InteractiveBoardProjectorView: React.FC<InteractiveBoardProjectorVi
                     {spotlightPost.rankAward === 'top1'
                       ? '🏆 Quán quân'
                       : spotlightPost.rankAward === 'top2'
-                      ? '🥈 Á quân'
-                      : spotlightPost.rankAward === 'top3'
-                      ? '🥉 Quý quân'
-                      : '💡 Sáng tạo'}
+                        ? '🥈 Á quân'
+                        : spotlightPost.rankAward === 'top3'
+                          ? '🥉 Quý quân'
+                          : '💡 Sáng tạo'}
                   </span>
                 </div>
               )}
@@ -122,7 +142,9 @@ export const InteractiveBoardProjectorView: React.FC<InteractiveBoardProjectorVi
               {onSendIntent && (
                 <button
                   type="button"
-                  onClick={() => onSendIntent({ type: 'toggle_spotlight', postId: spotlightPost.id })}
+                  onClick={() =>
+                    onSendIntent({ type: 'toggle_spotlight', postId: spotlightPost.id })
+                  }
                   className="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-sm rounded-2xl border border-slate-300 transition flex items-center gap-1 cursor-pointer ml-1"
                   title="Dừng chiếu phóng to bài này, quay lại bảng chung"
                 >
@@ -158,7 +180,9 @@ export const InteractiveBoardProjectorView: React.FC<InteractiveBoardProjectorVi
                 )}
                 {spotlightPost.imageUrl && (
                   <div className="rounded-3xl border-2 border-slate-200 bg-white p-3 flex flex-col items-center justify-center shadow-md">
-                    <span className="text-xs font-bold text-slate-400 mb-2">📷 ẢNH CHỤP BÀI LÀM</span>
+                    <span className="text-xs font-bold text-slate-400 mb-2">
+                      📷 ẢNH CHỤP BÀI LÀM
+                    </span>
                     <img
                       src={spotlightPost.imageUrl}
                       alt="Ảnh bài làm phóng to"
@@ -180,7 +204,9 @@ export const InteractiveBoardProjectorView: React.FC<InteractiveBoardProjectorVi
                   <div className="font-bold text-xs flex items-center gap-1.5 mb-1">
                     <span>⭐</span> Lời khen từ Giáo viên:
                   </div>
-                  <p className="text-sm font-medium leading-relaxed">{spotlightPost.teacherFeedback}</p>
+                  <p className="text-sm font-medium leading-relaxed">
+                    {spotlightPost.teacherFeedback}
+                  </p>
                 </div>
               )}
 
@@ -190,7 +216,7 @@ export const InteractiveBoardProjectorView: React.FC<InteractiveBoardProjectorVi
                     Chưa có bình luận nhận xét nào
                   </div>
                 ) : (
-                  (spotlightPost.comments || []).map((cm) => (
+                  (spotlightPost.comments || []).map(cm => (
                     <div
                       key={cm.id}
                       className={`p-3 rounded-2xl border text-sm ${
@@ -222,14 +248,16 @@ export const InteractiveBoardProjectorView: React.FC<InteractiveBoardProjectorVi
           {approvedPosts.length === 0 ? (
             <div className="h-full flex flex-col items-center justify-center text-slate-400 text-center">
               <span className="text-6xl mb-3">🎨</span>
-              <h3 className="text-2xl font-bold text-slate-600">Đang chờ các bài làm được nộp và phê duyệt...</h3>
+              <h3 className="text-2xl font-bold text-slate-600">
+                Đang chờ các bài làm được nộp và phê duyệt...
+              </h3>
               <p className="text-base text-slate-400 mt-1">
                 Các sản phẩm học tập sẽ xuất hiện sinh động tại đây khi Thầy/Cô duyệt bài
               </p>
             </div>
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
-              {approvedPosts.map((post) => {
+              {approvedPosts.map(post => {
                 const theme = COLOR_THEMES[post.color] || COLOR_THEMES.yellow;
 
                 return (
@@ -247,7 +275,9 @@ export const InteractiveBoardProjectorView: React.FC<InteractiveBoardProjectorVi
                             {post.authorName.charAt(0).toUpperCase()}
                           </div>
                           <div>
-                            <span className="font-black text-slate-800 text-lg">{post.authorName}</span>
+                            <span className="font-black text-slate-800 text-lg">
+                              {post.authorName}
+                            </span>
                           </div>
                         </div>
 
@@ -256,10 +286,10 @@ export const InteractiveBoardProjectorView: React.FC<InteractiveBoardProjectorVi
                             {post.rankAward === 'top1'
                               ? '🏆 Quán quân'
                               : post.rankAward === 'top2'
-                              ? '🥈 Á quân'
-                              : post.rankAward === 'top3'
-                              ? '🥉 Quý quân'
-                              : '💡 Sáng tạo'}
+                                ? '🥈 Á quân'
+                                : post.rankAward === 'top3'
+                                  ? '🥉 Quý quân'
+                                  : '💡 Sáng tạo'}
                           </span>
                         )}
                       </div>
@@ -272,7 +302,9 @@ export const InteractiveBoardProjectorView: React.FC<InteractiveBoardProjectorVi
                               <span>📝</span> Phiếu bài tập:
                             </span>
                             <span className="font-extrabold text-sm px-3 py-1 bg-indigo-100 text-indigo-800 rounded-xl">
-                              Đúng {post.worksheetResult.correctCount}/{post.worksheetResult.totalCount} ({post.worksheetResult.autoScore}/{post.worksheetResult.maxScore}đ)
+                              Đúng {post.worksheetResult.correctCount}/
+                              {post.worksheetResult.totalCount} ({post.worksheetResult.autoScore}/
+                              {post.worksheetResult.maxScore}đ)
                             </span>
                           </div>
                         )}

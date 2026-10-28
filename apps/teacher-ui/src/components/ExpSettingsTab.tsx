@@ -241,7 +241,7 @@ export const ExpSettingsTab: React.FC<ExpSettingsTabProps> = ({
       effectiveMap.set(`${er.activityId ?? '__global__'}::${er.trigger}`, er);
     }
 
-    const newRows: RuleConfigRow[] = RULE_METADATA.map((meta) => {
+    const newRows: RuleConfigRow[] = RULE_METADATA.map(meta => {
       const key = `${meta.activityId ?? '__global__'}::${meta.trigger}`;
       const effectiveMatch = effectiveMap.get(key);
       const isCustomized = teacherMap.has(key);
@@ -265,21 +265,21 @@ export const ExpSettingsTab: React.FC<ExpSettingsTabProps> = ({
   const handleExpChange = (key: string, valStr: string) => {
     const val = parseInt(valStr, 10);
     const safeVal = isNaN(val) ? 0 : Math.max(0, val);
-    setRows((prev) =>
-      prev.map((r) => (r.key === key ? { ...r, exp: safeVal, isCustomized: true } : r))
+    setRows(prev =>
+      prev.map(r => (r.key === key ? { ...r, exp: safeVal, isCustomized: true } : r))
     );
   };
 
   const handleToggleEnable = (key: string) => {
-    setRows((prev) =>
-      prev.map((r) => (r.key === key ? { ...r, enabled: !r.enabled, isCustomized: true } : r))
+    setRows(prev =>
+      prev.map(r => (r.key === key ? { ...r, enabled: !r.enabled, isCustomized: true } : r))
     );
   };
 
   const handleSave = async () => {
     setIsSaving(true);
     try {
-      const payload: RewardRuleItemInput[] = rows.map((r) => ({
+      const payload: RewardRuleItemInput[] = rows.map(r => ({
         activityId: r.activityId,
         trigger: r.trigger,
         exp: r.exp,
@@ -401,8 +401,8 @@ export const ExpSettingsTab: React.FC<ExpSettingsTabProps> = ({
         </Card>
       ) : (
         <div style={{ display: 'flex', flexDirection: 'column', gap: spacing.lg }}>
-          {categories.map((catKey) => {
-            const catRows = rows.filter((r) => r.category === catKey);
+          {categories.map(catKey => {
+            const catRows = rows.filter(r => r.category === catKey);
             if (catRows.length === 0) return null;
             const catInfo = CATEGORY_NAMES[catKey];
 
@@ -432,7 +432,7 @@ export const ExpSettingsTab: React.FC<ExpSettingsTabProps> = ({
                 </div>
 
                 <div style={{ display: 'flex', flexDirection: 'column', gap: spacing.md }}>
-                  {catRows.map((row) => (
+                  {catRows.map(row => (
                     <div
                       key={row.key}
                       style={{
@@ -543,7 +543,7 @@ export const ExpSettingsTab: React.FC<ExpSettingsTabProps> = ({
                             max={5000}
                             value={row.exp}
                             disabled={!row.enabled}
-                            onChange={(e) => handleExpChange(row.key, e.target.value)}
+                            onChange={e => handleExpChange(row.key, e.target.value)}
                             aria-label={`Số EXP cho ${row.name}`}
                             style={{
                               width: 90,
@@ -586,8 +586,8 @@ export const ExpSettingsTab: React.FC<ExpSettingsTabProps> = ({
       >
         <div style={{ padding: spacing.md }}>
           <p style={{ margin: '0 0 16px 0', fontSize: typography.body, color: colors.textPrimary }}>
-            Bạn có chắc chắn muốn xóa tất cả cài đặt EXP riêng của mình và khôi phục về các mức thưởng
-            mặc định của EduClass không?
+            Bạn có chắc chắn muốn xóa tất cả cài đặt EXP riêng của mình và khôi phục về các mức
+            thưởng mặc định của EduClass không?
           </p>
           <div style={{ display: 'flex', justifyContent: 'flex-end', gap: spacing.sm }}>
             <Button

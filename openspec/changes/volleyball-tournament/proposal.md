@@ -3,6 +3,7 @@
 ## 1. Bối cảnh & Vấn đề (Context & Motivation)
 
 Hiện tại, EduClass v2 đã có chế độ **Đấu Cờ Thụy Sỹ (`@educlass/activity-swiss-duel`)**, trong đó học sinh thi đấu 1v1 trên các bàn đấu, mỗi lượt cùng trả lời 2 câu hỏi. Tuy nhiên:
+
 1. **Thiếu tính giai đoạn và kịch tính giải đấu**: Thể thức Thụy Sỹ chỉ tích lũy điểm dần đều qua từng vòng trên một bảng xếp hạng chung duy nhất, thiếu đi cảm giác phân đoạn rõ rệt (vượt qua vòng bảng, lọt vào vòng loại trực tiếp, cạnh tranh tranh cúp).
 2. **Khó theo dõi toàn cục trong lớp học**: Khi toàn lớp 30–40 học sinh nằm chung một danh sách dài, học sinh khó hình dung đối thủ tiếp theo của mình là ai và không có mục tiêu cục bộ ngắn hạn (như "phải thắng bạn này để giành vé Nhất bảng").
 3. **Mong muốn trải nghiệm giải đấu thể thao học đường**: Thể thức bóng chuyền (Volleyball Cup / Olympic) với **Vòng bảng (Pool Stage) $\rightarrow$ Bắt cặp xếp hạng theo tầng (Placement Brackets)** là mô hình hoàn hảo nhất cho giáo dục:
@@ -32,6 +33,7 @@ Hiện tại, EduClass v2 đã có chế độ **Đấu Cờ Thụy Sỹ (`@educ
 ## 3. Phạm vi Triển khai (Scope)
 
 ### Trong phạm vi (In-Scope):
+
 - **Gói Activity Độc Lập Mới**: `packages/activities/volleyball-tournament` (`@educlass/activity-volleyball-tournament`).
 - **Lõi Thuật toán & Schemas**:
   - `volleyball-schemas.ts`: State machine, Config, Matchup, Pool, PlacementBracket, Results.
@@ -49,5 +51,6 @@ Hiện tại, EduClass v2 đã có chế độ **Đấu Cờ Thụy Sỹ (`@educ
   - Cấu hình phân phối EXP theo chuẩn D8 (podium Kim Cương, Vàng, Bạc, Đồng).
 
 ### Ngoài phạm vi (Out-of-Scope):
+
 - Không thay đổi kiến trúc cơ sở dữ liệu cốt lõi (`packages/db`) hay thay đổi giao thức nền tảng Fastify/WS.
 - Không áp dụng cho thi đấu tổ đội trên cùng 1 máy (đã có tính năng ghép máy chung xử lý ở tầng ngoài).

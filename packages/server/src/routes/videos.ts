@@ -121,7 +121,8 @@ export const videosRoutes: FastifyPluginAsync<VideosRoutesOptions> = async (fast
 
     if (parseResult.data.title !== undefined) updateData.title = parseResult.data.title;
     if (parseResult.data.category !== undefined) updateData.category = parseResult.data.category;
-    if (parseResult.data.description !== undefined) updateData.description = parseResult.data.description;
+    if (parseResult.data.description !== undefined)
+      updateData.description = parseResult.data.description;
 
     if (parseResult.data.url) {
       const youtubeId = extractYouTubeId(parseResult.data.url);

@@ -44,7 +44,7 @@ export function calculateQuizScore(params: CalculateQuizScoreParams): QuizScoreR
   if (speedScoring && timeLimitSeconds > 0) {
     const elapsedSeconds = Math.max(0, responseTimeMs / 1000);
     // Tỷ lệ giảm dần tuyến tính từ 1.0 (trả lời tức thì) xuống tối thiểu 0.5 (ở giây cuối cùng của timeLimit)
-    const ratio = Math.max(0.5, Math.min(1.0, 1.0 - (elapsedSeconds / (timeLimitSeconds * 2))));
+    const ratio = Math.max(0.5, Math.min(1.0, 1.0 - elapsedSeconds / (timeLimitSeconds * 2)));
     speedPoints = Math.round(basePoints * ratio);
   }
 

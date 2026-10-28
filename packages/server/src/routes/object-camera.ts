@@ -27,7 +27,7 @@ function getLanIpAddress(): string {
   }
 
   const wifiOrLan = candidates.find(
-    (ip) => ip.startsWith('192.168.') || ip.startsWith('10.') || ip.startsWith('172.')
+    ip => ip.startsWith('192.168.') || ip.startsWith('10.') || ip.startsWith('172.')
   );
 
   return wifiOrLan ?? candidates[0] ?? '127.0.0.1';

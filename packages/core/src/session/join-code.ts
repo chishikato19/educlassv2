@@ -8,7 +8,7 @@ export function isValidJoinCode(code: string): boolean {
 /**
  * Sinh mã vào lớp 6 chữ số ngẫu nhiên (từ 100000 đến 999999).
  * Đảm bảo không trùng với các mã đang được dùng trong `existingCodes`.
- * 
+ *
  * @param existingCodes Tập hợp các mã đang được sử dụng bởi các phiên mở khác
  * @param rng Hàm sinh số ngẫu nhiên [0, 1), mặc định là Math.random
  */

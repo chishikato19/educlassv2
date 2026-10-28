@@ -230,7 +230,11 @@ export function applyAttackToCell(
         updated.currentHp = updated.maxHp;
         updated.tugOfWarHp = 0;
         updated.reinforceLevel = 0;
-        return { cell: updated, event: 'captured', pointsGained: getTerrainBasePoints(updated.terrain) };
+        return {
+          cell: updated,
+          event: 'captured',
+          pointsGained: getTerrainBasePoints(updated.terrain),
+        };
       }
     } else {
       updated.tugOfWarHp -= 1;
@@ -240,7 +244,11 @@ export function applyAttackToCell(
         updated.currentHp = updated.maxHp;
         updated.tugOfWarHp = 0;
         updated.reinforceLevel = 0;
-        return { cell: updated, event: 'captured', pointsGained: getTerrainBasePoints(updated.terrain) };
+        return {
+          cell: updated,
+          event: 'captured',
+          pointsGained: getTerrainBasePoints(updated.terrain),
+        };
       }
     }
     return { cell: updated, event: 'damaged', pointsGained: 0 };
@@ -261,7 +269,11 @@ export function applyAttackToCell(
     updated.currentHp = 1; // Khởi đầu với 1 máu
     updated.reinforceLevel = 0;
     updated.tugOfWarHp = 0;
-    return { cell: updated, event: 'captured', pointsGained: getTerrainBasePoints(updated.terrain) };
+    return {
+      cell: updated,
+      event: 'captured',
+      pointsGained: getTerrainBasePoints(updated.terrain),
+    };
   }
 
   return { cell: updated, event: 'damaged', pointsGained: 0 };
@@ -313,10 +325,10 @@ export function calculateScoresAndDominance(
       c.terrain === 'big_castle'
         ? ptsBig
         : c.terrain === 'small_castle'
-        ? ptsSmall
-        : c.terrain === 'watchtower'
-        ? ptsTower
-        : ptsPlain;
+          ? ptsSmall
+          : c.terrain === 'watchtower'
+            ? ptsTower
+            : ptsPlain;
 
     const reinforcePts = c.reinforceLevel * ptsReinforce;
 
@@ -412,9 +424,7 @@ export function getParticipantScore(p: TerritoryParticipant): number {
 /**
  * Bảng xếp hạng tướng lĩnh đóng góp theo từng phe và toàn bộ người chơi
  */
-export function getLeaderboardByTeam(
-  participants: Record<string, TerritoryParticipant>
-): {
+export function getLeaderboardByTeam(participants: Record<string, TerritoryParticipant>): {
   blueCommanders: TerritoryParticipant[];
   redCommanders: TerritoryParticipant[];
   allRanked: TerritoryParticipant[];

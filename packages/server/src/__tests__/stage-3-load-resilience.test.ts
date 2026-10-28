@@ -1,10 +1,6 @@
 import { WebSocket } from 'ws';
 import { afterAll, describe, expect, it } from 'vitest';
-import {
-  createDatabaseConnection,
-  runMigrations,
-  UserRepository,
-} from '@educlass/db';
+import { createDatabaseConnection, runMigrations, UserRepository } from '@educlass/db';
 import type { FastifyInstance } from 'fastify';
 import { buildServer } from '../app.js';
 import { ScryptPasswordHasher } from '../auth/password-hasher.js';
@@ -30,10 +26,7 @@ function waitForOpen(ws: WebSocket): Promise<void> {
   });
 }
 
-function createClientSocket(
-  url: string,
-  handle: { messageCount: number }
-): WebSocket {
+function createClientSocket(url: string, handle: { messageCount: number }): WebSocket {
   const ws = new WebSocket(url);
   ws.on('message', () => {
     handle.messageCount++;
@@ -50,7 +43,10 @@ describe('Stage 3 DoD: Load Test 50 Clients & Random Network Disruption (Task 3.
     // Dọn dẹp toàn bộ kết nối WebSocket còn mở
     for (const c of clients) {
       try {
-        if (c.socket.readyState === WebSocket.OPEN || c.socket.readyState === WebSocket.CONNECTING) {
+        if (
+          c.socket.readyState === WebSocket.OPEN ||
+          c.socket.readyState === WebSocket.CONNECTING
+        ) {
           c.socket.terminate();
         }
       } catch {

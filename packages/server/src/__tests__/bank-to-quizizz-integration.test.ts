@@ -1,9 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import {
-  createDatabaseConnection,
-  runMigrations,
-  UserRepository,
-} from '@educlass/db';
+import { createDatabaseConnection, runMigrations, UserRepository } from '@educlass/db';
 import { buildServer } from '../app.js';
 import { ScryptPasswordHasher } from '../auth/password-hasher.js';
 
@@ -79,7 +75,8 @@ describe('E2E Test: Ngân hàng đề -> Rút bộ đề thi Quizizz -> Chơi Qu
           }),
           answerJson: JSON.stringify({
             correct: 0,
-            explanation: 'Dựa vào bảng xét dấu, hàm số đồng biến trên khoảng (-∞; 1) và (2; +∞), tương ứng đồ thị A.',
+            explanation:
+              'Dựa vào bảng xét dấu, hàm số đồng biến trên khoảng (-∞; 1) và (2; +∞), tương ứng đồ thị A.',
           }),
           points: 1000,
         },
@@ -127,13 +124,14 @@ describe('E2E Test: Ngân hàng đề -> Rút bộ đề thi Quizizz -> Chơi Qu
               type: 'short',
               contentJson: JSON.stringify({
                 stem: {
-                  text: 'Dựa vào đồ thị đạo hàm $y = f\'(x)$ cắt trục hoành tại 3 điểm phân biệt như hình vẽ, hàm số $y = f(x)$ có bao nhiêu điểm cực trị?',
+                  text: "Dựa vào đồ thị đạo hàm $y = f'(x)$ cắt trục hoành tại 3 điểm phân biệt như hình vẽ, hàm số $y = f(x)$ có bao nhiêu điểm cực trị?",
                   images: [sampleQuestionImageBase64],
                 },
               }),
               answerJson: JSON.stringify({
                 accepted: ['3', 'ba', '3 điểm'],
-                explanation: 'Đạo hàm đổi dấu 3 lần khi đi qua các nghiệm đơn nên có 3 điểm cực trị.',
+                explanation:
+                  'Đạo hàm đổi dấu 3 lần khi đi qua các nghiệm đơn nên có 3 điểm cực trị.',
               }),
               points: 1000,
             },
@@ -178,7 +176,8 @@ describe('E2E Test: Ngân hàng đề -> Rút bộ đề thi Quizizz -> Chơi Qu
                 stem: {
                   text: 'Kéo thả các cụm từ thích hợp vào chỗ trống để hoàn thành định lý Fermat về cực trị:',
                 },
-                template: 'Nếu hàm số đạt cực trị tại $x_0$ và có đạo hàm thì đạo hàm tại đó {{blank_1}}. Điểm $x_0$ được gọi là điểm {{blank_2}}.',
+                template:
+                  'Nếu hàm số đạt cực trị tại $x_0$ và có đạo hàm thì đạo hàm tại đó {{blank_1}}. Điểm $x_0$ được gọi là điểm {{blank_2}}.',
                 blanks: [
                   { id: 'blank_1', position: 1 },
                   { id: 'blank_2', position: 2 },
@@ -316,7 +315,9 @@ describe('E2E Test: Ngân hàng đề -> Rút bộ đề thi Quizizz -> Chơi Qu
         if (type === 'mcq4') {
           const rawOpts = (q.options as Array<{ text?: string; images?: string[] }>) || [];
           const options = rawOpts.map((o, oIdx) => o.text ?? `Phương án ${oIdx + 1}`);
-          const optionImages = rawOpts.map((o) => (o.images?.[0] ? `/api/assets/${o.images[0]}` : undefined));
+          const optionImages = rawOpts.map(o =>
+            o.images?.[0] ? `/api/assets/${o.images[0]}` : undefined
+          );
           const hasAnyOptImg = optionImages.some(img => Boolean(img));
 
           return {
@@ -582,7 +583,11 @@ describe('E2E Test: Ngân hàng đề -> Rút bộ đề thi Quizizz -> Chơi Qu
       expect(finalResult.score).toBeGreaterThan(4500);
 
       // Kiểm tra điểm thưởng EXP đã được ghi nhận trong bảng reward_log
-      const expTotals = await app.rewardRepo.getParticipantExpTotals(sessionId, participantId, 'quiz-live');
+      const expTotals = await app.rewardRepo.getParticipantExpTotals(
+        sessionId,
+        participantId,
+        'quiz-live'
+      );
       expect(expTotals.activityExp).toBeGreaterThan(0);
       expect(expTotals.sessionExp).toBeGreaterThan(0);
     } finally {

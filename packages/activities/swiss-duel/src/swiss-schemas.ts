@@ -40,7 +40,7 @@ export const SwissParticipantStateSchema = z.object({
   participantId: z.string(),
   displayName: z.string(),
   tournamentPoints: z.number().default(0), // Thắng 2, Hòa 1, Thua 0
-  correctCount: z.number().default(0),     // Tổng số câu đúng tích lũy
+  correctCount: z.number().default(0), // Tổng số câu đúng tích lũy
   matchesWon: z.number().default(0),
   matchesDrawn: z.number().default(0),
   matchesLost: z.number().default(0),
@@ -81,12 +81,7 @@ export const SwissDuelConfigSchema = z.object({
 });
 export type SwissDuelConfig = z.infer<typeof SwissDuelConfigSchema>;
 
-export const SwissDuelStatusSchema = z.enum([
-  'waiting',
-  'in_round',
-  'round_review',
-  'finished',
-]);
+export const SwissDuelStatusSchema = z.enum(['waiting', 'in_round', 'round_review', 'finished']);
 export type SwissDuelStatus = z.infer<typeof SwissDuelStatusSchema>;
 
 export const SwissDuelStateSchema = z.object({

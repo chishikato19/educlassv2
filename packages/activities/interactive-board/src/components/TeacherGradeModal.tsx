@@ -46,7 +46,9 @@ export const TeacherGradeModal: React.FC<TeacherGradeModalProps> = ({
 
         <form onSubmit={handleSubmit} className="p-5 space-y-4">
           <div className="text-center">
-            <span className="text-xs text-slate-400 uppercase font-bold tracking-wider">Học sinh</span>
+            <span className="text-xs text-slate-400 uppercase font-bold tracking-wider">
+              Học sinh
+            </span>
             <h3 className="text-xl font-extrabold text-slate-800 mt-0.5">{post.authorName}</h3>
           </div>
 
@@ -60,9 +62,11 @@ export const TeacherGradeModal: React.FC<TeacherGradeModalProps> = ({
                 max={maxGrade}
                 step="0.1"
                 value={grade}
-                onChange={(e) => {
+                onChange={e => {
                   const val = parseFloat(e.target.value);
-                  setGrade(isNaN(val) ? 0 : Math.min(maxGrade, Math.max(0, Math.round(val * 10) / 10)));
+                  setGrade(
+                    isNaN(val) ? 0 : Math.min(maxGrade, Math.max(0, Math.round(val * 10) / 10))
+                  );
                 }}
                 className="w-28 h-14 text-center text-4xl font-black text-emerald-700 bg-white border-2 border-emerald-400 rounded-2xl focus:outline-none focus:ring-4 focus:ring-emerald-200 shadow-inner"
               />
@@ -80,7 +84,7 @@ export const TeacherGradeModal: React.FC<TeacherGradeModalProps> = ({
                 max={maxGrade}
                 step={maxGrade === 10 ? '0.1' : '1'}
                 value={grade}
-                onChange={(e) => setGrade(parseFloat(e.target.value))}
+                onChange={e => setGrade(parseFloat(e.target.value))}
                 className="w-full accent-emerald-600 cursor-pointer h-2 bg-emerald-200 rounded-lg"
               />
             </div>
@@ -88,9 +92,11 @@ export const TeacherGradeModal: React.FC<TeacherGradeModalProps> = ({
 
           {/* Các nút bấm chọn điểm nhanh */}
           <div>
-            <label className="text-xs font-bold text-slate-500 block mb-1.5">HOẶC CHỌN NHANH ĐIỂM SỐ</label>
+            <label className="text-xs font-bold text-slate-500 block mb-1.5">
+              HOẶC CHỌN NHANH ĐIỂM SỐ
+            </label>
             <div className="flex flex-wrap gap-1.5">
-              {quickGrades.map((val) => (
+              {quickGrades.map(val => (
                 <button
                   key={val}
                   type="button"
@@ -109,10 +115,12 @@ export const TeacherGradeModal: React.FC<TeacherGradeModalProps> = ({
 
           {/* Nhập lời nhận xét của giáo viên */}
           <div>
-            <label className="text-xs font-bold text-slate-500 block mb-1.5">LỜI NHẬN XÉT SƯ PHẠM (TÙY CHỌN)</label>
+            <label className="text-xs font-bold text-slate-500 block mb-1.5">
+              LỜI NHẬN XÉT SƯ PHẠM (TÙY CHỌN)
+            </label>
             <textarea
               value={feedback}
-              onChange={(e) => setFeedback(e.target.value)}
+              onChange={e => setFeedback(e.target.value)}
               placeholder="Nhập lời khen ngợi hoặc lưu ý cần cải thiện cho học sinh..."
               rows={3}
               className="w-full p-3 rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-emerald-500 text-sm text-slate-800 resize-none"

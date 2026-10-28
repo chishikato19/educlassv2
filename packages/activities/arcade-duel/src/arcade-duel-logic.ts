@@ -1,7 +1,4 @@
-import type {
-  ActiveEffect,
-  CombatEvent,
-} from '@educlass/protocol';
+import type { ActiveEffect, CombatEvent } from '@educlass/protocol';
 import {
   applyScoreModifiers,
   createEmptyInventory,
@@ -208,11 +205,7 @@ export function handleOptionSelection(
     let newCombatFeed = [...state.combatFeed];
 
     if (state.config.enablePowerUps !== false) {
-      const powerUpResult = grantPowerUp(
-        player.inventory,
-        newStreak,
-        state.config.dropCondition
-      );
+      const powerUpResult = grantPowerUp(player.inventory, newStreak, state.config.dropCondition);
       updatedInventory = powerUpResult.inventory;
 
       if (powerUpResult.grantedItem) {
@@ -274,7 +267,9 @@ export function handleOptionSelection(
     return {
       ...state,
       status: bothFinished ? 'finished' : state.status,
-      winnerTeamId: bothFinished ? determineWinner(newBlue.score, newRed.score) : state.winnerTeamId,
+      winnerTeamId: bothFinished
+        ? determineWinner(newBlue.score, newRed.score)
+        : state.winnerTeamId,
       bluePlayer: newBlue,
       redPlayer: newRed,
       combatFeed: newCombatFeed,
@@ -326,7 +321,9 @@ export function handleOptionSelection(
     return {
       ...state,
       status: bothFinished ? 'finished' : state.status,
-      winnerTeamId: bothFinished ? determineWinner(newBlue.score, newRed.score) : state.winnerTeamId,
+      winnerTeamId: bothFinished
+        ? determineWinner(newBlue.score, newRed.score)
+        : state.winnerTeamId,
       bluePlayer: newBlue,
       redPlayer: newRed,
     };
@@ -336,7 +333,10 @@ export function handleOptionSelection(
 /**
  * Lật bài khi kết thúc lượt ở Chế độ Cùng trả lời (Sync Turn)
  */
-export function revealTurnResults(state: ArcadeDuelState, now: number = Date.now()): ArcadeDuelState {
+export function revealTurnResults(
+  state: ArcadeDuelState,
+  now: number = Date.now()
+): ArcadeDuelState {
   const currentQ = state.questions[state.currentQuestionIndex];
   const basePoints = currentQ ? currentQ.points : 100;
 

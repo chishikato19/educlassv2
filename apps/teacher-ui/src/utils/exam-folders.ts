@@ -10,8 +10,8 @@ export function normalizeFolderPath(path: string | null | undefined): string {
   if (!path) return '';
   return path
     .split('/')
-    .map((p) => p.trim())
-    .filter((p) => p.length > 0)
+    .map(p => p.trim())
+    .filter(p => p.length > 0)
     .join('/');
 }
 
@@ -49,7 +49,7 @@ export function getStoredFolders(): string[] {
     if (!raw) return [];
     const parsed = JSON.parse(raw);
     if (Array.isArray(parsed)) {
-      return parsed.map((p) => normalizeFolderPath(String(p))).filter(Boolean);
+      return parsed.map(p => normalizeFolderPath(String(p))).filter(Boolean);
     }
     return [];
   } catch {
@@ -81,7 +81,7 @@ export function removeStoredFolder(folderPath: string): void {
   const norm = normalizeFolderPath(folderPath);
   if (!norm) return;
   const current = getStoredFolders();
-  const updated = current.filter((p) => p !== norm && !p.startsWith(`${norm}/`));
+  const updated = current.filter(p => p !== norm && !p.startsWith(`${norm}/`));
   try {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(updated));
   } catch {
@@ -98,7 +98,7 @@ export function renameStoredFolder(oldPath: string, newPath: string): void {
   if (!normOld || !normNew || normOld === normNew) return;
 
   const current = getStoredFolders();
-  const updated = current.map((p) => {
+  const updated = current.map(p => {
     if (p === normOld) return normNew;
     if (p.startsWith(`${normOld}/`)) {
       return `${normNew}${p.slice(normOld.length)}`;
@@ -203,7 +203,7 @@ export function getImmediateSubFolders(
 
   return Array.from(subSet)
     .sort((a, b) => a.localeCompare(b, 'vi'))
-    .map((fullPath) => ({
+    .map(fullPath => ({
       name: getFolderLeafName(fullPath),
       fullPath,
     }));
@@ -222,15 +222,15 @@ export function countExamsInFolder(
   if (!normTarget) {
     if (recursive) return exams.length;
     // Thư mục gốc: chỉ đếm các bài thi không thuộc thư mục nào
-    return exams.filter((e) => !normalizeFolderPath(e.folder)).length;
+    return exams.filter(e => !normalizeFolderPath(e.folder)).length;
   }
 
   if (recursive) {
-    return exams.filter((e) => {
+    return exams.filter(e => {
       const eNorm = normalizeFolderPath(e.folder);
       return eNorm === normTarget || eNorm.startsWith(`${normTarget}/`);
     }).length;
   }
 
-  return exams.filter((e) => normalizeFolderPath(e.folder) === normTarget).length;
+  return exams.filter(e => normalizeFolderPath(e.folder) === normTarget).length;
 }

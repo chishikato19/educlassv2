@@ -90,7 +90,13 @@ export const SlotMachineMode: React.FC<RandomPickerModeProps> = ({
       if (tensReelRef.current) gsap.killTweensOf(tensReelRef.current);
       if (unitsReelRef.current) gsap.killTweensOf(unitsReelRef.current);
     };
-  }, [isPicking, slotState?.tens, slotState?.units, slotState?.isSpinningTens, slotState?.isSpinningUnits]);
+  }, [
+    isPicking,
+    slotState?.tens,
+    slotState?.units,
+    slotState?.isSpinningTens,
+    slotState?.isSpinningUnits,
+  ]);
 
   const handlePullLever = () => {
     if (isPicking) return;
@@ -182,7 +188,7 @@ export const SlotMachineMode: React.FC<RandomPickerModeProps> = ({
 
           {/* DẢI ĐÈN LED CHÂN MÁY */}
           <div className="flex gap-4 mt-5">
-            {[1, 2, 3, 4, 5, 6, 7].map((i) => (
+            {[1, 2, 3, 4, 5, 6, 7].map(i => (
               <span
                 key={i}
                 className={`w-3 h-3 rounded-full ${
