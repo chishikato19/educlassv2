@@ -338,8 +338,11 @@ describe('SwissDuelActivity Lifecycle', () => {
     }) as SwissDuelState;
 
     const matchup = state.matchups[0]!;
-    expect(matchup.player1Score).toBe(2);
-    expect(matchup.player1Results[0]).toBe(true);
-    expect(matchup.player1Results[1]).toBe(true);
+    const isP1 = matchup.player1Id === 'p1';
+    const p1Score = isP1 ? matchup.player1Score : matchup.player2Score;
+    const p1Results = isP1 ? matchup.player1Results : matchup.player2Results;
+    expect(p1Score).toBe(2);
+    expect(p1Results[0]).toBe(true);
+    expect(p1Results[1]).toBe(true);
   });
 });

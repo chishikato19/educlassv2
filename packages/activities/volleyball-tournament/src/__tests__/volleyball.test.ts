@@ -58,7 +58,7 @@ describe('Volleyball Pools Logic', () => {
     const pool: VolleyballPool = {
       id: 'A',
       name: 'Bảng A',
-      playerIds: ['p1', 'p2', 'p3', 'p4'],
+      playerIds: ['p1', 'p2'],
       standings: [],
     };
 
