@@ -125,7 +125,7 @@ describe('Session FSM - State Transition Table (Task 1.4)', () => {
           closing: baseClosingState,
           closed: baseClosedState,
         };
-        const currentState = stateMap[currentStatus];
+        const currentState = stateMap[currentStatus]!;
 
         if (expectedSuccess) {
           const nextState = transitionSession(currentState, event);
@@ -263,11 +263,11 @@ describe('Session FSM - State Transition Table (Task 1.4)', () => {
     });
 
     it('SESSION_TRANSITION_TABLE định nghĩa đúng cấu trúc trạng thái', () => {
-      expect(SESSION_TRANSITION_TABLE.open.INITIATE_CLOSING).toBe('closing');
-      expect(SESSION_TRANSITION_TABLE.open.FORCE_CLOSE).toBe('closed');
-      expect(SESSION_TRANSITION_TABLE.closing.COMPLETE_CLOSING).toBe('closed');
-      expect(SESSION_TRANSITION_TABLE.closing.FORCE_CLOSE).toBe('closed');
-      expect(Object.keys(SESSION_TRANSITION_TABLE.closed)).toHaveLength(0);
+      expect(SESSION_TRANSITION_TABLE.open?.INITIATE_CLOSING).toBe('closing');
+      expect(SESSION_TRANSITION_TABLE.open?.FORCE_CLOSE).toBe('closed');
+      expect(SESSION_TRANSITION_TABLE.closing?.COMPLETE_CLOSING).toBe('closed');
+      expect(SESSION_TRANSITION_TABLE.closing?.FORCE_CLOSE).toBe('closed');
+      expect(Object.keys(SESSION_TRANSITION_TABLE.closed ?? {})).toHaveLength(0);
     });
   });
 });

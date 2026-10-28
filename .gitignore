@@ -10,6 +10,7 @@ coverage
 *.exe
 *.blockmap
 *.node
+*.tsbuildinfo
 data/temp/
 
 everything-everywhere-for-antigravity/

@@ -86,7 +86,7 @@ export class SessionTransitionError extends Error {
  * Lấy danh sách các sự kiện được phép kích hoạt từ trạng thái hiện tại
  */
 export function getAllowedEvents(status: SessionStatus): readonly SessionFsmEventType[] {
-  const transitions = SESSION_TRANSITION_TABLE[status];
+  const transitions = SESSION_TRANSITION_TABLE[status] ?? {};
   return Object.keys(transitions) as SessionFsmEventType[];
 }
 
@@ -94,7 +94,7 @@ export function getAllowedEvents(status: SessionStatus): readonly SessionFsmEven
  * Kiểm tra xem một sự kiện có được phép chuyển từ trạng thái hiện tại hay không
  */
 export function canTransition(status: SessionStatus, eventType: SessionFsmEventType): boolean {
-  return SESSION_TRANSITION_TABLE[status][eventType] !== undefined;
+  return SESSION_TRANSITION_TABLE[status]?.[eventType] !== undefined;
 }
 
 /**
@@ -104,7 +104,7 @@ export function getNextStatus(
   status: SessionStatus,
   eventType: SessionFsmEventType
 ): SessionStatus | null {
-  return SESSION_TRANSITION_TABLE[status][eventType] ?? null;
+  return SESSION_TRANSITION_TABLE[status]?.[eventType] ?? null;
 }
 
 /**
