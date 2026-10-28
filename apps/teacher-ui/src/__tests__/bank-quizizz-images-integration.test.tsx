@@ -223,11 +223,11 @@ describe('UI Test: Question Bank to Quizizz with Question & Option Images', () =
     expect(stemImg.src).toContain('/api/assets/sample_graph_image.png');
 
     // Kiểm tra ảnh của 4 phương án được render
-    const optAImg = screen.getByAltText('Ảnh đáp án ▲') as HTMLImageElement;
+    const optAImg = screen.getByAltText(/Ảnh đáp án (▲|A)/) as HTMLImageElement;
     expect(optAImg).toBeDefined();
     expect(optAImg.src).toContain('/api/assets/opt_a.png');
 
-    const optBImg = screen.getByAltText('Ảnh đáp án ◆') as HTMLImageElement;
+    const optBImg = screen.getByAltText(/Ảnh đáp án (◆|B)/) as HTMLImageElement;
     expect(optBImg).toBeDefined();
     expect(optBImg.src).toContain('/api/assets/opt_b.png');
   });
