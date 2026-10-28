@@ -31,7 +31,7 @@
   ],
   "forceCodeSigning": false,
   "win": {
-    "target": ["nsis", "portable"],
+    "target": ["nsis"],
     "signAndEditExecutable": false
   },
   "portable": {
