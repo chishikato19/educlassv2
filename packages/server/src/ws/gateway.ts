@@ -7,7 +7,11 @@ import {
   type Envelope,
 } from '@educlass/protocol';
 import { generateId, type ParticipantRepository } from '@educlass/db';
-import type { ActivityEngine } from '../activity/engine.js';
+
+export interface ActivityPresenceHandler {
+  handleParticipantOnline: (sessionId: string, participantId: string) => Promise<void>;
+  handleParticipantOffline: (sessionId: string, participantId: string) => Promise<void>;
+}
 
 export interface ConnectedClient {
   id: string;
@@ -127,7 +131,7 @@ export class WsGatewayManager {
 export interface WsGatewayOptions {
   manager?: WsGatewayManager | undefined;
   participantRepo?: ParticipantRepository | undefined;
-  activityEngine?: ActivityEngine | undefined;
+  activityEngine?: ActivityPresenceHandler | undefined;
 }
 
 interface WsQuery {
