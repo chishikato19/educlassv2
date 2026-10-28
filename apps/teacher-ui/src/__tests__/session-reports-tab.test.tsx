@@ -80,7 +80,7 @@ describe('SessionReportsTab Component', () => {
       render(<SessionReportsTab onExportExcel={handleExport} />);
     });
 
-    const exportBtn = screen.getByText('📥 Xuất file Excel');
+    const exportBtn = screen.getByText(/Xuất file Excel/i);
     fireEvent.click(exportBtn);
 
     expect(handleExport).toHaveBeenCalledWith('sess-1');

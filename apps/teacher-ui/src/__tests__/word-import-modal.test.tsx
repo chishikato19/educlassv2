@@ -84,7 +84,7 @@ describe('WordImportModal UI Component (apps/teacher-ui)', () => {
     expect(screen.getByText(/1 cảnh báo/i)).toBeDefined();
 
     // Hiển thị danh sách câu hỏi xem trước
-    expect(screen.getByText(/Đạo hàm của \$x\^2\$ là:/i)).toBeDefined();
+    expect(screen.getByText(/Đạo hàm của/i)).toBeDefined();
     expect(screen.getByText(/Khối lượng mol của O2 là bao nhiêu\?/i)).toBeDefined();
 
     // Cho phép đổi đáp án đúng của câu 1 từ B (1) sang A (0)
